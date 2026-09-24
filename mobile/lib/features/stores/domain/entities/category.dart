@@ -1,0 +1,14 @@
+import 'package:equatable/equatable.dart';
+
+/// Categoría global de negocio (Restaurantes, Bodegas, Farmacia…).
+final class Category extends Equatable {
+  const Category({required this.id, required this.name, required this.slug, this.iconUrl});
+
+  final String id;
+  final String name;
+  final String slug;
+  final String? iconUrl;
+
+  @override
+  List<Object?> get props => [id, name, slug, iconUrl];
+}

@@ -1,0 +1,1864 @@
+{
+  "city": {
+    "id": "city_espinar",
+    "name": "Espinar",
+    "region": "Cusco",
+    "currency": "PEN",
+    "centerLat": -14.7936,
+    "centerLng": -71.4128
+  },
+  "categories": [
+    {
+      "id": "cat_restaurantes",
+      "name": "Restaurantes",
+      "slug": "restaurantes",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_bodegas",
+      "name": "Bodegas",
+      "slug": "bodegas",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_farmacia",
+      "name": "Farmacia",
+      "slug": "farmacia",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_postres",
+      "name": "Postres",
+      "slug": "postres",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_licores",
+      "name": "Licores",
+      "slug": "licores",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_mercado",
+      "name": "Mercado",
+      "slug": "mercado",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_regalos",
+      "name": "Regalos",
+      "slug": "regalos",
+      "iconUrl": null
+    },
+    {
+      "id": "cat_encargos",
+      "name": "Encargos",
+      "slug": "encargos",
+      "iconUrl": null
+    }
+  ],
+  "promotions": [
+    {
+      "id": "promo_pollo",
+      "title": "2x1 en 1/4 de pollo",
+      "subtitle": "Solo los martes en El Chaski Dorado",
+      "imageUrl": "https://loremflickr.com/800/400/roast,chicken?lock=11",
+      "storeId": "st_chaski_dorado",
+      "couponCode": null
+    },
+    {
+      "id": "promo_bienvenida",
+      "title": "S/ 10 de descuento",
+      "subtitle": "En tu primer pedido con el código",
+      "imageUrl": "https://loremflickr.com/800/400/food,table?lock=12",
+      "storeId": null,
+      "couponCode": "BIENVENIDO10"
+    },
+    {
+      "id": "promo_delivery",
+      "title": "Delivery gratis",
+      "subtitle": "En Dulce Kantu por compras desde S/ 30",
+      "imageUrl": "https://loremflickr.com/800/400/cake,dessert?lock=13",
+      "storeId": "st_dulce_kantu",
+      "couponCode": "KANTUFREE"
+    }
+  ],
+  "stores": [
+    {
+      "id": "st_chaski_dorado",
+      "name": "Pollería El Chaski Dorado",
+      "slug": "el-chaski-dorado",
+      "description": "Pollo a la brasa al carbón de leña, papas nativas y cremas de la casa.",
+      "logoUrl": "https://loremflickr.com/200/200/roast,chicken?lock=21",
+      "coverUrl": "https://loremflickr.com/900/500/roast,chicken?lock=22",
+      "categoryIds": [
+        "cat_restaurantes"
+      ],
+      "addressLine": "Av. Túpac Amaru 245, Yauri",
+      "phone": "984 111 222",
+      "latitude": -14.7921,
+      "longitude": -71.4109,
+      "ratingAvg": 4.7,
+      "ratingCount": 312,
+      "popularity": 98,
+      "distanceKm": 0.6,
+      "etaMinutes": 30,
+      "deliveryFee": 350,
+      "minOrderAmount": 1500,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 1,
+          "opensAt": 660,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 660,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 660,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 660,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 660,
+          "closesAt": 1440
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 660,
+          "closesAt": 1440
+        },
+        {
+          "dayOfWeek": 0,
+          "opensAt": 720,
+          "closesAt": 1320
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_cd_pollos",
+          "name": "Pollos a la brasa",
+          "productIds": [
+            "pr_pollo_entero",
+            "pr_pollo_cuarto",
+            "pr_pollo_medio"
+          ]
+        },
+        {
+          "id": "ms_cd_combos",
+          "name": "Combos",
+          "productIds": [
+            "pr_combo_familiar"
+          ]
+        },
+        {
+          "id": "ms_cd_bebidas",
+          "name": "Bebidas",
+          "productIds": [
+            "pr_chicha_morada",
+            "pr_inca_kola"
+          ]
+        }
+      ],
+      "tags": [
+        "almuerzo",
+        "noche"
+      ],
+      "promoLabel": "2x1 los martes",
+      "ownerName": "Don Julián",
+      "attendingSince": 2011
+    },
+    {
+      "id": "st_pizzeria_qori",
+      "name": "Pizzería Qori",
+      "slug": "pizzeria-qori",
+      "description": "Pizzas al horno de barro con ingredientes de la región.",
+      "logoUrl": "https://loremflickr.com/200/200/pizza?lock=31",
+      "coverUrl": "https://loremflickr.com/900/500/pizza,oven?lock=32",
+      "categoryIds": [
+        "cat_restaurantes"
+      ],
+      "addressLine": "Jr. Espinar 118, Yauri",
+      "phone": "984 333 444",
+      "latitude": -14.7958,
+      "longitude": -71.4143,
+      "ratingAvg": 4.5,
+      "ratingCount": 187,
+      "popularity": 90,
+      "distanceKm": 1.1,
+      "etaMinutes": 40,
+      "deliveryFee": 450,
+      "minOrderAmount": 2000,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 2,
+          "opensAt": 1020,
+          "closesAt": 1410
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 1020,
+          "closesAt": 1410
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 1020,
+          "closesAt": 1410
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 1020,
+          "closesAt": 60
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 1020,
+          "closesAt": 60
+        },
+        {
+          "dayOfWeek": 0,
+          "opensAt": 1020,
+          "closesAt": 1380
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_pq_pizzas",
+          "name": "Pizzas",
+          "productIds": [
+            "pr_pizza_andina",
+            "pr_pizza_americana",
+            "pr_pizza_hawaiana"
+          ]
+        },
+        {
+          "id": "ms_pq_entradas",
+          "name": "Entradas",
+          "productIds": [
+            "pr_pan_ajo"
+          ]
+        },
+        {
+          "id": "ms_pq_bebidas",
+          "name": "Bebidas",
+          "productIds": [
+            "pr_inca_kola_qori"
+          ]
+        }
+      ],
+      "tags": [
+        "noche"
+      ],
+      "promoLabel": null,
+      "ownerName": "Marisol",
+      "attendingSince": 2018
+    },
+    {
+      "id": "st_burger_andina",
+      "name": "Burger Andina",
+      "slug": "burger-andina",
+      "description": "Hamburguesas de res y alpaca con papas nativas crocantes.",
+      "logoUrl": "https://loremflickr.com/200/200/burger?lock=41",
+      "coverUrl": "https://loremflickr.com/900/500/burger,fries?lock=42",
+      "categoryIds": [
+        "cat_restaurantes"
+      ],
+      "addressLine": "Calle Arequipa 310, Yauri",
+      "phone": "984 555 666",
+      "latitude": -14.7904,
+      "longitude": -71.4161,
+      "ratingAvg": 4.6,
+      "ratingCount": 143,
+      "popularity": 85,
+      "distanceKm": 1.4,
+      "etaMinutes": 35,
+      "deliveryFee": 450,
+      "minOrderAmount": 1500,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 1,
+          "opensAt": 720,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 720,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 720,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 720,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 720,
+          "closesAt": 1440
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 720,
+          "closesAt": 1440
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_ba_burgers",
+          "name": "Hamburguesas",
+          "productIds": [
+            "pr_burger_clasica",
+            "pr_burger_alpaca"
+          ]
+        },
+        {
+          "id": "ms_ba_acomp",
+          "name": "Acompañamientos",
+          "productIds": [
+            "pr_papas_nativas"
+          ]
+        }
+      ],
+      "tags": [
+        "almuerzo",
+        "noche"
+      ],
+      "promoLabel": "Envío gratis hoy",
+      "ownerName": "Kevin",
+      "attendingSince": 2021
+    },
+    {
+      "id": "st_dulce_kantu",
+      "name": "Dulce Kantu",
+      "slug": "dulce-kantu",
+      "description": "Pastelería y café: tortas, alfajores y café de altura.",
+      "logoUrl": "https://loremflickr.com/200/200/cake?lock=51",
+      "coverUrl": "https://loremflickr.com/900/500/cake,bakery?lock=52",
+      "categoryIds": [
+        "cat_postres"
+      ],
+      "addressLine": "Plaza de Armas 12, Yauri",
+      "phone": "984 777 888",
+      "latitude": -14.7933,
+      "longitude": -71.4122,
+      "ratingAvg": 4.8,
+      "ratingCount": 96,
+      "popularity": 80,
+      "distanceKm": 0.3,
+      "etaMinutes": 25,
+      "deliveryFee": 300,
+      "minOrderAmount": 1000,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 1,
+          "opensAt": 480,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 480,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 480,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 480,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 480,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 540,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 0,
+          "opensAt": 540,
+          "closesAt": 1200
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_dk_tortas",
+          "name": "Tortas",
+          "productIds": [
+            "pr_torta_chocolate",
+            "pr_tres_leches"
+          ]
+        },
+        {
+          "id": "ms_dk_cafe",
+          "name": "Café",
+          "productIds": [
+            "pr_cafe_altura"
+          ]
+        }
+      ],
+      "tags": [
+        "desayuno",
+        "tarde"
+      ],
+      "promoLabel": null,
+      "ownerName": "Kantu",
+      "attendingSince": 2016
+    },
+    {
+      "id": "st_bodega_wayki",
+      "name": "Bodega Don Wayki",
+      "slug": "bodega-don-wayki",
+      "description": "Abarrotes, bebidas y licores. Lo que te falta, al toque.",
+      "logoUrl": "https://loremflickr.com/200/200/grocery?lock=61",
+      "coverUrl": "https://loremflickr.com/900/500/grocery,store?lock=62",
+      "categoryIds": [
+        "cat_bodegas",
+        "cat_licores"
+      ],
+      "addressLine": "Jr. Bolognesi 402, Yauri",
+      "phone": "984 999 000",
+      "latitude": -14.7967,
+      "longitude": -71.4098,
+      "ratingAvg": 4.3,
+      "ratingCount": 58,
+      "popularity": 70,
+      "distanceKm": 0.9,
+      "etaMinutes": 20,
+      "deliveryFee": 350,
+      "minOrderAmount": 800,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 1,
+          "opensAt": 420,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 420,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 420,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 420,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 420,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 420,
+          "closesAt": 1380
+        },
+        {
+          "dayOfWeek": 0,
+          "opensAt": 480,
+          "closesAt": 1260
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_bw_abarrotes",
+          "name": "Abarrotes",
+          "productIds": [
+            "pr_arroz",
+            "pr_aceite",
+            "pr_leche"
+          ]
+        },
+        {
+          "id": "ms_bw_bebidas",
+          "name": "Bebidas y licores",
+          "productIds": [
+            "pr_agua",
+            "pr_cerveza_cusquena"
+          ]
+        }
+      ],
+      "tags": [
+        "desayuno",
+        "tarde",
+        "noche"
+      ],
+      "promoLabel": null,
+      "ownerName": "Don Wayki",
+      "attendingSince": 2004
+    },
+    {
+      "id": "st_botica_salud",
+      "name": "Botica Salud Espinar",
+      "slug": "botica-salud-espinar",
+      "description": "Medicamentos, cuidado personal y primeros auxilios.",
+      "logoUrl": "https://loremflickr.com/200/200/pharmacy?lock=71",
+      "coverUrl": "https://loremflickr.com/900/500/pharmacy?lock=72",
+      "categoryIds": [
+        "cat_farmacia"
+      ],
+      "addressLine": "Av. Espinar 520, Yauri",
+      "phone": "984 222 333",
+      "latitude": -14.7989,
+      "longitude": -71.418,
+      "ratingAvg": 4.4,
+      "ratingCount": 41,
+      "popularity": 60,
+      "distanceKm": 1.9,
+      "etaMinutes": 30,
+      "deliveryFee": 500,
+      "minOrderAmount": 0,
+      "isOpenNow": false,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 1,
+          "opensAt": 480,
+          "closesAt": 780
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 480,
+          "closesAt": 780
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 480,
+          "closesAt": 780
+        }
+      ],
+      "menuSections": [
+        {
+          "id": "ms_bs_basicos",
+          "name": "Básicos",
+          "productIds": [
+            "pr_paracetamol",
+            "pr_alcohol"
+          ]
+        }
+      ],
+      "tags": [],
+      "promoLabel": null,
+      "ownerName": "Q.F. Liliana",
+      "attendingSince": 2013
+    },
+    {
+      "id": "st_dona_rosa",
+      "name": "Picantería Doña Rosa",
+      "slug": "dona-rosa",
+      "description": "Caldo de cordero, chairo y el menú del día que se acaba temprano.",
+      "logoUrl": "https://loremflickr.com/200/200/soup?lock=31",
+      "coverUrl": "https://loremflickr.com/900/500/soup,peru?lock=32",
+      "categoryIds": [
+        "cat_restaurantes"
+      ],
+      "addressLine": "Jr. Bolognesi 118, Yauri",
+      "phone": "984 222 333",
+      "latitude": -14.7931,
+      "longitude": -71.412,
+      "ratingAvg": 4.9,
+      "ratingCount": 204,
+      "popularity": 99,
+      "distanceKm": 0.4,
+      "etaMinutes": 25,
+      "deliveryFee": 300,
+      "minOrderAmount": 1000,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 0,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 1,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 420,
+          "closesAt": 1260
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 420,
+          "closesAt": 1260
+        }
+      ],
+      "tags": [
+        "desayuno",
+        "almuerzo",
+        "noche",
+        "caldos"
+      ],
+      "promoLabel": "−15 % en caldos hoy",
+      "ownerName": "Rosa",
+      "attendingSince": 2009,
+      "menuSections": [
+        {
+          "id": "ms_dr_menu",
+          "name": "Menú del día",
+          "productIds": [
+            "pr_menu_dia"
+          ]
+        },
+        {
+          "id": "ms_dr_caldos",
+          "name": "Caldos",
+          "productIds": [
+            "pr_caldo_cordero",
+            "pr_chairo"
+          ]
+        },
+        {
+          "id": "ms_dr_extras",
+          "name": "Para acompañar",
+          "productIds": [
+            "pr_rocoto_relleno",
+            "pr_mate_coca"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "st_tanta_wasi",
+      "name": "Panadería Tanta Wasi",
+      "slug": "tanta-wasi",
+      "description": "Pan de horno de leña desde las 6 de la mañana.",
+      "logoUrl": "https://loremflickr.com/200/200/bread?lock=41",
+      "coverUrl": "https://loremflickr.com/900/500/bakery,bread?lock=42",
+      "categoryIds": [
+        "cat_mercado"
+      ],
+      "addressLine": "Av. Espinar 402, Yauri",
+      "phone": "984 333 444",
+      "latitude": -14.794,
+      "longitude": -71.4131,
+      "ratingAvg": 4.8,
+      "ratingCount": 158,
+      "popularity": 90,
+      "distanceKm": 0.8,
+      "etaMinutes": 20,
+      "deliveryFee": 250,
+      "minOrderAmount": 500,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 0,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 1,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 360,
+          "closesAt": 1200
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 360,
+          "closesAt": 1200
+        }
+      ],
+      "tags": [
+        "desayuno",
+        "tarde"
+      ],
+      "promoLabel": null,
+      "ownerName": "Don Teófilo",
+      "attendingSince": 1998,
+      "menuSections": [
+        {
+          "id": "ms_tw_panes",
+          "name": "Panes",
+          "productIds": [
+            "pr_pan_chuta",
+            "pr_pan_anis"
+          ]
+        },
+        {
+          "id": "ms_tw_dulces",
+          "name": "Dulces",
+          "productIds": [
+            "pr_bizcocho"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "st_quesos_kana",
+      "name": "Quesos K'ana",
+      "slug": "quesos-kana",
+      "description": "Quesos frescos y yogurt de las comunidades de Espinar.",
+      "logoUrl": "https://loremflickr.com/200/200/cheese?lock=51",
+      "coverUrl": "https://loremflickr.com/900/500/cheese,farm?lock=52",
+      "categoryIds": [
+        "cat_mercado"
+      ],
+      "addressLine": "Mercado Central, puesto 14",
+      "phone": "984 444 555",
+      "latitude": -14.7928,
+      "longitude": -71.4115,
+      "ratingAvg": 4.8,
+      "ratingCount": 96,
+      "popularity": 80,
+      "distanceKm": 0.5,
+      "etaMinutes": 25,
+      "deliveryFee": 300,
+      "minOrderAmount": 800,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 0,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 1,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 420,
+          "closesAt": 1080
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 420,
+          "closesAt": 1080
+        }
+      ],
+      "tags": [
+        "desayuno"
+      ],
+      "promoLabel": null,
+      "ownerName": "Elena",
+      "attendingSince": 2015,
+      "menuSections": [
+        {
+          "id": "ms_qk_quesos",
+          "name": "Quesos",
+          "productIds": [
+            "pr_queso_fresco",
+            "pr_queso_andino"
+          ]
+        },
+        {
+          "id": "ms_qk_lacteos",
+          "name": "Lácteos",
+          "productIds": [
+            "pr_yogurt_aguaymanto"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "st_floreria_wayta",
+      "name": "Florería Wayta",
+      "slug": "floreria-wayta",
+      "description": "Arreglos, tarjetas y detalles para quedar bien.",
+      "logoUrl": "https://loremflickr.com/200/200/flowers?lock=61",
+      "coverUrl": "https://loremflickr.com/900/500/flowers,bouquet?lock=62",
+      "categoryIds": [
+        "cat_regalos"
+      ],
+      "addressLine": "Jr. Grau 205, Yauri",
+      "phone": "984 555 666",
+      "latitude": -14.7945,
+      "longitude": -71.414,
+      "ratingAvg": 4.6,
+      "ratingCount": 41,
+      "popularity": 60,
+      "distanceKm": 1.1,
+      "etaMinutes": 40,
+      "deliveryFee": 500,
+      "minOrderAmount": 2000,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 0,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 1,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 540,
+          "closesAt": 1140
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 540,
+          "closesAt": 1140
+        }
+      ],
+      "tags": [
+        "tarde"
+      ],
+      "promoLabel": null,
+      "ownerName": "Wayta",
+      "attendingSince": 2019,
+      "menuSections": [
+        {
+          "id": "ms_fw_arreglos",
+          "name": "Arreglos",
+          "productIds": [
+            "pr_ramo_rosas",
+            "pr_caja_detalle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "st_encargos",
+      "name": "Encargos Chaski",
+      "slug": "encargos-chaski",
+      "description": "Te llevamos o recogemos lo que necesites dentro de Yauri.",
+      "logoUrl": "https://loremflickr.com/200/200/package,delivery?lock=71",
+      "coverUrl": "https://loremflickr.com/900/500/motorcycle,delivery?lock=72",
+      "categoryIds": [
+        "cat_encargos"
+      ],
+      "addressLine": "Cobertura en todo Yauri",
+      "phone": "984 666 777",
+      "latitude": -14.7936,
+      "longitude": -71.4128,
+      "ratingAvg": 4.7,
+      "ratingCount": 77,
+      "popularity": 70,
+      "distanceKm": 0.2,
+      "etaMinutes": 35,
+      "deliveryFee": 600,
+      "minOrderAmount": 0,
+      "isOpenNow": true,
+      "deliversToYou": true,
+      "schedules": [
+        {
+          "dayOfWeek": 0,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 1,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 2,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 3,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 4,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 5,
+          "opensAt": 480,
+          "closesAt": 1320
+        },
+        {
+          "dayOfWeek": 6,
+          "opensAt": 480,
+          "closesAt": 1320
+        }
+      ],
+      "tags": [],
+      "promoLabel": null,
+      "ownerName": "el equipo Chaski",
+      "attendingSince": 2026,
+      "menuSections": [
+        {
+          "id": "ms_en_encargos",
+          "name": "Encargos",
+          "productIds": [
+            "pr_encargo_simple",
+            "pr_encargo_tramite"
+          ]
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "pr_pollo_entero",
+      "storeId": "st_chaski_dorado",
+      "name": "Pollo entero a la brasa",
+      "description": "Con papas fritas familiares, ensalada y cremas.",
+      "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=101",
+      "basePrice": 6500,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [],
+      "options": [
+        {
+          "id": "op_pe_papas",
+          "name": "Tipo de papas",
+          "minSelect": 1,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_pe_fritas",
+              "name": "Papas fritas",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pe_nativas",
+              "name": "Papas nativas",
+              "priceDelta": 400,
+              "isAvailable": true
+            }
+          ]
+        },
+        {
+          "id": "op_pe_cremas",
+          "name": "Cremas",
+          "minSelect": 0,
+          "maxSelect": 3,
+          "values": [
+            {
+              "id": "ov_pe_mayo",
+              "name": "Mayonesa",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pe_aji",
+              "name": "Ají de la casa",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pe_huacatay",
+              "name": "Huacatay",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pe_rocoto",
+              "name": "Rocoto",
+              "priceDelta": 0,
+              "isAvailable": false
+            }
+          ]
+        }
+      ],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pollo_medio",
+      "storeId": "st_chaski_dorado",
+      "name": "1/2 pollo a la brasa",
+      "description": "Con papas fritas, ensalada y cremas.",
+      "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=102",
+      "basePrice": 3500,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pollo_cuarto",
+      "storeId": "st_chaski_dorado",
+      "name": "1/4 de pollo a la brasa",
+      "description": "Pierna o pecho, con papas y ensalada.",
+      "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=103",
+      "basePrice": 1800,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [
+        {
+          "id": "va_pc_pierna",
+          "name": "Pierna",
+          "price": 1800,
+          "isAvailable": true
+        },
+        {
+          "id": "va_pc_pecho",
+          "name": "Pecho",
+          "price": 1900,
+          "isAvailable": true
+        }
+      ],
+      "options": [
+        {
+          "id": "op_pc_extra",
+          "name": "Agrega un extra",
+          "minSelect": 0,
+          "maxSelect": 2,
+          "values": [
+            {
+              "id": "ov_pc_huevo",
+              "name": "Huevo frito",
+              "priceDelta": 200,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pc_platano",
+              "name": "Plátano frito",
+              "priceDelta": 300,
+              "isAvailable": true
+            }
+          ]
+        }
+      ],
+      "isLocal": false
+    },
+    {
+      "id": "pr_combo_familiar",
+      "storeId": "st_chaski_dorado",
+      "name": "Combo familiar",
+      "description": "1 pollo entero, papas familiares, ensalada y chicha de 1.5 L.",
+      "imageUrl": "https://loremflickr.com/600/450/chicken,dinner?lock=104",
+      "basePrice": 7900,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_chicha_morada",
+      "storeId": "st_chaski_dorado",
+      "name": "Chicha morada",
+      "description": "Preparada en casa con maíz morado.",
+      "imageUrl": "https://loremflickr.com/600/450/purple,drink?lock=105",
+      "basePrice": 800,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [
+        {
+          "id": "va_ch_vaso",
+          "name": "Vaso",
+          "price": 400,
+          "isAvailable": true
+        },
+        {
+          "id": "va_ch_jarra",
+          "name": "Jarra 1 L",
+          "price": 800,
+          "isAvailable": true
+        }
+      ],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_inca_kola",
+      "storeId": "st_chaski_dorado",
+      "name": "Inca Kola 1.5 L",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/soda,bottle?lock=106",
+      "basePrice": 900,
+      "isAvailable": false,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pizza_andina",
+      "storeId": "st_pizzeria_qori",
+      "name": "Pizza Andina",
+      "description": "Queso andino, chorizo artesanal, rocoto y aceitunas.",
+      "imageUrl": "https://loremflickr.com/600/450/pizza?lock=201",
+      "basePrice": 3200,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [
+        {
+          "id": "va_pa_personal",
+          "name": "Personal",
+          "price": 2200,
+          "isAvailable": true
+        },
+        {
+          "id": "va_pa_mediana",
+          "name": "Mediana",
+          "price": 3200,
+          "isAvailable": true
+        },
+        {
+          "id": "va_pa_familiar",
+          "name": "Familiar",
+          "price": 4600,
+          "isAvailable": true
+        }
+      ],
+      "options": [
+        {
+          "id": "op_pa_borde",
+          "name": "Borde",
+          "minSelect": 1,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_pa_clasico",
+              "name": "Clásico",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pa_queso",
+              "name": "Relleno de queso",
+              "priceDelta": 600,
+              "isAvailable": true
+            }
+          ]
+        },
+        {
+          "id": "op_pa_extras",
+          "name": "Extras",
+          "minSelect": 0,
+          "maxSelect": 3,
+          "values": [
+            {
+              "id": "ov_pa_xqueso",
+              "name": "Extra queso",
+              "priceDelta": 400,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pa_champi",
+              "name": "Champiñones",
+              "priceDelta": 300,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_pa_tocino",
+              "name": "Tocino",
+              "priceDelta": 500,
+              "isAvailable": true
+            }
+          ]
+        }
+      ],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pizza_americana",
+      "storeId": "st_pizzeria_qori",
+      "name": "Pizza Americana",
+      "description": "Jamón y queso mozzarella.",
+      "imageUrl": "https://loremflickr.com/600/450/pizza?lock=202",
+      "basePrice": 2800,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [
+        {
+          "id": "va_pm_personal",
+          "name": "Personal",
+          "price": 1900,
+          "isAvailable": true
+        },
+        {
+          "id": "va_pm_mediana",
+          "name": "Mediana",
+          "price": 2800,
+          "isAvailable": true
+        },
+        {
+          "id": "va_pm_familiar",
+          "name": "Familiar",
+          "price": 4000,
+          "isAvailable": false
+        }
+      ],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pizza_hawaiana",
+      "storeId": "st_pizzeria_qori",
+      "name": "Pizza Hawaiana",
+      "description": "Jamón, piña y queso mozzarella.",
+      "imageUrl": "https://loremflickr.com/600/450/pizza?lock=203",
+      "basePrice": 2900,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_pan_ajo",
+      "storeId": "st_pizzeria_qori",
+      "name": "Pan al ajo",
+      "description": "6 unidades con mantequilla de ajo y orégano.",
+      "imageUrl": "https://loremflickr.com/600/450/garlic,bread?lock=204",
+      "basePrice": 1000,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_inca_kola_qori",
+      "storeId": "st_pizzeria_qori",
+      "name": "Inca Kola 1 L",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/soda?lock=205",
+      "basePrice": 700,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_burger_clasica",
+      "storeId": "st_burger_andina",
+      "name": "Burger clásica",
+      "description": "Carne de res 150 g, queso, lechuga, tomate y salsa de la casa.",
+      "imageUrl": "https://loremflickr.com/600/450/burger?lock=301",
+      "basePrice": 1800,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [],
+      "options": [
+        {
+          "id": "op_bc_punto",
+          "name": "Término de la carne",
+          "minSelect": 1,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_bc_medio",
+              "name": "Término medio",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_bc_tres",
+              "name": "Tres cuartos",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_bc_cocido",
+              "name": "Bien cocido",
+              "priceDelta": 0,
+              "isAvailable": true
+            }
+          ]
+        },
+        {
+          "id": "op_bc_extras",
+          "name": "Extras",
+          "minSelect": 0,
+          "maxSelect": 2,
+          "values": [
+            {
+              "id": "ov_bc_tocino",
+              "name": "Tocino",
+              "priceDelta": 400,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_bc_huevo",
+              "name": "Huevo",
+              "priceDelta": 200,
+              "isAvailable": true
+            }
+          ]
+        }
+      ],
+      "isLocal": false
+    },
+    {
+      "id": "pr_burger_alpaca",
+      "storeId": "st_burger_andina",
+      "name": "Burger de alpaca",
+      "description": "Carne de alpaca, queso paria, cebolla caramelizada y huacatay.",
+      "imageUrl": "https://loremflickr.com/600/450/burger,gourmet?lock=302",
+      "basePrice": 2600,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_papas_nativas",
+      "storeId": "st_burger_andina",
+      "name": "Papas nativas",
+      "description": "Papas nativas crocantes con sal de Maras.",
+      "imageUrl": "https://loremflickr.com/600/450/fries?lock=303",
+      "basePrice": 900,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_torta_chocolate",
+      "storeId": "st_dulce_kantu",
+      "name": "Torta de chocolate",
+      "description": "Húmeda, con fudge de la casa.",
+      "imageUrl": "https://loremflickr.com/600/450/chocolate,cake?lock=401",
+      "basePrice": 900,
+      "isAvailable": true,
+      "isFeatured": true,
+      "variants": [
+        {
+          "id": "va_tc_tajada",
+          "name": "Tajada",
+          "price": 900,
+          "isAvailable": true
+        },
+        {
+          "id": "va_tc_entera",
+          "name": "Entera (12 porciones)",
+          "price": 8500,
+          "isAvailable": true
+        }
+      ],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_tres_leches",
+      "storeId": "st_dulce_kantu",
+      "name": "Tres leches",
+      "description": "Clásica, con canela.",
+      "imageUrl": "https://loremflickr.com/600/450/cake,cream?lock=402",
+      "basePrice": 800,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_cafe_altura",
+      "storeId": "st_dulce_kantu",
+      "name": "Café de altura",
+      "description": "Café de La Convención, pasado o americano.",
+      "imageUrl": "https://loremflickr.com/600/450/coffee?lock=403",
+      "basePrice": 600,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [
+        {
+          "id": "op_ca_leche",
+          "name": "¿Con leche?",
+          "minSelect": 0,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_ca_entera",
+              "name": "Leche entera",
+              "priceDelta": 100,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_ca_vegetal",
+              "name": "Leche vegetal",
+              "priceDelta": 200,
+              "isAvailable": true
+            }
+          ]
+        }
+      ],
+      "isLocal": false
+    },
+    {
+      "id": "pr_arroz",
+      "storeId": "st_bodega_wayki",
+      "name": "Arroz extra 1 kg",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/rice?lock=501",
+      "basePrice": 480,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_aceite",
+      "storeId": "st_bodega_wayki",
+      "name": "Aceite vegetal 1 L",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/oil,bottle?lock=502",
+      "basePrice": 1050,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_leche",
+      "storeId": "st_bodega_wayki",
+      "name": "Leche evaporada",
+      "description": "Lata de 400 g.",
+      "imageUrl": "https://loremflickr.com/600/450/milk?lock=503",
+      "basePrice": 420,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_agua",
+      "storeId": "st_bodega_wayki",
+      "name": "Agua mineral 2.5 L",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/water,bottle?lock=504",
+      "basePrice": 350,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_cerveza_cusquena",
+      "storeId": "st_bodega_wayki",
+      "name": "Cerveza Cusqueña",
+      "description": "Botella de 620 ml.",
+      "imageUrl": "https://loremflickr.com/600/450/beer?lock=505",
+      "basePrice": 750,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [
+        {
+          "id": "va_cc_unidad",
+          "name": "Unidad",
+          "price": 750,
+          "isAvailable": true
+        },
+        {
+          "id": "va_cc_six",
+          "name": "Six pack",
+          "price": 4000,
+          "isAvailable": true
+        }
+      ],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_paracetamol",
+      "storeId": "st_botica_salud",
+      "name": "Paracetamol 500 mg",
+      "description": "Caja x 10 tabletas.",
+      "imageUrl": "https://loremflickr.com/600/450/pills?lock=601",
+      "basePrice": 350,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_alcohol",
+      "storeId": "st_botica_salud",
+      "name": "Alcohol medicinal 250 ml",
+      "description": null,
+      "imageUrl": "https://loremflickr.com/600/450/pharmacy,bottle?lock=602",
+      "basePrice": 450,
+      "isAvailable": true,
+      "isFeatured": false,
+      "variants": [],
+      "options": [],
+      "isLocal": false
+    },
+    {
+      "id": "pr_menu_dia",
+      "storeId": "st_dona_rosa",
+      "name": "Menú del día",
+      "description": "Entrada, segundo y refresco. Pregunta por el segundo de hoy.",
+      "imageUrl": "https://loremflickr.com/600/450/lunch,peru?lock=201",
+      "basePrice": 1200,
+      "isAvailable": true,
+      "isFeatured": true,
+      "isLocal": true,
+      "variants": [],
+      "options": [
+        {
+          "id": "op_md_segundo",
+          "name": "Segundo",
+          "minSelect": 1,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_md_estofado",
+              "name": "Estofado de res",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_md_trucha",
+              "name": "Trucha frita",
+              "priceDelta": 300,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_md_tallarin",
+              "name": "Tallarín saltado",
+              "priceDelta": 0,
+              "isAvailable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pr_caldo_cordero",
+      "storeId": "st_dona_rosa",
+      "name": "Caldo de cordero",
+      "description": "Con papa, chuño y hierbabuena. El que te devuelve el alma.",
+      "imageUrl": "https://loremflickr.com/600/450/soup,lamb?lock=202",
+      "basePrice": 1400,
+      "isAvailable": true,
+      "isFeatured": true,
+      "isLocal": true,
+      "variants": [
+        {
+          "id": "va_cc_regular",
+          "name": "Regular",
+          "price": 1400,
+          "isAvailable": true
+        },
+        {
+          "id": "va_cc_grande",
+          "name": "Grande",
+          "price": 1800,
+          "isAvailable": true
+        }
+      ],
+      "options": [
+        {
+          "id": "op_cc_extra",
+          "name": "Agrega",
+          "minSelect": 0,
+          "maxSelect": 2,
+          "values": [
+            {
+              "id": "ov_cc_mote",
+              "name": "Mote",
+              "priceDelta": 200,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_cc_cancha",
+              "name": "Cancha",
+              "priceDelta": 150,
+              "isAvailable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pr_chairo",
+      "storeId": "st_dona_rosa",
+      "name": "Chairo",
+      "description": "Sopa espesa de chuño, carne y verduras.",
+      "imageUrl": "https://loremflickr.com/600/450/soup,stew?lock=203",
+      "basePrice": 1300,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_rocoto_relleno",
+      "storeId": "st_dona_rosa",
+      "name": "Rocoto relleno",
+      "description": "Solo domingos… y hoy.",
+      "imageUrl": "https://loremflickr.com/600/450/stuffed,pepper?lock=204",
+      "basePrice": 1500,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_mate_coca",
+      "storeId": "st_dona_rosa",
+      "name": "Mate de coca",
+      "description": "Para la altura.",
+      "imageUrl": "https://loremflickr.com/600/450/tea,herbal?lock=205",
+      "basePrice": 300,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": false,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_pan_chuta",
+      "storeId": "st_tanta_wasi",
+      "name": "Pan chuta (6 unid.)",
+      "description": "El pan grande de horno de leña.",
+      "imageUrl": "https://loremflickr.com/600/450/bread,round?lock=206",
+      "basePrice": 600,
+      "isAvailable": true,
+      "isFeatured": true,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_pan_anis",
+      "storeId": "st_tanta_wasi",
+      "name": "Pan de anís (10 unid.)",
+      "description": "Recién salido a las 6 a. m.",
+      "imageUrl": "https://loremflickr.com/600/450/bread,rolls?lock=207",
+      "basePrice": 500,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_bizcocho",
+      "storeId": "st_tanta_wasi",
+      "name": "Bizcocho de maíz",
+      "description": "Para el lonche.",
+      "imageUrl": "https://loremflickr.com/600/450/corn,cake?lock=208",
+      "basePrice": 350,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": false,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_queso_fresco",
+      "storeId": "st_quesos_kana",
+      "name": "Queso fresco (1/2 kg)",
+      "description": "De vaca, hecho ayer en Pallpata.",
+      "imageUrl": "https://loremflickr.com/600/450/cheese,fresh?lock=209",
+      "basePrice": 1300,
+      "isAvailable": true,
+      "isFeatured": true,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_queso_andino",
+      "storeId": "st_quesos_kana",
+      "name": "Queso andino madurado (1/2 kg)",
+      "description": "Tres semanas de maduración.",
+      "imageUrl": "https://loremflickr.com/600/450/cheese,aged?lock=210",
+      "basePrice": 1800,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_yogurt_aguaymanto",
+      "storeId": "st_quesos_kana",
+      "name": "Yogurt de aguaymanto 1 L",
+      "description": "Sin conservantes.",
+      "imageUrl": "https://loremflickr.com/600/450/yogurt?lock=211",
+      "basePrice": 900,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_ramo_rosas",
+      "storeId": "st_floreria_wayta",
+      "name": "Ramo de 12 rosas",
+      "description": "Con tarjeta escrita a mano.",
+      "imageUrl": "https://loremflickr.com/600/450/roses,bouquet?lock=212",
+      "basePrice": 4500,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": false,
+      "variants": [],
+      "options": [
+        {
+          "id": "op_rr_color",
+          "name": "Color",
+          "minSelect": 1,
+          "maxSelect": 1,
+          "values": [
+            {
+              "id": "ov_rr_rojo",
+              "name": "Rojas",
+              "priceDelta": 0,
+              "isAvailable": true
+            },
+            {
+              "id": "ov_rr_blanco",
+              "name": "Blancas",
+              "priceDelta": 0,
+              "isAvailable": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pr_caja_detalle",
+      "storeId": "st_floreria_wayta",
+      "name": "Caja detalle",
+      "description": "Chocolates de Cusco, flor y tarjeta.",
+      "imageUrl": "https://loremflickr.com/600/450/gift,box?lock=213",
+      "basePrice": 3500,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": true,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_encargo_simple",
+      "storeId": "st_encargos",
+      "name": "Llevar un paquete",
+      "description": "Hasta 5 kg dentro de Yauri. Escribe en la nota qué y a dónde.",
+      "imageUrl": "https://loremflickr.com/600/450/package?lock=214",
+      "basePrice": 600,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": false,
+      "variants": [],
+      "options": []
+    },
+    {
+      "id": "pr_encargo_tramite",
+      "storeId": "st_encargos",
+      "name": "Hacer una cola o trámite",
+      "description": "Pagos, recojos, colas. Cuéntanos en la nota.",
+      "imageUrl": "https://loremflickr.com/600/450/queue,office?lock=215",
+      "basePrice": 1000,
+      "isAvailable": true,
+      "isFeatured": false,
+      "isLocal": false,
+      "variants": [],
+      "options": []
+    }
+  ]
+}

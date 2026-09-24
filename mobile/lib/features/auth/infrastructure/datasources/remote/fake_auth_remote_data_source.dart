@@ -1,0 +1,107 @@
+import 'package:chaski/core/errors/app_exception.dart';
+import 'package:chaski/core/fake/fake_backend.dart';
+import 'package:chaski/core/storage/token_storage.dart';
+import 'package:chaski/features/auth/infrastructure/datasources/remote/auth_remote_data_source.dart';
+import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
+
+/// Simula `/auth/otp/*`, `/auth/register` y `/users/me` en memoria.
+///
+/// - Cualquier celular válido recibe el código [demoCode].
+/// - [demoPhone] ya tiene cuenta (entra directo); otros números piden nombre.
+class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
+  FakeAuthRemoteDataSource(this._backend, this._tokenStorage);
+
+  static const demoPhone = '984123456';
+  static const demoCode = '123456';
+  static const _tokenPrefix = 'fake-access.';
+  static const _registrationPrefix = 'fake-registration.';
+
+  final FakeBackend _backend;
+  final TokenStorage _tokenStorage;
+
+  final Map<String, Map<String, dynamic>> _usersByPhone = {
+    demoPhone: {
+      'id': 'usr_demo_customer',
+      'phone': demoPhone,
+      'firstName': 'Alex',
+      'lastName': 'Quispe',
+      'email': null,
+      'avatarUrl': null,
+      'roles': ['CUSTOMER'],
+    },
+  };
+  final Set<String> _codesSent = {};
+
+  @override
+  Future<OtpChallengeDto> requestCode(String phone) async {
+    await _backend.delay();
+    _codesSent.add(phone);
+    return OtpChallengeDto.fromJson({'phone': phone, 'resendAfterSeconds': 30, 'codeLength': 6});
+  }
+
+  @override
+  Future<OtpVerifyResponseDto> verifyCode({required String phone, required String code}) async {
+    await _backend.delay();
+    if (!_codesSent.contains(phone)) {
+      throw const ApiException(statusCode: 409, code: 'OTP_NOT_REQUESTED', message: 'Pide un código primero.');
+    }
+    if (code != demoCode) {
+      throw const ApiException(
+        statusCode: 422,
+        code: 'OTP_INVALID',
+        message: 'Ese código no coincide. Revisa el mensaje e inténtalo otra vez.',
+      );
+    }
+    final user = _usersByPhone[phone];
+    if (user == null) {
+      return OtpVerifyResponseDto.fromJson({'status': 'PROFILE_REQUIRED', 'registrationToken': '$_registrationPrefix$phone'});
+    }
+    return OtpVerifyResponseDto.fromJson({'status': 'AUTHENTICATED', ..._tokens(user)});
+  }
+
+  @override
+  Future<AuthResponseDto> register({
+    required String registrationToken,
+    required String firstName,
+    required String lastName,
+  }) async {
+    await _backend.delay();
+    if (!registrationToken.startsWith(_registrationPrefix)) {
+      throw const ApiException(statusCode: 401, code: 'REGISTRATION_EXPIRED', message: 'Vuelve a verificar tu número.');
+    }
+    final phone = registrationToken.substring(_registrationPrefix.length);
+    final user = <String, dynamic>{
+      'id': 'usr_${DateTime.now().microsecondsSinceEpoch}',
+      'phone': phone,
+      'firstName': firstName,
+      'lastName': lastName,
+      'email': null,
+      'avatarUrl': null,
+      'roles': ['CUSTOMER'],
+    };
+    _usersByPhone[phone] = user;
+    return AuthResponseDto.fromJson(_tokens(user));
+  }
+
+  @override
+  Future<UserDto> me() async {
+    await _backend.delay();
+    // Simula el header Authorization que agregaría AuthInterceptor.
+    final tokens = await _tokenStorage.read();
+    final userId = tokens?.accessToken.replaceFirst(_tokenPrefix, '');
+    final user = _usersByPhone.values.where((u) => u['id'] == userId).firstOrNull;
+    if (user == null) {
+      throw const ApiException(statusCode: 401, code: 'TOKEN_EXPIRED', message: 'Sesión expirada.');
+    }
+    return UserDto.fromJson(user);
+  }
+
+  @override
+  Future<void> logout(String refreshToken) => _backend.delay();
+
+  Map<String, Object?> _tokens(Map<String, dynamic> user) => {
+    'user': user,
+    'accessToken': '$_tokenPrefix${user['id']}',
+    'refreshToken': 'fake-refresh.${user['id']}',
+  };
+}

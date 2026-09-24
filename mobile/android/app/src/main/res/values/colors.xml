@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismo tono que SplashPage (AppColors.anil): el paso del splash
+         nativo a Flutter no produce destello. -->
+    <color name="splash_background">#2F3A9E</color>
+</resources>

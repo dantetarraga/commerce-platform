@@ -1,0 +1,20 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+  errors:
+    invalid_annotation_target: ignore
+
+linter:
+  rules:
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    sort_pub_dependencies: false
+    one_member_abstracts: false
+    # Los Notifiers de Riverpod exponen métodos (update/change) por convención.
+    use_setters_to_change_properties: false
