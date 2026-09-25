@@ -1,6 +1,6 @@
 # Chaski — Arquitectura y diseño inicial
 
-Versión 0.4 · 2026-09-22 · Estado: **pendiente de aprobación** · [Cambios v0.3 → v0.4](#cambios-v03--v04) · [Cambios v0.2 → v0.3](#cambios-v02--v03) · [Cambios v0.1 → v0.2](#cambios-v01--v02)
+Versión 0.5 · 2026-09-24 · Estado: **en implementación** · [Cambios v0.4 → v0.5](#cambios-v04--v05) · [Cambios v0.3 → v0.4](#cambios-v03--v04) · [Cambios v0.2 → v0.3](#cambios-v02--v03) · [Cambios v0.1 → v0.2](#cambios-v01--v02)
 
 ---
 
@@ -210,13 +210,13 @@ backend/
     │   └── prisma.service.ts
     └── modules/
         ├── health/                 # GET /health (liveness + DB)
-        ├── auth/
+        ├── auth/                            # agrupado por responsabilidad (ver reglas abajo)
         │   ├── auth.module.ts, auth.controller.ts, auth.service.ts
-        │   ├── tokens.service.ts            # emisión/rotación/revocación de refresh tokens
-        │   ├── password.service.ts          # argon2id
-        │   ├── strategies/jwt.strategy.ts   # valida firma/exp; no consulta la BD
-        │   ├── dto/ (register.dto.ts, login.dto.ts, refresh.dto.ts, logout.dto.ts, auth-response.dto.ts)
-        │   └── auth.service.spec.ts
+        │   ├── jwt-auth.guard.ts            # guard global; valida firma/exp sin consultar la BD
+        │   ├── dto/auth.dto.ts
+        │   ├── otp/ (otp.service.ts, otp.service.spec.ts)   # códigos SMS: hash, vencimiento, intentos
+        │   ├── tokens/tokens.service.ts     # access JWT + refresh rotativo + registration token
+        │   └── sms/sms-sender.ts            # abstracción del proveedor de SMS
         ├── users/          (users.controller|service, dto/update-me.dto.ts)
         ├── addresses/      (controller, service, dto/)
         ├── cities/         (controller: GET /cities, /cities/resolve; service)
@@ -246,6 +246,10 @@ backend/
         └── notifications/  (service, listeners/order-events.listener.ts, push/)  # Fase 3
 ```
 
+**Organización de archivos**
+- Los unit tests (`*.spec.ts`) van junto al archivo que prueban; los e2e, en `backend/test/`.
+- Los módulos son planos (`x.module.ts`, `x.controller.ts`, `x.service.ts`, `dto/`). Cuando un módulo pasa de unos 10 archivos, se agrupa **por responsabilidad** (`auth/otp/`, `auth/tokens/`), no por tipo (`services/`, `controllers/`): así cada concepto queda junto con su test.
+
 **Responsabilidades**: el Controller se encarga de HTTP, DTO, roles y status codes. El Service tiene los casos de negocio y las transacciones (`prisma.$transaction`). Prisma es la persistencia; no hay repositorios encima de Prisma. Las queries complejas o en SQL crudo (búsqueda con trigramas) van en un `*.queries.ts` del módulo.
 
 ---
@@ -270,7 +274,7 @@ backend/
 
 ### Esquema (borrador Prisma)
 
-> Borrador para revisión. En la Fase 1 se valida con `prisma validate` y se ajustan detalles de sintaxis según la versión estable de Prisma vigente.
+> **Desde v0.5 la fuente de verdad es `backend/prisma/schema.prisma`** (Prisma 7). El borrador de abajo queda como referencia histórica; las diferencias están en [Cambios v0.4 → v0.5](#cambios-v04--v05).
 
 ```prisma
 generator client {
@@ -866,11 +870,12 @@ model Device {                           // tokens FCM (Fase 3)
   - *offset* (`?page=&limit=` → `{ items, page, limit, total }`) en listados ordenados por cálculo (stores por distancia, búsqueda);
   - *cursor* (`?cursor=&limit=` → `{ items, nextCursor }`) en listas cronológicas (historial de pedidos, notificaciones).
 
-### Auth
+### Auth (celular + código OTP, sin contraseña)
 | Método | Ruta | Notas |
 |---|---|---|
-| POST | `/auth/register` | siempre crea un CUSTOMER (roles no autoasignables) → `{ user, accessToken, refreshToken }` · throttle |
-| POST | `/auth/login` | throttle 5/min por IP+email |
+| POST | `/auth/otp/request` | `{ phone }` (9 dígitos, empieza con 9) → `{ phone, resendAfterSeconds, codeLength }` · reenvío cada 30 s, máx. 5 por hora · throttle 5/min |
+| POST | `/auth/otp/verify` | `{ phone, code }` → `{ status: AUTHENTICATED, user, accessToken, refreshToken }` o `{ status: PROFILE_REQUIRED, registrationToken }` · 5 intentos por código · errores `OTP_INVALID` (422), `OTP_NOT_REQUESTED`/`OTP_EXPIRED` (409), `OTP_TOO_MANY_ATTEMPTS` (429) |
+| POST | `/auth/register` | `{ registrationToken, firstName, lastName }` → `{ user, accessToken, refreshToken }` · siempre CUSTOMER · si el número ya tiene cuenta, inicia sesión con ella |
 | POST | `/auth/refresh` | body `{ refreshToken }` → par nuevo (rotación) |
 | POST | `/auth/logout` | **público e idempotente**, body `{ refreshToken }` → revoca su familia · 204 aunque ya esté revocado |
 
@@ -948,7 +953,7 @@ model Device {                           // tokens FCM (Fase 3)
 ```
 Catálogo de códigos en `common/exceptions/error-codes.ts`, documentado en Swagger:
 - **Generales:** `VALIDATION_ERROR`, `NOT_FOUND`, `FORBIDDEN`, `RATE_LIMITED`, `INTERNAL_ERROR`.
-- **Auth:** `INVALID_CREDENTIALS`, `TOKEN_EXPIRED`, `EMAIL_ALREADY_EXISTS`.
+- **Auth:** `TOKEN_EXPIRED`, `INVALID_REFRESH_TOKEN`, `OTP_NOT_REQUESTED`, `OTP_EXPIRED`, `OTP_INVALID`, `OTP_TOO_MANY_ATTEMPTS`, `OTP_RESEND_TOO_SOON`, `OTP_TOO_MANY_REQUESTS`, `REGISTRATION_EXPIRED`, `USER_DISABLED`, `EMAIL_ALREADY_EXISTS`.
 - **Catálogo:** `PRODUCT_UNAVAILABLE`, `PRODUCT_OUT_OF_STOCK`, `INVALID_PRODUCT_OPTIONS`.
 - **Carrito:** `CART_STORE_CONFLICT`, `CART_EMPTY`, `CART_NOT_EMPTY`.
 - **Checkout:** `STORE_CLOSED`, `BELOW_MINIMUM_ORDER`, `ADDRESS_OUT_OF_COVERAGE`.
@@ -1070,7 +1075,7 @@ DELIVERED y CANCELLED son estados finales. En Flutter, "Repartidor asignado" es 
 25. **Entornos** con `--dart-define-from-file` (dev/prod), sin secretos en el código. La API key de Maps se restringe por package/SHA.
 26. **Identidad visual propia**: se define en `app/theme` (paleta, tipografía, radios, espaciado) con tokens, sin copiar Rappi ni PedidosYa. La propuesta de identidad (andina, cálida y moderna, coherente con "Chaski") se presenta en la Fase 1 antes de construir pantallas.
 
-**Lo que NO se hace en el MVP (a propósito)**: microservicios, CQRS, event sourcing, Redis, colas, PostGIS, i18n completo, panel web de merchant (el merchant opera vía endpoints y Swagger/seed hasta la Fase 3+), multi-tenant de marcas, verificación de teléfono por OTP.
+**Lo que NO se hace en el MVP (a propósito)**: microservicios, CQRS, event sourcing, Redis, colas, PostGIS, i18n completo, panel web de merchant (el merchant opera vía endpoints y Swagger/seed hasta la Fase 3+), multi-tenant de marcas.
 
 ---
 
@@ -1120,6 +1125,22 @@ Cada paso termina con código compilando, tests verdes y un commit.
 Panel web de merchant/admin · app courier (mismo backend, otra app Flutter que reutiliza `core/`) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
 
 ---
+
+## Cambios v0.4 → v0.5
+
+La app Flutter se construyó antes que el backend y su contrato (los `Api*RemoteDataSource` y los fakes de `mobile/lib/features/*/infrastructure`) manda sobre este documento. El backend de la Fase 1 ya está implementado en `backend/` siguiendo ese contrato:
+
+- **Auth por celular + OTP**, sin email ni contraseña: `/auth/otp/request`, `/auth/otp/verify`, `/auth/register` con `registrationToken` (JWT de 15 min con audiencia propia, no sirve como access token). `User.phone` es obligatorio y único; se quitan `email` obligatorio y `passwordHash`. Nueva tabla `OtpChallenge` (solo HMAC del código, vencimiento, intentos y consumo). El SMS va detrás de `SmsSender`; hasta tener proveedor se loguea, y fuera de producción `OTP_DEV_CODE` fija el código.
+- **La bolsa vive en el dispositivo**: se eliminan `Cart`, `CartItem` y `CartItemOption`. `POST /orders` (Fase 2) recibe los ítems y el backend recalcula precios, disponibilidad y totales.
+- **Estados del pedido** con los nombres de la app: `RECEIVED → CONFIRMED → PREPARING → READY → COURIER_ASSIGNED → ON_THE_WAY → DELIVERED`, más `CANCELLED`. "Repartidor asignado" pasa a ser un estado real.
+- **Pedido**: dirección como snapshot (`addressTitle`, `addressStreet`, `addressRef`, coordenadas) sin `addressId`; se agregan `tip` y `scheduledFor`; métodos de pago `CASH`, `YAPE`, `PLIN`, `CARD`.
+- **Calificación**: `POST /orders/:id/rating` `{ rating, comment }`; `Review` guarda un solo `rating`.
+- **Cupones desde el inicio**: `POST /coupons/validate` (Fase 2) → `{ code, discount, label }`; `Coupon.label` es el texto que ve el cliente.
+- **Negocio**: `tags`, `promoLabel`, `ownerDisplayName` (se expone como `ownerName`), `attendingSince` y `popularityScore` (orden "popular"). **Producto**: `isLocal` ("Hecho en Espinar"). **Courier**: `vehicleLabel` y `activeSince` para la tarjeta del repartidor.
+- **Endpoints nuevos**: `/discovery/local-products`, `/discovery/popular-searches` (tabla `PopularSearch` con términos curados; el conteo de negocios se calcula) y `GET /cities`. `/promotions` y `/categories` devuelven arrays. `lat`/`lng` son opcionales en todo el catálogo: sin ellos se usa el centro de la ciudad.
+- **Direcciones**: por ahora en el dispositivo; `Address` queda en el schema con `kind`/`label`/`street` para la sincronización futura.
+- **Stack**: NestJS 11, Prisma 7 (generador `prisma-client` en CommonJS, `@prisma/adapter-pg`, URL en `prisma.config.ts`). Búsqueda con `immutable_unaccent()` + índices GIN de trigramas creados en la migración inicial. Postgres de desarrollo en el puerto 5433 (`docker-compose.yml`).
+- **Tests e2e**: corren contra `chaski_test`, que se migra con `migrate deploy`, se vacía y se siembra en cada corrida.
 
 ## Cambios v0.3 → v0.4
 

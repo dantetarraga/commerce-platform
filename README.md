@@ -6,16 +6,19 @@
 
 ```
 chaski/
-├── backend/     # API NestJS + Prisma + PostgreSQL (se crea en la Fase 1)
-├── mobile/      # App Flutter para el CUSTOMER (se crea en la Fase 1)
+├── backend/     # API NestJS + Prisma + PostgreSQL
+├── mobile/      # App Flutter para el CUSTOMER
 ├── docs/        # Arquitectura, decisiones y API
-└── docker-compose.yml   # (Fase 1) Postgres + API para desarrollo
+└── docker-compose.yml   # Postgres 16 para desarrollo (puerto 5433)
 ```
 
 ## Documentación
 
-- [Arquitectura y diseño inicial](docs/ARQUITECTURA.md) (v0.4)
+- [Arquitectura y diseño inicial](docs/ARQUITECTURA.md) (v0.5)
+- [Backend: arranque y endpoints](backend/README.md)
+- [Qué falta para el MVP](docs/PENDIENTES.md)
 
 ## Estado
 
-Fase de diseño: todavía no hay código. La implementación empieza cuando se apruebe el diseño.
+- **mobile**: flujo completo del cliente, con datos de demo (`env/fake.json`) o contra la API (`env/dev.json`).
+- **backend**: Fase 1 lista (auth por OTP, catálogo, búsqueda, discovery, seed de Espinar). Siguiente: cupones y pedidos.
