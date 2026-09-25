@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { AppException, ErrorCode } from '../../../common/exceptions/app.exception';
 import type { Env } from '../../../config/env';
 import { PrismaService } from '../../../database/prisma.service';
-import { SmsSender } from '../sms/sms-sender';
+import { SmsInvalidNumberError, SmsSender } from '../sms/sms-sender';
 
 export const OTP_LENGTH = 6;
 const MAX_REQUESTS_PER_HOUR = 5;
@@ -33,7 +33,7 @@ export class OtpService {
     private readonly sms: SmsSender,
     config: ConfigService<Env, true>,
   ) {
-    this.secret = config.get('JWT_ACCESS_SECRET', { infer: true });
+    this.secret = config.get('OTP_SECRET', { infer: true });
     this.ttlMs = config.get('OTP_TTL_SECONDS', { infer: true }) * 1000;
     this.resendSeconds = config.get('OTP_RESEND_SECONDS', { infer: true });
     this.maxAttempts = config.get('OTP_MAX_ATTEMPTS', { infer: true });
@@ -72,10 +72,28 @@ export class OtpService {
       randomInt(0, 10 ** OTP_LENGTH)
         .toString()
         .padStart(OTP_LENGTH, '0');
-    await this.prisma.otpChallenge.create({
+    const challenge = await this.prisma.otpChallenge.create({
       data: { phone, codeHash: this.hash(phone, code), expiresAt: new Date(now.getTime() + this.ttlMs) },
+      select: { id: true },
     });
-    await this.sms.send(phone, `Tu código de Chaski es ${code}. No lo compartas con nadie.`);
+    try {
+      await this.sms.send(phone, `Tu código de Chaski es ${code}. No lo compartas con nadie.`);
+    } catch (error) {
+      // Si no salió el SMS, el código no cuenta: se puede reintentar sin esperar.
+      await this.prisma.otpChallenge.delete({ where: { id: challenge.id } });
+      if (error instanceof SmsInvalidNumberError) {
+        throw new AppException(
+          ErrorCode.SMS_INVALID_NUMBER,
+          HttpStatus.UNPROCESSABLE_ENTITY,
+          'No pudimos enviar un SMS a ese número. Revisa que sea tu celular.',
+        );
+      }
+      throw new AppException(
+        ErrorCode.SMS_SEND_FAILED,
+        HttpStatus.BAD_GATEWAY,
+        'No pudimos enviar el código. Inténtalo de nuevo en un momento.',
+      );
+    }
 
     return { phone, resendAfterSeconds: this.resendSeconds, codeLength: OTP_LENGTH };
   }

@@ -4,7 +4,7 @@ import { AppException } from '../../../common/exceptions/app.exception';
 import type { PrismaService } from '../../../database/prisma.service';
 import type { OtpChallenge } from '../../../generated/prisma/client';
 import { OtpService } from './otp.service';
-import { SmsSender } from '../sms/sms-sender';
+import { SmsDeliveryError, SmsInvalidNumberError, SmsSender } from '../sms/sms-sender';
 
 const PHONE = '987654321';
 const NOW = new Date('2026-09-24T12:00:00Z');
@@ -13,7 +13,7 @@ function setup(env: Record<string, unknown> = {}) {
   const prisma = mockDeep<PrismaService>();
   const sms = { send: jest.fn().mockResolvedValue(undefined) } as unknown as jest.Mocked<SmsSender>;
   const values: Record<string, unknown> = {
-    JWT_ACCESS_SECRET: 'x'.repeat(32),
+    OTP_SECRET: 'x'.repeat(32),
     OTP_TTL_SECONDS: 300,
     OTP_RESEND_SECONDS: 30,
     OTP_MAX_ATTEMPTS: 5,
@@ -47,6 +47,25 @@ describe('OtpService.request', () => {
     expect(data.codeHash).not.toContain('123456');
     expect(data.expiresAt).toEqual(new Date(NOW.getTime() + 300_000));
     expect(sms.send).toHaveBeenCalledWith(PHONE, expect.stringContaining('123456'));
+  });
+
+  it('si el SMS falla, borra el código para poder reintentar enseguida', async () => {
+    const { prisma, sms, service } = setup();
+    prisma.otpChallenge.findMany.mockResolvedValue([]);
+    prisma.otpChallenge.create.mockResolvedValue({ id: 'otp_9' } as OtpChallenge);
+    sms.send.mockRejectedValue(new SmsDeliveryError('caído'));
+
+    expect(await codeOf(service.request(PHONE, NOW))).toBe('SMS_SEND_FAILED');
+    expect(prisma.otpChallenge.delete).toHaveBeenCalledWith({ where: { id: 'otp_9' } });
+  });
+
+  it('número rechazado por el proveedor → SMS_INVALID_NUMBER', async () => {
+    const { prisma, sms, service } = setup();
+    prisma.otpChallenge.findMany.mockResolvedValue([]);
+    prisma.otpChallenge.create.mockResolvedValue({ id: 'otp_9' } as OtpChallenge);
+    sms.send.mockRejectedValue(new SmsInvalidNumberError('no es celular'));
+
+    expect(await codeOf(service.request(PHONE, NOW))).toBe('SMS_INVALID_NUMBER');
   });
 
   it('no permite pedir otro código antes del tiempo de reenvío', async () => {

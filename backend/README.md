@@ -33,8 +33,9 @@ En debug, Android permite `http`; iOS lo permite solo hacia la red local.
 
 ### Entrar sin SMS
 
-Todavía no hay proveedor de SMS: el código se escribe en el log. Fuera de
-producción, con `OTP_DEV_CODE=123456` todos los códigos son ese valor.
+En desarrollo `SMS_PROVIDER=log`: el código se escribe en el log, y con
+`OTP_DEV_CODE=123456` todos los códigos son ese valor. En producción el
+envío es por Twilio (obligatorio) y `OTP_DEV_CODE` está prohibido.
 El seed crea la cuenta demo `984123456` (Alex Quispe); cualquier otro celular
 pide nombre y apellido.
 
@@ -124,3 +125,42 @@ del seed (código `123456`):
 | Dueño de Pollería El Chaski Dorado | `910000000` (los demás negocios: `910000001`…`910000010`, en el orden del catálogo) |
 | Repartidores | `900000101` (Luis), `900000102` (Yeni) |
 | Admin | `900000001` |
+
+## Despliegue en Railway
+
+La imagen sale de `Dockerfile` y Railway la configura con `railway.toml`
+(migraciones en `preDeployCommand`, health check en `/api/v1/health`).
+
+1. **Proyecto:** en Railway, *New Project → Deploy from GitHub repo* (el repo
+   tiene que estar en GitHub). En el servicio de la API: *Settings → Root
+   Directory* = `/backend` y *Config File* = `/backend/railway.toml`.
+2. **Base de datos:** *New → Database → PostgreSQL*. En las variables de la
+   API, `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`.
+3. **Variables de la API:**
+
+   | Variable | Valor |
+   |---|---|
+   | `NODE_ENV` | `production` |
+   | `JWT_ACCESS_SECRET`, `OTP_SECRET` | dos valores distintos de 48+ caracteres: `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
+   | `SMS_PROVIDER` | `twilio` |
+   | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | de la consola de Twilio |
+   | `TWILIO_MESSAGING_SERVICE_SID` (o `TWILIO_FROM`) | el Messaging Service o el número remitente |
+   | `TRUST_PROXY` | `1` |
+   | `LOG_LEVEL` | `info` |
+
+   Railway pone `PORT` solo. Si falta o está mal una variable, la API no
+   arranca y el log dice cuál.
+4. **Dominio:** *Settings → Networking → Generate Domain*. Revisa
+   `https://<dominio>/api/v1/health`.
+5. **Datos iniciales (opcional):** el seed de Espinar se corre desde tu
+   máquina contra la URL pública de la base:
+   `DATABASE_URL="<URL pública de Postgres>" npm run db:seed`.
+6. **App:** un `env/prod.json` con `USE_FAKE_DATA: false` y
+   `API_BASE_URL: https://<dominio>/api/v1`.
+
+**Twilio:** una cuenta de prueba solo envía a números verificados en la
+consola. Para usuarios reales hace falta pasar la cuenta a pago y crear un
+Messaging Service con un remitente que entregue en Perú.
+
+**Pendiente:** la imagen pesa ~800 MB porque incluye el CLI de Prisma para
+migrar; se puede separar en una imagen solo de migraciones más adelante.

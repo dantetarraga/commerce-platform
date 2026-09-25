@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { Express } from 'express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { createValidationPipe } from './common/validation';
@@ -13,6 +14,9 @@ export function configureApp(app: INestApplication): void {
   const config = app.get(ConfigService<Env, true>);
   app.useLogger(app.get(Logger));
   app.use(helmet());
+  // Detrás de un proxy (Railway), la IP real del cliente viene en X-Forwarded-For.
+  const trustProxy = config.get('TRUST_PROXY', { infer: true });
+  if (trustProxy > 0) (app.getHttpAdapter().getInstance() as Express).set('trust proxy', trustProxy);
   app.enableCors({ origin: config.get('CORS_ORIGINS', { infer: true }) });
   app.setGlobalPrefix(API_PREFIX);
   app.useGlobalPipes(createValidationPipe());

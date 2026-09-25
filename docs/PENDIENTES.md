@@ -14,7 +14,7 @@ Estado al 2026-09-24. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Onboarding, login OTP, home, búsqueda, negocio, producto, bolsa, checkout (propina, programado, cupón, vuelto), seguimiento, historial, calificación, favoritos, direcciones, avisos, perfil | Ubicación real, avisos y direcciones contra la API, editar perfil |
-| Backend (`backend/`) | Auth OTP + refresh rotativo, `/users/me`, catálogo, search, discovery, cupones, pedidos, **operación de negocio y repartidor**, cancelación, seed de Espinar, 47 unit + 57 e2e | Avisos, direcciones, CRUD de catálogo, SMS real |
+| Backend (`backend/`) | Auth OTP (SMS por Twilio) + refresh rotativo, `/users/me`, catálogo, search, discovery, cupones, pedidos, operación de negocio y repartidor, cancelación, Dockerfile para Railway, seed de Espinar, 56 unit + 57 e2e | Avisos, direcciones, CRUD de catálogo |
 | Infra | `docker-compose.yml` con Postgres para desarrollo | CI, Dockerfile de la API, hosting, base administrada |
 | Repo | Backend, CI y docs commiteados en la rama `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
 
@@ -77,13 +77,13 @@ Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y u
 
 | Tema | Falta |
 |---|---|
-| SMS | Sin proveedor no se puede entrar en producción: el código solo va al log. Implementar `SmsSender` con un proveedor que entregue en Perú |
-| Deploy | Dockerfile de la API, hosting, Postgres administrado, `prisma migrate deploy` al arrancar, variables de producción, HTTPS |
+| SMS | ✅ Twilio implementado (`SMS_PROVIDER=twilio`, obligatorio en producción). Falta crear la cuenta y el Messaging Service |
+| Deploy | ✅ Dockerfile + `railway.toml` probados localmente. Falta crear el proyecto en Railway (guía en `backend/README.md`) y reducir la imagen (~800 MB) |
 | CI | No hay `.github/workflows`. Mínimo: lint + unit + e2e del backend (con servicio Postgres) y `flutter analyze` + `flutter test` |
 | Pagos | Hoy Yape, Plin, tarjeta y efectivo se pagan **al recibir**, así que el MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) sigue en la Fase 4 |
 | Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
 | Limpieza de datos | Los `OtpChallenge` y `RefreshToken` vencidos se acumulan; falta un job que los borre |
-| Secretos | El HMAC del OTP reutiliza `JWT_ACCESS_SECRET`; conviene un `OTP_SECRET` propio para poder rotarlos por separado |
+| Secretos | ✅ `OTP_SECRET` propio, validado distinto de `JWT_ACCESS_SECRET` |
 | Rate limit | El throttler guarda en memoria: vale para una instancia; con varias hace falta Redis |
 | Observabilidad | Solo logs JSON con `requestId`. Errores (Sentry) y métricas después del lanzamiento |
 | Legal | Se guardan celulares y direcciones: faltan política de privacidad y términos (Ley 29733 de protección de datos personales) |
@@ -98,8 +98,8 @@ Esfuerzos aproximados, para una persona.
 | 2 | ✅ Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
 | 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
 | 4 | ✅ Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
-| 5 | Proveedor de SMS | 1 día | Login en producción |
-| 6 | Deploy (Dockerfile, hosting, base, HTTPS) | 1–2 días | Piloto con usuarios reales |
+| 5 | ✅ Proveedor de SMS (Twilio; falta crear la cuenta) | 1 día | Login en producción |
+| 6 | ✅ Deploy preparado para Railway (Dockerfile, `railway.toml`, guía); falta crear el proyecto | 1–2 días | Piloto con usuarios reales |
 | 7 | Ubicación real: GPS, mapa, sincronizar direcciones | 3–4 días | Fee y cobertura correctos |
 | 8 | Avisos in-app + push | 3 días | Seguimiento sin abrir la app |
 | 9 | Panel de merchant/admin y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |

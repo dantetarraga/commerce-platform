@@ -43,6 +43,8 @@ jobs:
       - run: npm test
       - run: npm run test:e2e
       - run: npm run build
+      - name: Docker image
+        run: docker build -t chaski-api .
 
   mobile:
     name: Mobile (analyze, test)

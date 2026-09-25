@@ -1,0 +1,13 @@
+# Configuración de Railway para el servicio de la API.
+# En el servicio: Root Directory = /backend y Config File = /backend/railway.toml.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+watchPatterns = ["/backend/**"]
+
+[deploy]
+# Aplica migraciones pendientes antes de poner la versión nueva en línea.
+preDeployCommand = ["npx prisma migrate deploy"]
+healthcheckPath = "/api/v1/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
