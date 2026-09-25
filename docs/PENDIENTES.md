@@ -82,7 +82,7 @@ Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y u
 | CI | No hay `.github/workflows`. Mínimo: lint + unit + e2e del backend (con servicio Postgres) y `flutter analyze` + `flutter test` |
 | Pagos | Hoy Yape, Plin, tarjeta y efectivo se pagan **al recibir**, así que el MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) sigue en la Fase 4 |
 | Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
-| Limpieza de datos | Los `OtpChallenge` y `RefreshToken` vencidos se acumulan; falta un job que los borre |
+| Limpieza de datos | ✅ Tarea diaria (4 a. m., hora de Lima) que borra códigos OTP viejos y refresh tokens vencidos |
 | Secretos | ✅ `OTP_SECRET` propio, validado distinto de `JWT_ACCESS_SECRET` |
 | Rate limit | El throttler guarda en memoria: vale para una instancia; con varias hace falta Redis |
 | Observabilidad | Solo logs JSON con `requestId`. Errores (Sentry) y métricas después del lanzamiento |

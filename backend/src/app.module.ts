@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { LoggerModule } from 'nestjs-pino';
@@ -16,6 +17,7 @@ import { CitiesModule } from './modules/cities/cities.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { CouriersModule } from './modules/couriers/couriers.module';
 import { HealthModule } from './modules/health/health.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { MerchantModule } from './modules/merchant/merchant.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
@@ -65,6 +67,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
         skipIf: () => config.get('NODE_ENV', { infer: true }) === 'test',
       }),
     }),
+    ScheduleModule.forRoot(),
     PrismaModule,
     HealthModule,
     AuthModule,
@@ -79,6 +82,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     OrdersModule,
     MerchantModule,
     CouriersModule,
+    MaintenanceModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
