@@ -171,18 +171,21 @@ export class OrdersService {
   }
 
   async list(userId: string, query: ListOrdersQueryDto) {
+    const { orders, nextCursor } = await this.page({ customerId: userId }, query);
+    return { items: orders.map(toOrderResponse), nextCursor };
+  }
+
+  /** Página por cursor, del más reciente al más antiguo. La usan también negocio y courier. */
+  async page(where: Prisma.OrderWhereInput, query: ListOrdersQueryDto) {
     const orders = await this.prisma.order.findMany({
-      where: { customerId: userId },
+      where,
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: query.limit + 1,
       ...(query.cursor && { cursor: { id: query.cursor }, skip: 1 }),
       include: orderInclude,
     });
     const page = orders.slice(0, query.limit);
-    return {
-      items: page.map(toOrderResponse),
-      nextCursor: orders.length > query.limit ? page[page.length - 1].id : null,
-    };
+    return { orders: page, nextCursor: orders.length > query.limit ? page[page.length - 1].id : null };
   }
 
   /** Solo pedidos del usuario; uno ajeno responde 404 para no revelar que existe. */

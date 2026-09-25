@@ -8,6 +8,8 @@ export const orderInclude = {
   store: { select: { logoUrl: true, ownerDisplayName: true } },
   courier: { include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } } },
   review: { select: { rating: true } },
+  // Solo para las vistas del negocio y del repartidor.
+  customer: { select: { firstName: true, lastName: true, phone: true } },
 } satisfies Prisma.OrderInclude;
 
 export type OrderWithDetails = Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
@@ -59,5 +61,21 @@ export function toOrderResponse(order: OrderWithDetails) {
     estimatedArrival: order.estimatedAt?.toISOString() ?? null,
     scheduledFor: order.scheduledFor?.toISOString() ?? null,
     rating: order.review?.rating ?? null,
+  };
+}
+
+/**
+ * Vista del negocio y del repartidor: el pedido más a quién y dónde
+ * entregarlo. Nunca se usa para el cliente.
+ */
+export function toStaffOrderResponse(order: OrderWithDetails) {
+  return {
+    ...toOrderResponse(order),
+    customer: {
+      name: `${order.customer.firstName} ${order.customer.lastName}`.trim(),
+      phone: order.customer.phone,
+    },
+    deliveryLocation: { lat: Number(order.deliveryLat), lng: Number(order.deliveryLng) },
+    cancelReason: order.cancelReason,
   };
 }

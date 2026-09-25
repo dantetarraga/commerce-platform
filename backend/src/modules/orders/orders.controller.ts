@@ -5,8 +5,11 @@ import type { AuthUser } from '../../common/decorators/auth.decorators';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { Role } from '../../generated/prisma/enums';
 import { ListOrdersQueryDto, RateOrderDto } from './dto/order-queries.dto';
+import { CancelOrderDto } from './dto/order-status.dto';
 import { PlaceOrderDto } from './dto/place-order.dto';
+import { toOrderResponse } from './order-presenter';
 import { OrdersService } from './orders.service';
+import { OrderStatusService } from './status/order-status.service';
 
 const IDEMPOTENCY_KEY = /^[\w-]{8,100}$/;
 
@@ -15,7 +18,10 @@ const IDEMPOTENCY_KEY = /^[\w-]{8,100}$/;
 @Roles(Role.CUSTOMER)
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly orders: OrdersService) {}
+  constructor(
+    private readonly orders: OrdersService,
+    private readonly status: OrderStatusService,
+  ) {}
 
   @Post()
   @ApiHeader({ name: 'Idempotency-Key', required: false, description: 'Repetir la request devuelve el mismo pedido' })
@@ -40,6 +46,14 @@ export class OrdersController {
   @Get(':id')
   detail(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.orders.detail(user.id, id);
+  }
+
+  /** Solo mientras el negocio no empezó a prepararlo. */
+  @Post(':id/cancel')
+  @HttpCode(HttpStatus.OK)
+  async cancel(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dto: CancelOrderDto) {
+    const order = await this.status.cancel({ userId: user.id, role: Role.CUSTOMER }, id, dto.reason ?? undefined);
+    return toOrderResponse(order);
   }
 
   @Post(':id/rating')

@@ -66,7 +66,9 @@ src/
     ├── products/    # detalle con variantes y opciones
     ├── search/      # /search y /discovery/* (unaccent + pg_trgm)
     ├── coupons/     # validación compartida por la bolsa y el pedido
-    ├── orders/      # crear, listar, detalle, calificar (precios en order-pricing.ts)
+    ├── orders/      # crear, listar, detalle, calificar, cancelar; status/ = máquina de estados
+    ├── merchant/    # operación del negocio: /merchant/*
+    ├── couriers/    # operación del repartidor: /courier/*
     ├── categories/, promotions/, health/
     └── delivery/    # cálculo puro de distancia, cobertura, fee y ETA
 ```
@@ -95,9 +97,30 @@ Prefijo `/api/v1`. Errores siempre como
 | POST | `/orders` (header opcional `Idempotency-Key`) → pedido | Bearer (CUSTOMER) |
 | GET | `/orders?cursor=&limit=` → `{ items, nextCursor }`, `/orders/:id` | Bearer (CUSTOMER) |
 | POST | `/orders/:id/rating` `{ rating: 1..5, comment? }` | Bearer (CUSTOMER) |
+| POST | `/orders/:id/cancel` `{ reason? }` (solo en RECEIVED o CONFIRMED) | Bearer (CUSTOMER) |
+| GET | `/merchant/orders?status=&cursor=`, `/merchant/orders/:id` (con cliente y ubicación) | Bearer (MERCHANT, ADMIN) |
+| POST | `/merchant/orders/:id/status` `{ status: CONFIRMED\|PREPARING\|READY }`, `/merchant/orders/:id/cancel` `{ reason }` | Bearer (MERCHANT, ADMIN) |
+| PATCH | `/merchant/stores/:id` `{ isAcceptingOrders }` | Bearer (MERCHANT, ADMIN) |
+| GET | `/courier/orders/available`, `/courier/orders` | Bearer (COURIER) |
+| POST | `/courier/orders/:id/accept`, `/courier/orders/:id/status` `{ status: ON_THE_WAY\|DELIVERED }` | Bearer (COURIER) |
 | GET | `/health` | pública |
 
 `POST /orders` recibe la bolsa del dispositivo y recalcula todo: horario (o
 `scheduledFor` hasta 7 días), cobertura, variantes y opciones, stock
 condicional, mínimo, cupón (con cupo condicional), propina (máx. S/ 50) y
 vuelto. Todo en una transacción; el código público sale de `order_code_seq`.
+
+### Operar un pedido (sin panel todavía)
+
+Los estados avanzan con la máquina de `orders/status/order-status.machine.ts`:
+el negocio confirma, prepara y marca listo; un repartidor lo toma (solo uno
+puede), sale y entrega. Entregar marca el pago como cobrado; cancelar devuelve
+stock y cupón. Para probarlo desde Swagger (`/docs`), entra con los usuarios
+del seed (código `123456`):
+
+| Rol | Celular |
+|---|---|
+| Cliente demo | `984123456` |
+| Dueño de Pollería El Chaski Dorado | `910000000` (los demás negocios: `910000001`…`910000010`, en el orden del catálogo) |
+| Repartidores | `900000101` (Luis), `900000102` (Yeni) |
+| Admin | `900000001` |

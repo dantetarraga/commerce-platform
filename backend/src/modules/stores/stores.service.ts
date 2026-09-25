@@ -97,6 +97,19 @@ export class StoresService {
     };
   }
 
+  /** Pausa o reanuda pedidos. `ownerId` limita al dueño; sin él (admin), cualquiera. */
+  async setAcceptingOrders(storeId: string, isAcceptingOrders: boolean, ownerId?: string) {
+    const { count } = await this.prisma.store.updateMany({
+      where: { id: storeId, deletedAt: null, ...(ownerId && { ownerId }) },
+      data: { isAcceptingOrders },
+    });
+    if (count === 0) throw AppException.notFound('No encontramos ese negocio.');
+    return this.prisma.store.findUniqueOrThrow({
+      where: { id: storeId },
+      select: { id: true, name: true, isAcceptingOrders: true },
+    });
+  }
+
   /** Para otros módulos (productos, búsqueda): negocio + su ciudad, o 404. */
   async load(storeId: string): Promise<{ store: StoreForSummary; city: CityContext }> {
     const store = await this.prisma.store.findFirst({

@@ -14,7 +14,7 @@ Estado al 2026-09-24. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Onboarding, login OTP, home, búsqueda, negocio, producto, bolsa, checkout (propina, programado, cupón, vuelto), seguimiento, historial, calificación, favoritos, direcciones, avisos, perfil | Ubicación real, avisos y direcciones contra la API, editar perfil |
-| Backend (`backend/`) | Auth OTP + refresh rotativo, `/users/me`, catálogo, search, discovery, **cupones y pedidos** (crear, listar, detalle, calificar), seed de Espinar, 36 unit + 52 e2e | Operación (merchant/courier), cancelación, avisos, direcciones |
+| Backend (`backend/`) | Auth OTP + refresh rotativo, `/users/me`, catálogo, search, discovery, cupones, pedidos, **operación de negocio y repartidor**, cancelación, seed de Espinar, 47 unit + 57 e2e | Avisos, direcciones, CRUD de catálogo, SMS real |
 | Infra | `docker-compose.yml` con Postgres para desarrollo | CI, Dockerfile de la API, hosting, base administrada |
 | Repo | Backend, CI y docs commiteados en la rama `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
 
@@ -38,9 +38,9 @@ Además, para que funcionen bien:
 - **Pedidos programados:** si el negocio está cerrado, se acepta cuando `scheduledFor` cae dentro de su horario (el fake ya lo hace).
 - **Popularidad:** `Store.popularityScore` es un dato fijo del seed; debería calcularse con los pedidos recientes.
 
-### Operación: hoy nadie avanza un pedido
+### Operación de pedidos (hecho vía API; falta el panel)
 
-Un pedido creado se queda en `RECEIVED` para siempre: no hay endpoints para merchant ni courier, aunque el seed ya crea esos usuarios y roles.
+Ya existen `/merchant/*`, `/courier/*` y `POST /orders/:id/cancel`, con la máquina de estados, cancelación con restauración de stock y cupón, y pausa del negocio. Se opera desde Swagger con los usuarios del seed (ver `backend/README.md`). Falta: botón de cancelar en la app, CRUD de catálogo y los paneles.
 
 | Pieza | Mínimo para el MVP |
 |---|---|
@@ -97,7 +97,7 @@ Esfuerzos aproximados, para una persona.
 | 1 | ✅ Commitear lo actual + CI básica | 0.5 día | Trabajar sobre una base segura |
 | 2 | ✅ Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
 | 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
-| 4 | Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
+| 4 | ✅ Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
 | 5 | Proveedor de SMS | 1 día | Login en producción |
 | 6 | Deploy (Dockerfile, hosting, base, HTTPS) | 1–2 días | Piloto con usuarios reales |
 | 7 | Ubicación real: GPS, mapa, sincronizar direcciones | 3–4 días | Fee y cobertura correctos |
