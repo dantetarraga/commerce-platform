@@ -59,6 +59,8 @@ src/
     ├── stores/      # listado con distancia/fee/ETA/horario, detalle, menú
     ├── products/    # detalle con variantes y opciones
     ├── search/      # /search y /discovery/* (unaccent + pg_trgm)
+    ├── coupons/     # validación compartida por la bolsa y el pedido
+    ├── orders/      # crear, listar, detalle, calificar (precios en order-pricing.ts)
     ├── categories/, promotions/, health/
     └── delivery/    # cálculo puro de distancia, cobertura, fee y ETA
 ```
@@ -83,7 +85,13 @@ Prefijo `/api/v1`. Errores siempre como
 | GET | `/products/:id?lat=&lng=` | pública |
 | GET | `/search?q=&lat=&lng=` | pública |
 | GET | `/discovery/local-products`, `/discovery/popular-searches` | pública |
+| POST | `/coupons/validate` `{ code, storeId, subtotal }` → `{ code, discount, label }` | Bearer |
+| POST | `/orders` (header opcional `Idempotency-Key`) → pedido | Bearer (CUSTOMER) |
+| GET | `/orders?cursor=&limit=` → `{ items, nextCursor }`, `/orders/:id` | Bearer (CUSTOMER) |
+| POST | `/orders/:id/rating` `{ rating: 1..5, comment? }` | Bearer (CUSTOMER) |
 | GET | `/health` | pública |
 
-Pendiente (fase 2): `POST /coupons/validate`, `POST /orders`, `GET /orders`,
-`GET /orders/:id`, `POST /orders/:id/rating`. El schema ya tiene sus tablas.
+`POST /orders` recibe la bolsa del dispositivo y recalcula todo: horario (o
+`scheduledFor` hasta 7 días), cobertura, variantes y opciones, stock
+condicional, mínimo, cupón (con cupo condicional), propina (máx. S/ 50) y
+vuelto. Todo en una transacción; el código público sale de `order_code_seq`.

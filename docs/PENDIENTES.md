@@ -14,13 +14,13 @@ Estado al 2026-09-24. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Onboarding, login OTP, home, búsqueda, negocio, producto, bolsa, checkout (propina, programado, cupón, vuelto), seguimiento, historial, calificación, favoritos, direcciones, avisos, perfil | Ubicación real, avisos y direcciones contra la API, editar perfil |
-| Backend (`backend/`) | Auth OTP + refresh rotativo, `/users/me`, cities, categories, promotions, stores, products, search, discovery, seed de Espinar, 22 unit + 29 e2e | Cupones, pedidos, operación (merchant/courier), avisos, direcciones |
+| Backend (`backend/`) | Auth OTP + refresh rotativo, `/users/me`, catálogo, search, discovery, **cupones y pedidos** (crear, listar, detalle, calificar), seed de Espinar, 36 unit + 52 e2e | Operación (merchant/courier), cancelación, avisos, direcciones |
 | Infra | `docker-compose.yml` con Postgres para desarrollo | CI, Dockerfile de la API, hosting, base administrada |
-| Repo | Commit inicial de mobile | `backend/`, `docker-compose.yml`, `infra/` y los cambios de docs **sin commitear**; 4 archivos de mobile modificados |
+| Repo | Backend, CI y docs commiteados en la rama `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
 
 ## Backend
 
-### Endpoints que la app ya consume y no existen
+### ~~Endpoints que la app ya consume y no existen~~ (hecho)
 
 Contrato exacto en `mobile/lib/features/cart/infrastructure/datasources/coupon_remote_data_source.dart` y `mobile/lib/features/orders/infrastructure/` (`OrderJson` y el datasource fake).
 
@@ -94,8 +94,8 @@ Esfuerzos aproximados, para una persona.
 
 | # | Trabajo | Esfuerzo | Desbloquea |
 |---|---|---|---|
-| 1 | Commitear lo actual + CI básica | 0.5 día | Trabajar sobre una base segura |
-| 2 | Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
+| 1 | ✅ Commitear lo actual + CI básica | 0.5 día | Trabajar sobre una base segura |
+| 2 | ✅ Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
 | 3 | App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
 | 4 | Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
 | 5 | Proveedor de SMS | 1 día | Login en producción |

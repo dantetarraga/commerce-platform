@@ -13,7 +13,9 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CitiesModule } from './modules/cities/cities.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
 import { HealthModule } from './modules/health/health.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
 import { PromotionsModule } from './modules/promotions/promotions.module';
 import { SearchModule } from './modules/search/search.module';
@@ -71,6 +73,8 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     StoresModule,
     ProductsModule,
     SearchModule,
+    CouponsModule,
+    OrdersModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

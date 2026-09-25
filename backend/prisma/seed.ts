@@ -62,6 +62,7 @@ const COUPONS = [
     type: CouponType.FIXED_AMOUNT,
     value: 1000,
     minOrderAmount: 2000,
+    firstOrderOnly: true,
   },
   {
     code: 'KANTUFREE',
@@ -105,7 +106,14 @@ export async function seed(prisma: PrismaClient): Promise<void> {
   }
 
   for (const coupon of COUPONS) {
-    const data = { cityId: CITY.id, startsAt: VALID_FROM, endsAt: VALID_UNTIL, perUserLimit: 1, ...coupon };
+    const data = {
+      cityId: CITY.id,
+      startsAt: VALID_FROM,
+      endsAt: VALID_UNTIL,
+      perUserLimit: 1,
+      firstOrderOnly: false,
+      ...coupon,
+    };
     await prisma.coupon.upsert({ where: { code: coupon.code }, create: data, update: data });
   }
 

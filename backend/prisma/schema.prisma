@@ -363,7 +363,7 @@ model PopularSearch {
 
 model Order {
   id             String            @id @default(cuid())
-  code           String            @unique // público y legible: "#2481"
+  code           String            @unique // público y legible: "#2481" (secuencia order_code_seq)
   idempotencyKey String?
   customerId     String
   storeId        String
@@ -507,6 +507,7 @@ model Coupon {
   endsAt         DateTime
   usageLimit     Int? // null = sin límite global
   perUserLimit   Int        @default(1)
+  firstOrderOnly Boolean    @default(false) // solo si el cliente no tiene pedidos previos
   usedCount      Int        @default(0) // incremento condicional al crear el pedido
   isActive       Boolean    @default(true)
 
