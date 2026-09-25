@@ -3,6 +3,8 @@ import { AppException, ErrorCode } from '../../../common/exceptions/app.exceptio
 import { PrismaService } from '../../../database/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
 import { OrderStatus, PaymentStatus, Role } from '../../../generated/prisma/enums';
+import { NotificationsService } from '../../notifications/notifications.service';
+import { orderNotice } from '../../notifications/order-notices';
 import { orderInclude, OrderWithDetails } from '../order-presenter';
 import { canTransition } from './order-status.machine';
 
@@ -31,12 +33,15 @@ export function scopeFor(actor: OrderActor): Prisma.OrderWhereInput {
 /**
  * Cambios de estado del pedido. Cada uno va en una transacción, con update
  * condicional sobre el estado actual (dos personas no avanzan el mismo pedido
- * a la vez), historial y sus efectos: cobrar al entregar, restaurar stock y
- * cupón al cancelar.
+ * a la vez), historial, el aviso al cliente y sus efectos: cobrar al
+ * entregar, restaurar stock y cupón al cancelar.
  */
 @Injectable()
 export class OrderStatusService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   async find(actor: OrderActor, orderId: string): Promise<OrderWithDetails> {
     const order = await this.prisma.order.findFirst({
@@ -59,20 +64,28 @@ export class OrderStatusService {
         await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: PaymentStatus.PAID } });
         await tx.store.update({ where: { id: order.storeId }, data: { popularityScore: { increment: 1 } } });
       }
+      const courier = order.courier && {
+        firstName: order.courier.user.firstName,
+        vehicleLabel: order.courier.vehicleLabel,
+      };
+      await this.notifyCustomer(tx, order, to, { courier });
     });
     return this.find(actor, orderId);
+  }
+
+  async courierFor(userId: string) {
+    const courier = await this.prisma.courier.findUnique({
+      where: { userId },
+      include: { user: { select: { firstName: true } } },
+    });
+    if (!courier) throw AppException.notFound('No tienes perfil de repartidor.');
+    return courier;
   }
 
   /**
    * El courier toma un pedido listo de su ciudad. Condicional: si dos
    * repartidores aceptan a la vez, solo uno se lo lleva.
    */
-  async courierFor(userId: string) {
-    const courier = await this.prisma.courier.findUnique({ where: { userId } });
-    if (!courier) throw AppException.notFound('No tienes perfil de repartidor.');
-    return courier;
-  }
-
   async accept(courierUserId: string, orderId: string): Promise<OrderWithDetails> {
     const courier = await this.courierFor(courierUserId);
 
@@ -96,6 +109,13 @@ export class OrderStatusService {
           changedById: courierUserId,
           changedByRole: Role.COURIER,
         },
+      });
+      const order = await tx.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { id: true, code: true, storeId: true, storeName: true, customerId: true },
+      });
+      await this.notifyCustomer(tx, order, OrderStatus.COURIER_ASSIGNED, {
+        courier: { firstName: courier.user.firstName, vehicleLabel: courier.vehicleLabel },
       });
     });
     return this.find({ userId: courierUserId, role: Role.COURIER }, orderId);
@@ -138,8 +158,28 @@ export class OrderStatusService {
         }
       }
       await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: PaymentStatus.CANCELLED } });
+      // Si canceló el propio cliente, ya lo sabe.
+      if (actor.role !== Role.CUSTOMER) {
+        await this.notifyCustomer(tx, order, OrderStatus.CANCELLED, { cancelReason: reason });
+      }
     });
     return this.find(actor, orderId);
+  }
+
+  private async notifyCustomer(
+    tx: Prisma.TransactionClient,
+    order: { id: string; code: string; storeId: string; storeName: string; customerId: string },
+    to: OrderStatus,
+    extra: { courier?: { firstName: string; vehicleLabel: string } | null; cancelReason?: string },
+  ) {
+    const notice = orderNotice(to, {
+      orderId: order.id,
+      code: order.code,
+      storeId: order.storeId,
+      storeName: order.storeName,
+      ...extra,
+    });
+    if (notice) await this.notifications.notifyOrder(tx, order.customerId, notice);
   }
 
   private async move(

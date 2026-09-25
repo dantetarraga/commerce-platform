@@ -1,19 +1,5 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
-
-export class ListOrdersQueryDto {
-  /** `nextCursor` de la página anterior. */
-  @IsOptional()
-  @IsString()
-  cursor?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(50)
-  limit = 20;
-}
 
 export class RateOrderDto {
   @IsInt()

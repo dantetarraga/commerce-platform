@@ -56,7 +56,7 @@ Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y u
 
 | Módulo | Estado en la app | Endpoint sugerido |
 |---|---|---|
-| Avisos | Repositorio fake en memoria | `GET /notifications`, `POST /notifications/read-all`, generados al cambiar el estado del pedido |
+| Avisos | ✅ In-app: el backend los crea en cada cambio de estado; la app lee `/notifications`. Falta push (FCM) | — |
 | Direcciones | Guardadas en el dispositivo | `GET/POST/PATCH/DELETE /users/me/addresses` (la tabla `Address` ya existe) |
 | Favoritos | Guardados en el dispositivo | Opcional: sincronizar para que se conserven al cambiar de teléfono |
 
@@ -68,7 +68,7 @@ Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y u
 | Enviar `lat`/`lng` | `/stores/:id` y `/products/:id` los aceptan, pero la app no los envía, así que el fee se calcula desde el centro de la ciudad |
 | `Idempotency-Key` | Generarlo al abrir el checkout y regenerarlo si cambia el pedido (§8 del doc) |
 | Editar perfil | El botón dice "Muy pronto"; `PATCH /users/me` ya existe |
-| Avisos reales y push | Hoy son datos de prueba; push (FCM) va con el módulo de avisos |
+| Push | Los avisos in-app ya son reales; falta push con FCM para enterarse sin abrir la app |
 | Seguimiento | Consulta cada 8 s. Alcanza para el MVP; WebSocket después |
 | Android | El `AndroidManifest.xml` de `main` no declara `INTERNET` (solo debug/profile lo tienen), así que un build de release no llega a la API. Además, `http://10.0.2.2` necesita permitir tráfico sin TLS en debug. **Verificar** en un dispositivo |
 | Host de la API | `env/dev.json` usa `10.0.2.2` (solo el emulador de Android). Un teléfono físico o iOS necesita la IP de la máquina o un túnel |

@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { CursorQueryDto } from '../../../common/dto/cursor-query.dto';
 import { OrderStatus } from '../../../generated/prisma/enums';
-import { ListOrdersQueryDto } from './order-queries.dto';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -32,7 +32,7 @@ export class AdvanceOrderDto {
   note?: string | null;
 }
 
-export class StaffOrdersQueryDto extends ListOrdersQueryDto {
+export class StaffOrdersQueryDto extends CursorQueryDto {
   @IsOptional()
   @IsIn(Object.values(OrderStatus))
   status?: OrderStatus;

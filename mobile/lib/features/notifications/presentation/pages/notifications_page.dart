@@ -21,10 +21,11 @@ class NotificationsPage extends ConsumerWidget {
       context.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': storeId}).ignore();
       return;
     }
-    // Avisos del pedido en curso: llevan a su seguimiento.
-    final activeId = ref.read(activeOrderIdProvider).value;
-    if (notice.kind.isOrder && notice.kind != NoticeKind.delivered && activeId != null) {
-      context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': activeId}).ignore();
+    // Avisos de un pedido: llevan a su seguimiento (el aviso dice cuál; los
+    // de prueba no lo traen y usan el pedido en curso).
+    final orderId = notice.orderId ?? ref.read(activeOrderIdProvider).value;
+    if (notice.kind.isOrder && notice.kind != NoticeKind.delivered && orderId != null) {
+      context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': orderId}).ignore();
     }
   }
 
@@ -98,6 +99,7 @@ class NoticeTile extends StatelessWidget {
     NoticeKind.courierAssigned => Icons.two_wheeler_rounded,
     NoticeKind.courierNearby => Icons.delivery_dining_rounded,
     NoticeKind.delivered => Icons.shopping_bag_rounded,
+    NoticeKind.orderCancelled => Icons.cancel_outlined,
     NoticeKind.promotion => Icons.local_offer_rounded,
   };
 

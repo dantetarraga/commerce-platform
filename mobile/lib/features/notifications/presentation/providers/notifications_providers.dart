@@ -1,13 +1,17 @@
+import 'package:chaski/app/config/app_config_provider.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
+import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/features/notifications/domain/notice.dart';
+import 'package:chaski/features/notifications/infrastructure/api_notifications_repository.dart';
 import 'package:chaski/features/notifications/infrastructure/fake_notifications_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Providers escritos a mano (sin codegen).
 
-/// Aún no hay endpoint de avisos: se usa el repositorio en memoria.
 final notificationsRepositoryProvider = Provider<NotificationsRepository>(
-  (ref) => FakeNotificationsRepository(ref.watch(fakeBackendProvider)),
+  (ref) => ref.watch(appEnvProvider).useFakeData
+      ? FakeNotificationsRepository(ref.watch(fakeBackendProvider))
+      : ApiNotificationsRepository(ref.watch(apiClientProvider)),
 );
 
 /// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".

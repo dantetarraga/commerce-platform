@@ -18,6 +18,7 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 import { CouriersModule } from './modules/couriers/couriers.module';
 import { HealthModule } from './modules/health/health.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { MerchantModule } from './modules/merchant/merchant.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
@@ -83,6 +84,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     MerchantModule,
     CouriersModule,
     MaintenanceModule,
+    NotificationsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

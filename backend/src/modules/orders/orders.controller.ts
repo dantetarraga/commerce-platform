@@ -2,9 +2,10 @@ import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Post, Quer
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../common/decorators/auth.decorators';
+import { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { Role } from '../../generated/prisma/enums';
-import { ListOrdersQueryDto, RateOrderDto } from './dto/order-queries.dto';
+import { RateOrderDto } from './dto/order-queries.dto';
 import { CancelOrderDto } from './dto/order-status.dto';
 import { PlaceOrderDto } from './dto/place-order.dto';
 import { toOrderResponse } from './order-presenter';
@@ -39,7 +40,7 @@ export class OrdersController {
   }
 
   @Get()
-  list(@CurrentUser() user: AuthUser, @Query() query: ListOrdersQueryDto) {
+  list(@CurrentUser() user: AuthUser, @Query() query: CursorQueryDto) {
     return this.orders.list(user.id, query);
   }
 

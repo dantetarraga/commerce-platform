@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import type { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { isOpenAt, localTime } from '../../common/utils/schedule';
 import { PrismaService } from '../../database/prisma.service';
@@ -8,7 +9,7 @@ import type { CityContext } from '../cities/cities.service';
 import { CouponsService } from '../coupons/coupons.service';
 import { isStoreOpen, StoreForSummary, storeDelivery } from '../stores/store-presenter';
 import { StoresService } from '../stores/stores.service';
-import type { ListOrdersQueryDto, RateOrderDto } from './dto/order-queries.dto';
+import type { RateOrderDto } from './dto/order-queries.dto';
 import type { PlaceOrderDto } from './dto/place-order.dto';
 import { MAX_TIP } from './dto/place-order.dto';
 import { orderTotals, priceItem, PricedItem, unavailable } from './order-pricing';
@@ -170,13 +171,13 @@ export class OrdersService {
     }
   }
 
-  async list(userId: string, query: ListOrdersQueryDto) {
+  async list(userId: string, query: CursorQueryDto) {
     const { orders, nextCursor } = await this.page({ customerId: userId }, query);
     return { items: orders.map(toOrderResponse), nextCursor };
   }
 
   /** Página por cursor, del más reciente al más antiguo. La usan también negocio y courier. */
-  async page(where: Prisma.OrderWhereInput, query: ListOrdersQueryDto) {
+  async page(where: Prisma.OrderWhereInput, query: CursorQueryDto) {
     const orders = await this.prisma.order.findMany({
       where,
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],

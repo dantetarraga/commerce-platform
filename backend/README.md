@@ -70,6 +70,8 @@ src/
     ├── orders/      # crear, listar, detalle, calificar, cancelar; status/ = máquina de estados
     ├── merchant/    # operación del negocio: /merchant/*
     ├── couriers/    # operación del repartidor: /courier/*
+    ├── notifications/ # avisos in-app, creados en la transacción de cada cambio de estado
+    ├── maintenance/ # limpieza diaria de datos de auth vencidos
     ├── categories/, promotions/, health/
     └── delivery/    # cálculo puro de distancia, cobertura, fee y ETA
 ```
@@ -104,6 +106,7 @@ Prefijo `/api/v1`. Errores siempre como
 | PATCH | `/merchant/stores/:id` `{ isAcceptingOrders }` | Bearer (MERCHANT, ADMIN) |
 | GET | `/courier/orders/available`, `/courier/orders` | Bearer (COURIER) |
 | POST | `/courier/orders/:id/accept`, `/courier/orders/:id/status` `{ status: ON_THE_WAY\|DELIVERED }` | Bearer (COURIER) |
+| GET | `/notifications?cursor=&limit=` → `{ items, nextCursor, unreadCount }`; POST `/notifications/read-all` | Bearer |
 | GET | `/health` | pública |
 
 `POST /orders` recibe la bolsa del dispositivo y recalcula todo: horario (o

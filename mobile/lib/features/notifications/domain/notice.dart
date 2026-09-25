@@ -8,6 +8,7 @@ enum NoticeKind {
   courierAssigned,
   courierNearby,
   delivered,
+  orderCancelled,
   promotion;
 
   /// Avisos del pedido (se pintan en cobalto suave; las promos, en lima).

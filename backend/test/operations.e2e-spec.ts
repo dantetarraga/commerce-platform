@@ -143,6 +143,26 @@ describe('Operación del pedido (e2e)', () => {
     const store = await prisma.store.findUniqueOrThrow({ where: { id: STORE } });
     expect(store.popularityScore).toBe(popularityBefore + 1);
 
+    // Cada paso le llegó al cliente como aviso, del más reciente al más antiguo.
+    const notices = await http().get(`${API}/notifications`).set(customer.auth).expect(200);
+    expect(notices.body.items.map((n: { kind: string }) => n.kind)).toEqual([
+      'DELIVERED',
+      'COURIER_NEARBY',
+      'COURIER_ASSIGNED',
+      'PREPARING',
+      'ORDER_CONFIRMED',
+    ]);
+    expect(notices.body.items[2]).toMatchObject({
+      title: 'Luis va por tu pedido',
+      orderId: order.id,
+      read: false,
+      at: expect.any(String),
+    });
+    expect(notices.body.unreadCount).toBe(5);
+    await http().post(`${API}/notifications/read-all`).set(customer.auth).expect(204);
+    const read = await http().get(`${API}/notifications`).set(customer.auth).expect(200);
+    expect(read.body.unreadCount).toBe(0);
+
     // Entregado es final.
     expect((await courierStatus(order.id, 'DELIVERED').expect(409)).body.code).toBe('INVALID_STATUS_TRANSITION');
   });
@@ -187,6 +207,13 @@ describe('Operación del pedido (e2e)', () => {
       .send({ reason: 'Se acabó el pollo' })
       .expect(200);
     expect(res.body).toMatchObject({ status: 'CANCELLED', cancelReason: 'Se acabó el pollo' });
+
+    const notices = await http().get(`${API}/notifications`).set(customer.auth).expect(200);
+    expect(notices.body.items[0]).toMatchObject({
+      kind: 'ORDER_CANCELLED',
+      orderId: order.id,
+      body: 'Pollería El Chaski Dorado: Se acabó el pollo. No se te cobró nada.',
+    });
   });
 
   it('pausar el negocio corta los pedidos nuevos; solo su dueño puede', async () => {

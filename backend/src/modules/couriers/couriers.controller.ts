@@ -2,8 +2,8 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../common/decorators/auth.decorators';
+import { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { OrderStatus, Role } from '../../generated/prisma/enums';
-import { ListOrdersQueryDto } from '../orders/dto/order-queries.dto';
 import { AdvanceOrderDto } from '../orders/dto/order-status.dto';
 import { toStaffOrderResponse } from '../orders/order-presenter';
 import { OrdersService } from '../orders/orders.service';
@@ -25,7 +25,7 @@ export class CouriersController {
 
   /** Listos en el negocio y sin repartidor, en la ciudad del courier. */
   @Get('orders/available')
-  async available(@CurrentUser() user: AuthUser, @Query() query: ListOrdersQueryDto) {
+  async available(@CurrentUser() user: AuthUser, @Query() query: CursorQueryDto) {
     const courier = await this.status.courierFor(user.id);
     const { orders, nextCursor } = await this.orders.page(
       { cityId: courier.cityId, status: OrderStatus.READY, courierId: null },
@@ -36,7 +36,7 @@ export class CouriersController {
 
   /** Los pedidos que tomó, del más reciente al más antiguo. */
   @Get('orders')
-  async mine(@CurrentUser() user: AuthUser, @Query() query: ListOrdersQueryDto) {
+  async mine(@CurrentUser() user: AuthUser, @Query() query: CursorQueryDto) {
     const { orders, nextCursor } = await this.orders.page(scopeFor({ userId: user.id, role: Role.COURIER }), query);
     return { items: orders.map(toStaffOrderResponse), nextCursor };
   }
