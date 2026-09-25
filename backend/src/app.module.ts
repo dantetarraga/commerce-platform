@@ -10,6 +10,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { RolesGuard } from './common/guards/roles.guard';
 import { Env, validateEnv } from './config/env';
 import { PrismaModule } from './database/prisma.module';
+import { AddressesModule } from './modules/addresses/addresses.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
 import { CategoriesModule } from './modules/categories/categories.module';
@@ -85,6 +86,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     CouriersModule,
     MaintenanceModule,
     NotificationsModule,
+    AddressesModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

@@ -8,9 +8,14 @@ part of 'address_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Con la API, local primero y sincronizado con la cuenta: al entrar o salir
+/// de la sesión el repositorio cambia y la libreta se vuelve a cargar.
 
 @ProviderFor(addressRepository)
 final addressRepositoryProvider = AddressRepositoryProvider._();
+
+/// Con la API, local primero y sincronizado con la cuenta: al entrar o salir
+/// de la sesión el repositorio cambia y la libreta se vuelve a cargar.
 
 final class AddressRepositoryProvider
     extends
@@ -20,6 +25,8 @@ final class AddressRepositoryProvider
           AddressRepository
         >
     with $Provider<AddressRepository> {
+  /// Con la API, local primero y sincronizado con la cuenta: al entrar o salir
+  /// de la sesión el repositorio cambia y la libreta se vuelve a cargar.
   AddressRepositoryProvider._()
     : super(
         from: null,
@@ -54,7 +61,7 @@ final class AddressRepositoryProvider
   }
 }
 
-String _$addressRepositoryHash() => r'391ca865d72a199222a1ccb94adbabe20e1bf8c5';
+String _$addressRepositoryHash() => r'062c5e88901e84d78ae79dcf2681a5b43031799a';
 
 /// Libreta de direcciones. La seleccionada define dónde se entregan los
 /// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app

@@ -57,7 +57,7 @@ Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y u
 | Módulo | Estado en la app | Endpoint sugerido |
 |---|---|---|
 | Avisos | ✅ In-app: el backend los crea en cada cambio de estado; la app lee `/notifications`. Falta push (FCM) | — |
-| Direcciones | Guardadas en el dispositivo | `GET/POST/PATCH/DELETE /users/me/addresses` (la tabla `Address` ya existe) |
+| Direcciones | ✅ Local primero y sincronizadas con `GET/PUT /users/me/addresses` | — |
 | Favoritos | Guardados en el dispositivo | Opcional: sincronizar para que se conserven al cambiar de teléfono |
 
 ## App móvil

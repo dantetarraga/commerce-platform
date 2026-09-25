@@ -158,10 +158,11 @@ model RefreshToken {
   @@index([familyId])
 }
 
-// Hoy las direcciones viven en el dispositivo; la tabla queda para sincronizarlas.
+// Libreta de direcciones sincronizada con la app (local primero; ver PUT /users/me/addresses).
 model Address {
   id          String    @id @default(cuid())
   userId      String
+  clientId    String // id que genera la app; único por usuario
   cityId      String?
   kind        String // HOME, WORK, OTHER (AddressKind de la app)
   label       String?
@@ -177,6 +178,7 @@ model Address {
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   city City? @relation(fields: [cityId], references: [id])
 
+  @@unique([userId, clientId])
   @@index([userId])
 }
 

@@ -14,6 +14,9 @@ class ApiClient {
   Future<dynamic> post(String path, {Object? body, Map<String, String>? headers}) =>
       _send(() => _dio.post<dynamic>(path, data: body, options: Options(headers: headers)));
 
+  Future<dynamic> put(String path, {Object? body}) =>
+      _send(() => _dio.put<dynamic>(path, data: body));
+
   Future<dynamic> patch(String path, {Object? body}) =>
       _send(() => _dio.patch<dynamic>(path, data: body));
 

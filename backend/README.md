@@ -62,6 +62,7 @@ src/
 └── modules/
     ├── auth/        # OTP por SMS, registro, refresh rotativo, guard JWT global
     ├── users/       # /users/me
+    ├── addresses/   # libreta sincronizada con la app (local primero)
     ├── cities/      # resolución de ciudad por ubicación
     ├── stores/      # listado con distancia/fee/ETA/horario, detalle, menú
     ├── products/    # detalle con variantes y opciones
@@ -90,6 +91,7 @@ Prefijo `/api/v1`. Errores siempre como
 | POST | `/auth/refresh` `{ refreshToken }` → par nuevo (rotación) | pública |
 | POST | `/auth/logout` `{ refreshToken }` → 204, idempotente | pública |
 | GET/PATCH | `/users/me` | Bearer |
+| GET/PUT | `/users/me/addresses` `{ selectedId, addresses[] }` (libreta completa, ids de la app) | Bearer |
 | GET | `/cities`, `/categories`, `/promotions?cityId=` | pública |
 | GET | `/stores?lat=&lng=&sort=distance\|popular\|rating&categoryId=&includeOutOfCoverage=&page=&limit=` | pública |
 | GET | `/stores/:id?lat=&lng=`, `/stores/:id/products` | pública |
