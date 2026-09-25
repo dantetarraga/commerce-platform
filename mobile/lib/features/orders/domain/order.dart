@@ -170,6 +170,10 @@ final class Order extends Equatable {
 
   bool get isActive => !status.isFinal;
 
+  /// El cliente puede cancelar mientras el negocio no empezó a prepararlo
+  /// (misma regla que el backend).
+  bool get canBeCancelled => status == OrderStatus.received || status == OrderStatus.confirmed;
+
   int get itemCount => lines.fold(0, (sum, l) => sum + l.quantity);
 
   DateTime? timeOf(OrderStatus s) => events.where((e) => e.status == s).firstOrNull?.at;
@@ -316,4 +320,6 @@ abstract interface class OrdersRepository {
   Future<Result<List<Order>>> history();
 
   Future<Result<Order>> rate(String orderId, {required int rating, String comment = ''});
+
+  Future<Result<Order>> cancel(String orderId, {String? reason});
 }

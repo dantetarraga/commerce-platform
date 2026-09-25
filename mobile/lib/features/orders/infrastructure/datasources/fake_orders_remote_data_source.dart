@@ -264,6 +264,28 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
   }
 
   @override
+  Future<Map<String, dynamic>> cancel(String orderId, {String? reason}) async {
+    await _backend.delay();
+    final order = _orders[orderId];
+    if (order == null) throw const ApiException(statusCode: 404, code: 'NOT_FOUND', message: 'No encontramos ese pedido.');
+    if (order['status'] != 'RECEIVED' && order['status'] != 'CONFIRMED') {
+      throw const ApiException(
+        statusCode: 409,
+        code: 'INVALID_STATUS_TRANSITION',
+        message: 'El negocio ya está preparando tu pedido: escríbenos para cancelarlo.',
+      );
+    }
+    order
+      ..['status'] = 'CANCELLED'
+      ..['events'] = [
+        ...(order['events'] as List),
+        {'status': 'CANCELLED', 'at': DateTime.now().toUtc().toIso8601String()},
+      ];
+    if (!_changes.isClosed) _changes.add(Map.of(order));
+    return Map.of(order);
+  }
+
+  @override
   Stream<Map<String, dynamic>> watch(String orderId) async* {
     yield await get(orderId);
     yield* _changes.stream.where((o) => o['id'] == orderId);

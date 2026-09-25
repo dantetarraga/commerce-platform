@@ -1,4 +1,6 @@
 import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/errors/failure.dart';
+import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/presentation/pages/order_help_page.dart';
 import 'package:chaski/features/orders/presentation/pages/order_tracking_page.dart';
@@ -8,6 +10,9 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class _MockOrdersRepository extends Mock implements OrdersRepository {}
 
 void main() {
   final placed = DateTime(2026, 9, 23, 13, 2);
@@ -31,14 +36,17 @@ void main() {
     estimatedArrival: eta,
   );
 
-  Future<void> pump(WidgetTester tester, Widget page, Order o) async {
+  Future<void> pump(WidgetTester tester, Widget page, Order o, {OrdersRepository? repository}) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [orderWatchProvider(o.id).overrideWith((ref) => Stream.value(o))],
+        overrides: [
+          orderWatchProvider(o.id).overrideWith((ref) => Stream.value(o)),
+          if (repository != null) ordersRepositoryProvider.overrideWithValue(repository),
+        ],
         child: MaterialApp(
           theme: AppTheme.light(),
           home: MediaQuery(data: const MediaQueryData(disableAnimations: true), child: page),
@@ -101,5 +109,55 @@ void main() {
     AppToast.dismiss();
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
+  });
+
+  group('cancelar desde la ayuda', () {
+    testWidgets('solo aparece antes de que el negocio empiece a preparar', (tester) async {
+      await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.preparing));
+      expect(find.text('Cancelar pedido'), findsNothing);
+    });
+
+    testWidgets('confirma, cancela y avisa que no se cobró', (tester) async {
+      final repository = _MockOrdersRepository();
+      when(
+        () => repository.cancel('o1', reason: any(named: 'reason')),
+      ).thenAnswer((_) async => Result.ok(order(OrderStatus.cancelled)));
+      when(repository.history).thenAnswer((_) async => const Result.ok(<Order>[]));
+      when(() => repository.watch('o1')).thenAnswer((_) => Stream.value(order(OrderStatus.cancelled)));
+
+      await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.received), repository: repository);
+      await tester.tap(find.text('Cancelar pedido'));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('¿Cancelar tu pedido?'), findsOneWidget);
+
+      await tester.tap(find.text('Sí, cancelar'));
+      await tester.pump(const Duration(milliseconds: 400));
+      verify(() => repository.cancel('o1', reason: any(named: 'reason'))).called(1);
+      expect(find.text('Cancelamos tu pedido. No se te cobró nada.'), findsOneWidget);
+
+      AppToast.dismiss();
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 5));
+    });
+
+    testWidgets('si ya no se puede, muestra el motivo del backend', (tester) async {
+      final repository = _MockOrdersRepository();
+      when(() => repository.cancel('o1', reason: any(named: 'reason'))).thenAnswer(
+        (_) async => const Result.err(
+          BusinessFailure('INVALID_STATUS_TRANSITION', 'El negocio ya está preparando tu pedido: escríbenos para cancelarlo.'),
+        ),
+      );
+
+      await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.confirmed), repository: repository);
+      await tester.tap(find.text('Cancelar pedido'));
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.tap(find.text('Sí, cancelar'));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.textContaining('escríbenos para cancelarlo'), findsOneWidget);
+
+      AppToast.dismiss();
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(seconds: 5));
+    });
   });
 }

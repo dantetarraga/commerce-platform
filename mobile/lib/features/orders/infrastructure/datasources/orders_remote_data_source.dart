@@ -12,6 +12,8 @@ abstract interface class OrdersRemoteDataSource {
 
   Future<Map<String, dynamic>> rate(String orderId, {required int rating, required String comment});
 
+  Future<Map<String, dynamic>> cancel(String orderId, {String? reason});
+
   /// Cambios del pedido. La API real consulta periódicamente; el fake empuja.
   Stream<Map<String, dynamic>> watch(String orderId);
 }
@@ -43,6 +45,10 @@ class ApiOrdersRemoteDataSource implements OrdersRemoteDataSource {
   @override
   Future<Map<String, dynamic>> rate(String orderId, {required int rating, required String comment}) async =>
       (await _api.post('/orders/$orderId/rating', body: {'rating': rating, 'comment': comment})) as Map<String, dynamic>;
+
+  @override
+  Future<Map<String, dynamic>> cancel(String orderId, {String? reason}) async =>
+      (await _api.post('/orders/$orderId/cancel', body: {'reason': ?reason})) as Map<String, dynamic>;
 
   @override
   Stream<Map<String, dynamic>> watch(String orderId) async* {

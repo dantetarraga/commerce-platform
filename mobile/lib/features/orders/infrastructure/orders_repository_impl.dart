@@ -24,6 +24,10 @@ class OrdersRepositoryImpl implements OrdersRepository {
   Future<Result<List<Order>>> history() => guard(() async => (await _remote.list()).map(OrderJson.fromJson).toList());
 
   @override
+  Future<Result<Order>> cancel(String orderId, {String? reason}) =>
+      guard(() async => OrderJson.fromJson(await _remote.cancel(orderId, reason: reason)));
+
+  @override
   Future<Result<Order>> rate(String orderId, {required int rating, String comment = ''}) =>
       guard(() async => OrderJson.fromJson(await _remote.rate(orderId, rating: rating, comment: comment)));
 }

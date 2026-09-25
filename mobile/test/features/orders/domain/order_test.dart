@@ -32,6 +32,14 @@ void main() {
     expect(order(OrderStatus.onTheWay, payment: const CashPayment()).detail, contains('efectivo'));
   });
 
+  test('se puede cancelar solo antes de que el negocio empiece a preparar', () {
+    expect(order(OrderStatus.received).canBeCancelled, isTrue);
+    expect(order(OrderStatus.confirmed).canBeCancelled, isTrue);
+    expect(order(OrderStatus.preparing).canBeCancelled, isFalse);
+    expect(order(OrderStatus.delivered).canBeCancelled, isFalse);
+    expect(order(OrderStatus.cancelled).canBeCancelled, isFalse);
+  });
+
   test('reached respeta el orden del quipu y cancelado no alcanza nada', () {
     final o = order(OrderStatus.ready);
     expect(o.reached(OrderStatus.preparing), isTrue);

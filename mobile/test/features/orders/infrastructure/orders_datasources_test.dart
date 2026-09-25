@@ -1,3 +1,4 @@
+import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
@@ -95,6 +96,18 @@ void main() {
       ),
     );
     tearDown(() => fake.dispose());
+
+    test('cancela un pedido recién hecho; uno entregado ya no', () async {
+      final placed = await fake.place(_body());
+      final cancelled = await fake.cancel(placed['id'] as String);
+      expect(cancelled['status'], 'CANCELLED');
+
+      final delivered = (await fake.list()).firstWhere((o) => o['status'] == 'DELIVERED');
+      await expectLater(
+        fake.cancel(delivered['id'] as String),
+        throwsA(isA<ApiException>().having((e) => e.code, 'code', 'INVALID_STATUS_TRANSITION')),
+      );
+    });
 
     test('la misma clave devuelve el mismo pedido, como la API', () async {
       final first = await fake.place(_body(), idempotencyKey: 'key-1');

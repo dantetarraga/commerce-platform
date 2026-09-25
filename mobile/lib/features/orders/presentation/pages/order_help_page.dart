@@ -1,3 +1,4 @@
+import 'package:chaski/core/result/result.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
@@ -49,6 +50,10 @@ class OrderHelpPage extends ConsumerWidget {
               _ => const Skeleton(child: SkeletonBox(height: 72, borderRadius: AppRadius.card)),
             },
           ),
+          if (order.value case final value? when value.canBeCancelled) ...[
+            const SizedBox(height: AppSpacing.md),
+            _CancelOrderButton(order: value),
+          ],
           const SizedBox(height: AppSpacing.section),
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
@@ -81,6 +86,59 @@ class OrderHelpPage extends ConsumerWidget {
     title: reason,
     builder: (_) => _DescribeSheet(order: order),
   ).ignore();
+}
+
+/// Cancelar mientras el negocio no empezó a prepararlo. Después, solo por soporte.
+class _CancelOrderButton extends ConsumerStatefulWidget {
+  const _CancelOrderButton({required this.order});
+
+  final Order order;
+
+  @override
+  ConsumerState<_CancelOrderButton> createState() => _CancelOrderButtonState();
+}
+
+class _CancelOrderButtonState extends ConsumerState<_CancelOrderButton> {
+  var _cancelling = false;
+
+  Future<void> _cancel() async {
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: '¿Cancelar tu pedido?',
+      message: '${widget.order.store.name} todavía no empezó a prepararlo. No se te cobrará nada.',
+      confirmLabel: 'Sí, cancelar',
+      cancelLabel: 'No, mantenerlo',
+      destructive: true,
+    );
+    if (!confirmed || !mounted) return;
+
+    setState(() => _cancelling = true);
+    final result = await ref.read(ordersRepositoryProvider).cancel(widget.order.id);
+    if (!mounted) return;
+    setState(() => _cancelling = false);
+    switch (result) {
+      case Ok():
+        ref
+          ..invalidate(orderWatchProvider(widget.order.id))
+          ..invalidate(ordersHistoryProvider);
+        if (ref.read(activeOrderIdProvider).value == widget.order.id) {
+          ref.read(activeOrderIdProvider.notifier).clear();
+        }
+        AppToast.show(context, 'Cancelamos tu pedido. No se te cobró nada.', kind: AppToastKind.success);
+      case Err(:final failure):
+        // P. ej. el negocio lo empezó a preparar hace un momento.
+        ref.invalidate(orderWatchProvider(widget.order.id));
+        AppToast.show(context, failure.message, kind: AppToastKind.error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => AppButton.danger(
+    label: 'Cancelar pedido',
+    icon: Icons.cancel_outlined,
+    loading: _cancelling,
+    onPressed: _cancelling ? null : _cancel,
+  );
 }
 
 class _OrderSummaryCard extends StatelessWidget {
