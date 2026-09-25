@@ -1,4 +1,6 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/network/api_client.dart';
+import 'package:chaski/core/network/location_query.dart';
 import 'package:chaski/features/stores/domain/entities/store_query.dart';
 import 'package:chaski/features/stores/infrastructure/models/store_dtos.dart';
 
@@ -7,7 +9,7 @@ abstract interface class StoresRemoteDataSource {
 
   Future<StorePageDto> getStores(StoreQuery query);
 
-  Future<StoreDetailDto> getStoreDetail(String storeId);
+  Future<StoreDetailDto> getStoreDetail(String storeId, {GeoCoordinates? near});
 
   Future<StoreMenuDto> getStoreMenu(String storeId);
 }
@@ -40,8 +42,8 @@ class ApiStoresRemoteDataSource implements StoresRemoteDataSource {
   }
 
   @override
-  Future<StoreDetailDto> getStoreDetail(String storeId) async {
-    final data = await _api.get('/stores/$storeId');
+  Future<StoreDetailDto> getStoreDetail(String storeId, {GeoCoordinates? near}) async {
+    final data = await _api.get('/stores/$storeId', query: locationQuery(near));
     return StoreDetailDto.fromJson(data as Map<String, dynamic>);
   }
 

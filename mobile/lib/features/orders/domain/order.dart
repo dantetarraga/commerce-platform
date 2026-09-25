@@ -304,7 +304,9 @@ final class PlaceOrderItem extends Equatable {
 }
 
 abstract interface class OrdersRepository {
-  Future<Result<Order>> placeOrder(PlaceOrderRequest request);
+  /// [idempotencyKey]: repetir la llamada con la misma clave (doble tap,
+  /// reintento tras un corte) devuelve el mismo pedido en vez de crear otro.
+  Future<Result<Order>> placeOrder(PlaceOrderRequest request, {String? idempotencyKey});
 
   /// Estado vivo del pedido: emite el actual y cada cambio.
   Stream<Order> watch(String orderId);

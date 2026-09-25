@@ -10,8 +10,9 @@ class OrdersRepositoryImpl implements OrdersRepository {
   final OrdersRemoteDataSource _remote;
 
   @override
-  Future<Result<Order>> placeOrder(PlaceOrderRequest request) =>
-      guard(() async => OrderJson.fromJson(await _remote.place(OrderJson.requestToJson(request))));
+  Future<Result<Order>> placeOrder(PlaceOrderRequest request, {String? idempotencyKey}) => guard(
+    () async => OrderJson.fromJson(await _remote.place(OrderJson.requestToJson(request), idempotencyKey: idempotencyKey)),
+  );
 
   @override
   Stream<Order> watch(String orderId) => _remote.watch(orderId).map(OrderJson.fromJson);

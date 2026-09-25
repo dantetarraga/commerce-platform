@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/page_result.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/stores/domain/entities/category.dart';
@@ -36,7 +37,8 @@ class GetStoreDetail {
   const GetStoreDetail(this._repository);
   final StoresRepository _repository;
 
-  Future<Result<StoreDetail>> call(String storeId) => _repository.getStoreDetail(storeId);
+  Future<Result<StoreDetail>> call(String storeId, {GeoCoordinates? near}) =>
+      _repository.getStoreDetail(storeId, near: near);
 }
 
 class GetStoreMenu {

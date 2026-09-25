@@ -96,7 +96,7 @@ Esfuerzos aproximados, para una persona.
 |---|---|---|---|
 | 1 | ✅ Commitear lo actual + CI básica | 0.5 día | Trabajar sobre una base segura |
 | 2 | ✅ Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
-| 3 | App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
+| 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
 | 4 | Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
 | 5 | Proveedor de SMS | 1 día | Login en producción |
 | 6 | Deploy (Dockerfile, hosting, base, HTTPS) | 1–2 días | Piloto con usuarios reales |

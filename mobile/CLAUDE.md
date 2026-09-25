@@ -16,7 +16,8 @@
 
 ```bash
 flutter run --dart-define-from-file=env/fake.json   # demo sin backend
-flutter run --dart-define-from-file=env/dev.json    # contra la API local
+flutter run --dart-define-from-file=env/dev.json    # contra la API local (emulador Android)
+flutter run --dart-define-from-file=env/dev-device.json  # teléfono (con `adb reverse tcp:3000 tcp:3000`) o simulador iOS
 dart run build_runner build --delete-conflicting-outputs
 flutter analyze && flutter test
 ```

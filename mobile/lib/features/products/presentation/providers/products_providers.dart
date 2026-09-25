@@ -1,6 +1,7 @@
 import 'package:chaski/app/config/app_config_provider.dart';
 import 'package:chaski/core/domain/quantity.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
+import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/features/products/domain/entities/product.dart';
 import 'package:chaski/features/products/domain/entities/product_selection.dart';
@@ -20,9 +21,12 @@ ProductsRemoteDataSource productsRemoteDataSource(Ref ref) => ref.watch(appEnvPr
 @Riverpod(keepAlive: true)
 ProductsRepository productsRepository(Ref ref) => ProductsRepositoryImpl(ref.watch(productsRemoteDataSourceProvider));
 
+/// El delivery del negocio depende de la ubicación de entrega actual.
 @riverpod
-Future<Product> productDetail(Ref ref, String productId) =>
-    GetProductDetail(ref.watch(productsRepositoryProvider)).call(productId).then((r) => r.getOrThrow());
+Future<Product> productDetail(Ref ref, String productId) {
+  final near = ref.watch(currentDeliveryLocationProvider).coordinates;
+  return GetProductDetail(ref.watch(productsRepositoryProvider)).call(productId, near: near).then((r) => r.getOrThrow());
+}
 
 /// Selección en curso del detalle de producto. La lógica vive en la entidad;
 /// el controller solo expone sus transiciones a la UI.

@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/page_result.dart';
 import 'package:chaski/core/errors/failure_mapper.dart';
 import 'package:chaski/core/result/result.dart';
@@ -31,8 +32,8 @@ class StoresRepositoryImpl implements StoresRepository {
       guard(() async => (await _remote.getStores(query)).toDomain());
 
   @override
-  Future<Result<StoreDetail>> getStoreDetail(String storeId) =>
-      guard(() async => (await _remote.getStoreDetail(storeId)).toDomain());
+  Future<Result<StoreDetail>> getStoreDetail(String storeId, {GeoCoordinates? near}) =>
+      guard(() async => (await _remote.getStoreDetail(storeId, near: near)).toDomain());
 
   @override
   Future<Result<StoreMenu>> getStoreMenu(String storeId) =>

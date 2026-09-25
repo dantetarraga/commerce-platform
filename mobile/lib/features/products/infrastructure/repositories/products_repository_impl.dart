@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/errors/failure_mapper.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/products/domain/entities/product.dart';
@@ -11,6 +12,6 @@ class ProductsRepositoryImpl implements ProductsRepository {
   final ProductsRemoteDataSource _remote;
 
   @override
-  Future<Result<Product>> getProduct(String productId) =>
-      guard(() async => (await _remote.getProduct(productId)).toDomain());
+  Future<Result<Product>> getProduct(String productId, {GeoCoordinates? near}) =>
+      guard(() async => (await _remote.getProduct(productId, near: near)).toDomain());
 }

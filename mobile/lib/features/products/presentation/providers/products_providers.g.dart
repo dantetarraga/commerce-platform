@@ -105,12 +105,17 @@ final class ProductsRepositoryProvider
 String _$productsRepositoryHash() =>
     r'd89f42f09c1c38adf183c4f12d406b2d50e0b70d';
 
+/// El delivery del negocio depende de la ubicación de entrega actual.
+
 @ProviderFor(productDetail)
 final productDetailProvider = ProductDetailFamily._();
+
+/// El delivery del negocio depende de la ubicación de entrega actual.
 
 final class ProductDetailProvider
     extends $FunctionalProvider<AsyncValue<Product>, Product, FutureOr<Product>>
     with $FutureModifier<Product>, $FutureProvider<Product> {
+  /// El delivery del negocio depende de la ubicación de entrega actual.
   ProductDetailProvider._({
     required ProductDetailFamily super.from,
     required String super.argument,
@@ -154,7 +159,9 @@ final class ProductDetailProvider
   }
 }
 
-String _$productDetailHash() => r'e5c1289f299d0f3b7c76cd6357e6d70a4a66f3b6';
+String _$productDetailHash() => r'be25875624dd7e6b24a0477801be9d5fd76a6325';
+
+/// El delivery del negocio depende de la ubicación de entrega actual.
 
 final class ProductDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Product>, String> {
@@ -166,6 +173,8 @@ final class ProductDetailFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
+
+  /// El delivery del negocio depende de la ubicación de entrega actual.
 
   ProductDetailProvider call(String productId) =>
       ProductDetailProvider._(argument: productId, from: this);

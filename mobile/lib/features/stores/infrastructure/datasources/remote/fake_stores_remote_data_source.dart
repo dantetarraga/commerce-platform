@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/core/fake/fake_catalog_json.dart';
@@ -51,7 +52,7 @@ class FakeStoresRemoteDataSource implements StoresRemoteDataSource {
   }
 
   @override
-  Future<StoreDetailDto> getStoreDetail(String storeId) async {
+  Future<StoreDetailDto> getStoreDetail(String storeId, {GeoCoordinates? near}) async {
     await _backend.delay();
     final store = await _findStore(storeId);
     return StoreDetailDto.fromJson({

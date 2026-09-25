@@ -14,6 +14,7 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
 
   final FakeBackend _backend;
   final Map<String, Map<String, dynamic>> _orders = {};
+  final Map<String, String> _orderIdByIdempotencyKey = {};
   final _changes = StreamController<Map<String, dynamic>>.broadcast();
   final List<Timer> _timers = [];
   var _seeded = false;
@@ -125,9 +126,11 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> place(Map<String, Object?> body) async {
+  Future<Map<String, dynamic>> place(Map<String, Object?> body, {String? idempotencyKey}) async {
     await _backend.delay();
     await _seed();
+    // Igual que la API: la misma clave devuelve el pedido ya creado.
+    if (_orders[_orderIdByIdempotencyKey[idempotencyKey]] case final existing?) return Map.of(existing);
     final catalog = await _backend.catalog();
     final store = _backend.listOf(catalog, 'stores').where((s) => s['id'] == body['storeId']).firstOrNull;
     if (store == null) {
@@ -182,6 +185,7 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
       notes: body['notes'] as String? ?? '',
     );
     _orders[order['id'] as String] = order;
+    if (idempotencyKey != null) _orderIdByIdempotencyKey[idempotencyKey] = order['id'] as String;
     _scheduleProgression(order['id'] as String);
     return Map.of(order);
   }

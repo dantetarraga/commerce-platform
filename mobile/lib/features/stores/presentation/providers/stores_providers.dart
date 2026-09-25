@@ -41,9 +41,12 @@ Future<PageResult<StoreSummary>> stores(Ref ref, {StoreSort sort = StoreSort.dis
   return GetStores(ref.watch(storesRepositoryProvider)).call(query).then((r) => r.getOrThrow());
 }
 
+/// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
 @riverpod
-Future<StoreDetail> storeDetail(Ref ref, String storeId) =>
-    GetStoreDetail(ref.watch(storesRepositoryProvider)).call(storeId).then((r) => r.getOrThrow());
+Future<StoreDetail> storeDetail(Ref ref, String storeId) {
+  final near = ref.watch(currentDeliveryLocationProvider).coordinates;
+  return GetStoreDetail(ref.watch(storesRepositoryProvider)).call(storeId, near: near).then((r) => r.getOrThrow());
+}
 
 @riverpod
 Future<StoreMenu> storeMenu(Ref ref, String storeId) =>

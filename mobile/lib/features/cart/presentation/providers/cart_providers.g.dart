@@ -84,7 +84,7 @@ final class CartControllerProvider
   CartController create() => CartController();
 }
 
-String _$cartControllerHash() => r'dd03921f4a00c8b502c73911bb710c74704093c3';
+String _$cartControllerHash() => r'20a5c49370a0643e7d2918fb9f7f3eac674a7b29';
 
 /// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
 /// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)

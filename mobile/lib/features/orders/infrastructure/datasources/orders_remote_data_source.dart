@@ -4,7 +4,7 @@ import 'package:chaski/core/network/api_client.dart';
 
 /// Fuente remota de `/orders`. Devuelve JSON crudo (ver `OrderJson`).
 abstract interface class OrdersRemoteDataSource {
-  Future<Map<String, dynamic>> place(Map<String, Object?> body);
+  Future<Map<String, dynamic>> place(Map<String, Object?> body, {String? idempotencyKey});
 
   Future<Map<String, dynamic>> get(String orderId);
 
@@ -23,8 +23,13 @@ class ApiOrdersRemoteDataSource implements OrdersRemoteDataSource {
   final Duration pollEvery;
 
   @override
-  Future<Map<String, dynamic>> place(Map<String, Object?> body) async =>
-      (await _api.post('/orders', body: body)) as Map<String, dynamic>;
+  Future<Map<String, dynamic>> place(Map<String, Object?> body, {String? idempotencyKey}) async =>
+      (await _api.post(
+            '/orders',
+            body: body,
+            headers: {'Idempotency-Key': ?idempotencyKey},
+          ))
+          as Map<String, dynamic>;
 
   @override
   Future<Map<String, dynamic>> get(String orderId) async => (await _api.get('/orders/$orderId')) as Map<String, dynamic>;

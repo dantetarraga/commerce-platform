@@ -2,6 +2,7 @@ import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/core/storage/storage_providers.dart';
+import 'package:chaski/core/utils/idempotency_keys.dart';
 import 'package:chaski/features/addresses/addresses.dart';
 import 'package:chaski/features/cart/cart.dart';
 import 'package:chaski/features/checkout/domain/checkout.dart';
@@ -34,6 +35,8 @@ final class CheckoutState extends Equatable {
 
 @riverpod
 class CheckoutController extends _$CheckoutController {
+  final _idempotency = IdempotencyKeys<PlaceOrderRequest>();
+
   @override
   CheckoutState build() {
     // Vive mientras dure la sesión: la hora programada se elige a veces en el
@@ -76,11 +79,15 @@ class CheckoutController extends _$CheckoutController {
     };
     if (draft.issues(cart, address).isNotEmpty || address == null) return null;
 
+    final request = draft.toRequest(cart, address);
     state = state.copyWith(placing: true, clearError: true);
-    final result = await ref.read(ordersRepositoryProvider).placeOrder(draft.toRequest(cart, address));
+    final result = await ref
+        .read(ordersRepositoryProvider)
+        .placeOrder(request, idempotencyKey: _idempotency.keyFor(request));
     if (!ref.mounted) return null;
     switch (result) {
       case Ok(:final value):
+        _idempotency.reset();
         await ref.read(checkoutPreferencesProvider).rememberPayment(draft.paymentKind!);
         await ref.read(cartControllerProvider.notifier).clear();
         ref.read(activeOrderIdProvider.notifier).set(value.id);

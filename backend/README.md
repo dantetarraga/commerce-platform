@@ -22,8 +22,14 @@ npm run db:seed                 # Espinar con el catálogo de la demo
 npm run start:dev               # http://localhost:3000/api/v1 · Swagger en /docs
 ```
 
-La app se conecta con `mobile/env/dev.json` (`USE_FAKE_DATA: false`). En el
-emulador de Android el host es `10.0.2.2`.
+La app se conecta con `USE_FAKE_DATA: false`:
+
+- **Emulador de Android:** `mobile/env/dev.json` (host `10.0.2.2`).
+- **Teléfono Android por USB:** `adb reverse tcp:3000 tcp:3000` y
+  `mobile/env/dev-device.json` (`localhost`).
+- **Simulador de iOS:** `mobile/env/dev-device.json`.
+
+En debug, Android permite `http`; iOS lo permite solo hacia la red local.
 
 ### Entrar sin SMS
 
