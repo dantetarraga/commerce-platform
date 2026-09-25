@@ -1,107 +1,86 @@
 # Chaski — qué falta para el MVP
 
-Estado al 2026-09-24. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
+Estado al 2026-09-25. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
 
-**En corto:** la app cubre todo el flujo del cliente, pero fuera del catálogo corre con datos de demo. El backend tiene la Fase 1 (auth por OTP, catálogo, búsqueda, discovery). Lo que bloquea usar la app contra la API real es, en orden:
+**En corto:** la app y el backend ya cubren el ciclo completo de un pedido: pedir, confirmar, preparar, repartir, entregar, calificar y cancelar. También hay avisos in-app y direcciones sincronizadas. Para un piloto en Espinar faltan tres cosas fuera del código:
 
-1. Los endpoints de **cupones y pedidos**, que la app ya llama.
-2. Alguien que **avance el estado del pedido** (merchant y courier).
-3. Un **proveedor de SMS** real.
-4. El **deploy**.
+1. Crear la cuenta de **Twilio**.
+2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
+3. Hacer **push** de la rama `feat/backend-fase-1` para que corra la CI.
+
+Lo que sigue en código es la ubicación real, el push y el panel del negocio.
 
 ## Estado actual
 
 | Parte | Listo | Falta |
 |---|---|---|
-| App (`mobile/`) | Onboarding, login OTP, home, búsqueda, negocio, producto, bolsa, checkout (propina, programado, cupón, vuelto), seguimiento, historial, calificación, favoritos, direcciones, avisos, perfil | Ubicación real, avisos y direcciones contra la API, editar perfil |
-| Backend (`backend/`) | Auth OTP (SMS por Twilio) + refresh rotativo, `/users/me`, catálogo, search, discovery, cupones, pedidos, operación de negocio y repartidor, cancelación, Dockerfile para Railway, seed de Espinar, 56 unit + 57 e2e | Avisos, direcciones, CRUD de catálogo |
-| Infra | `docker-compose.yml` con Postgres para desarrollo | CI, Dockerfile de la API, hosting, base administrada |
-| Repo | Backend, CI y docs commiteados en la rama `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
+| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local; 139 tests | Ubicación real (GPS/mapa), editar perfil, push |
+| Backend (`backend/`) | Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria; 62 unit + 62 e2e | CRUD de catálogo, push, imágenes |
+| Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
+| Repo | Todo commiteado en `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
+
+## Operación de pedidos
+
+Se opera por API: `/merchant/*` para el negocio y `/courier/*` para el repartidor, con los usuarios del seed desde Swagger (ver `backend/README.md`).
+
+| Pieza | Estado |
+|---|---|
+| Máquina de estados | ✅ `RECEIVED → CONFIRMED → PREPARING → READY → COURIER_ASSIGNED → ON_THE_WAY → DELIVERED`, con permisos por rol |
+| Negocio | ✅ Ver sus pedidos con datos del cliente, avanzar, cancelar con motivo, pausar pedidos |
+| Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
+| Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
+| Catálogo | Falta el CRUD de negocios, productos, horarios y promociones: hoy todo sale del seed |
+| Paneles | Faltan un panel web para negocio y admin, y una app para el repartidor |
 
 ## Backend
 
-### ~~Endpoints que la app ya consume y no existen~~ (hecho)
-
-Contrato exacto en `mobile/lib/features/cart/infrastructure/datasources/coupon_remote_data_source.dart` y `mobile/lib/features/orders/infrastructure/` (`OrderJson` y el datasource fake).
-
-| Endpoint | Qué hace | Errores que espera la app |
-|---|---|---|
-| `POST /coupons/validate` | `{ code, storeId, subtotal }` → `{ code, discount, label }` | `COUPON_INVALID`, `COUPON_MIN_NOT_REACHED` (422) |
-| `POST /orders` | Recibe los ítems de la bolsa local, recalcula precios, fee, descuento y total; guarda snapshots, stock condicional y cupón | `STORE_CLOSED`, `PRODUCT_UNAVAILABLE` (409), `MIN_ORDER_NOT_REACHED` (422) |
-| `GET /orders?limit=30` | Historial del usuario → `{ items }` | — |
-| `GET /orders/:id` | Detalle; la app lo consulta cada 8 s para el seguimiento | 404 si no es suyo |
-| `POST /orders/:id/rating` | `{ rating, comment }` → pedido actualizado; recalcula `Store.ratingAvg` | solo si está `DELIVERED` |
-
-Además, para que funcionen bien:
-
-- **Idempotencia:** la app no envía `Idempotency-Key` en `POST /orders`, así que un doble tap o un reintento de red crea dos pedidos. El schema ya tiene `@@unique([customerId, idempotencyKey])`; falta enviarlo desde la app.
-- **Pedidos programados:** si el negocio está cerrado, se acepta cuando `scheduledFor` cae dentro de su horario (el fake ya lo hace).
-- **Popularidad:** `Store.popularityScore` es un dato fijo del seed; debería calcularse con los pedidos recientes.
-
-### Operación de pedidos (hecho vía API; falta el panel)
-
-Ya existen `/merchant/*`, `/courier/*` y `POST /orders/:id/cancel`, con la máquina de estados, cancelación con restauración de stock y cupón, y pausa del negocio. Se opera desde Swagger con los usuarios del seed (ver `backend/README.md`). Falta: botón de cancelar en la app, CRUD de catálogo y los paneles.
-
-| Pieza | Mínimo para el MVP |
+| Pendiente | Detalle |
 |---|---|
-| Máquina de estados | `RECEIVED → CONFIRMED → PREPARING → READY → COURIER_ASSIGNED → ON_THE_WAY → DELIVERED`, con transiciones permitidas por rol (§8 del doc) |
-| Merchant | Ver los pedidos de su negocio, confirmar, preparar, marcar listo, cancelar con motivo, pausar el negocio (`isAcceptingOrders`) |
-| Courier | Ver los pedidos listos, aceptar (→ `COURIER_ASSIGNED`), en camino, entregado |
-| Cancelación | Restaura stock y cupón, cancela el pago, guarda motivo y rol. La app no tiene botón de cancelar; hoy solo muestra el estado |
-| Catálogo | No hay CRUD de negocios, productos, horarios ni promociones: todo sale del seed |
-
-Para empezar alcanza con operar vía Swagger. Un panel web de merchant/admin y una app de courier vienen después.
-
-### Otros módulos pendientes
-
-| Módulo | Estado en la app | Endpoint sugerido |
-|---|---|---|
-| Avisos | ✅ In-app: el backend los crea en cada cambio de estado; la app lee `/notifications`. Falta push (FCM) | — |
-| Direcciones | ✅ Local primero y sincronizadas con `GET/PUT /users/me/addresses` | — |
-| Favoritos | Guardados en el dispositivo | Opcional: sincronizar para que se conserven al cambiar de teléfono |
+| CRUD de catálogo | Para sumar negocios, productos, horarios y promociones sin tocar el seed |
+| Push (FCM) | Los avisos in-app ya se crean en cada cambio de estado; falta enviarlos como push (tabla `Device` lista) |
+| Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
+| Favoritos | Guardados en el dispositivo. Opcional: sincronizar para no perderlos al cambiar de teléfono |
+| ETA en camino | `estimatedArrival` se fija al crear el pedido; conviene recalcularlo al salir el repartidor |
 
 ## App móvil
 
 | Pendiente | Detalle |
 |---|---|
-| Ubicación real | `CurrentDeliveryLocation` está fijo en el centro de Espinar. No hay GPS, ni mapa, ni geocodificación (no hay dependencia de mapas en `pubspec.yaml`). El formulario de dirección parte del punto actual |
-| Enviar `lat`/`lng` | `/stores/:id` y `/products/:id` los aceptan, pero la app no los envía, así que el fee se calcula desde el centro de la ciudad |
-| `Idempotency-Key` | Generarlo al abrir el checkout y regenerarlo si cambia el pedido (§8 del doc) |
+| Ubicación real | `CurrentDeliveryLocation` arranca en el centro de Espinar. No hay GPS, mapa ni geocodificación (sin dependencia de mapas en `pubspec.yaml`); el formulario de dirección parte del punto actual |
 | Editar perfil | El botón dice "Muy pronto"; `PATCH /users/me` ya existe |
-| Push | Los avisos in-app ya son reales; falta push con FCM para enterarse sin abrir la app |
+| Push | Registro del token FCM y apertura del pedido al tocar el aviso |
 | Seguimiento | Consulta cada 8 s. Alcanza para el MVP; WebSocket después |
-| Android | El `AndroidManifest.xml` de `main` no declara `INTERNET` (solo debug/profile lo tienen), así que un build de release no llega a la API. Además, `http://10.0.2.2` necesita permitir tráfico sin TLS en debug. **Verificar** en un dispositivo |
-| Host de la API | `env/dev.json` usa `10.0.2.2` (solo el emulador de Android). Un teléfono físico o iOS necesita la IP de la máquina o un túnel |
+| Probar en un teléfono | Con `adb reverse tcp:3000 tcp:3000` y `env/dev-device.json` |
 
 ## Producción, calidad y seguridad
 
-| Tema | Falta |
+| Tema | Estado |
 |---|---|
-| SMS | ✅ Twilio implementado (`SMS_PROVIDER=twilio`, obligatorio en producción). Falta crear la cuenta y el Messaging Service |
-| Deploy | ✅ Dockerfile + `railway.toml` probados localmente. Falta crear el proyecto en Railway (guía en `backend/README.md`) y reducir la imagen (~800 MB) |
-| CI | No hay `.github/workflows`. Mínimo: lint + unit + e2e del backend (con servicio Postgres) y `flutter analyze` + `flutter test` |
-| Pagos | Hoy Yape, Plin, tarjeta y efectivo se pagan **al recibir**, así que el MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) sigue en la Fase 4 |
-| Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
-| Limpieza de datos | ✅ Tarea diaria (4 a. m., hora de Lima) que borra códigos OTP viejos y refresh tokens vencidos |
-| Secretos | ✅ `OTP_SECRET` propio, validado distinto de `JWT_ACCESS_SECRET` |
-| Rate limit | El throttler guarda en memoria: vale para una instancia; con varias hace falta Redis |
-| Observabilidad | Solo logs JSON con `requestId`. Errores (Sentry) y métricas después del lanzamiento |
-| Legal | Se guardan celulares y direcciones: faltan política de privacidad y términos (Ley 29733 de protección de datos personales) |
+| SMS | ✅ Twilio (`SMS_PROVIDER=twilio`, obligatorio en producción). Falta crear la cuenta y el Messaging Service |
+| Deploy | ✅ Dockerfile + `railway.toml` probados localmente. Falta crear el proyecto y separar las migraciones para achicar la imagen |
+| CI | ✅ Lint, unit, e2e, build e imagen Docker del backend; `flutter analyze` + `flutter test`. Corre al hacer push |
+| Pagos | Yape, Plin, tarjeta y efectivo se pagan **al recibir**: el MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) en la Fase 4 |
+| Limpieza de datos | ✅ Tarea diaria que borra códigos OTP viejos y refresh tokens vencidos |
+| Secretos | ✅ `OTP_SECRET` propio, distinto de `JWT_ACCESS_SECRET` |
+| Rate limit | En memoria (con `TRUST_PROXY` para Railway): vale para una instancia; con varias hace falta Redis |
+| Observabilidad | Logs JSON con `requestId`. Errores (Sentry) y métricas después del lanzamiento |
+| Legal | Se guardan celulares y direcciones: faltan la política de privacidad y los términos (Ley 29733 de protección de datos personales) |
 
-## Plan sugerido
+## Plan
 
 Esfuerzos aproximados, para una persona.
 
 | # | Trabajo | Esfuerzo | Desbloquea |
 |---|---|---|---|
-| 1 | ✅ Commitear lo actual + CI básica | 0.5 día | Trabajar sobre una base segura |
-| 2 | ✅ Backend: cupones + pedidos (crear, listar, detalle, calificar) con e2e | 2–3 días | Comprar contra la API real |
-| 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, permisos y host de Android | 0.5 día | Probar en un dispositivo |
-| 4 | ✅ Máquina de estados + endpoints de merchant y courier + cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
-| 5 | ✅ Proveedor de SMS (Twilio; falta crear la cuenta) | 1 día | Login en producción |
-| 6 | ✅ Deploy preparado para Railway (Dockerfile, `railway.toml`, guía); falta crear el proyecto | 1–2 días | Piloto con usuarios reales |
-| 7 | Ubicación real: GPS, mapa, sincronizar direcciones | 3–4 días | Fee y cobertura correctos |
-| 8 | Avisos in-app + push | 3 días | Seguimiento sin abrir la app |
-| 9 | Panel de merchant/admin y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |
+| 1 | ✅ Commit + CI básica | 0.5 día | Base segura |
+| 2 | ✅ Cupones + pedidos (crear, listar, detalle, calificar) | 2–3 días | Comprar contra la API |
+| 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, Android e iOS | 0.5 día | Probar en un dispositivo |
+| 4 | ✅ Máquina de estados, negocio, repartidor, cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
+| 5 | ✅ SMS con Twilio (falta la cuenta) | 1 día | Login en producción |
+| 6 | ✅ Deploy preparado para Railway (falta el proyecto) | 1–2 días | Piloto con usuarios reales |
+| 7 | ✅ Avisos in-app, direcciones en la API, cancelar en la app, endurecimiento | 2 días | Seguimiento y datos entre dispositivos |
+| 8 | Ubicación real: GPS, mapa y geocodificación | 3–4 días | Fee y cobertura correctos |
+| 9 | Push con FCM | 2 días | Enterarse sin abrir la app |
+| 10 | Panel de negocio/admin y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |
 
-Con los pasos 1 a 6 se puede hacer un piloto en Espinar operando a mano (merchant y courier vía Swagger o con alguien del equipo). Los pasos 7 a 9 lo vuelven sostenible.
+Con lo hecho hasta el paso 7 ya se puede hacer un piloto operando a mano: el negocio y el repartidor usan Swagger, o alguien del equipo lo hace por ellos. Los pasos 8 a 10 lo vuelven sostenible.
