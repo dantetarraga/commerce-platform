@@ -30,7 +30,7 @@ Se opera por API: `/merchant/*` para el negocio y `/courier/*` para el repartido
 | Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
 | Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
 | Catálogo | Falta el CRUD de negocios, productos, horarios y promociones: hoy todo sale del seed |
-| Paneles | En curso: app **Chaski Socios** (modos Negocio y Repartidor). Después, el panel admin web |
+| Paneles | ✅ App **Chaski Socios**: el negocio acepta con tiempo, rechaza, marca listo, pausa y agota productos; el repartidor se conecta, toma, recoge y entrega registrando el cobro. Alarma con la app abierta. Faltan el alta de socios por admin, el push y el panel admin web |
 
 ## Backend
 
@@ -80,7 +80,7 @@ Esfuerzos aproximados, para una persona.
 | 6 | ✅ Deploy preparado para Railway (falta el proyecto) | 1–2 días | Piloto con usuarios reales |
 | 7 | ✅ Avisos in-app, direcciones en la API, cancelar en la app, endurecimiento | 2 días | Seguimiento y datos entre dispositivos |
 | 8 | Ubicación real: GPS, mapa y geocodificación | 3–4 días | Fee y cobertura correctos |
-| 9 | App Chaski Socios: base, modo Negocio y modo Repartidor con cobro contraentrega | 2–3 semanas | Operar sin Swagger (demo con el seed) |
+| 9 | ✅ App Chaski Socios: base, modo Negocio y modo Repartidor con cobro contraentrega (app + API) | 2–3 semanas | Operar sin Swagger (demo con el seed) |
 | 10 | Alta y suspensión de socios por admin | 1–2 días | Piloto con socios reales |
 | 11 | Push con FCM, alarma con la app cerrada y plazo de aceptación | 4–5 días | Que ningún pedido quede sin atender |
 | 12 | Panel admin web y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |

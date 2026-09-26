@@ -1,5 +1,5 @@
 import { haversineKm } from '../../common/utils/geo';
-import { DeliveryTariff, estimateDelivery } from './delivery';
+import { DeliveryTariff, estimateAfterAccept, estimateDelivery } from './delivery';
 
 const tariff: DeliveryTariff = {
   baseDeliveryFee: 250,
@@ -50,5 +50,21 @@ describe('estimateDelivery', () => {
   it('el radio propio del negocio reemplaza al de la ciudad', () => {
     const destination = { lat: plaza.lat + 0.02, lng: plaza.lng };
     expect(estimateDelivery({ ...origin, deliveryRadiusKm: 2 }, destination, tariff).deliversToYou).toBe(false);
+  });
+});
+
+describe('estimateAfterAccept', () => {
+  const now = new Date('2026-09-25T17:00:00Z');
+
+  it('ahora + preparación + viaje, redondeado a múltiplos de 5', () => {
+    // 2 km a 20 km/h = 6 min; 20 + 6 = 26 → 30.
+    const at = estimateAfterAccept({ now, prepMinutes: 20, distanceMeters: 2000, avgSpeedKmh: 20 });
+    expect(at.toISOString()).toBe('2026-09-25T17:30:00.000Z');
+  });
+
+  it('un pedido programado no se estima antes de su hora', () => {
+    const scheduledFor = new Date('2026-09-25T19:00:00Z');
+    const at = estimateAfterAccept({ now, prepMinutes: 10, distanceMeters: 1000, avgSpeedKmh: 20, scheduledFor });
+    expect(at).toEqual(scheduledFor);
   });
 });

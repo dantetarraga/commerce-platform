@@ -1,7 +1,10 @@
-import { Transform } from 'class-transformer';
-import { IsIn, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsIn, IsInt, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateNested } from 'class-validator';
 import { CursorQueryDto } from '../../../common/dto/cursor-query.dto';
-import { OrderStatus } from '../../../generated/prisma/enums';
+import { MoneyDto } from '../../../common/dto/money.dto';
+import { OrderStatus, PaymentMethodType } from '../../../generated/prisma/enums';
+import { ORDER_LIST_SCOPES } from '../order-list-scope';
+import type { OrderListScope } from '../order-list-scope';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -36,4 +39,40 @@ export class StaffOrdersQueryDto extends CursorQueryDto {
   @IsOptional()
   @IsIn(Object.values(OrderStatus))
   status?: OrderStatus;
+
+  /** `active`: no finales; `today`: creados hoy (hora de Lima). */
+  @IsOptional()
+  @IsIn(ORDER_LIST_SCOPES)
+  scope?: OrderListScope;
+}
+
+/** El negocio acepta y dice en cuántos minutos tendrá listo el pedido. */
+export class AcceptOrderDto {
+  @Type(() => Number)
+  @IsInt({ message: 'El tiempo de preparación va en minutos.' })
+  @Min(5, { message: 'El tiempo de preparación es de 5 a 90 minutos.' })
+  @Max(90, { message: 'El tiempo de preparación es de 5 a 90 minutos.' })
+  prepMinutes!: number;
+}
+
+/** Métodos que el repartidor puede registrar al cobrar (contraentrega). */
+export const COLLECTED_METHODS = [PaymentMethodType.CASH, PaymentMethodType.YAPE, PaymentMethodType.PLIN];
+
+/** ON_THE_WAY, o DELIVERED con cómo pagó el cliente y cuánto cobró. */
+export class CourierAdvanceOrderDto extends AdvanceOrderDto {
+  @IsOptional()
+  @IsIn(COLLECTED_METHODS, { message: 'Elige cómo pagó el cliente: efectivo, Yape o Plin.' })
+  collectedMethod?: PaymentMethodType;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => MoneyDto)
+  collectedAmount?: MoneyDto;
+}
+
+export class CourierOrdersQueryDto extends CursorQueryDto {
+  /** `active`: en curso; `today`: creados hoy (hora de Lima). */
+  @IsOptional()
+  @IsIn(ORDER_LIST_SCOPES)
+  scope?: OrderListScope;
 }

@@ -45,3 +45,22 @@ export function estimateDelivery(
     etaMinutes: Math.ceil((origin.avgPrepMinutes + travelMinutes) / 5) * 5,
   };
 }
+
+/**
+ * Nueva hora estimada de entrega cuando el negocio acepta y dice cuánto tarda:
+ * ahora + `prepMinutes` + viaje (distancia por calle ya guardada en el pedido
+ * ÷ velocidad media de la ciudad), redondeado hacia arriba a múltiplos de 5
+ * como `estimateDelivery`. Un pedido programado no se estima antes de su hora.
+ */
+export function estimateAfterAccept(input: {
+  now: Date;
+  prepMinutes: number;
+  distanceMeters: number;
+  avgSpeedKmh: number;
+  scheduledFor?: Date | null;
+}): Date {
+  const travelMinutes = (input.distanceMeters / 1000 / input.avgSpeedKmh) * 60;
+  const minutes = Math.ceil((input.prepMinutes + travelMinutes) / 5) * 5;
+  const estimated = new Date(input.now.getTime() + minutes * 60_000);
+  return input.scheduledFor && input.scheduledFor > estimated ? input.scheduledFor : estimated;
+}

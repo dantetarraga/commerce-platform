@@ -209,6 +209,7 @@ describe('Cupones y pedidos (e2e)', () => {
         'ADDRESS_OUT_OF_COVERAGE',
       ],
       ['vuelto insuficiente', { payment: { type: 'CASH', changeFor: pen(1000) } }, 422, 'CASH_CHANGE_TOO_LOW'],
+      ['con tarjeta (solo contraentrega)', { payment: { type: 'CARD' } }, 422, 'PAYMENT_METHOD_UNAVAILABLE'],
       ['programado en el pasado', { scheduledFor: '2020-01-01T12:00:00.000Z' }, 422, 'SCHEDULE_INVALID'],
     ])('%s → %s', async (_label, overrides, status, code) => {
       const res = await http().post(`${API}/orders`).set(rosa.auth).send(orderBody(overrides)).expect(status);

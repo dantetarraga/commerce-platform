@@ -480,18 +480,24 @@ model Courier {
 }
 
 model Payment {
-  id         String            @id @default(cuid())
-  orderId    String            @unique
-  method     PaymentMethodType
-  provider   String // "cash", "yape", "culqi"…
-  status     PaymentStatus     @default(PENDING)
-  amount     Int
-  currency   String
-  externalId String?
-  metadata   Json?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  order      Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id              String             @id @default(cuid())
+  orderId         String             @unique
+  method          PaymentMethodType
+  provider        String // "cash", "yape", "culqi"…
+  status          PaymentStatus      @default(PENDING)
+  amount          Int
+  currency        String
+  externalId      String?
+  metadata        Json?
+  // Lo que el repartidor dice que cobró al entregar (contraentrega). Puede no
+  // coincidir con `amount`: se guarda tal cual para rendir cuentas.
+  collectedById   String? // User.id del repartidor
+  collectedMethod PaymentMethodType?
+  collectedAmount Int? // céntimos
+  collectedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  order           Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Coupon {

@@ -5,11 +5,14 @@ import { PaymentMethodType } from '../../generated/prisma/enums';
 export const orderInclude = {
   items: { include: { options: true }, orderBy: { id: 'asc' } },
   statusHistory: { orderBy: { createdAt: 'asc' } },
-  store: { select: { logoUrl: true, ownerDisplayName: true } },
+  store: {
+    select: { logoUrl: true, ownerDisplayName: true, addressLine: true, phone: true, latitude: true, longitude: true },
+  },
   courier: { include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } } },
   review: { select: { rating: true } },
   // Solo para las vistas del negocio y del repartidor.
   customer: { select: { firstName: true, lastName: true, phone: true } },
+  payment: { select: { collectedMethod: true, collectedAmount: true, collectedAt: true } },
 } satisfies Prisma.OrderInclude;
 
 export type OrderWithDetails = Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
@@ -69,13 +72,32 @@ export function toOrderResponse(order: OrderWithDetails) {
  * entregarlo. Nunca se usa para el cliente.
  */
 export function toStaffOrderResponse(order: OrderWithDetails) {
+  const base = toOrderResponse(order);
+  const payment = order.payment;
   return {
-    ...toOrderResponse(order),
+    ...base,
+    // `lines` sigue el orden de `order.items`: se suma la nota de cada producto.
+    lines: base.lines.map((line, i) => ({ ...line, notes: order.items[i].notes ?? '' })),
     customer: {
       name: `${order.customer.firstName} ${order.customer.lastName}`.trim(),
       phone: order.customer.phone,
     },
     deliveryLocation: { lat: Number(order.deliveryLat), lng: Number(order.deliveryLng) },
+    // Dónde recoger: datos actuales del negocio (no hay snapshot de dirección).
+    pickup: {
+      address: order.store.addressLine,
+      phone: order.store.phone,
+      location: { lat: Number(order.store.latitude), lng: Number(order.store.longitude) },
+    },
+    distanceMeters: order.distanceMeters,
     cancelReason: order.cancelReason,
+    collection:
+      payment?.collectedMethod && payment.collectedAmount !== null && payment.collectedAt
+        ? {
+            method: payment.collectedMethod,
+            amount: money(payment.collectedAmount, order.currency),
+            collectedAt: payment.collectedAt.toISOString(),
+          }
+        : null,
   };
 }

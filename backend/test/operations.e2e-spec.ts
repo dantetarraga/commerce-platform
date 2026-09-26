@@ -46,8 +46,11 @@ describe('Operación del pedido (e2e)', () => {
     };
   const merchantStatus = (id: string, status: string, session = merchant) =>
     http().post(`${API}/merchant/orders/${id}/status`).set(session.auth).send({ status });
-  const courierStatus = (id: string, status: string, session = luis) =>
-    http().post(`${API}/courier/orders/${id}/status`).set(session.auth).send({ status });
+  const courierStatus = (id: string, status: string, session = luis, extra: object = {}) =>
+    http()
+      .post(`${API}/courier/orders/${id}/status`)
+      .set(session.auth)
+      .send({ status, ...extra });
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -65,6 +68,10 @@ describe('Operación del pedido (e2e)', () => {
     otherMerchant = await logIn(app, QORI_OWNER);
     luis = await logIn(app, LUIS);
     yeni = await logIn(app, YENI);
+    // Solo los repartidores conectados ven y toman pedidos.
+    for (const session of [luis, yeni]) {
+      await http().patch(`${API}/courier/me/status`).set(session.auth).send({ status: 'AVAILABLE' }).expect(200);
+    }
   });
 
   afterAll(async () => {
@@ -72,6 +79,7 @@ describe('Operación del pedido (e2e)', () => {
     await prisma.storeSchedule.createMany({ data: originalSchedules });
     await prisma.product.update({ where: { id: 'pr_pollo_medio' }, data: { stock: null } });
     await prisma.store.update({ where: { id: STORE }, data: { isAcceptingOrders: true } });
+    await prisma.courier.updateMany({ data: { status: 'OFFLINE' } });
     await app.close();
   });
 
@@ -122,7 +130,8 @@ describe('Operación del pedido (e2e)', () => {
     await courierStatus(order.id, 'ON_THE_WAY', yeni).expect(404);
 
     await courierStatus(order.id, 'ON_THE_WAY').expect(200);
-    await courierStatus(order.id, 'DELIVERED').expect(200);
+    const collection = { collectedMethod: 'CASH', collectedAmount: { amount: 5000, currency: 'PEN' } };
+    await courierStatus(order.id, 'DELIVERED', luis, collection).expect(200);
 
     // El cliente ve toda la línea de tiempo, como la pinta la app.
     const final = await http().get(`${API}/orders/${order.id}`).set(customer.auth).expect(200);

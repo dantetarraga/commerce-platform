@@ -45,6 +45,15 @@ export class OrdersService {
       if (existing) return existing;
     }
 
+    // Por ahora solo contraentrega: sin pasarela, la tarjeta no se puede cobrar.
+    if (dto.payment.type === PaymentMethodType.CARD) {
+      throw new AppException(
+        ErrorCode.PAYMENT_METHOD_UNAVAILABLE,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        'Por ahora solo aceptamos efectivo, Yape o Plin al recibir.',
+      );
+    }
+
     const { store, city } = await this.stores.load(dto.storeId);
     const scheduledFor = this.checkSchedule(store, city, dto.scheduledFor, now);
 
@@ -143,7 +152,7 @@ export class OrdersService {
             statusHistory: {
               create: { toStatus: OrderStatus.RECEIVED, changedById: userId, changedByRole: Role.CUSTOMER },
             },
-            // Yape, Plin, tarjeta y efectivo se pagan al recibir el pedido.
+            // Efectivo, Yape y Plin se pagan al recibir el pedido.
             payment: {
               create: {
                 method: dto.payment.type,

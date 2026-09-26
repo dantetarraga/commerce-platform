@@ -2,7 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../../common/exceptions/app.exception';
 import { PrismaService } from '../../../database/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
-import { OrderStatus, PaymentStatus, Role } from '../../../generated/prisma/enums';
+import { CourierStatus, OrderStatus, PaymentMethodType, PaymentStatus, Role } from '../../../generated/prisma/enums';
+import { estimateAfterAccept } from '../../delivery/delivery';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { orderNotice } from '../../notifications/order-notices';
 import { orderInclude, OrderWithDetails } from '../order-presenter';
@@ -15,6 +16,15 @@ export interface OrderActor {
 }
 
 const ORDER_NOT_FOUND = 'No encontramos ese pedido.';
+
+/** Estados en que el pedido está en manos del repartidor. */
+export const COURIER_ACTIVE_STATUSES = [OrderStatus.COURIER_ASSIGNED, OrderStatus.ON_THE_WAY];
+
+/** Lo que el repartidor cobró al entregar (contraentrega). */
+export interface Collection {
+  method: PaymentMethodType;
+  amount: number;
+}
 
 /** Pedidos que el actor puede ver y tocar. Uno ajeno responde 404. */
 export function scopeFor(actor: OrderActor): Prisma.OrderWhereInput {
@@ -52,23 +62,85 @@ export class OrderStatusService {
     return order;
   }
 
-  async advance(actor: OrderActor, orderId: string, to: OrderStatus, note?: string): Promise<OrderWithDetails> {
+  /**
+   * Un paso adelante. Al entregar, el repartidor dice cómo pagó el cliente y
+   * cuánto cobró (`collection`); queda en el pago aunque no coincida con el
+   * total, y el repartidor vuelve a estar disponible.
+   */
+  async advance(
+    actor: OrderActor,
+    orderId: string,
+    to: OrderStatus,
+    note?: string,
+    collection?: Collection,
+  ): Promise<OrderWithDetails> {
     const order = await this.find(actor, orderId);
     if (to === OrderStatus.CANCELLED || !canTransition(order.status, to, actor.role)) {
       throw invalidTransition(order.status, to);
     }
+    if (to === OrderStatus.DELIVERED && actor.role === Role.COURIER && !collection) {
+      throw new AppException(
+        ErrorCode.COLLECTION_REQUIRED,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        'Indica cómo pagó el cliente y cuánto cobraste.',
+      );
+    }
     await this.prisma.$transaction(async (tx) => {
-      const data = to === OrderStatus.DELIVERED ? { deliveredAt: new Date() } : {};
+      const now = new Date();
+      const data = to === OrderStatus.DELIVERED ? { deliveredAt: now } : {};
       await this.move(tx, actor, order.id, order.status, to, note, data);
       if (to === OrderStatus.DELIVERED) {
-        await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: PaymentStatus.PAID } });
+        await tx.payment.updateMany({
+          where: { orderId: order.id },
+          data: {
+            status: PaymentStatus.PAID,
+            ...(collection && {
+              collectedById: actor.userId,
+              collectedMethod: collection.method,
+              collectedAmount: collection.amount,
+              collectedAt: now,
+            }),
+          },
+        });
         await tx.store.update({ where: { id: order.storeId }, data: { popularityScore: { increment: 1 } } });
+        if (order.courierId) await this.releaseCourier(tx, order.courierId);
       }
       const courier = order.courier && {
         firstName: order.courier.user.firstName,
         vehicleLabel: order.courier.vehicleLabel,
       };
       await this.notifyCustomer(tx, order, to, { courier });
+    });
+    return this.find(actor, orderId);
+  }
+
+  /**
+   * El negocio acepta un pedido nuevo y dice en cuántos minutos lo tiene: en
+   * una transacción pasa RECEIVED → CONFIRMED → PREPARING (dos filas de
+   * historial), recalcula la hora estimada y avisa al cliente una sola vez.
+   */
+  async acceptByMerchant(actor: OrderActor, orderId: string, prepMinutes: number): Promise<OrderWithDetails> {
+    const order = await this.find(actor, orderId);
+    if (!canTransition(order.status, OrderStatus.CONFIRMED, actor.role)) {
+      throw invalidTransition(order.status, OrderStatus.PREPARING);
+    }
+    const city = await this.prisma.city.findUniqueOrThrow({
+      where: { id: order.cityId },
+      select: { avgSpeedKmh: true },
+    });
+
+    await this.prisma.$transaction(async (tx) => {
+      await this.move(tx, actor, order.id, OrderStatus.RECEIVED, OrderStatus.CONFIRMED, undefined, {});
+      const estimatedAt = estimateAfterAccept({
+        now: new Date(),
+        prepMinutes,
+        distanceMeters: order.distanceMeters,
+        avgSpeedKmh: city.avgSpeedKmh,
+        scheduledFor: order.scheduledFor,
+      });
+      const note = `Listo en ${prepMinutes} min`;
+      await this.move(tx, actor, order.id, OrderStatus.CONFIRMED, OrderStatus.PREPARING, note, { estimatedAt });
+      await this.notifyCustomer(tx, order, OrderStatus.PREPARING, {});
     });
     return this.find(actor, orderId);
   }
@@ -82,14 +154,37 @@ export class OrderStatusService {
     return courier;
   }
 
+  /** Id del pedido que el repartidor tiene en curso, o null. */
+  async activeOrderId(courierId: string, client: Prisma.TransactionClient = this.prisma): Promise<string | null> {
+    const order = await client.order.findFirst({
+      where: { courierId, status: { in: COURIER_ACTIVE_STATUSES } },
+      select: { id: true },
+    });
+    return order?.id ?? null;
+  }
+
   /**
-   * El courier toma un pedido listo de su ciudad. Condicional: si dos
-   * repartidores aceptan a la vez, solo uno se lo lleva.
+   * El courier toma un pedido listo de su ciudad. Tiene que estar conectado
+   * (AVAILABLE) y sin otro pedido; pasa a BUSY en la misma transacción.
+   * Condicional: si dos repartidores aceptan a la vez, solo uno se lo lleva
+   * (el otro recibe ORDER_ALREADY_TAKEN y su BUSY se revierte).
    */
   async accept(courierUserId: string, orderId: string): Promise<OrderWithDetails> {
     const courier = await this.courierFor(courierUserId);
 
     await this.prisma.$transaction(async (tx) => {
+      const busy = await tx.courier.updateMany({
+        where: { id: courier.id, status: CourierStatus.AVAILABLE },
+        data: { status: CourierStatus.BUSY },
+      });
+      if (busy.count === 0 || (await this.activeOrderId(courier.id, tx))) {
+        throw new AppException(
+          ErrorCode.COURIER_NOT_AVAILABLE,
+          HttpStatus.CONFLICT,
+          'Conéctate y termina tu entrega actual antes de tomar otro pedido.',
+        );
+      }
+
       const { count } = await tx.order.updateMany({
         where: { id: orderId, cityId: courier.cityId, status: OrderStatus.READY, courierId: null },
         data: { status: OrderStatus.COURIER_ASSIGNED, courierId: courier.id },
@@ -158,12 +253,21 @@ export class OrderStatusService {
         }
       }
       await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: PaymentStatus.CANCELLED } });
+      if (order.courierId) await this.releaseCourier(tx, order.courierId);
       // Si canceló el propio cliente, ya lo sabe.
       if (actor.role !== Role.CUSTOMER) {
         await this.notifyCustomer(tx, order, OrderStatus.CANCELLED, { cancelReason: reason });
       }
     });
     return this.find(actor, orderId);
+  }
+
+  /** El repartidor terminó (entregó o se canceló su pedido): vuelve a estar disponible. */
+  private async releaseCourier(tx: Prisma.TransactionClient, courierId: string) {
+    await tx.courier.updateMany({
+      where: { id: courierId, status: CourierStatus.BUSY },
+      data: { status: CourierStatus.AVAILABLE },
+    });
   }
 
   private async notifyCustomer(
