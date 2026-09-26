@@ -23,19 +23,45 @@ class StaffOrderHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
-    return Row(
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final fresh = order.status == OrderStatus.received;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(order.order.code, style: theme.textTheme.titleLarge?.copyWith(fontFeatures: AppTypography.tabularFigures)),
-        const SizedBox(width: AppSpacing.xs),
-        Expanded(
-          child: Text(
-            '${order.status.staffLabel} · ${staffTimeAgo(order.order.placedAt)}',
-            style: muted,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Wrap(
+          spacing: AppSpacing.xs,
+          runSpacing: AppSpacing.xs,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              order.order.code,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontFeatures: AppTypography.tabularFigures,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.xs,
+                vertical: AppSpacing.xxs,
+              ),
+              decoration: BoxDecoration(
+                color: fresh ? theme.colorScheme.primaryContainer : context.chaski.raised,
+                borderRadius: AppRadius.tile,
+              ),
+              child: Text(
+                order.status.staffLabel,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: fresh ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            ?trailing,
+          ],
         ),
-        ?trailing,
+        const SizedBox(height: AppSpacing.xxs),
+        Text('Recibido ${staffTimeAgo(order.order.placedAt)}', style: muted),
       ],
     );
   }
@@ -50,8 +76,13 @@ class StaffOrderLines extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
-    final note = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error, fontWeight: FontWeight.w600);
+    final muted = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final note = theme.textTheme.bodySmall?.copyWith(
+      color: theme.colorScheme.primary,
+      fontWeight: FontWeight.w600,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -61,10 +92,25 @@ class StaffOrderLines extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 32,
-                  child: Text('${line.quantity}×', style: theme.textTheme.titleSmall),
+                Container(
+                  constraints: const BoxConstraints(minWidth: 32),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: AppSpacing.xxs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: AppRadius.tile,
+                  ),
+                  child: Text(
+                    '${line.quantity}×',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
+                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,8 +128,14 @@ class StaffOrderLines extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(top: AppSpacing.xxs),
             padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
-            child: Text('Nota: ${order.notes}', style: theme.textTheme.bodyMedium),
+            decoration: BoxDecoration(
+              color: context.chaski.raised,
+              borderRadius: AppRadius.card,
+            ),
+            child: Text(
+              'Nota: ${order.notes}',
+              style: theme.textTheme.bodyMedium,
+            ),
           ),
       ],
     );
@@ -108,10 +160,18 @@ class StaffOrderPayment extends StatelessWidget {
         Expanded(
           child: Text(
             '${payment.label}$change',
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
-        Text(Formatters.money(order.total), style: theme.textTheme.titleMedium),
+        const SizedBox(width: AppSpacing.sm),
+        Flexible(
+          child: Text(
+            Formatters.money(order.total),
+            style: theme.textTheme.titleLarge,
+          ),
+        ),
       ],
     );
   }

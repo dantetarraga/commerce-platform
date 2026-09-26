@@ -91,6 +91,8 @@ Future<ProviderContainer> pumpPartner(
   OrderAlarm? alarm,
   Size size = const Size(390, 844),
   Duration orderStep = const Duration(seconds: 2),
+  double textScale = 1,
+  Brightness brightness = Brightness.light,
 }) => _pumpApp(
   tester,
   router: (c) => c.read(partnerRouterProvider),
@@ -98,6 +100,8 @@ Future<ProviderContainer> pumpPartner(
   signedInAs: signedInAs,
   size: size,
   orderStep: orderStep,
+  textScale: textScale,
+  brightness: brightness,
 );
 
 Future<ProviderContainer> _pumpApp(
@@ -109,6 +113,8 @@ Future<ProviderContainer> _pumpApp(
   bool onboardingSeen = true,
   String? signedInAs,
   bool disableAnimations = false,
+  double textScale = 1,
+  Brightness brightness = Brightness.light,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -119,10 +125,14 @@ Future<ProviderContainer> _pumpApp(
     overrides: [
       preferencesStorageProvider.overrideWithValue(MemoryPreferences(onboardingSeen: onboardingSeen)),
       tokenStorageProvider.overrideWithValue(
-        MemoryTokens(signedInAs != null ? (accessToken: 'fake-access.$signedInAs', refreshToken: 'fake-refresh.x') : null),
+        MemoryTokens(
+          signedInAs != null ? (accessToken: 'fake-access.$signedInAs', refreshToken: 'fake-refresh.x') : null,
+        ),
       ),
       localJsonStoreProvider.overrideWithValue(MemoryJsonStore()),
-      fakeBackendProvider.overrideWithValue(FakeBackend(latency: const Duration(milliseconds: 10), orderStep: orderStep)),
+      fakeBackendProvider.overrideWithValue(
+        FakeBackend(latency: const Duration(milliseconds: 10), orderStep: orderStep),
+      ),
       appEnvProvider.overrideWithValue(const AppEnv(apiBaseUrl: 'http://test', useFakeData: true)),
       orderAlarmProvider.overrideWithValue(alarm ?? RecordingAlarm()),
     ],
@@ -131,10 +141,12 @@ Future<ProviderContainer> _pumpApp(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp.router(
-        theme: AppTheme.light(),
+        theme: brightness == Brightness.dark ? AppTheme.dark() : AppTheme.light(),
         routerConfig: router(container),
         builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(disableAnimations: disableAnimations),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(disableAnimations: disableAnimations, textScaler: TextScaler.linear(textScale)),
           child: child!,
         ),
       ),
@@ -164,5 +176,4 @@ Future<void> settle(WidgetTester tester, {int frames = 20, Duration step = const
 
 String currentPath(ProviderContainer c) => c.read(appRouterProvider).routeInformationProvider.value.uri.path;
 
-String currentPartnerPath(ProviderContainer c) =>
-    c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;
+String currentPartnerPath(ProviderContainer c) => c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;

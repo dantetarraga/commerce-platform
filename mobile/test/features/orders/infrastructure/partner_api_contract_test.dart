@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';

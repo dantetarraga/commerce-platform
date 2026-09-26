@@ -3,6 +3,7 @@ import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/widgets/partner_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -20,32 +21,47 @@ class MerchantOrderCard extends ConsumerStatefulWidget {
 class _MerchantOrderCardState extends ConsumerState<MerchantOrderCard> {
   var _busy = false;
 
-  Future<void> _run(Future<Failure?> Function(MerchantOrderActions actions) action, String done) async {
+  Future<void> _run(
+    Future<Failure?> Function(MerchantOrderActions actions) action,
+    String done,
+  ) async {
     setState(() => _busy = true);
-    final failure = await action(ref.read(merchantOrderActionsProvider.notifier));
+    final failure = await action(
+      ref.read(merchantOrderActionsProvider.notifier),
+    );
     if (!mounted) return;
     setState(() => _busy = false);
-    AppToast.show(context, failure?.message ?? done, kind: failure == null ? AppToastKind.success : AppToastKind.error);
+    AppToast.show(
+      context,
+      failure?.message ?? done,
+      kind: failure == null ? AppToastKind.success : AppToastKind.error,
+    );
   }
 
   Future<void> _accept() async {
     final minutes = await showAppBottomSheet<int>(
       context,
       title: '¿En cuánto estará listo?',
-      builder: (_) => const _PrepTimeSheet(),
+      builder: (_) => const SingleChildScrollView(child: _PrepTimeSheet()),
     );
     if (minutes == null) return;
-    await _run((a) => a.accept(widget.order.id, prepMinutes: minutes), 'Aceptado. Avisamos al cliente.');
+    await _run(
+      (a) => a.accept(widget.order.id, prepMinutes: minutes),
+      'Aceptado. Avisamos al cliente.',
+    );
   }
 
   Future<void> _reject() async {
     final reason = await showAppBottomSheet<String>(
       context,
       title: '¿Por qué lo rechazas?',
-      builder: (_) => const _RejectSheet(),
+      builder: (_) => const SingleChildScrollView(child: _RejectSheet()),
     );
     if (reason == null) return;
-    await _run((a) => a.reject(widget.order.id, reason: reason), 'Pedido rechazado. Avisamos al cliente.');
+    await _run(
+      (a) => a.reject(widget.order.id, reason: reason),
+      'Pedido rechazado. Avisamos al cliente.',
+    );
   }
 
   @override
@@ -53,50 +69,92 @@ class _MerchantOrderCardState extends ConsumerState<MerchantOrderCard> {
     final theme = Theme.of(context);
     final order = widget.order;
     final courier = order.order.courier;
-    return AppCard(
-      variant: AppCardVariant.raised,
+    return PartnerSurface(
+      highlighted: order.status == OrderStatus.received,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           StaffOrderHeader(order: order),
           const SizedBox(height: AppSpacing.xxs),
-          Text(order.customerName, style: theme.textTheme.bodyMedium),
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppSpacing.xxs),
+              Expanded(
+                child: Text(
+                  order.customerName,
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: AppSpacing.sm),
           StaffOrderLines(order: order.order),
           const Divider(height: AppSpacing.lg),
           StaffOrderPayment(order: order.order),
           const SizedBox(height: AppSpacing.sm),
           switch (order.status) {
-            OrderStatus.received => Row(
-              children: [
-                Expanded(
-                  child: AppButton.secondary(label: 'Rechazar', onPressed: _busy ? null : _reject),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  flex: 2,
-                  child: AppButton(label: 'Aceptar', loading: _busy, onPressed: _busy ? null : _accept),
-                ),
-              ],
+            OrderStatus.received => LayoutBuilder(
+              builder: (context, constraints) {
+                final narrow = constraints.maxWidth < 280 || MediaQuery.textScalerOf(context).scale(14) > 20;
+                final accept = AppButton(
+                  label: 'Aceptar',
+                  loading: _busy,
+                  onPressed: _busy ? null : _accept,
+                );
+                final reject = AppButton.secondary(
+                  label: 'Rechazar',
+                  onPressed: _busy ? null : _reject,
+                );
+                if (narrow) {
+                  return Column(
+                    children: [
+                      accept,
+                      const SizedBox(height: AppSpacing.xs),
+                      reject,
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(child: reject),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(child: accept),
+                  ],
+                );
+              },
             ),
             OrderStatus.confirmed || OrderStatus.preparing => AppButton(
               label: 'Marcar listo',
               loading: _busy,
               onPressed: _busy
                   ? null
-                  : () => _run((a) => a.markReady(order.id), 'Listo. Avisamos a los repartidores.'),
+                  : () => _run(
+                      (a) => a.markReady(order.id),
+                      'Listo. Avisamos a los repartidores.',
+                    ),
             ),
             OrderStatus.ready => Text(
               'Esperando que un repartidor lo tome.',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             OrderStatus.courierAssigned || OrderStatus.onTheWay => Text(
               '${courier?.firstName ?? 'El repartidor'} · ${order.status.staffLabel.toLowerCase()}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             OrderStatus.delivered || OrderStatus.cancelled => Text(
               order.cancelReason == null ? order.status.staffLabel : 'Cancelado: ${order.cancelReason}',
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
           },
         ],
@@ -120,7 +178,12 @@ class _PrepTimeSheetState extends State<_PrepTimeSheet> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -130,11 +193,18 @@ class _PrepTimeSheetState extends State<_PrepTimeSheet> {
               runSpacing: AppSpacing.xs,
               children: [
                 for (final m in prepTimeChoices)
-                  AppChip(label: '$m min', selected: m == _minutes, onTap: () => setState(() => _minutes = m)),
+                  AppChip(
+                    label: '$m min',
+                    selected: m == _minutes,
+                    onTap: () => setState(() => _minutes = m),
+                  ),
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            AppButton(label: 'Aceptar · $_minutes min', onPressed: () => Navigator.of(context).pop(_minutes)),
+            AppButton(
+              label: 'Aceptar · $_minutes min',
+              onPressed: () => Navigator.of(context).pop(_minutes),
+            ),
           ],
         ),
       ),
@@ -178,7 +248,12 @@ class _RejectSheetState extends State<_RejectSheet> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -205,7 +280,9 @@ class _RejectSheetState extends State<_RejectSheet> {
             const SizedBox(height: AppSpacing.sm),
             Text(
               'El cliente verá este motivo.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             AppButton.danger(

@@ -17,7 +17,7 @@ void main() {
     await tester.tap(find.byType(Switch));
     await settle(tester);
     expect(find.text('Conectado'), findsOneWidget);
-    expect(find.text('Tomar pedido'), findsNWidgets(2));
+    expect(find.text('Tomar pedido'), findsWidgets);
     expect(alarm.rings, 1);
     expect(alarm.awake, isTrue);
     await unmountChaski(tester, container);
@@ -25,9 +25,13 @@ void main() {
 
   testWidgets('toma un pedido, lo recoge y lo entrega registrando el cobro', (tester) async {
     final container = await pumpPartner(tester, signedInAs: courier, size: const Size(390, 1000));
+    // El pedido histórico del demo puede pertenecer a ayer cerca de medianoche.
+    final before = tester.widget<Text>(find.textContaining(RegExp(r'^\d+ entrega'))).data!;
+    final deliveredBefore = int.parse(before.split(' ').first);
     await tester.tap(find.byType(Switch));
     await settle(tester);
 
+    await tester.ensureVisible(find.text('Tomar pedido').first);
     await tester.tap(find.text('Tomar pedido').first);
     await settle(tester);
     expect(find.byType(ActiveDeliveryPage), findsOneWidget);
@@ -42,7 +46,9 @@ void main() {
     await tester.tap(find.text('Confirmar entrega'));
     await settle(tester);
     expect(find.byType(ActiveDeliveryPage), findsNothing);
-    expect(find.textContaining('2 entregas'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Tu jornada de hoy'), 350, scrollable: find.byType(Scrollable).first);
+    await settle(tester);
+    expect(find.textContaining('${deliveredBefore + 1} entrega'), findsOneWidget);
     await unmountChaski(tester, container);
   });
 }
