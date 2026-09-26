@@ -206,7 +206,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                     const SizedBox(height: AppSpacing.md),
                     AnimatedSize(
                       duration: _duration,
-                      curve: AppMotion.postaOut,
+                      curve: AppMotion.arrive,
                       child: cart.reachesMinimum
                           ? const SizedBox(width: double.infinity)
                           : Padding(padding: const EdgeInsets.only(bottom: AppSpacing.md), child: _MinimumStrip(cart: cart)),
@@ -278,7 +278,7 @@ class _Appear extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final curved = CurvedAnimation(parent: animation, curve: AppMotion.postaOut, reverseCurve: AppMotion.postaIn);
+    final curved = CurvedAnimation(parent: animation, curve: AppMotion.arrive, reverseCurve: AppMotion.depart);
     return SizeTransition(
       sizeFactor: curved,
       alignment: Alignment.topCenter,
@@ -539,7 +539,7 @@ class _MinimumStrip extends StatelessWidget {
               child: TweenAnimationBuilder<double>(
                 tween: Tween(end: cart.minimumProgress),
                 duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
-                curve: AppMotion.postaOut,
+                curve: AppMotion.arrive,
                 builder: (context, p, _) => LinearProgressIndicator(
                   value: p,
                   minHeight: 5,
@@ -623,7 +623,7 @@ class _CouponRowState extends ConsumerState<_CouponRow> {
 
     return AnimatedSize(
       duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-      curve: AppMotion.postaOut,
+      curve: AppMotion.arrive,
       alignment: Alignment.topCenter,
       child: !_open
           ? Align(

@@ -53,12 +53,12 @@ class _RouteMapState extends State<RouteMap> with SingleTickerProviderStateMixin
     final map = TweenAnimationBuilder<double>(
       tween: Tween(end: widget.progress.clamp(0.0, 1.0)),
       duration: reduceMotionOf(context) ? Duration.zero : AppMotion.story,
-      curve: AppMotion.postaOut,
+      curve: AppMotion.arrive,
       builder: (context, p, _) => AnimatedBuilder(
         animation: _draw,
         builder: (context, _) => CustomPaint(
           painter: _RoutePainter(
-            reveal: AppMotion.postaOut.transform(_draw.value),
+            reveal: AppMotion.arrive.transform(_draw.value),
             progress: p,
             showCourier: widget.showCourier,
             ground: chaski.raised,

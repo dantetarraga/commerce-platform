@@ -90,6 +90,6 @@ class CartController extends _$CartController {
   Future<void> clear() => _commit(Cart.empty);
 }
 
-/// Cantidad de productos en la bolsa (para la posta y badges).
+/// Cantidad de productos en la bolsa (para la barra de compra y badges).
 @riverpod
 int cartItemCount(Ref ref) => ref.watch(cartControllerProvider).value?.itemCount ?? 0;

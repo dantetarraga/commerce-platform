@@ -41,7 +41,7 @@ Future<List<Order>> ordersHistory(Ref ref) =>
 @riverpod
 Stream<Order> orderWatch(Ref ref, String orderId) => ref.watch(ordersRepositoryProvider).watch(orderId);
 
-/// Id del pedido en curso (el que muestra la posta). Al abrir la app se
+/// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
 /// recupera del historial; al confirmar un pedido se fija aquí.
 @Riverpod(keepAlive: true)
 class ActiveOrderId extends _$ActiveOrderId {

@@ -3,12 +3,12 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// El traspaso: la foto del producto viaja desde [from] hasta la posta (abajo,
+/// El traspaso: la foto del producto viaja desde [from] hasta la barra de compra (abajo,
 /// al centro) encogiéndose, como el chaski que entrega el mensaje.
 ///
 /// [from] es el rectángulo global de origen (p. ej. la foto del detalle).
 /// Con movimiento reducido no hace nada.
-Future<void> flyToPosta(BuildContext context, {required Rect from, String? imageUrl}) async {
+Future<void> flyToPurchaseBar(BuildContext context, {required Rect from, String? imageUrl}) async {
   if (reduceMotionOf(context)) return;
   final overlay = Overlay.of(context, rootOverlay: true);
   final size = MediaQuery.sizeOf(context);
@@ -20,8 +20,8 @@ Future<void> flyToPosta(BuildContext context, {required Rect from, String? image
     builder: (_) => AnimatedBuilder(
       animation: controller,
       builder: (context, _) {
-        final t = AppMotion.postaOut.transform(controller.value);
-        // Arco: sube un poco antes de caer hacia la posta.
+        final t = AppMotion.arrive.transform(controller.value);
+        // Arco: sube un poco antes de caer hacia la barra de compra.
         final rect = Rect.lerp(from, to, t)!;
         final lift = -80 * (1 - (2 * t - 1) * (2 * t - 1));
         return Positioned(

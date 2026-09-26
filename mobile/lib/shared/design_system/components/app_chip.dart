@@ -53,7 +53,7 @@ class AppChip extends StatelessWidget {
             customBorder: const StadiumBorder(),
             child: AnimatedContainer(
               duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
-              curve: AppMotion.postaOut,
+              curve: AppMotion.arrive,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.xs),
               decoration: ShapeDecoration(color: bg, shape: const StadiumBorder()),
               child: Row(

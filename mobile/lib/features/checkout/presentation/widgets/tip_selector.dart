@@ -82,7 +82,7 @@ class _TipChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: AnimatedContainer(
             duration: duration,
-            curve: AppMotion.postaOut,
+            curve: AppMotion.arrive,
             height: 40,
             alignment: Alignment.center,
             decoration: BoxDecoration(

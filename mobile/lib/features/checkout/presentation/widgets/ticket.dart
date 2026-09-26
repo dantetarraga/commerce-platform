@@ -208,7 +208,7 @@ class PrintIn extends StatefulWidget {
 
 class _PrintInState extends State<PrintIn> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 680));
-  late final Animation<double> _t = CurvedAnimation(parent: _controller, curve: AppMotion.postaOut);
+  late final Animation<double> _t = CurvedAnimation(parent: _controller, curve: AppMotion.arrive);
   var _started = false;
 
   @override

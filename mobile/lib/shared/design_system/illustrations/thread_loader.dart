@@ -5,7 +5,7 @@ import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// Indicador de carga de Chaski: una cuerda que ondula y un nudo que la
-/// recorre, como la posta que viaja. Reemplaza al spinner genérico en cargas
+/// recorre, como la barra de compra que viaja. Reemplaza al spinner genérico en cargas
 /// de pantalla completa (splash, confirmar pedido).
 ///
 /// Con movimiento reducido, la cuerda queda quieta y el nudo "respira".
@@ -92,7 +92,7 @@ class _LoaderPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
     // El nudo avanza de izquierda a derecha con aceleración suave.
-    final progress = still ? 0.5 : AppMotion.postaOut.transform(t);
+    final progress = still ? 0.5 : AppMotion.arrive.transform(t);
     final x = size.width * progress;
     final center = Offset(x, _y(x, size));
     final r = 6 + breathe * 1.5;

@@ -5,20 +5,20 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// Qué muestra la posta. El design system no conoce carrito ni pedidos: la app
+/// Qué muestra la barra de compra. El design system no conoce carrito ni pedidos: la app
 /// traduce su estado a una de estas formas.
-sealed class PostaState {
-  const PostaState();
+sealed class PurchaseBarState {
+  const PurchaseBarState();
 }
 
-/// Nada que hacer: la posta desaparece.
-final class PostaHidden extends PostaState {
-  const PostaHidden();
+/// Nada que hacer: la barra de compra desaparece.
+final class PurchaseBarHidden extends PurchaseBarState {
+  const PurchaseBarHidden();
 }
 
 /// Hay productos en la bolsa.
-final class PostaCart extends PostaState {
-  const PostaCart({required this.count, required this.total, this.storeName});
+final class PurchaseBarCart extends PurchaseBarState {
+  const PurchaseBarCart({required this.count, required this.total, this.storeName});
 
   final int count;
   final Money total;
@@ -26,8 +26,8 @@ final class PostaCart extends PostaState {
 }
 
 /// Hay un pedido en curso (o recién entregado).
-final class PostaOrder extends PostaState {
-  const PostaOrder({required this.message, this.eta, this.delivered = false});
+final class PurchaseBarOrder extends PurchaseBarState {
+  const PurchaseBarOrder({required this.message, this.eta, this.delivered = false});
 
   /// "Luis va en camino", "Doña Rosa está preparando tu pedido".
   final String message;
@@ -42,22 +42,22 @@ final class PostaOrder extends PostaState {
 /// (tinta) para distinguirse del resto de la pantalla; la acción va en cobalto.
 ///
 /// Incrementar [pulse] hace "saltar" el contador (al recibir un producto).
-class AppPosta extends StatefulWidget {
-  const AppPosta({required this.state, required this.onTap, this.pulse = 0, super.key});
+class AppPurchaseBar extends StatefulWidget {
+  const AppPurchaseBar({required this.state, required this.onTap, this.pulse = 0, super.key});
 
-  final PostaState state;
+  final PurchaseBarState state;
   final VoidCallback onTap;
   final int pulse;
 
   @override
-  State<AppPosta> createState() => _AppPostaState();
+  State<AppPurchaseBar> createState() => _AppPurchaseBarState();
 }
 
-class _AppPostaState extends State<AppPosta> with SingleTickerProviderStateMixin {
+class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProviderStateMixin {
   late final _pulse = AnimationController(vsync: this, duration: AppMotion.story);
 
   @override
-  void didUpdateWidget(AppPosta oldWidget) {
+  void didUpdateWidget(AppPurchaseBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.pulse != oldWidget.pulse && !reduceMotionOf(context)) _pulse.forward(from: 0);
   }
@@ -68,14 +68,14 @@ class _AppPostaState extends State<AppPosta> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  (String, String?, String) _texts(PostaState state) => switch (state) {
-    PostaCart(:final total, :final storeName) => (Formatters.money(total), storeName, 'Ver bolsa'),
-    PostaOrder(:final message, :final eta, :final delivered) => (
+  (String, String?, String) _texts(PurchaseBarState state) => switch (state) {
+    PurchaseBarCart(:final total, :final storeName) => (Formatters.money(total), storeName, 'Ver bolsa'),
+    PurchaseBarOrder(:final message, :final eta, :final delivered) => (
       message,
       delivered ? '¿Qué tal estuvo?' : null,
       eta ?? (delivered ? 'Calificar' : 'Ver'),
     ),
-    PostaHidden() => ('', null, ''),
+    PurchaseBarHidden() => ('', null, ''),
   };
 
   @override
@@ -84,15 +84,15 @@ class _AppPostaState extends State<AppPosta> with SingleTickerProviderStateMixin
     final scheme = theme.colorScheme;
     final chaski = context.chaski;
     final state = widget.state;
-    final visible = state is! PostaHidden;
-    final delivered = state is PostaOrder && state.delivered;
+    final visible = state is! PurchaseBarHidden;
+    final delivered = state is PurchaseBarOrder && state.delivered;
     final bg = scheme.inverseSurface;
     final fg = scheme.onInverseSurface;
     final actionBg = delivered ? chaski.success : scheme.primary;
     final actionFg = delivered ? scheme.onTertiary : scheme.onPrimary;
     final (title, subtitle, action) = _texts(state);
     final reduce = reduceMotionOf(context);
-    final count = state is PostaCart ? state.count : null;
+    final count = state is PurchaseBarCart ? state.count : null;
 
     final pill = Semantics(
       button: true,
@@ -117,7 +117,7 @@ class _AppPostaState extends State<AppPosta> with SingleTickerProviderStateMixin
                 padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
                 child: AnimatedSwitcher(
                   duration: reduce ? Duration.zero : AppMotion.base,
-                  switchInCurve: AppMotion.postaOut,
+                  switchInCurve: AppMotion.arrive,
                   transitionBuilder: (child, animation) => FadeTransition(
                     opacity: animation,
                     child: SlideTransition(
@@ -175,7 +175,7 @@ class _AppPostaState extends State<AppPosta> with SingleTickerProviderStateMixin
 
     return AnimatedSize(
       duration: reduce ? Duration.zero : AppMotion.move,
-      curve: AppMotion.postaOut,
+      curve: AppMotion.arrive,
       alignment: Alignment.bottomCenter,
       child: visible
           ? Padding(padding: const EdgeInsets.only(bottom: AppSpacing.xs), child: pill)

@@ -49,7 +49,7 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
     if (reduceMotionOf(context)) {
       setState(() => _offset = target);
     } else {
-      _glideTween = Tween(begin: _offset, end: target).animate(CurvedAnimation(parent: _glide, curve: AppMotion.postaOut));
+      _glideTween = Tween(begin: _offset, end: target).animate(CurvedAnimation(parent: _glide, curve: AppMotion.arrive));
       _glide.forward(from: 0);
       _drop.forward(from: 0);
     }

@@ -215,7 +215,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   child: Center(
                     child: AnimatedContainer(
                       duration: reduced ? Duration.zero : AppMotion.base,
-                      curve: AppMotion.postaOut,
+                      curve: AppMotion.arrive,
                       width: index == _page ? 24 : 8,
                       height: 8,
                       decoration: BoxDecoration(

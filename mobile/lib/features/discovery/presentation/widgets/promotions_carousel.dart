@@ -87,7 +87,7 @@ class _Dots extends StatelessWidget {
           for (var index = 0; index < count; index++)
             AnimatedContainer(
               duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-              curve: AppMotion.postaOut,
+              curve: AppMotion.arrive,
               margin: const EdgeInsets.symmetric(horizontal: 3),
               width: index == current ? 18 : 6,
               height: 6,

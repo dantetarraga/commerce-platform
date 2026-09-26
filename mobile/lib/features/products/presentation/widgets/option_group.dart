@@ -200,7 +200,7 @@ class _ChoiceRow extends StatelessWidget {
                 : null,
             child: AnimatedContainer(
               duration: duration,
-              curve: AppMotion.postaOut,
+              curve: AppMotion.arrive,
               constraints: const BoxConstraints(minHeight: 52),
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
               decoration: BoxDecoration(

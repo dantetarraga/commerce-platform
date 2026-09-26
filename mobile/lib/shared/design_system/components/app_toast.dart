@@ -8,14 +8,14 @@ import 'package:flutter/semantics.dart';
 
 enum AppToastKind { info, success, undo, error }
 
-/// Aviso breve que aparece arriba de la posta (nunca la tapa) y se va solo.
+/// Aviso breve que aparece arriba de la barra de compra (nunca la tapa) y se va solo.
 ///
 /// `AppToast.show(context, 'Eliminado', kind: AppToastKind.undo, onAction: …)`.
 abstract final class AppToast {
   static OverlayEntry? _current;
   static Timer? _timer;
 
-  /// Distancia al borde inferior: deja libre la barra de navegación + posta.
+  /// Distancia al borde inferior: deja libre la barra de navegación + barra de compra.
   static double bottomOffset = 150;
 
   static void show(
@@ -89,7 +89,7 @@ class _ToastView extends StatelessWidget {
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1),
           duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-          curve: AppMotion.postaOut,
+          curve: AppMotion.arrive,
           builder: (context, t, child) => Opacity(
             opacity: t,
             child: Transform.translate(offset: Offset(0, (1 - t) * 16), child: child),

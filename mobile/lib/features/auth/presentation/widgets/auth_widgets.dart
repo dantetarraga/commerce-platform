@@ -53,7 +53,7 @@ class AnimatedFormError extends StatelessWidget {
     final error = this.error;
     return AnimatedSize(
       duration: reduced ? Duration.zero : AppMotion.base,
-      curve: AppMotion.postaOut,
+      curve: AppMotion.arrive,
       alignment: Alignment.topCenter,
       child: AnimatedSwitcher(
         duration: reduced ? Duration.zero : AppMotion.quick,

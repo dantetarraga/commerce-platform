@@ -47,7 +47,7 @@ void main() {
     await tester.tap(quickAdd);
     await settle(tester);
     expect(container.read(cartControllerProvider).value?.itemCount, 1);
-    expect(find.bySemanticsLabel(RegExp('^1 producto')), findsOneWidget); // la posta
+    expect(find.bySemanticsLabel(RegExp('^1 producto')), findsOneWidget); // la barra de compra
 
     // ── Producto con variante: se elige "Grande" y se agrega ──
     router.pushNamed(ProductDetailPage.name, pathParameters: {'productId': 'pr_caldo_cordero'}).ignore();

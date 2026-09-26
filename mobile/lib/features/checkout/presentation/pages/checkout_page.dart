@@ -101,7 +101,7 @@ class CheckoutPage extends ConsumerWidget {
               children: [
                 AnimatedSize(
                   duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-                  curve: AppMotion.postaOut,
+                  curve: AppMotion.arrive,
                   child: switch ((state.error, firstIssue)) {
                     (final error?, _) => _Notice(key: const ValueKey('error'), message: error.message, danger: true),
                     (null, final issue?) => _Notice(key: ValueKey(issue), message: issue.message),
@@ -161,8 +161,8 @@ class _AnimatedTotal extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-      switchInCurve: AppMotion.postaOut,
-      switchOutCurve: AppMotion.postaIn,
+      switchInCurve: AppMotion.arrive,
+      switchOutCurve: AppMotion.depart,
       layoutBuilder: (current, previous) => Stack(alignment: Alignment.centerRight, children: [...previous, ?current]),
       transitionBuilder: (child, animation) {
         final incoming = child.key == ValueKey(total.cents);

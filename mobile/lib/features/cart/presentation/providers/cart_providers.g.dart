@@ -108,16 +108,16 @@ abstract class _$CartController extends $AsyncNotifier<Cart> {
   }
 }
 
-/// Cantidad de productos en la bolsa (para la posta y badges).
+/// Cantidad de productos en la bolsa (para la barra de compra y badges).
 
 @ProviderFor(cartItemCount)
 final cartItemCountProvider = CartItemCountProvider._();
 
-/// Cantidad de productos en la bolsa (para la posta y badges).
+/// Cantidad de productos en la bolsa (para la barra de compra y badges).
 
 final class CartItemCountProvider extends $FunctionalProvider<int, int, int>
     with $Provider<int> {
-  /// Cantidad de productos en la bolsa (para la posta y badges).
+  /// Cantidad de productos en la bolsa (para la barra de compra y badges).
   CartItemCountProvider._()
     : super(
         from: null,

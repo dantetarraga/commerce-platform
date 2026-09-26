@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Flujo único para agregar a la bolsa desde cualquier pantalla: resuelve el
-/// conflicto de negocio (preguntando), vibra y confirma con un aviso. La posta
+/// conflicto de negocio (preguntando), vibra y confirma con un aviso. La barra de compra
 /// hace saltar su nudo sola al ver crecer la bolsa.
 ///
 /// Devuelve `true` si el producto quedó en la bolsa.

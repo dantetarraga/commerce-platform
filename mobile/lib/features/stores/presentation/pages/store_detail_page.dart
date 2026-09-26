@@ -857,7 +857,7 @@ class _SectionTabsState extends State<_SectionTabs> {
     if (reduceMotionOf(context)) {
       _scroll.jumpTo(target);
     } else {
-      _scroll.animateTo(target, duration: AppMotion.base, curve: AppMotion.postaOut).ignore();
+      _scroll.animateTo(target, duration: AppMotion.base, curve: AppMotion.arrive).ignore();
     }
   }
 

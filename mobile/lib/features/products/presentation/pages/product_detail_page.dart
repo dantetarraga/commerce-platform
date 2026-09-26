@@ -66,7 +66,7 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
     final target = missingId == null ? null : _groupKeys[missingId]?.currentContext;
     HapticFeedback.mediumImpact().ignore();
     if (target != null) {
-      Scrollable.ensureVisible(target, duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move, curve: AppMotion.postaOut)
+      Scrollable.ensureVisible(target, duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move, curve: AppMotion.arrive)
           .ignore();
     }
   }
@@ -93,9 +93,9 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
       setState(() => _adding = false);
       return;
     }
-    // El traspaso: la foto viaja a la posta y la pantalla se cierra.
+    // El traspaso: la foto viaja a la barra de compra y la pantalla se cierra.
     final from = globalRectOf(_imageKey);
-    if (from != null) await flyToPosta(context, from: from.deflate(from.width * 0.2), imageUrl: product.imageUrl);
+    if (from != null) await flyToPurchaseBar(context, from: from.deflate(from.width * 0.2), imageUrl: product.imageUrl);
     if (mounted) context.pop();
   }
 
@@ -239,7 +239,7 @@ class _AddBar extends StatelessWidget {
             children: [
               AnimatedSize(
                 duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
-                curve: AppMotion.postaOut,
+                curve: AppMotion.arrive,
                 alignment: Alignment.bottomCenter,
                 child: hint == null
                     ? const SizedBox(width: double.infinity)

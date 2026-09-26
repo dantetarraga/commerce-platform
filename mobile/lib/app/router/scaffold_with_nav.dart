@@ -1,10 +1,10 @@
-import 'package:chaski/app/posta/posta_bar.dart';
+import 'package:chaski/app/purchase_bar/purchase_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Tres destinos (Cerca · Explorar · Tú) y la posta flotando encima.
+/// Tres destinos (Cerca · Explorar · Tú) y la barra de compra flotando encima.
 ///
-/// No hay pestaña de Pedidos: el pedido en curso vive en la posta, visible en
+/// No hay pestaña de Pedidos: el pedido en curso vive en la barra de compra, visible en
 /// toda la app; el historial está dentro de "Tú".
 class ScaffoldWithNav extends StatelessWidget {
   const ScaffoldWithNav({required this.shell, super.key});
@@ -23,7 +23,7 @@ class ScaffoldWithNav extends StatelessWidget {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const PostaBar(),
+          const PurchaseBar(),
           NavigationBar(
             selectedIndex: shell.currentIndex,
             onDestinationSelected: _select,

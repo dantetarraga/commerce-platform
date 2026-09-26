@@ -275,17 +275,17 @@ final class OrderWatchFamily extends $Family
   String toString() => r'orderWatchProvider';
 }
 
-/// Id del pedido en curso (el que muestra la posta). Al abrir la app se
+/// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
 /// recupera del historial; al confirmar un pedido se fija aquí.
 
 @ProviderFor(ActiveOrderId)
 final activeOrderIdProvider = ActiveOrderIdProvider._();
 
-/// Id del pedido en curso (el que muestra la posta). Al abrir la app se
+/// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
 /// recupera del historial; al confirmar un pedido se fija aquí.
 final class ActiveOrderIdProvider
     extends $AsyncNotifierProvider<ActiveOrderId, String?> {
-  /// Id del pedido en curso (el que muestra la posta). Al abrir la app se
+  /// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
   /// recupera del historial; al confirmar un pedido se fija aquí.
   ActiveOrderIdProvider._()
     : super(
@@ -308,7 +308,7 @@ final class ActiveOrderIdProvider
 
 String _$activeOrderIdHash() => r'82c597b9b8d7abc38b0ff1ecf42056c44156a862';
 
-/// Id del pedido en curso (el que muestra la posta). Al abrir la app se
+/// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
 /// recupera del historial; al confirmar un pedido se fija aquí.
 
 abstract class _$ActiveOrderId extends $AsyncNotifier<String?> {

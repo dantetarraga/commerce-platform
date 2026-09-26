@@ -236,7 +236,7 @@ class _SlotCell extends StatelessWidget {
         onTap: onTap,
         child: AnimatedContainer(
           duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
-          curve: AppMotion.postaOut,
+          curve: AppMotion.arrive,
           height: AppSpacing.minTouch,
           alignment: Alignment.center,
           decoration: BoxDecoration(

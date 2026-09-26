@@ -86,7 +86,7 @@ class _ThreadIllustrationState extends State<ThreadIllustration> with SingleTick
           builder: (context, _) => CustomPaint(
             painter: ThreadPainter(
               scene: threadSceneData(widget.scene),
-              progress: AppMotion.postaOut.transform(_controller.value),
+              progress: AppMotion.arrive.transform(_controller.value),
               thread: colors.thread,
               knot: colors.accent,
             ),

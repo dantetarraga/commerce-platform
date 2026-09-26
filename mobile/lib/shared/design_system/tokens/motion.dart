@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Motion system "Posta": rápido al tocar, suave al llegar, siempre hacia adelante.
+/// Sistema de movimiento: rápido al tocar, suave al llegar, siempre hacia adelante.
 abstract final class AppMotion {
   /// Presionar (escala 0.97).
   static const tap = Duration(milliseconds: 90);
@@ -11,17 +11,17 @@ abstract final class AppMotion {
   /// Crossfade de carga, hojas pequeñas.
   static const base = Duration(milliseconds: 240);
 
-  /// Páginas, elementos compartidos, card → posta.
+  /// Páginas, elementos compartidos, card → barra de compra.
   static const move = Duration(milliseconds: 360);
 
   /// Onboarding, nudo de confirmación.
   static const story = Duration(milliseconds: 520);
 
   /// Lo que llega o se asienta.
-  static const Curve postaOut = Cubic(0.16, 1, 0.3, 1);
+  static const Curve arrive = Cubic(0.16, 1, 0.3, 1);
 
   /// Lo que se va (usar ~70 % de la duración de entrada).
-  static const Curve postaIn = Cubic(0.7, 0, 0.84, 0);
+  static const Curve depart = Cubic(0.7, 0, 0.84, 0);
 
   /// Solo nudos y favoritos: leve sobrepaso.
   static const Curve knot = Cubic(0.34, 1.56, 0.64, 1);
@@ -86,7 +86,7 @@ class _FadeSlideInState extends State<FadeSlideIn> with SingleTickerProviderStat
     super.initState();
     final total = widget.duration + widget.delay;
     final start = total == Duration.zero ? 0.0 : widget.delay.inMicroseconds / total.inMicroseconds;
-    _progress = CurvedAnimation(parent: _controller, curve: Interval(start, 1, curve: AppMotion.postaOut));
+    _progress = CurvedAnimation(parent: _controller, curve: Interval(start, 1, curve: AppMotion.arrive));
   }
 
   @override
@@ -136,8 +136,8 @@ class LoadCrossFade extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-      switchInCurve: AppMotion.postaOut,
-      switchOutCurve: AppMotion.postaIn,
+      switchInCurve: AppMotion.arrive,
+      switchOutCurve: AppMotion.depart,
       layoutBuilder: (current, previous) => Stack(
         alignment: Alignment.topCenter,
         children: [...previous, ?current],

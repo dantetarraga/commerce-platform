@@ -1,4 +1,4 @@
-import 'package:chaski/app/posta/with_posta.dart';
+import 'package:chaski/app/purchase_bar/with_purchase_bar.dart';
 import 'package:chaski/app/router/routes.dart';
 import 'package:chaski/app/router/scaffold_with_nav.dart';
 import 'package:chaski/features/addresses/addresses.dart';
@@ -117,7 +117,7 @@ GoRouter appRouter(Ref ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.storeDetail,
         name: StoreDetailPage.name,
-        builder: (_, state) => WithPosta(
+        builder: (_, state) => WithPurchaseBar(
           child: StoreDetailPage(
             storeId: state.pathParameters['storeId']!,
             args: state.extra is StoreRouteArgs ? state.extra! as StoreRouteArgs : const StoreRouteArgs(),

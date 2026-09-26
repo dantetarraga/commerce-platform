@@ -56,7 +56,7 @@ class _OrderConfirmedPageState extends State<_OrderConfirmedPage> with SingleTic
     super.dispose();
   }
 
-  Animation<double> _interval(double begin, double end, [Curve curve = AppMotion.postaOut]) =>
+  Animation<double> _interval(double begin, double end, [Curve curve = AppMotion.arrive]) =>
       CurvedAnimation(parent: _controller, curve: Interval(begin, end, curve: curve));
 
   @override

@@ -68,7 +68,7 @@ class CheckoutController extends _$CheckoutController {
   );
 
   /// Confirma el pedido. Si sale bien vacía la bolsa, fija el pedido activo
-  /// (la posta pasa a mostrarlo) y devuelve el pedido creado.
+  /// (la barra de compra pasa a mostrarlo) y devuelve el pedido creado.
   Future<Order?> place() async {
     final cart = ref.read(cartControllerProvider).value ?? Cart.empty;
     final address = ref.read(selectedAddressProvider);

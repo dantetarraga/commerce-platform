@@ -74,7 +74,7 @@ class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
             if (kind == PaymentKind.cash)
               AnimatedSize(
                 duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-                curve: AppMotion.postaOut,
+                curve: AppMotion.arrive,
                 alignment: Alignment.topCenter,
                 child: _kind == PaymentKind.cash
                     ? _CashChange(

@@ -250,7 +250,7 @@ class _EtaHeader extends StatelessWidget {
       liveRegion: true,
       child: AnimatedSwitcher(
         duration: duration,
-        switchInCurve: AppMotion.postaOut,
+        switchInCurve: AppMotion.arrive,
         transitionBuilder: (child, animation) => FadeTransition(
           opacity: animation,
           child: SlideTransition(
