@@ -1,6 +1,6 @@
 # Chaski — qué falta para el MVP
 
-Estado al 2026-09-25. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
+Estado al 2026-09-25. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [OPERACION.md](OPERACION.md) (cómo se opera con negocios y repartidores).
 
 **En corto:** la app y el backend ya cubren el ciclo completo de un pedido: pedir, confirmar, preparar, repartir, entregar, calificar y cancelar. También hay avisos in-app y direcciones sincronizadas. Para un piloto en Espinar faltan tres cosas fuera del código:
 
@@ -8,7 +8,7 @@ Estado al 2026-09-25. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5).
 2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
 3. Hacer **push** de la rama `feat/backend-fase-1` para que corra la CI.
 
-Lo que sigue en código es la ubicación real, el push y el panel del negocio.
+Lo que sigue en código es la **app Chaski Socios** (negocio y repartidor), el alta de socios por admin y el push. Después, la ubicación real y el panel admin web.
 
 ## Estado actual
 
@@ -30,7 +30,7 @@ Se opera por API: `/merchant/*` para el negocio y `/courier/*` para el repartido
 | Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
 | Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
 | Catálogo | Falta el CRUD de negocios, productos, horarios y promociones: hoy todo sale del seed |
-| Paneles | Faltan un panel web para negocio y admin, y una app para el repartidor |
+| Paneles | En curso: app **Chaski Socios** (modos Negocio y Repartidor). Después, el panel admin web |
 
 ## Backend
 
@@ -80,7 +80,9 @@ Esfuerzos aproximados, para una persona.
 | 6 | ✅ Deploy preparado para Railway (falta el proyecto) | 1–2 días | Piloto con usuarios reales |
 | 7 | ✅ Avisos in-app, direcciones en la API, cancelar en la app, endurecimiento | 2 días | Seguimiento y datos entre dispositivos |
 | 8 | Ubicación real: GPS, mapa y geocodificación | 3–4 días | Fee y cobertura correctos |
-| 9 | Push con FCM | 2 días | Enterarse sin abrir la app |
-| 10 | Panel de negocio/admin y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |
+| 9 | App Chaski Socios: base, modo Negocio y modo Repartidor con cobro contraentrega | 2–3 semanas | Operar sin Swagger (demo con el seed) |
+| 10 | Alta y suspensión de socios por admin | 1–2 días | Piloto con socios reales |
+| 11 | Push con FCM, alarma con la app cerrada y plazo de aceptación | 4–5 días | Que ningún pedido quede sin atender |
+| 12 | Panel admin web y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |
 
-Con lo hecho hasta el paso 7 ya se puede hacer un piloto operando a mano: el negocio y el repartidor usan Swagger, o alguien del equipo lo hace por ellos. Los pasos 8 a 10 lo vuelven sostenible.
+Con lo hecho hasta el paso 7 ya se puede hacer un piloto operando a mano: el negocio y el repartidor usan Swagger, o alguien del equipo lo hace por ellos. Los pasos 9 a 11 permiten la prueba con socios reales; el detalle está en [OPERACION.md](OPERACION.md).

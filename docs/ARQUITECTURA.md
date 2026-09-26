@@ -931,12 +931,14 @@ model Device {                           // tokens FCM (Fase 3)
 | GET | `/orders?cursor=&limit=` | CUSTOMER: sus pedidos · MERCHANT: los de sus negocios · COURIER: los asignados |
 | GET | `/orders/:id` | con ownership según rol |
 | POST | `/orders/:id/cancel` | `{ reason? }` · reglas por rol en la máquina de estados |
-| PATCH | `/orders/:id/status` [MERCHANT, COURIER, ADMIN] | `{ status, note? }` validado por la máquina de estados |
 | POST | `/orders/:id/reorder` [CUSTOMER] | `{ replaceCart?: boolean }` · si el carrito no está vacío y `replaceCart` no es true → **409 `CART_NOT_EMPTY`** · devuelve el carrito nuevo + lo que no se pudo agregar |
 | POST | `/orders/:id/review` [CUSTOMER] | Fase 4, solo si está DELIVERED |
 
-### Couriers (Fase 3) 🔒 [COURIER]
-`PATCH /couriers/me/status` · `POST /couriers/me/location` · `GET /couriers/me/orders` · `POST /orders/:id/assign` [ADMIN/MERCHANT] o `POST /orders/:id/accept` [COURIER]
+### Negocio y repartidor 🔒 [MERCHANT] · [COURIER]
+> Esta sección reemplaza el borrador inicial (`PATCH /orders/:id/status`, `/couriers/me/*`). El contrato vigente está en `backend/src/modules/merchant` y `backend/src/modules/couriers`; la operación se describe en [OPERACION.md](OPERACION.md).
+
+- **Negocio** (`merchant/*`): `GET merchant/orders` · `GET merchant/orders/:id` · `POST merchant/orders/:id/accept` · `POST merchant/orders/:id/status` · `POST merchant/orders/:id/cancel` · `GET merchant/stores` · `PATCH merchant/stores/:id` · `PATCH merchant/products/:id` · `GET merchant/summary`
+- **Repartidor** (`courier/*`): `GET courier/me` · `PATCH courier/me/status` · `GET courier/orders/available` · `GET courier/orders` · `POST courier/orders/:id/accept` · `POST courier/orders/:id/status` · `GET courier/me/summary`
 
 ### Notifications (Fase 3) 🔒
 `GET /notifications?cursor=&limit=` · `PATCH /notifications/:id/read` · `POST /notifications/read-all` · `POST /devices` (registrar token push)
@@ -1122,7 +1124,7 @@ Cada paso termina con código compilando, tests verdes y un commit.
 **Flutter**: aplicar cupón en checkout, pago con tarjeta/Yape, calificar pedido.
 
 ### Después del MVP (según tracción)
-Panel web de merchant/admin · app courier (mismo backend, otra app Flutter que reutiliza `core/`) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
+Panel web de merchant/admin · app Chaski Socios para negocios y repartidores (mismo proyecto Flutter, flavor `partner`; ver [OPERACION.md](OPERACION.md)) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
 
 ---
 
