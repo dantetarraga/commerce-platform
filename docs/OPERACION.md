@@ -83,3 +83,62 @@ Antes de abrir al público:
 - guardar qué versión de los términos aceptó cada usuario y cuándo.
 
 Los textos los tiene que revisar un abogado.
+
+## 7. Contrato de la API para Chaski Socios
+
+Prefijo `/api/v1`. Montos como `{ amount, currency }` en céntimos. Fechas ISO-8601 UTC; `date=YYYY-MM-DD` es el día en hora de Lima (por defecto, hoy). Los datasources `Api*`/`Fake*` de `merchant_orders` y `courier_deliveries` en la app son la fuente de verdad de este contrato.
+
+### Pedido para socios (`StaffOrder`)
+
+Es el pedido del cliente (`OrderJson`) más:
+
+| Campo | Tipo | Nota |
+|---|---|---|
+| `lines[].notes` | string | Nota del cliente para ese producto (`''` si no hay) |
+| `customer` | `{ name, phone }` | |
+| `deliveryLocation` | `{ lat, lng }` | |
+| `pickup` | `{ address, phone, location: { lat, lng } }` | Dónde recoger: datos actuales del negocio (`phone` puede ser null) |
+| `distanceMeters` | int | Del negocio al cliente |
+| `cancelReason` | string \| null | |
+| `collection` | `{ method, amount, collectedAt }` \| null | Lo que cobró el repartidor al entregar |
+
+### Negocio (`MERCHANT`; el `ADMIN` ve todos)
+
+| Método | Ruta | Cuerpo / query | Respuesta |
+|---|---|---|---|
+| GET | `merchant/stores` | | `[{ id, name, logoUrl, isAcceptingOrders, isOpenNow }]` |
+| PATCH | `merchant/stores/:id` | `{ isAcceptingOrders }` | `{ id, name, isAcceptingOrders }` |
+| GET | `merchant/orders` | `scope=active\|today`, `status?`, `cursor?`, `limit?` | `{ items: StaffOrder[], nextCursor }` |
+| GET | `merchant/orders/:id` | | `StaffOrder` |
+| POST | `merchant/orders/:id/accept` | `{ prepMinutes }` (5–90) | `StaffOrder` (queda en `PREPARING`) |
+| POST | `merchant/orders/:id/status` | `{ status: "READY" }` | `StaffOrder` |
+| POST | `merchant/orders/:id/cancel` | `{ reason }` (3–300) | `StaffOrder` |
+| GET | `merchant/stores/:id/products` | | `[{ id, name, imageUrl, price, section, isAvailable }]` |
+| PATCH | `merchant/products/:id` | `{ isAvailable }` | `{ id, isAvailable }` |
+| GET | `merchant/summary` | `date?` | `{ date, deliveredCount, cancelledCount, activeCount, sales }` |
+
+- `scope=active`: pedidos no finales (`RECEIVED` … `ON_THE_WAY`). `scope=today`: todos los creados ese día. Sin `scope`, todos.
+- `sales` suma el `subtotal` de los entregados (lo que es del negocio; el envío es del repartidor).
+
+### Repartidor (`COURIER`)
+
+| Método | Ruta | Cuerpo / query | Respuesta |
+|---|---|---|---|
+| GET | `courier/me` | | `Courier` = `{ id, name, phone, vehicleLabel, status, activeOrderId }` |
+| PATCH | `courier/me/status` | `{ status: "AVAILABLE" \| "OFFLINE" }` | `Courier` |
+| GET | `courier/orders/available` | `cursor?`, `limit?` | `{ items: StaffOrder[], nextCursor }` (vacío si no está `AVAILABLE`) |
+| GET | `courier/orders` | `scope=active\|today`, `cursor?`, `limit?` | `{ items: StaffOrder[], nextCursor }` |
+| POST | `courier/orders/:id/accept` | | `StaffOrder` (el repartidor pasa a `BUSY`) |
+| POST | `courier/orders/:id/status` | `{ status: "ON_THE_WAY" }` o `{ status: "DELIVERED", collectedMethod: "CASH"\|"YAPE"\|"PLIN", collectedAmount: Money }` | `StaffOrder` |
+| GET | `courier/me/summary` | `date?` | `{ date, deliveredCount, collected: { total, CASH, YAPE, PLIN } }` |
+
+- `status` del repartidor: `OFFLINE`, `AVAILABLE` o `BUSY`. Con un pedido activo está `BUSY`; al entregar o si se cancela su pedido vuelve a `AVAILABLE`.
+
+### Errores nuevos
+
+| Código | HTTP | Cuándo |
+|---|---|---|
+| `COURIER_HAS_ACTIVE_ORDER` | 409 | Desconectarse con un pedido en curso |
+| `COURIER_NOT_AVAILABLE` | 409 | Tomar un pedido sin estar conectado o teniendo otro activo |
+| `COLLECTION_REQUIRED` | 422 | Marcar entregado sin decir cómo pagó el cliente |
+| `PAYMENT_METHOD_UNAVAILABLE` | 422 | Pedir con tarjeta (solo contraentrega: efectivo, Yape o Plin) |
