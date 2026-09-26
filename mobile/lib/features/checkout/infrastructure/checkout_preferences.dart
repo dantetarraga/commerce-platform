@@ -12,7 +12,7 @@ class CheckoutPreferences {
   Future<PaymentKind?> lastPayment() async {
     final json = await _store.read(_key);
     if (json is! Map) return null;
-    return PaymentKind.values.where((k) => k.name == json['payment']).firstOrNull;
+    return PaymentKind.offered.where((k) => k.name == json['payment']).firstOrNull;
   }
 
   Future<void> rememberPayment(PaymentKind kind) => _store.write(_key, {'payment': kind.name});

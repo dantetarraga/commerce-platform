@@ -24,7 +24,9 @@ class FakeBackend {
 
   /// Catálogo de prueba (ciudad, categorías, negocios, productos, promociones).
   Future<Map<String, dynamic>> catalog() async {
-    return _catalog ??= jsonDecode(await _bundle.loadString(_catalogAsset)) as Map<String, dynamic>;
+    // Sin el caché del bundle: este objeto ya guarda el catálogo, y el caché
+    // global comparte un Future entre tests que en el segundo nunca completa.
+    return _catalog ??= jsonDecode(await _bundle.loadString(_catalogAsset, cache: false)) as Map<String, dynamic>;
   }
 
   List<Map<String, dynamic>> listOf(Map<String, dynamic> catalog, String key) =>

@@ -1,0 +1,120 @@
+{
+ "id": "cmuhx5nft0006s4ntsindh8vz",
+ "code": "#2481",
+ "store": {
+  "id": "st_chaski_dorado",
+  "name": "Pollería El Chaski Dorado",
+  "logoUrl": "https://loremflickr.com/200/200/roast,chicken?lock=21",
+  "ownerName": "Don Julián"
+ },
+ "lines": [
+  {
+   "productId": "pr_chicha_morada",
+   "name": "Chicha morada",
+   "quantity": 2,
+   "total": {
+    "amount": 1600,
+    "currency": "PEN"
+   },
+   "description": "Jarra 1 L",
+   "notes": "Bien helada"
+  }
+ ],
+ "subtotal": {
+  "amount": 1600,
+  "currency": "PEN"
+ },
+ "deliveryFee": {
+  "amount": 350,
+  "currency": "PEN"
+ },
+ "discount": {
+  "amount": 0,
+  "currency": "PEN"
+ },
+ "tip": {
+  "amount": 0,
+  "currency": "PEN"
+ },
+ "total": {
+  "amount": 1950,
+  "currency": "PEN"
+ },
+ "notes": "Tocar el timbre",
+ "address": {
+  "title": "Casa",
+  "street": "Jr. Túpac Amaru 214",
+  "reference": "Puerta verde"
+ },
+ "payment": {
+  "type": "CASH",
+  "changeFor": null
+ },
+ "status": "DELIVERED",
+ "events": [
+  {
+   "status": "RECEIVED",
+   "at": "2026-09-26T04:58:16.169Z"
+  },
+  {
+   "status": "CONFIRMED",
+   "at": "2026-09-26T04:58:22.350Z"
+  },
+  {
+   "status": "PREPARING",
+   "at": "2026-09-26T04:58:22.353Z"
+  },
+  {
+   "status": "READY",
+   "at": "2026-09-26T04:58:24.398Z"
+  },
+  {
+   "status": "COURIER_ASSIGNED",
+   "at": "2026-09-26T04:58:36.772Z"
+  },
+  {
+   "status": "ON_THE_WAY",
+   "at": "2026-09-26T04:58:40.930Z"
+  },
+  {
+   "status": "DELIVERED",
+   "at": "2026-09-26T04:58:45.042Z"
+  }
+ ],
+ "placedAt": "2026-09-26T04:58:16.169Z",
+ "courier": {
+  "name": "Luis Quispe",
+  "vehicle": "Moto roja",
+  "since": 2023,
+  "avatarUrl": null
+ },
+ "estimatedArrival": "2026-09-26T05:23:22.351Z",
+ "scheduledFor": null,
+ "rating": null,
+ "customer": {
+  "name": "Alex Quispe",
+  "phone": "984123456"
+ },
+ "deliveryLocation": {
+  "lat": -14.7935,
+  "lng": -71.4125
+ },
+ "pickup": {
+  "address": "Av. Túpac Amaru 245, Yauri",
+  "phone": "984 111 222",
+  "location": {
+   "lat": -14.7921,
+   "lng": -71.4109
+  }
+ },
+ "distanceMeters": 300,
+ "cancelReason": null,
+ "collection": {
+  "method": "CASH",
+  "amount": {
+   "amount": 1950,
+   "currency": "PEN"
+  },
+  "collectedAt": "2026-09-26T04:58:45.040Z"
+ }
+}

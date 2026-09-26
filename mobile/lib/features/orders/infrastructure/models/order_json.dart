@@ -18,6 +18,8 @@ abstract final class OrderJson {
 
   static OrderStatus statusFromJson(String s) => _status[s] ?? OrderStatus.received;
 
+  static Money moneyFromJson(Object? json) => _money(json);
+
   static Money _money(Object? json) {
     final m = json! as Map<String, dynamic>;
     return Money(m['amount'] as int, currency: m['currency'] as String? ?? Money.defaultCurrency);
@@ -61,6 +63,7 @@ abstract final class OrderJson {
             quantity: l['quantity'] as int,
             total: _money(l['total']),
             description: l['description'] as String? ?? '',
+            notes: l['notes'] as String? ?? '',
           ),
       ],
       subtotal: _money(json['subtotal']),
@@ -89,6 +92,7 @@ abstract final class OrderJson {
       estimatedArrival: date('estimatedArrival'),
       scheduledFor: date('scheduledFor'),
       rating: json['rating'] as int?,
+      notes: json['notes'] as String? ?? '',
     );
   }
 

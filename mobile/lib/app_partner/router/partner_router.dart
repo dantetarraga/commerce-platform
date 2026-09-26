@@ -61,11 +61,25 @@ GoRouter partnerRouter(Ref ref) {
         path: PartnerRoutePaths.merchantHome,
         name: MerchantHomePage.name,
         builder: (_, _) => const MerchantHomePage(),
+        routes: [
+          GoRoute(
+            path: PartnerRoutePaths.merchantProducts,
+            name: MerchantProductsPage.name,
+            builder: (_, state) => MerchantProductsPage(storeId: state.pathParameters['storeId']!),
+          ),
+        ],
       ),
       GoRoute(
         path: PartnerRoutePaths.courierHome,
         name: CourierHomePage.name,
         builder: (_, _) => const CourierHomePage(),
+        routes: [
+          GoRoute(
+            path: PartnerRoutePaths.activeDelivery,
+            name: ActiveDeliveryPage.name,
+            builder: (_, state) => ActiveDeliveryPage(orderId: state.pathParameters['orderId']!),
+          ),
+        ],
       ),
     ],
   );

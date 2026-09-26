@@ -63,7 +63,14 @@ final class CardPayment extends PaymentMethod {
 }
 
 final class OrderLine extends Equatable {
-  const OrderLine({required this.name, required this.quantity, required this.total, this.description = '', this.productId});
+  const OrderLine({
+    required this.name,
+    required this.quantity,
+    required this.total,
+    this.description = '',
+    this.productId,
+    this.notes = '',
+  });
 
   final String? productId;
   final String name;
@@ -71,8 +78,11 @@ final class OrderLine extends Equatable {
   final Money total;
   final String description;
 
+  /// Nota del cliente para este producto ("sin ají"). Solo la ven los socios.
+  final String notes;
+
   @override
-  List<Object?> get props => [productId, name, quantity, total, description];
+  List<Object?> get props => [productId, name, quantity, total, description, notes];
 }
 
 final class OrderStore extends Equatable {
@@ -137,6 +147,7 @@ final class Order extends Equatable {
     this.scheduledFor,
     this.rating,
     this.tip = const Money.zero(),
+    this.notes = '',
   });
 
   final String id;
@@ -167,6 +178,9 @@ final class Order extends Equatable {
 
   /// 1..5 estrellas si ya se calificó.
   final int? rating;
+
+  /// Nota general del cliente ("tocar el timbre dos veces").
+  final String notes;
 
   bool get isActive => !status.isFinal;
 
@@ -238,12 +252,13 @@ final class Order extends Equatable {
     scheduledFor: scheduledFor,
     rating: rating ?? this.rating,
     tip: tip,
+    notes: notes,
   );
 
   @override
   List<Object?> get props => [
     id, code, store, lines, subtotal, deliveryFee, discount, total, addressTitle, addressStreet,
-    addressReference, payment, status, events, placedAt, courier, estimatedArrival, scheduledFor, rating, tip,
+    addressReference, payment, status, events, placedAt, courier, estimatedArrival, scheduledFor, rating, tip, notes,
   ];
 }
 

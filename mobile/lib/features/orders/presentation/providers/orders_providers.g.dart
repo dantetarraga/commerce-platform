@@ -57,6 +57,56 @@ final class OrdersRemoteDataSourceProvider
 String _$ordersRemoteDataSourceHash() =>
     r'026fa6e867dd29d80ed08f5f5efe23dcb24f919c';
 
+/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
+
+@ProviderFor(fakeStaffOrders)
+final fakeStaffOrdersProvider = FakeStaffOrdersProvider._();
+
+/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
+
+final class FakeStaffOrdersProvider
+    extends
+        $FunctionalProvider<FakeStaffOrders, FakeStaffOrders, FakeStaffOrders>
+    with $Provider<FakeStaffOrders> {
+  /// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+  /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
+  FakeStaffOrdersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'fakeStaffOrdersProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$fakeStaffOrdersHash();
+
+  @$internal
+  @override
+  $ProviderElement<FakeStaffOrders> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FakeStaffOrders create(Ref ref) {
+    return fakeStaffOrders(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FakeStaffOrders value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FakeStaffOrders>(value),
+    );
+  }
+}
+
+String _$fakeStaffOrdersHash() => r'75ded5de8f638ec7650685a6af901fd659db7bee';
+
 @ProviderFor(ordersRepository)
 final ordersRepositoryProvider = OrdersRepositoryProvider._();
 

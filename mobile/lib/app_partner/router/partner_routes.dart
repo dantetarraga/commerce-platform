@@ -8,7 +8,9 @@ abstract final class PartnerRoutePaths {
   static const notPartner = '/no-socio';
 
   static const merchantHome = '/negocio';
+  static const merchantProducts = 'productos/:storeId'; // hija de /negocio
   static const courierHome = '/reparto';
+  static const activeDelivery = 'pedido/:orderId'; // hija de /reparto
 
   /// Rutas accesibles sin sesión (se comparan con el inicio del path).
   static const Set<String> public = {splash, login, notPartner};

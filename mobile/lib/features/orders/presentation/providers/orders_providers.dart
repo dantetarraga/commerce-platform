@@ -4,6 +4,7 @@ import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
+import 'package:chaski/features/orders/infrastructure/datasources/fake_staff_orders.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
 import 'package:chaski/features/orders/infrastructure/orders_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,6 +15,16 @@ part 'orders_providers.g.dart';
 OrdersRemoteDataSource ordersRemoteDataSource(Ref ref) {
   if (!ref.watch(appEnvProvider).useFakeData) return ApiOrdersRemoteDataSource(ref.watch(apiClientProvider));
   final fake = FakeOrdersRemoteDataSource(ref.watch(fakeBackendProvider));
+  ref.onDispose(fake.dispose);
+  return fake;
+}
+
+/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
+@Riverpod(keepAlive: true)
+FakeStaffOrders fakeStaffOrders(Ref ref) {
+  final backend = ref.watch(fakeBackendProvider);
+  final fake = FakeStaffOrders(backend, newOrderEvery: backend.orderStep * 7);
   ref.onDispose(fake.dispose);
   return fake;
 }

@@ -1,0 +1,10 @@
+{
+ "date": "2026-09-25",
+ "deliveredCount": 0,
+ "cancelledCount": 0,
+ "activeCount": 1,
+ "sales": {
+  "amount": 0,
+  "currency": "PEN"
+ }
+}

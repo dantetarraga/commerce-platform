@@ -1,0 +1,22 @@
+{
+ "date": "2026-09-25",
+ "deliveredCount": 1,
+ "collected": {
+  "total": {
+   "amount": 1950,
+   "currency": "PEN"
+  },
+  "CASH": {
+   "amount": 1950,
+   "currency": "PEN"
+  },
+  "YAPE": {
+   "amount": 0,
+   "currency": "PEN"
+  },
+  "PLIN": {
+   "amount": 0,
+   "currency": "PEN"
+  }
+ }
+}

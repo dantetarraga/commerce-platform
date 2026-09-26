@@ -25,7 +25,16 @@ final class DeliverAt extends DeliveryTime {
   List<Object?> get props => [at];
 }
 
-enum PaymentKind { yape, plin, cash, card }
+enum PaymentKind {
+  yape,
+  plin,
+  cash,
+  card;
+
+  /// Lo que se ofrece hoy: todo contraentrega, y sin tarjeta porque los
+  /// repartidores no llevan POS (ver docs/OPERACION.md §4).
+  static const List<PaymentKind> offered = [yape, plin, cash];
+}
 
 /// Lo que falta para poder confirmar, en el orden en que se muestra.
 enum CheckoutIssue { emptyCart, belowMinimum, missingAddress, missingPayment, cashTooLow }

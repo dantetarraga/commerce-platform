@@ -2,6 +2,7 @@ import 'package:chaski/app/config/app_config_provider.dart';
 import 'package:chaski/app/config/env.dart';
 import 'package:chaski/app/router/app_router.dart';
 import 'package:chaski/app_partner/router/partner_router.dart';
+import 'package:chaski/core/alarm/order_alarm.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/storage/local_json_store.dart';
@@ -25,6 +26,25 @@ class MemoryPreferences implements PreferencesStorage {
 
   @override
   Future<void> markOnboardingSeen() async => onboardingSeen = true;
+}
+
+/// Alarma de pedidos sin audio ni wakelock: registra lo que se pidió.
+class RecordingAlarm implements OrderAlarm {
+  bool ringing = false;
+  int rings = 0;
+  bool awake = false;
+
+  @override
+  Future<void> ring() async {
+    if (!ringing) rings++;
+    ringing = true;
+  }
+
+  @override
+  Future<void> silence() async => ringing = false;
+
+  @override
+  Future<void> keepAwake({required bool on}) async => awake = on;
 }
 
 /// Tokens en memoria (sin plugin nativo).
@@ -68,11 +88,13 @@ Future<ProviderContainer> pumpChaski(
 Future<ProviderContainer> pumpPartner(
   WidgetTester tester, {
   String? signedInAs,
+  OrderAlarm? alarm,
   Size size = const Size(390, 844),
   Duration orderStep = const Duration(seconds: 2),
 }) => _pumpApp(
   tester,
   router: (c) => c.read(partnerRouterProvider),
+  alarm: alarm,
   signedInAs: signedInAs,
   size: size,
   orderStep: orderStep,
@@ -83,6 +105,7 @@ Future<ProviderContainer> _pumpApp(
   required GoRouter Function(ProviderContainer) router,
   required Size size,
   required Duration orderStep,
+  OrderAlarm? alarm,
   bool onboardingSeen = true,
   String? signedInAs,
   bool disableAnimations = false,
@@ -101,6 +124,7 @@ Future<ProviderContainer> _pumpApp(
       localJsonStoreProvider.overrideWithValue(MemoryJsonStore()),
       fakeBackendProvider.overrideWithValue(FakeBackend(latency: const Duration(milliseconds: 10), orderStep: orderStep)),
       appEnvProvider.overrideWithValue(const AppEnv(apiBaseUrl: 'http://test', useFakeData: true)),
+      orderAlarmProvider.overrideWithValue(alarm ?? RecordingAlarm()),
     ],
   );
   await tester.pumpWidget(
@@ -126,7 +150,8 @@ Future<ProviderContainer> _pumpApp(
 Future<void> unmountChaski(WidgetTester tester, ProviderContainer container) async {
   await tester.pumpWidget(const SizedBox());
   container.dispose();
-  await tester.pump(const Duration(seconds: 1));
+  // Más que un aviso (AppToast dura 2.6 s), para que no quede su timer vivo.
+  await tester.pump(const Duration(seconds: 3));
 }
 
 /// `pumpAndSettle` no sirve con shimmer y animaciones en bucle: avanza el

@@ -69,7 +69,7 @@ class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
             style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontFeatures: AppTypography.tabularFigures),
           ),
           const SizedBox(height: AppSpacing.md),
-          for (final kind in PaymentKind.values) ...[
+          for (final kind in PaymentKind.offered) ...[
             _PaymentOption(kind: kind, selected: _kind == kind, onTap: () => _select(kind)),
             if (kind == PaymentKind.cash)
               AnimatedSize(

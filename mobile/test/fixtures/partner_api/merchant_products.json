@@ -1,0 +1,68 @@
+[
+ {
+  "id": "pr_pollo_entero",
+  "name": "Pollo entero a la brasa",
+  "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=101",
+  "price": {
+   "amount": 6500,
+   "currency": "PEN"
+  },
+  "section": "Pollos a la brasa",
+  "isAvailable": true
+ },
+ {
+  "id": "pr_pollo_cuarto",
+  "name": "1/4 de pollo a la brasa",
+  "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=103",
+  "price": {
+   "amount": 1800,
+   "currency": "PEN"
+  },
+  "section": "Pollos a la brasa",
+  "isAvailable": true
+ },
+ {
+  "id": "pr_pollo_medio",
+  "name": "1/2 pollo a la brasa",
+  "imageUrl": "https://loremflickr.com/600/450/roast,chicken?lock=102",
+  "price": {
+   "amount": 3500,
+   "currency": "PEN"
+  },
+  "section": "Pollos a la brasa",
+  "isAvailable": true
+ },
+ {
+  "id": "pr_combo_familiar",
+  "name": "Combo familiar",
+  "imageUrl": "https://loremflickr.com/600/450/chicken,dinner?lock=104",
+  "price": {
+   "amount": 7900,
+   "currency": "PEN"
+  },
+  "section": "Combos",
+  "isAvailable": true
+ },
+ {
+  "id": "pr_chicha_morada",
+  "name": "Chicha morada",
+  "imageUrl": "https://loremflickr.com/600/450/purple,drink?lock=105",
+  "price": {
+   "amount": 400,
+   "currency": "PEN"
+  },
+  "section": "Bebidas",
+  "isAvailable": true
+ },
+ {
+  "id": "pr_inca_kola",
+  "name": "Inca Kola 1.5 L",
+  "imageUrl": "https://loremflickr.com/600/450/soda,bottle?lock=106",
+  "price": {
+   "amount": 900,
+   "currency": "PEN"
+  },
+  "section": "Bebidas",
+  "isAvailable": false
+ }
+]
