@@ -448,10 +448,12 @@ class OffersRow extends ConsumerWidget {
 
   static const _heroSource = 'offers';
 
+  static bool accepts(StoreSummary s) => s.promoLabel != null && s.isOpenNow;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stores = ref.watch(storesProvider(sort: StoreSort.popular)).value;
-    final offers = stores?.items.where((s) => s.promoLabel != null && s.isOpenNow).toList();
+    final offers = stores?.items.where(accepts).toList();
     if (offers == null || offers.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -492,7 +494,8 @@ class NearbyCollection extends ConsumerWidget {
     final moment = ref.watch(currentMomentProvider);
     final provider = storesProvider(sort: StoreSort.popular);
     final stores = ref.watch(provider);
-    final picked = stores.value?.items.where((s) => s.isOpenNow).toList()
+    // Los que tienen oferta ya salen en "Ofertas de hoy".
+    final picked = stores.value?.items.where((s) => s.isOpenNow && !OffersRow.accepts(s)).toList()
       ?..sort((a, b) => (b.tags.contains(moment.tag) ? 1 : 0).compareTo(a.tags.contains(moment.tag) ? 1 : 0));
     if (picked != null && picked.isEmpty) return const SizedBox.shrink();
 

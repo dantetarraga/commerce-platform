@@ -1,12 +1,13 @@
 import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
 
-/// Contrato de la fuente remota de auth. Vive en infrastructure: el dominio
-/// solo conoce `AuthRepository`.
 abstract interface class AuthRemoteDataSource {
   Future<OtpChallengeDto> requestCode(String phone);
 
-  Future<OtpVerifyResponseDto> verifyCode({required String phone, required String code});
+  Future<OtpVerifyResponseDto> verifyCode({
+    required String phone,
+    required String code,
+  });
 
   Future<AuthResponseDto> register({
     required String registrationToken,
@@ -31,8 +32,14 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<OtpVerifyResponseDto> verifyCode({required String phone, required String code}) async {
-    final data = await _api.post('/auth/otp/verify', body: {'phone': phone, 'code': code});
+  Future<OtpVerifyResponseDto> verifyCode({
+    required String phone,
+    required String code,
+  }) async {
+    final data = await _api.post(
+      '/auth/otp/verify',
+      body: {'phone': phone, 'code': code},
+    );
     return OtpVerifyResponseDto.fromJson(data as Map<String, dynamic>);
   }
 
@@ -44,7 +51,11 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   }) async {
     final data = await _api.post(
       '/auth/register',
-      body: {'registrationToken': registrationToken, 'firstName': firstName, 'lastName': lastName},
+      body: {
+        'registrationToken': registrationToken,
+        'firstName': firstName,
+        'lastName': lastName,
+      },
     );
     return AuthResponseDto.fromJson(data as Map<String, dynamic>);
   }
@@ -56,5 +67,6 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> logout(String refreshToken) => _api.post('/auth/logout', body: {'refreshToken': refreshToken});
+  Future<void> logout(String refreshToken) =>
+      _api.post('/auth/logout', body: {'refreshToken': refreshToken});
 }

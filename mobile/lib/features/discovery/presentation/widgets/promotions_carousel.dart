@@ -6,13 +6,20 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// Carrusel paginado: cada banner encaja al soltar y el siguiente asoma.
+/// Carrusel paginado: el banner arranca en el margen de la pantalla (alineado
+/// con las demás secciones), encaja al soltar y el siguiente asoma a la derecha.
 class PromotionsCarousel extends StatefulWidget {
   const PromotionsCarousel({required this.promotions, required this.onTap, super.key});
 
   static const height = 150.0;
-  static const viewportFraction = 0.86;
-  static const double _gap = AppSpacing.xs / 2;
+  static const viewportFraction = 0.88;
+
+  /// Espacio entre banners.
+  static const double _gap = AppSpacing.xs;
+
+  /// El PageView queda medio hueco por dentro del margen a cada lado: así el
+  /// primer banner arranca en el margen y el último termina en el margen.
+  static const double _leading = AppSpacing.gutter - _gap / 2;
 
   final List<Promotion> promotions;
   final ValueChanged<Promotion> onTap;
@@ -36,15 +43,22 @@ class _PromotionsCarouselState extends State<PromotionsCarousel> {
     final promotions = widget.promotions;
     return Column(
       children: [
-        SizedBox(
-          height: PromotionsCarousel.height,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: promotions.length,
-            onPageChanged: (page) => setState(() => _page = page),
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: PromotionsCarousel._gap),
-              child: _PromotionBanner(promotion: promotions[index], onTap: () => widget.onTap(promotions[index])),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: PromotionsCarousel._leading),
+          child: SizedBox(
+            height: PromotionsCarousel.height,
+            child: PageView.builder(
+              controller: _controller,
+              // Alineado al margen (no centrado); sin recortar para que el
+              // siguiente asome más allá del margen.
+              padEnds: false,
+              clipBehavior: Clip.none,
+              itemCount: promotions.length,
+              onPageChanged: (page) => setState(() => _page = page),
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: PromotionsCarousel._gap / 2),
+                child: _PromotionBanner(promotion: promotions[index], onTap: () => widget.onTap(promotions[index])),
+              ),
             ),
           ),
         ),
@@ -167,17 +181,16 @@ class _PromotionBanner extends StatelessWidget {
   }
 }
 
-/// Misma geometría que el carrusel: banner centrado, el siguiente asomando y
-/// el hueco de los puntos.
+/// Misma geometría que el carrusel: banner en el margen, el siguiente
+/// asomando y el hueco de los puntos.
 class PromotionsCarouselSkeleton extends StatelessWidget {
   const PromotionsCarouselSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
-      final page = constraints.maxWidth * PromotionsCarousel.viewportFraction;
-      final inset = (constraints.maxWidth - page) / 2 + PromotionsCarousel._gap;
-      final banner = page - PromotionsCarousel._gap * 2;
+      final page = (constraints.maxWidth - PromotionsCarousel._leading * 2) * PromotionsCarousel.viewportFraction;
+      final banner = page - PromotionsCarousel._gap;
       return SizedBox(
         height: PromotionsCarousel.height + AppSpacing.xs + 6,
         child: ClipRect(
@@ -187,9 +200,9 @@ class PromotionsCarouselSkeleton extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: inset),
+                const SizedBox(width: AppSpacing.gutter),
                 SkeletonBox(width: banner, height: PromotionsCarousel.height, borderRadius: AppRadius.card),
-                const SizedBox(width: PromotionsCarousel._gap * 2),
+                const SizedBox(width: PromotionsCarousel._gap),
                 SkeletonBox(width: banner, height: PromotionsCarousel.height, borderRadius: AppRadius.card),
               ],
             ),
