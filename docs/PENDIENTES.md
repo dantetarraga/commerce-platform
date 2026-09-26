@@ -1,27 +1,27 @@
 # Chaski — qué falta para el MVP
 
-Estado al 2026-09-25. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [OPERACION.md](OPERACION.md) (cómo se opera con negocios y repartidores).
+Estado al 2026-09-26. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [OPERACION.md](OPERACION.md) (cómo se opera con negocios y repartidores).
 
 **En corto:** la app y el backend ya cubren el ciclo completo de un pedido: pedir, confirmar, preparar, repartir, entregar, calificar y cancelar. También hay avisos in-app y direcciones sincronizadas. Para un piloto en Espinar faltan tres cosas fuera del código:
 
 1. Crear la cuenta de **Twilio**.
 2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
-3. Hacer **push** de la rama `feat/backend-fase-1` para que corra la CI.
+3. Hacer **push** de `main`: los commits de Chaski Socios están solo en local y la CI todavía no los probó.
 
-Lo que sigue en código es la **app Chaski Socios** (negocio y repartidor), el alta de socios por admin y el push. Después, la ubicación real y el panel admin web.
+La **app Chaski Socios** (negocio y repartidor) ya opera pedidos contra la API. Lo que sigue en código es el alta de socios por admin y el push con plazo de aceptación. Después, la ubicación real y el panel admin web.
 
 ## Estado actual
 
 | Parte | Listo | Falta |
 |---|---|---|
-| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local; 139 tests | Ubicación real (GPS/mapa), editar perfil, push |
-| Backend (`backend/`) | Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria; 62 unit + 62 e2e | CRUD de catálogo, push, imágenes |
-| Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
-| Repo | Todo commiteado en `feat/backend-fase-1` (sin push) | 4 archivos de mobile con cambios propios sin commitear |
+| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). **Chaski Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 158 tests | Ubicación real (GPS/mapa), editar perfil, push |
+| Backend (`backend/`) | Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; 76 unit + 73 e2e | Alta de socios por admin, CRUD de catálogo, push, imágenes |
+| Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker + APK de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
+| Repo | `feat/backend-fase-1` ya se integró a `main` y se borró. Todo commiteado | Push de `main` (los commits de Chaski Socios están solo en local) |
 
 ## Operación de pedidos
 
-Se opera por API: `/merchant/*` para el negocio y `/courier/*` para el repartidor, con los usuarios del seed desde Swagger (ver `backend/README.md`).
+El negocio y el repartidor operan desde **Chaski Socios** (`/merchant/*` y `/courier/*` por debajo; contrato en [OPERACION.md](OPERACION.md) §7). Mientras no exista el alta por admin, los socios son los del seed (ver `backend/README.md`).
 
 | Pieza | Estado |
 |---|---|
@@ -58,8 +58,8 @@ Se opera por API: `/merchant/*` para el negocio y `/courier/*` para el repartido
 |---|---|
 | SMS | ✅ Twilio (`SMS_PROVIDER=twilio`, obligatorio en producción). Falta crear la cuenta y el Messaging Service |
 | Deploy | ✅ Dockerfile + `railway.toml` probados localmente. Falta crear el proyecto y separar las migraciones para achicar la imagen |
-| CI | ✅ Lint, unit, e2e, build e imagen Docker del backend; `flutter analyze` + `flutter test`. Corre al hacer push |
-| Pagos | Yape, Plin, tarjeta y efectivo se pagan **al recibir**: el MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) en la Fase 4 |
+| CI | ✅ Lint, unit, e2e, build e imagen Docker del backend; `flutter analyze`, `flutter test` y APK de las dos apps. Corre al hacer push a `main` o en un PR |
+| Pagos | Efectivo, Yape y Plin se pagan **al recibir**; tarjeta está deshabilitada (sin POS). El repartidor registra lo cobrado al entregar. El MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) en la Fase 4 |
 | Limpieza de datos | ✅ Tarea diaria que borra códigos OTP viejos y refresh tokens vencidos |
 | Secretos | ✅ `OTP_SECRET` propio, distinto de `JWT_ACCESS_SECRET` |
 | Rate limit | En memoria (con `TRUST_PROXY` para Railway): vale para una instancia; con varias hace falta Redis |
