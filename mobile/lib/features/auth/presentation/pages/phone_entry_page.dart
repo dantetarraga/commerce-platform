@@ -10,11 +10,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+/// Cuenta de prueba que se ofrece en modo demo.
+typedef DemoAccount = ({String label, String phone});
+
 /// Paso 1 de la entrada: el celular. Sin contraseñas.
 class PhoneEntryPage extends ConsumerStatefulWidget {
-  const PhoneEntryPage({super.key});
+  const PhoneEntryPage({
+    this.title = '¿Cuál es tu celular?',
+    this.subtitle = 'Te mandamos un código por SMS. Sin contraseñas.',
+    this.demoAccounts = const [(label: 'Cliente', phone: FakeAuthRemoteDataSource.demoPhone)],
+    super.key,
+  });
 
   static const name = 'login';
+
+  final String title;
+  final String subtitle;
+
+  /// Cuentas que el modo demo ofrece para entrar con un toque.
+  final List<DemoAccount> demoAccounts;
 
   @override
   ConsumerState<PhoneEntryPage> createState() => _PhoneEntryPageState();
@@ -60,10 +74,7 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
         ],
       ),
       children: [
-        const AuthHeader(
-          title: '¿Cuál es tu celular?',
-          subtitle: Text('Te mandamos un código por SMS. Sin contraseñas.'),
-        ),
+        AuthHeader(title: widget.title, subtitle: Text(widget.subtitle)),
         const SizedBox(height: AppSpacing.lg),
         Form(
           key: _formKey,
@@ -77,12 +88,17 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
         AnimatedFormError(error: flow.step == PhoneAuthStep.phone ? flow.error : null),
         if (demo) ...[
           const SizedBox(height: AppSpacing.xl),
-          _DemoHint(
-            onUse: () async {
-              _phone.text = FakeAuthRemoteDataSource.demoPhone;
-              await _submit();
-            },
-          ),
+          for (final account in widget.demoAccounts) ...[
+            _DemoHint(
+              account: account,
+              showLabel: widget.demoAccounts.length > 1,
+              onUse: () async {
+                _phone.text = account.phone;
+                await _submit();
+              },
+            ),
+            const SizedBox(height: AppSpacing.xs),
+          ],
         ],
       ],
     );
@@ -90,8 +106,10 @@ class _PhoneEntryPageState extends ConsumerState<PhoneEntryPage> {
 }
 
 class _DemoHint extends StatelessWidget {
-  const _DemoHint({required this.onUse});
+  const _DemoHint({required this.account, required this.showLabel, required this.onUse});
 
+  final DemoAccount account;
+  final bool showLabel;
   final VoidCallback onUse;
 
   @override
@@ -106,7 +124,7 @@ class _DemoHint extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'Modo demo: usa ${formatPhone(FakeAuthRemoteDataSource.demoPhone)} y el código ${FakeAuthRemoteDataSource.demoCode}.',
+              '${showLabel ? '${account.label}: ' : 'Modo demo: '}usa ${formatPhone(account.phone)} y el código ${FakeAuthRemoteDataSource.demoCode}.',
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
             ),
           ),

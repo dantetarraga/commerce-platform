@@ -15,8 +15,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "pe.chaski.chaski"
+        // El applicationId de cada app se define en productFlavors.
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -27,6 +26,22 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    // Dos apps desde el mismo código: la del cliente y Chaski Socios (negocio y
+    // repartidor). Cada una se instala por separado. Ver docs/OPERACION.md.
+    flavorDimensions += "app"
+    productFlavors {
+        create("customer") {
+            dimension = "app"
+            applicationId = "pe.chaski.chaski"
+            manifestPlaceholders["appName"] = "Chaski"
+        }
+        create("partner") {
+            dimension = "app"
+            applicationId = "pe.chaski.socios"
+            manifestPlaceholders["appName"] = "Chaski Socios"
+        }
     }
 
     buildTypes {

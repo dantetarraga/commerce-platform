@@ -13,9 +13,13 @@ import 'package:go_router/go_router.dart';
 /// Paso 2: el código de 6 dígitos. Verifica al completar la última casilla;
 /// "Verificar" queda como acción explícita (deshabilitada hasta completar).
 class OtpPage extends ConsumerStatefulWidget {
-  const OtpPage({super.key});
+  const OtpPage({this.onProfileRequired, super.key});
 
   static const name = 'otp';
+
+  /// Qué hacer si el número no tiene cuenta. Por defecto se pide el nombre
+  /// para crearla (app del cliente); Chaski Socios no crea cuentas.
+  final void Function(BuildContext context)? onProfileRequired;
 
   @override
   ConsumerState<OtpPage> createState() => _OtpPageState();
@@ -53,7 +57,12 @@ class _OtpPageState extends ConsumerState<OtpPage> {
     if (!mounted) return;
     switch (next) {
       case PhoneAuthStep.profile:
-        await context.pushNamed(ProfileSetupPage.name);
+        final custom = widget.onProfileRequired;
+        if (custom != null) {
+          custom(context);
+        } else {
+          await context.pushNamed(ProfileSetupPage.name);
+        }
       case PhoneAuthStep.code:
         // Código incorrecto: vibración y casillas limpias para reintentar.
         HapticFeedback.heavyImpact().ignore();

@@ -1,6 +1,7 @@
 import 'package:chaski/app/config/app_config_provider.dart';
 import 'package:chaski/app/config/env.dart';
 import 'package:chaski/app/router/app_router.dart';
+import 'package:chaski/app_partner/router/partner_router.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/storage/local_json_store.dart';
@@ -11,6 +12,7 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 /// Preferencias en memoria (onboarding visto o no).
 class MemoryPreferences implements PreferencesStorage {
@@ -51,6 +53,39 @@ Future<ProviderContainer> pumpChaski(
   Size size = const Size(390, 844),
   Duration orderStep = const Duration(seconds: 2),
   bool disableAnimations = false,
+}) => _pumpApp(
+  tester,
+  router: (c) => c.read(appRouterProvider),
+  onboardingSeen: onboardingSeen,
+  signedInAs: signedIn ? 'usr_demo_customer' : null,
+  size: size,
+  orderStep: orderStep,
+  disableAnimations: disableAnimations,
+);
+
+/// Monta Chaski Socios. [signedInAs] es el id de un usuario del fake de auth
+/// (p. ej. `usr_owner_chaski_dorado` o `usr_courier_luis`).
+Future<ProviderContainer> pumpPartner(
+  WidgetTester tester, {
+  String? signedInAs,
+  Size size = const Size(390, 844),
+  Duration orderStep = const Duration(seconds: 2),
+}) => _pumpApp(
+  tester,
+  router: (c) => c.read(partnerRouterProvider),
+  signedInAs: signedInAs,
+  size: size,
+  orderStep: orderStep,
+);
+
+Future<ProviderContainer> _pumpApp(
+  WidgetTester tester, {
+  required GoRouter Function(ProviderContainer) router,
+  required Size size,
+  required Duration orderStep,
+  bool onboardingSeen = true,
+  String? signedInAs,
+  bool disableAnimations = false,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -61,7 +96,7 @@ Future<ProviderContainer> pumpChaski(
     overrides: [
       preferencesStorageProvider.overrideWithValue(MemoryPreferences(onboardingSeen: onboardingSeen)),
       tokenStorageProvider.overrideWithValue(
-        MemoryTokens(signedIn ? (accessToken: 'fake-access.usr_demo_customer', refreshToken: 'fake-refresh.x') : null),
+        MemoryTokens(signedInAs != null ? (accessToken: 'fake-access.$signedInAs', refreshToken: 'fake-refresh.x') : null),
       ),
       localJsonStoreProvider.overrideWithValue(MemoryJsonStore()),
       fakeBackendProvider.overrideWithValue(FakeBackend(latency: const Duration(milliseconds: 10), orderStep: orderStep)),
@@ -73,7 +108,7 @@ Future<ProviderContainer> pumpChaski(
       container: container,
       child: MaterialApp.router(
         theme: AppTheme.light(),
-        routerConfig: container.read(appRouterProvider),
+        routerConfig: router(container),
         builder: (context, child) => MediaQuery(
           data: MediaQuery.of(context).copyWith(disableAnimations: disableAnimations),
           child: child!,
@@ -103,3 +138,6 @@ Future<void> settle(WidgetTester tester, {int frames = 20, Duration step = const
 }
 
 String currentPath(ProviderContainer c) => c.read(appRouterProvider).routeInformationProvider.value.uri.path;
+
+String currentPartnerPath(ProviderContainer c) =>
+    c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;

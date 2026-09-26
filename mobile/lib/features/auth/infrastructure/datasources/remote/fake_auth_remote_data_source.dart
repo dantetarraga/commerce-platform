@@ -8,11 +8,15 @@ import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
 ///
 /// - Cualquier celular válido recibe el código [demoCode].
 /// - [demoPhone] ya tiene cuenta (entra directo); otros números piden nombre.
+/// - [demoMerchantPhone] y [demoCourierPhone] son los socios del seed del
+///   backend: el dueño de Pollería El Chaski Dorado y un repartidor.
 class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
   FakeAuthRemoteDataSource(this._backend, this._tokenStorage);
 
   static const demoPhone = '984123456';
   static const demoCode = '123456';
+  static const demoMerchantPhone = '910000000';
+  static const demoCourierPhone = '900000101';
   static const _tokenPrefix = 'fake-access.';
   static const _registrationPrefix = 'fake-registration.';
 
@@ -28,6 +32,24 @@ class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
       'email': null,
       'avatarUrl': null,
       'roles': ['CUSTOMER'],
+    },
+    demoMerchantPhone: {
+      'id': 'usr_owner_chaski_dorado',
+      'phone': demoMerchantPhone,
+      'firstName': 'Don Julián',
+      'lastName': '',
+      'email': null,
+      'avatarUrl': null,
+      'roles': ['MERCHANT'],
+    },
+    demoCourierPhone: {
+      'id': 'usr_courier_luis',
+      'phone': demoCourierPhone,
+      'firstName': 'Luis',
+      'lastName': 'Quispe',
+      'email': null,
+      'avatarUrl': null,
+      'roles': ['COURIER'],
     },
   };
   final Set<String> _codesSent = {};

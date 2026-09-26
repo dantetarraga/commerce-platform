@@ -47,7 +47,7 @@ jobs:
         run: docker build -t chaski-api .
 
   mobile:
-    name: Mobile (analyze, test)
+    name: Mobile (analyze, test, APKs)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,3 +61,11 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: APK del cliente
+        run: flutter build apk --debug --flavor customer -t lib/main.dart
+      - name: APK de Chaski Socios
+        run: flutter build apk --debug --flavor partner -t lib/main_partner.dart

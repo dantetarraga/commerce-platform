@@ -32,6 +32,13 @@ final class AuthUser extends Equatable {
 
   bool get isCustomer => roles.contains(UserRole.customer);
 
+  bool get isMerchant => roles.contains(UserRole.merchant);
+
+  bool get isCourier => roles.contains(UserRole.courier);
+
+  /// Puede usar Chaski Socios (modo negocio o repartidor).
+  bool get isPartner => isMerchant || isCourier;
+
   @override
   List<Object?> get props => [id, phone, firstName, lastName, email, avatarUrl, roles];
 }
