@@ -1,5 +1,6 @@
 import 'package:chaski/core/alarm/order_alarm.dart';
 import 'package:chaski/core/utils/formatters.dart';
+import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/presentation/pages/merchant_products_page.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
@@ -8,6 +9,7 @@ import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:chaski/shared/widgets/partner_brand.dart';
 import 'package:chaski/shared/widgets/partner_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -65,100 +67,80 @@ class _MerchantHomePageState extends ConsumerState<MerchantHomePage> {
       OrderStatus.courierAssigned,
       OrderStatus.onTheWay,
     });
-    final store = ref.watch(merchantStoresProvider).value?.firstOrNull;
+    final stores = ref.watch(merchantStoresProvider).value ?? const <MerchantStore>[];
+    final store = stores.firstOrNull;
+    final wide = MediaQuery.sizeOf(context).width >= 900 && MediaQuery.textScalerOf(context).scale(14) < 20;
 
     String tab(String label, int count) => count == 0 ? label : '$label ($count)';
 
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 76,
-          title: PartnerAppTitle(title: store?.name ?? 'Tu negocio'),
-          actions: [
-            if (store != null)
-              IconButton(
-                tooltip: 'Productos',
-                icon: const Icon(Icons.inventory_2_outlined),
-                onPressed: () => context.pushNamed(
-                  MerchantProductsPage.name,
-                  pathParameters: {'storeId': store.id},
-                ),
-              ),
-            const PartnerAccountButton(),
-          ],
+    final actions = [
+      if (store != null)
+        PartnerHeroAction(
+          icon: Icons.menu_book_rounded,
+          tooltip: 'Productos',
+          onPressed: () => context.pushNamed(
+            MerchantProductsPage.name,
+            pathParameters: {'storeId': store.id},
+          ),
         ),
+      const PartnerAccountButton(),
+    ];
+
+    Widget ordersTab(List<StaffOrder> list, String emptyTitle, String emptyMessage) => _OrdersTab(
+      value: orders,
+      orders: list,
+      emptyTitle: emptyTitle,
+      emptyMessage: emptyMessage,
+    );
+
+    final tabs = wide
+        ? const ['Comandas', 'Hoy']
+        : [
+            tab('Nuevas', fresh.length),
+            tab('En fogón', preparing.length),
+            tab('Listas', ready.length),
+            'Hoy',
+          ];
+
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        appBar: partnerStatusBar(context),
         body: SafeArea(
           top: false,
-          child: PartnerContent(
-            child: NestedScrollView(
-              headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                const SliverToBoxAdapter(child: _StoreSwitches()),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.gutter,
-                    AppSpacing.lg,
-                    AppSpacing.gutter,
-                    AppSpacing.md,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: PartnerSectionHeading(
-                      title: 'Tu operación',
-                      subtitle: !orders.hasValue
-                          ? orders.hasError
-                                ? 'No pudimos actualizar tus pedidos.'
-                                : 'Consultando tus pedidos…'
-                          : fresh.isEmpty
-                          ? 'Todo al día. Aquí sigue cada pedido.'
-                          : '${fresh.length} ${fresh.length == 1 ? 'pedido necesita' : 'pedidos necesitan'} tu respuesta.',
-                    ),
-                  ),
-                ),
-                SliverOverlapAbsorber(
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                  sliver: SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _OrderTabs(
-                      TabBar(
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.start,
-                        padding: AppSpacing.screen,
-                        labelStyle: Theme.of(context).textTheme.labelLarge,
-                        dividerColor: Colors.transparent,
-                        tabs: [
-                          Tab(text: tab('Nuevos', fresh.length)),
-                          Tab(text: tab('Preparando', preparing.length)),
-                          Tab(text: tab('Listos', ready.length)),
-                          const Tab(text: 'Hoy'),
-                        ],
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverToBoxAdapter(
+                child: wide
+                    ? _RailHero(store: store, actions: actions)
+                    : _KitchenHero(
+                        store: store,
+                        waiting: fresh.length,
+                        actions: actions,
+                        pill: stores.length == 1 ? _StoreSwitch(store: stores.single) : null,
                       ),
-                    ),
-                  ),
-                ),
-              ],
-              body: TabBarView(
-                children: [
-                  _OrdersTab(
-                    value: orders,
-                    orders: fresh,
-                    emptyTitle: 'Sin pedidos nuevos',
-                    emptyMessage: 'Te avisaremos con una alarma cuando llegue el siguiente.',
-                  ),
-                  _OrdersTab(
-                    value: orders,
-                    orders: preparing,
-                    emptyTitle: 'Nada en preparación',
-                    emptyMessage: 'Los pedidos que aceptes aparecen aquí hasta que los marques listos.',
-                  ),
-                  _OrdersTab(
-                    value: orders,
-                    orders: ready,
-                    emptyTitle: 'Nada esperando repartidor',
-                    emptyMessage: 'Aquí seguirás la recogida y la entrega de los pedidos listos.',
-                  ),
-                  const _TodayTab(),
-                ],
               ),
+              if (stores.length > 1) const SliverToBoxAdapter(child: _StoreSwitches()),
+              SliverOverlapAbsorber(
+                handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                sliver: SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _OrderTabs(PartnerPillTabs(labels: tabs)),
+                ),
+              ),
+            ],
+            body: TabBarView(
+              children: wide
+                  ? [
+                      _RailBoard(value: orders, fresh: fresh, cooking: preparing, ready: ready),
+                      const _TodayTab(),
+                    ]
+                  : [
+                      ordersTab(fresh, 'Sin comandas nuevas', 'Te avisaremos con una alarma cuando llegue la siguiente.'),
+                      ordersTab(preparing, 'Nada en el fogón', 'Las comandas que aceptes aparecen aquí hasta que estén listas.'),
+                      ordersTab(ready, 'Nada esperando repartidor', 'Aquí sigues la recogida y la entrega de lo que ya salió.'),
+                      const _TodayTab(),
+                    ],
             ),
           ),
         ),
@@ -167,35 +149,280 @@ class _MerchantHomePageState extends ConsumerState<MerchantHomePage> {
   }
 }
 
-/// "Recibiendo pedidos" por negocio. Pausar deja de mostrarlo abierto.
-class _StoreSwitches extends ConsumerStatefulWidget {
-  const _StoreSwitches();
+/// "Buenas noches, Rosa · Tu cocina, al toque." con la foto del negocio.
+class _KitchenHero extends ConsumerWidget {
+  const _KitchenHero({required this.store, required this.waiting, required this.actions, this.pill});
+
+  final MerchantStore? store;
+  final int waiting;
+  final List<Widget> actions;
+  final Widget? pill;
 
   @override
-  ConsumerState<_StoreSwitches> createState() => _StoreSwitchesState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authSessionProvider).value;
+    final summary = ref.watch(merchantSummaryProvider).value;
+    final parts = [
+      if (summary != null) '${summary.deliveredCount + summary.activeCount} comandas · ${Formatters.money(summary.sales)} hoy',
+      if (waiting > 0) '$waiting por responder' else if (summary != null) 'todo al día',
+    ];
+    return PartnerHero(
+      eyebrow: 'CHASKI SOCIOS · COCINA',
+      greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
+      title: 'Tu cocina,',
+      accent: 'al toque.',
+      subtitle: parts.isEmpty ? null : parts.join(' · '),
+      imageUrl: store?.logoUrl,
+      avatar: store == null || store!.logoUrl != null ? null : const _StoreMark(),
+      actions: actions,
+      pill: pill,
+    );
+  }
 }
 
-class _StoreSwitchesState extends ConsumerState<_StoreSwitches> {
-  final Set<String> _saving = {};
+class _StoreMark extends StatelessWidget {
+  const _StoreMark();
 
-  Future<void> _toggle(MerchantStore store, bool accepting) async {
-    setState(() => _saving.add(store.id));
-    final failure = await ref.read(merchantStoresProvider.notifier).setAccepting(store, accepting: accepting);
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: 130,
+      height: 130,
+      decoration: BoxDecoration(color: scheme.surface, shape: BoxShape.circle),
+      child: Icon(Icons.soup_kitchen_rounded, size: 56, color: scheme.primary),
+    );
+  }
+}
+
+/// Portada en barra para el riel de la tablet.
+class _RailHero extends ConsumerWidget {
+  const _RailHero({required this.store, required this.actions});
+
+  final MerchantStore? store;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final summary = ref.watch(merchantSummaryProvider).value;
+    return Container(
+      decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: AppRadius.hero),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            right: -40,
+            top: -60,
+            child: SizedBox.square(
+              dimension: 200,
+              child: CustomPaint(painter: DashedRingPainter(color: scheme.primary.withValues(alpha: 0.35))),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 14, 16, 16),
+            child: Row(
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: scheme.surface, width: 3)),
+                    child: AppNetworkImage(
+                      url: store?.logoUrl,
+                      width: 56,
+                      height: 56,
+                      borderRadius: const BorderRadius.all(Radius.circular(28)),
+                      fallbackIcon: Icons.storefront_rounded,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'CHASKI SOCIOS · ${(store?.name ?? 'Riel de comandas').toUpperCase()}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(color: scheme.onPrimaryContainer, letterSpacing: 1.4, fontWeight: FontWeight.w800),
+                      ),
+                      Text.rich(
+                        TextSpan(
+                          text: 'Tu cocina, ',
+                          children: [TextSpan(text: 'al toque.', style: TextStyle(color: scheme.primary))],
+                        ),
+                        style: TextStyle(fontFamily: AppTypography.display, fontSize: 28, fontWeight: FontWeight.w800, height: 1.05, color: scheme.onSurface),
+                      ),
+                    ],
+                  ),
+                ),
+                if (summary != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.button),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Comandas hoy', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                        Text(
+                          '${summary.deliveredCount + summary.activeCount} · ${Formatters.money(summary.sales)}',
+                          style: AppTypography.price(context, size: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (store != null) SizedBox(width: 270, child: _StoreSwitch(store: store!, compact: true)),
+                ...actions,
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Las tres barras de la cocina: nuevas, en fogón y listas, con sus comandas colgadas.
+class _RailBoard extends ConsumerWidget {
+  const _RailBoard({required this.value, required this.fresh, required this.cooking, required this.ready});
+
+  final AsyncValue<List<StaffOrder>> value;
+  final List<StaffOrder> fresh;
+  final List<StaffOrder> cooking;
+  final List<StaffOrder> ready;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget empty(String text) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      ),
+    );
+    List<Widget> cards(List<StaffOrder> list) => [for (final o in list) MerchantOrderCard(key: ValueKey(o.id), order: o)];
+    return RefreshIndicator(
+      onRefresh: () => ref.refresh(merchantActiveOrdersProvider.future),
+      child: AsyncValueView(
+        value: value,
+        onRetry: () => ref.invalidate(merchantActiveOrdersProvider),
+        loading: const Center(child: CircularProgressIndicator()),
+        data: (_) => CustomScrollView(
+          key: const PageStorageKey('rails'),
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: PartnerRail(
+                        title: 'Nuevas',
+                        count: fresh.length,
+                        dot: scheme.primary,
+                        empty: empty('Sin comandas nuevas'),
+                        children: cards(fresh),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: PartnerRail(
+                        title: 'En fogón',
+                        count: cooking.length,
+                        dot: scheme.onSurface,
+                        empty: empty('Nada en el fogón'),
+                        children: cards(cooking),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: PartnerRail(
+                        title: 'Listas',
+                        count: ready.length,
+                        dot: AppColors.hierba,
+                        empty: empty('Nada esperando repartidor'),
+                        children: cards(ready),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Cocina abierta · recibiendo": pausar deja de mostrar el negocio abierto.
+class _StoreSwitch extends ConsumerStatefulWidget {
+  const _StoreSwitch({required this.store, this.compact = false, this.named = false});
+
+  final MerchantStore store;
+  final bool compact;
+  final bool named;
+
+  @override
+  ConsumerState<_StoreSwitch> createState() => _StoreSwitchState();
+}
+
+class _StoreSwitchState extends ConsumerState<_StoreSwitch> {
+  var _saving = false;
+
+  Future<void> _toggle(bool accepting) async {
+    setState(() => _saving = true);
+    final failure = await ref.read(merchantStoresProvider.notifier).setAccepting(widget.store, accepting: accepting);
     if (!mounted) return;
-    setState(() => _saving.remove(store.id));
+    setState(() => _saving = false);
     if (failure != null) AppToast.show(context, failure.message, kind: AppToastKind.error);
   }
 
   @override
   Widget build(BuildContext context) {
+    final store = widget.store;
+    final on = store.isAcceptingOrders;
+    final title = widget.named
+        ? store.name
+        : !on
+        ? 'Cocina en pausa'
+        : widget.compact
+        ? 'Cocina abierta'
+        : 'Cocina abierta · recibiendo';
+    final message = !store.isOpenNow
+        ? 'Fuera de tu horario de atención'
+        : !on
+        ? 'Actívala cuando estés listo'
+        : widget.compact
+        ? 'Recibiendo comandas'
+        : 'Los clientes ven tu negocio abierto';
+    return PartnerStatusPill(
+      title: title,
+      message: message,
+      value: on,
+      busy: _saving,
+      onChanged: _toggle,
+    );
+  }
+}
+
+/// Con varios negocios, una píldora por cada uno y el acceso a su carta.
+class _StoreSwitches extends ConsumerWidget {
+  const _StoreSwitches();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final stores = ref.watch(merchantStoresProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.gutter,
-        AppSpacing.xs,
-        AppSpacing.gutter,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, 0),
       child: AsyncValueView(
         value: stores,
         compactError: true,
@@ -208,31 +435,15 @@ class _StoreSwitchesState extends ConsumerState<_StoreSwitches> {
                 padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                 child: Column(
                   children: [
-                    PartnerAvailability(
-                      title: list.length > 1
-                          ? store.name
-                          : store.isAcceptingOrders
-                          ? 'Recibiendo pedidos'
-                          : 'Pedidos en pausa',
-                      message: !store.isOpenNow
-                          ? 'Fuera de tu horario de atención'
-                          : store.isAcceptingOrders
-                          ? 'Tu tienda está abierta para los clientes'
-                          : 'Activa tu tienda cuando estés listo',
-                      icon: Icons.storefront_rounded,
-                      value: store.isAcceptingOrders,
-                      busy: _saving.contains(store.id),
-                      onChanged: (value) => _toggle(store, value),
-                    ),
-                    if (list.length > 1)
-                      TextButton.icon(
-                        onPressed: () => context.pushNamed(
-                          MerchantProductsPage.name,
-                          pathParameters: {'storeId': store.id},
-                        ),
-                        icon: const Icon(Icons.inventory_2_outlined),
-                        label: Text('Productos de ${store.name}'),
+                    _StoreSwitch(store: store, named: true),
+                    TextButton.icon(
+                      onPressed: () => context.pushNamed(
+                        MerchantProductsPage.name,
+                        pathParameters: {'storeId': store.id},
                       ),
+                      icon: const Icon(Icons.menu_book_rounded),
+                      label: Text('Carta de ${store.name}'),
+                    ),
                   ],
                 ),
               ),
@@ -246,13 +457,13 @@ class _StoreSwitchesState extends ConsumerState<_StoreSwitches> {
 class _OrderTabs extends SliverPersistentHeaderDelegate {
   _OrderTabs(this.tabs);
 
-  final TabBar tabs;
+  final PartnerPillTabs tabs;
 
   @override
-  double get minExtent => 56;
+  double get minExtent => 64;
 
   @override
-  double get maxExtent => 56;
+  double get maxExtent => 64;
 
   @override
   Widget build(

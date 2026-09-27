@@ -74,7 +74,7 @@ void main() {
     expect(find.text('Desconectado'), findsOneWidget);
     await tester.tap(find.byType(Switch));
     await settle(tester);
-    expect(find.text('Conectado'), findsOneWidget);
+    expect(find.text('En ruta · conectado'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await _capture(tester, find.byType(CourierHomePage), 'repartidor_movil');
     await unmountChaski(tester, partner);

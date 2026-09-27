@@ -1,5 +1,6 @@
 import 'package:chaski/core/alarm/order_alarm.dart';
 import 'package:chaski/core/utils/formatters.dart';
+import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/presentation/pages/active_delivery_page.dart';
 import 'package:chaski/features/courier_deliveries/presentation/providers/courier_providers.dart';
@@ -7,6 +8,7 @@ import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:chaski/shared/widgets/partner_brand.dart';
 import 'package:chaski/shared/widgets/partner_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,137 +76,163 @@ class _CourierHomePageState extends ConsumerState<CourierHomePage> {
     final delivery = ref.watch(courierActiveDeliveryProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 76,
-        title: const PartnerAppTitle(title: 'Reparto'),
-        actions: const [PartnerAccountButton()],
-      ),
+      appBar: partnerStatusBar(context),
       body: SafeArea(
         top: false,
-        child: PartnerContent(
-          maxWidth: 760,
-          child: AsyncValueView(
-            value: me,
-            onRetry: () => ref.invalidate(courierMeProvider),
-            loading: const Center(child: CircularProgressIndicator()),
-            data: (profile) => RefreshIndicator(
-              onRefresh: () async {
-                ref
-                  ..invalidate(courierMeProvider)
-                  ..invalidate(courierActiveDeliveryProvider)
-                  ..invalidate(courierAvailableOrdersProvider)
-                  ..invalidate(courierSummaryProvider);
-                await ref.read(courierMeProvider.future);
-              },
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.gutter,
-                      AppSpacing.xs,
-                      AppSpacing.gutter,
-                      AppSpacing.lg,
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          PartnerSectionHeading(
-                            title: 'Hola, ${profile.name.split(' ').first}',
-                            subtitle: 'Cada entrega empieza contigo.',
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          PartnerAvailability(
-                            title: profile.isOnline ? 'Conectado' : 'Desconectado',
-                            message: switch (profile.availability) {
-                              CourierAvailability.offline => 'Actívate cuando estés listo para repartir.',
-                              CourierAvailability.available => 'Recibes pedidos · ${profile.vehicleLabel}',
-                              CourierAvailability.busy => 'Tienes una entrega en curso',
-                            },
-                            icon: profile.isOnline ? Icons.delivery_dining_rounded : Icons.pause_circle_outline_rounded,
-                            value: profile.isOnline,
-                            busy: _changingAvailability,
-                            onChanged: _setOnline,
-                          ),
-                        ],
-                      ),
+        child: AsyncValueView(
+          value: me,
+          onRetry: () => ref.invalidate(courierMeProvider),
+          loading: const Center(child: CircularProgressIndicator()),
+          data: (profile) => RefreshIndicator(
+            onRefresh: () async {
+              ref
+                ..invalidate(courierMeProvider)
+                ..invalidate(courierActiveDeliveryProvider)
+                ..invalidate(courierAvailableOrdersProvider)
+                ..invalidate(courierSummaryProvider);
+              await ref.read(courierMeProvider.future);
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _CourierHero(
+                    profile: profile,
+                    pill: PartnerStatusPill(
+                      title: profile.isOnline ? 'En ruta · conectado' : 'Desconectado',
+                      message: switch (profile.availability) {
+                        CourierAvailability.offline => 'Conéctate para ver recorridos',
+                        CourierAvailability.available => 'Recibes recorridos en Yauri · ${profile.vehicleLabel}',
+                        CourierAvailability.busy => 'Tienes un recorrido en curso',
+                      },
+                      value: profile.isOnline,
+                      busy: _changingAvailability,
+                      onChanged: _setOnline,
                     ),
                   ),
-                  if (delivery.value case final active?)
-                    SliverPadding(
-                      padding: AppSpacing.screen,
-                      sliver: SliverToBoxAdapter(
-                        child: _ActiveDeliveryBanner(order: active),
-                      ),
-                    )
-                  else if (delivery.hasError || !delivery.hasValue)
-                    SliverToBoxAdapter(
-                      child: AsyncValueView(
-                        value: delivery,
-                        compactError: true,
-                        onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
-                        loading: const LinearProgressIndicator(),
-                        data: (_) => const SizedBox.shrink(),
-                      ),
-                    )
-                  else if (profile.isOnline) ...[
-                    const SliverPadding(
-                      padding: EdgeInsets.fromLTRB(
-                        AppSpacing.gutter,
-                        0,
-                        AppSpacing.gutter,
-                        AppSpacing.md,
-                      ),
-                      sliver: SliverToBoxAdapter(
-                        child: PartnerSectionHeading(
-                          title: 'Listos para recoger',
-                          subtitle: 'Elige tu próximo recorrido.',
+                ),
+                SliverToBoxAdapter(
+                  child: PartnerContent(
+                    maxWidth: 720,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 18, AppSpacing.gutter, 0),
+                      child: switch (delivery) {
+                        AsyncValue(value: final active?) => _ActiveDeliveryBanner(order: active),
+                        AsyncValue(hasError: true) || AsyncValue(hasValue: false) => AsyncValueView(
+                          value: delivery,
+                          compactError: true,
+                          onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
+                          loading: const LinearProgressIndicator(),
+                          data: (_) => const SizedBox.shrink(),
                         ),
-                      ),
+                        _ when profile.isOnline => const _AvailableOrders(),
+                        _ => const _OfflineNote(),
+                      },
                     ),
-                    const _AvailableOrders(),
-                  ] else
-                    SliverPadding(
-                      padding: AppSpacing.screen,
-                      sliver: SliverToBoxAdapter(
-                        child: PartnerSurface(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.route_rounded,
-                                size: 40,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Text(
-                                'Tu próxima ruta empieza aquí',
-                                style: Theme.of(context).textTheme.titleLarge,
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              const Text(
-                                'Al conectarte verás dónde recoger, dónde entregar y cuánto cobrar antes de tomar un pedido.',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  const SliverPadding(
-                    padding: EdgeInsets.fromLTRB(
-                      AppSpacing.gutter,
-                      AppSpacing.xl,
-                      AppSpacing.gutter,
-                      AppSpacing.xl,
-                    ),
-                    sliver: SliverToBoxAdapter(child: _TodaySummary()),
                   ),
-                ],
-              ),
+                ),
+                const SliverToBoxAdapter(
+                  child: PartnerContent(
+                    maxWidth: 720,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xl, AppSpacing.gutter, AppSpacing.xl),
+                      child: _TodaySummary(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// "Buenas noches, Luis · Yauri te espera." con su foto, la moto y el trazo.
+class _CourierHero extends ConsumerWidget {
+  const _CourierHero({required this.profile, required this.pill});
+
+  final CourierProfile profile;
+  final Widget pill;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authSessionProvider).value;
+    final summary = ref.watch(courierSummaryProvider).value;
+    final scheme = Theme.of(context).colorScheme;
+    return PartnerHero(
+      eyebrow: 'CHASKI SOCIOS · REPARTO',
+      greeting: '${partnerGreeting()}, ${profile.name.split(' ').first}',
+      title: 'Yauri te',
+      accent: 'espera.',
+      subtitle: summary == null
+          ? profile.vehicleLabel
+          : 'Hoy: ${summary.deliveredCount} ${summary.deliveredCount == 1 ? 'recorrido' : 'recorridos'} · cobraste ${Formatters.money(summary.total)}',
+      avatar: SizedBox.square(
+        dimension: 130,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: AppAvatar(
+                imageUrl: user?.avatarUrl,
+                initials: user?.initials,
+                seed: user?.id ?? profile.id,
+                size: 106,
+              ),
+            ),
+            Positioned(
+              right: 4,
+              bottom: 4,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: scheme.primary,
+                  borderRadius: AppRadius.button,
+                  border: Border.all(color: scheme.primaryContainer, width: 3),
+                ),
+                child: const Icon(Icons.two_wheeler_rounded, size: 20, color: AppColors.blanco),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: const [PartnerAccountButton()],
+      pill: pill,
+    );
+  }
+}
+
+class _OfflineNote extends StatelessWidget {
+  const _OfflineNote();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(color: theme.colorScheme.surface, borderRadius: AppRadius.card),
+      child: Row(
+        children: [
+          Icon(Icons.route_rounded, size: 36, color: theme.colorScheme.primary),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tu próximo recorrido empieza aquí', style: theme.textTheme.titleMedium),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  'Al conectarte verás de dónde sale, a dónde llega y cuánto cobras antes de tomarlo.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -218,32 +246,34 @@ class _ActiveDeliveryBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final pickingUp = order.status == OrderStatus.courierAssigned;
-    return PartnerSurface(
-      highlighted: true,
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: scheme.primary, width: 2),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'TU ENTREGA EN CURSO',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.primary,
-              letterSpacing: 1,
-            ),
+            'TU RECORRIDO EN CURSO · ${order.order.code}',
+            style: theme.textTheme.labelSmall?.copyWith(color: scheme.primary, letterSpacing: 1.2, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             pickingUp ? 'Recoge en ${order.order.store.name}' : 'Entrega a ${order.customerName}',
             style: theme.textTheme.headlineSmall,
           ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(pickingUp ? order.pickup.address : order.order.addressStreet),
-          const SizedBox(height: AppSpacing.md),
           Text(
-            '${order.order.code} · Cobrar ${Formatters.money(order.order.total)}',
-            style: theme.textTheme.titleSmall,
+            pickingUp ? order.pickup.address : order.order.addressStreet,
+            style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
+          _CollectLeader(order: order),
+          const SizedBox(height: AppSpacing.sm),
           AppButton(
             label: 'Continuar entrega',
             icon: Icons.arrow_forward_rounded,
@@ -252,6 +282,35 @@ class _ActiveDeliveryBanner extends StatelessWidget {
               pathParameters: {'orderId': order.id},
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// "Cobras · Yape ········ S/ 28.50" sobre fondo de campo.
+class _CollectLeader extends StatelessWidget {
+  const _CollectLeader({required this.order});
+
+  final StaffOrder order;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final payment = order.order.payment;
+    final how = payment is CashPayment && payment.changeFor != null
+        ? 'Efectivo · paga con ${Formatters.money(payment.changeFor!)}'
+        : payment.label;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text('Cobras · $how', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(Formatters.money(order.order.total), style: AppTypography.price(context)),
         ],
       ),
     );
@@ -287,143 +346,183 @@ class _AvailableOrdersState extends ConsumerState<_AvailableOrders> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final orders = ref.watch(courierAvailableOrdersProvider);
-    final list = orders.value;
-    if (list == null || list.isEmpty) {
-      return SliverToBoxAdapter(
-        child: AsyncValueView(
-          value: orders,
-          compactError: true,
-          onRetry: () => ref.invalidate(courierAvailableOrdersProvider),
-          loading: const Padding(
-            padding: EdgeInsets.all(AppSpacing.lg),
-            child: Center(child: CircularProgressIndicator()),
-          ),
-          data: (_) => const AppEmptyState(
-            title: 'Nada por ahora',
-            message: 'Te avisaremos cuando un negocio tenga un pedido listo.',
-          ),
-        ),
-      );
-    }
-    return SliverPadding(
-      padding: AppSpacing.screen,
-      sliver: SliverList.separated(
-        itemCount: list.length,
-        separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
-        itemBuilder: (context, index) {
-          final order = list[index];
-          return PartnerSurface(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                StaffOrderHeader(order: order),
-                const SizedBox(height: AppSpacing.md),
-                _RouteStop(
-                  icon: Icons.storefront_rounded,
-                  label: 'RECOGER',
-                  title: order.order.store.name,
-                  address: order.pickup.address,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 11),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      height: 18,
-                      child: VerticalDivider(color: theme.colorScheme.outline),
-                    ),
-                  ),
-                ),
-                _RouteStop(
-                  icon: Icons.location_on_outlined,
-                  label: 'ENTREGAR',
-                  title: order.order.addressStreet,
-                  address: Formatters.distance(order.distanceMeters / 1000),
-                ),
-                const Divider(height: AppSpacing.xl),
-                Wrap(
-                  spacing: AppSpacing.xl,
-                  runSpacing: AppSpacing.sm,
-                  children: [
-                    PartnerMetric(
-                      label: 'Costo de envío',
-                      value: Formatters.money(order.order.deliveryFee),
-                    ),
-                    PartnerMetric(
-                      label: 'Cobrar al cliente',
-                      value: Formatters.money(order.order.total),
-                      emphasized: true,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppButton(
-                  label: 'Tomar pedido',
-                  loading: _taking == order.id,
-                  onPressed: _taking == null ? () => _accept(order) : null,
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _RouteStop extends StatelessWidget {
-  const _RouteStop({
-    required this.icon,
-    required this.label,
-    required this.title,
-    required this.address,
-  });
-
-  final IconData icon;
-  final String label;
-  final String title;
-  final String address;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final list = orders.value ?? const <StaffOrder>[];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Icon(icon, color: theme.colorScheme.primary),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(child: Text('Recorridos listos', style: theme.textTheme.headlineSmall)),
+            if (list.isNotEmpty)
               Text(
-                label,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  letterSpacing: 1,
-                ),
+                '${list.length} en Yauri',
+                style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
-              Text(title, style: theme.textTheme.titleSmall),
-              Text(
-                address,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
+        const SizedBox(height: AppSpacing.sm),
+        if (list.isEmpty)
+          AsyncValueView(
+            value: orders,
+            compactError: true,
+            onRetry: () => ref.invalidate(courierAvailableOrdersProvider),
+            loading: const Padding(
+              padding: EdgeInsets.all(AppSpacing.lg),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            data: (_) => const AppEmptyState(
+              title: 'Nada por ahora',
+              message: 'Te avisaremos cuando un negocio tenga un pedido listo.',
+            ),
+          )
+        else
+          for (final (i, order) in list.indexed) ...[
+            if (i > 0) const SizedBox(height: AppSpacing.md),
+            _RouteCard(
+              order: order,
+              first: i == 0,
+              taking: _taking == order.id,
+              onTake: _taking == null ? () => _accept(order) : null,
+            ),
+          ],
       ],
     );
   }
 }
 
+/// Un recorrido: sale del negocio (foto) y llega a la casa por el trazo punteado.
+class _RouteCard extends StatelessWidget {
+  const _RouteCard({required this.order, required this.first, required this.taking, required this.onTake});
+
+  final StaffOrder order;
+  final bool first;
+  final bool taking;
+  final VoidCallback? onTake;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final label = theme.textTheme.labelSmall?.copyWith(letterSpacing: 1, fontWeight: FontWeight.w800);
+    final place = TextStyle(
+      fontFamily: AppTypography.display,
+      fontSize: 18,
+      fontWeight: FontWeight.w700,
+      color: scheme.onSurface,
+      height: 1.2,
+    );
+    final meters = order.distanceMeters;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: AppRadius.card,
+        border: first ? Border.all(color: scheme.primary, width: 2) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Stack(
+            children: [
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ExcludeSemantics(
+                      child: SizedBox(
+                        width: 44,
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: scheme.primary, width: 2)),
+                              padding: const EdgeInsets.all(2),
+                              child: AppNetworkImage(
+                                url: order.order.store.logoUrl,
+                                width: 38,
+                                height: 38,
+                                borderRadius: const BorderRadius.all(Radius.circular(19)),
+                                fallbackIcon: Icons.storefront_rounded,
+                              ),
+                            ),
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 6),
+                                child: DottedLine(vertical: true, gap: 8, radius: 1.8),
+                              ),
+                            ),
+                            const StationNode(icon: Icons.home_rounded, color: AppColors.hierba, size: 28),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 84),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'SALE DE · ${staffTimeAgo(order.order.placedAt).toUpperCase()}',
+                                  style: label?.copyWith(color: scheme.primary),
+                                ),
+                                Text(order.order.store.name, style: place),
+                                Text(order.pickup.address, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            'LLEGA A · ${meters < 1000 ? '$meters m' : Formatters.distance(meters / 1000)}',
+                            style: label?.copyWith(color: AppColors.hierba),
+                          ),
+                          Text(order.order.addressStreet, style: place),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Semantics(
+                  label: 'Ganas ${Formatters.money(order.order.deliveryFee)}',
+                  excludeSemantics: true,
+                  child: PartnerStamp('+${Formatters.money(order.order.deliveryFee)}', color: AppColors.hierba, size: 16),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _CollectLeader(order: order),
+          const SizedBox(height: 12),
+          AppButton(
+            label: 'Tomar recorrido',
+            icon: Icons.arrow_forward_rounded,
+            loading: taking,
+            onPressed: onTake,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// La jornada como boleta de rendición: lo cobrado por medio y el efectivo en mano.
 class _TodaySummary extends ConsumerWidget {
   const _TodaySummary();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final row = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600);
     return AsyncValueView(
       value: ref.watch(courierSummaryProvider),
       compactError: true,
@@ -432,55 +531,54 @@ class _TodaySummary extends ConsumerWidget {
       data: (summary) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PartnerSectionHeading(
-            title: 'Tu jornada de hoy',
-            subtitle:
-                '${summary.deliveredCount} ${summary.deliveredCount == 1 ? 'entrega completada' : 'entregas completadas'}',
+          Text('Tu jornada de hoy', style: theme.textTheme.headlineSmall),
+          Text(
+            '${summary.deliveredCount} ${summary.deliveredCount == 1 ? 'entrega completada' : 'entregas completadas'}',
+            style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
           ),
           const SizedBox(height: AppSpacing.md),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              borderRadius: AppRadius.card,
-            ),
+          const TicketEdge(top: true),
+          TicketSection(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Total cobrado',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'RENDICIÓN DEL DÍA',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    const PartnerStamp('PARA RENDIR', size: 11),
+                  ],
                 ),
-                Text(
-                  Formatters.money(summary.total),
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                const SizedBox(height: 8),
+                for (final (label, amount) in [('Yape', summary.yape), ('Plin', summary.plin), ('Efectivo', summary.cash)]) ...[
+                  LeaderRow(label: Text(label, style: row), value: Text(Formatters.money(amount), style: row)),
+                  const SizedBox(height: 6),
+                ],
+                LeaderRow(
+                  label: Text('Total cobrado', style: row?.copyWith(fontWeight: FontWeight.w800)),
+                  value: Text(Formatters.money(summary.total), style: row?.copyWith(fontWeight: FontWeight.w800)),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          Wrap(
-            spacing: AppSpacing.lg,
-            runSpacing: AppSpacing.md,
-            children: [
-              PartnerMetric(
-                label: 'Efectivo',
-                value: Formatters.money(summary.cash),
-              ),
-              PartnerMetric(
-                label: 'Yape',
-                value: Formatters.money(summary.yape),
-              ),
-              PartnerMetric(
-                label: 'Plin',
-                value: Formatters.money(summary.plin),
-              ),
-            ],
+          const TicketPerforation(),
+          TicketSection(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: LeaderRow(
+              label: Text('Efectivo en mano', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+              value: Text(Formatters.money(summary.cash), style: AppTypography.price(context, size: 26)),
+            ),
           ),
+          const TicketEdge(top: false),
         ],
       ),
     );

@@ -22,6 +22,7 @@ export 'components/app_search_bar.dart';
 export 'components/app_sheets.dart';
 export 'components/app_skeleton.dart';
 export 'components/app_store_card.dart';
+export 'components/app_ticket.dart';
 export 'components/app_toast.dart';
 export 'components/fly_to_purchase_bar.dart';
 export 'illustrations/app_rive_success.dart';

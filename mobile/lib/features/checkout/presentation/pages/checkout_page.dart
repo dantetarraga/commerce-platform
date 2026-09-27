@@ -9,7 +9,6 @@ import 'package:chaski/features/checkout/presentation/widgets/knot_celebration.d
 import 'package:chaski/features/checkout/presentation/widgets/payment_brand.dart';
 import 'package:chaski/features/checkout/presentation/widgets/payment_sheet.dart';
 import 'package:chaski/features/checkout/presentation/widgets/schedule_sheet.dart';
-import 'package:chaski/features/checkout/presentation/widgets/ticket.dart';
 import 'package:chaski/features/checkout/presentation/widgets/tip_selector.dart';
 import 'package:chaski/features/home/home.dart';
 import 'package:chaski/features/orders/orders.dart';
@@ -19,8 +18,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Checkout "Tu boleta": todo el pedido en una boleta impresa sobre crema, con
-/// encabezado terracota y el corte en zigzag abajo.
+/// Checkout "Tu boleta": todo el pedido en una boleta de papel arrancada de la
+/// ticketera, con el corte en zigzag arriba y abajo.
 /// Lo último que usaste ya viene elegido; solo tocas lo que quieres cambiar.
 class CheckoutPage extends ConsumerWidget {
   const CheckoutPage({super.key});
@@ -234,7 +233,7 @@ class _Boleta extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const TicketHeader(label: 'BOLETA DE PEDIDO'),
+        const TicketEdge(top: true),
         TicketSection(
           padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.xs),
           child: Column(

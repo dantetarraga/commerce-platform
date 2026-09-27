@@ -46,7 +46,40 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
     final theme = Theme.of(context);
     final products = ref.watch(merchantProductsProvider(widget.storeId));
     return Scaffold(
-      appBar: AppBar(title: const Text('Productos')),
+      appBar: AppBar(
+        toolbarHeight: 72,
+        backgroundColor: theme.colorScheme.primaryContainer,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(28)),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'CHASKI SOCIOS · CARTA',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text.rich(
+              TextSpan(
+                text: 'Tu carta, ',
+                children: [TextSpan(text: 'al día.', style: TextStyle(color: theme.colorScheme.primary))],
+              ),
+              style: TextStyle(
+                fontFamily: AppTypography.display,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: SafeArea(
         top: false,
         child: PartnerContent(
@@ -98,11 +131,12 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            PartnerSectionHeading(
-                              title: 'Tu menú, al día',
-                              subtitle: '$available de ${list.length} productos disponibles para pedir.',
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              '$available de ${list.length} productos disponibles para pedir.',
+                              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                             ),
-                            const SizedBox(height: AppSpacing.lg),
+                            const SizedBox(height: AppSpacing.md),
                             TextField(
                               controller: _search,
                               onChanged: (_) => setState(() {}),

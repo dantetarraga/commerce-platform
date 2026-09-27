@@ -2,7 +2,6 @@ import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/checkout/domain/checkout.dart';
 import 'package:chaski/features/checkout/presentation/widgets/checkout_format.dart';
-import 'package:chaski/features/checkout/presentation/widgets/ticket.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

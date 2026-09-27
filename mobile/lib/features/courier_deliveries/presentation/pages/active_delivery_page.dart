@@ -6,6 +6,7 @@ import 'package:chaski/features/courier_deliveries/presentation/providers/courie
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:chaski/shared/widgets/partner_brand.dart';
 import 'package:chaski/shared/widgets/partner_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +70,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> {
   Widget build(BuildContext context) {
     final delivery = ref.watch(courierActiveDeliveryProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Pedido en curso')),
+      appBar: partnerStatusBar(context),
       body: AsyncValueView(
         value: delivery,
         onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
@@ -86,160 +87,125 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> {
 
   Widget _content(BuildContext context, StaffOrder order) {
     final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     final pickingUp = order.status == OrderStatus.courierAssigned;
-    final payment = order.order.payment;
-    final change = payment is CashPayment && payment.changeFor != null
-        ? Money(payment.changeFor!.cents - order.order.total.cents)
-        : null;
+    final meters = order.distanceMeters;
+    final distance = meters < 1000 ? '$meters m' : Formatters.distance(meters / 1000);
+    final pickedAt = order.order.events.where((e) => e.status == OrderStatus.onTheWay).map((e) => e.at).firstOrNull;
+    final code = order.order.code.replaceAll('#', '');
+    final label = theme.textTheme.labelSmall?.copyWith(letterSpacing: 1, fontWeight: FontWeight.w800);
+    final place = TextStyle(fontFamily: AppTypography.display, fontSize: 18, fontWeight: FontWeight.w700, color: scheme.onSurface, height: 1.2);
+    final muted = theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant);
 
-    return SafeArea(
-      child: PartnerContent(
-        maxWidth: 760,
+    final you = PartnerStation(
+      node: const StationNode(icon: Icons.two_wheeler_rounded, size: 40, square: true),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 2),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.gutter,
-                  AppSpacing.sm,
-                  AppSpacing.gutter,
-                  AppSpacing.lg,
-                ),
-                children: [
-                  StaffOrderHeader(order: order),
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            borderRadius: AppRadius.tile,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Expanded(
-                        child: Container(
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: pickingUp ? theme.colorScheme.outlineVariant : theme.colorScheme.primary,
-                            borderRadius: AppRadius.tile,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  PartnerSectionHeading(
-                    title: pickingUp ? 'Recoge el pedido' : 'Entrega y cobra',
-                    subtitle: pickingUp
-                        ? 'Paso 1 de 2 · Confirma que llevas todo.'
-                        : 'Paso 2 de 2 · Confirma el pago al entregar.',
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _Step(
-                    number: 1,
-                    done: !pickingUp,
-                    current: pickingUp,
-                    label: pickingUp ? 'RECOGIDA' : 'RECOGIDO',
-                    title: order.order.store.name,
-                    subtitle: order.pickup.address,
-                    onCall: order.pickup.phone == null
-                        ? null
-                        : () => _open(
-                            () => ExternalLinks.call(
-                              order.pickup.phone!.replaceAll(' ', ''),
-                            ),
-                          ),
-                    onMap: () => _open(() => _map(order.pickup.location)),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  _Step(
-                    number: 2,
-                    done: false,
-                    current: !pickingUp,
-                    label: 'ENTREGA',
-                    title: order.customerName,
-                    subtitle: [
-                      order.order.addressStreet,
-                      if (order.order.addressReference.isNotEmpty) order.order.addressReference,
-                    ].join(' · '),
-                    onCall: () => _open(() => ExternalLinks.call(order.customerPhone)),
-                    onMap: () => _open(() => _map(order.deliveryLocation)),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: AppRadius.card,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Cobrar al entregar',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                        Text(
-                          Formatters.money(order.order.total),
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: theme.colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                        Text(
-                          change != null && change.cents > 0
-                              ? '${payment.label}: paga con ${Formatters.money((payment as CashPayment).changeFor!)} · '
-                                    'lleva ${Formatters.money(change)} de vuelto'
-                              : payment.label,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onPrimaryContainer,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text('Lo que llevas', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: AppSpacing.xs),
-                  PartnerSurface(child: StaffOrderLines(order: order.order)),
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                border: Border(
-                  top: BorderSide(color: theme.colorScheme.outlineVariant),
-                ),
-              ),
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.gutter,
-                AppSpacing.sm,
-                AppSpacing.gutter,
-                AppSpacing.md,
-              ),
-              child: pickingUp
-                  ? AppButton(
-                      label: 'Lo recogí',
-                      icon: Icons.shopping_bag_outlined,
-                      loading: _busy,
-                      onPressed: _busy ? null : () => _pickedUp(order),
-                    )
-                  : AppButton(
-                      label: 'Entregado',
-                      icon: Icons.check_rounded,
-                      loading: _busy,
-                      onPressed: _busy ? null : () => _deliver(order),
-                    ),
+            Text(pickingUp ? 'TÚ · VAS AL NEGOCIO' : 'TÚ · EN CAMINO', style: label?.copyWith(color: scheme.primary)),
+            Text(
+              pickingUp ? 'Luego llevas el pedido a $distance' : 'Por ${order.order.addressStreet} · $distance',
+              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
           ],
         ),
+      ),
+    );
+
+    final storeCard = PartnerStation(
+      node: StationNode(imageUrl: order.order.store.logoUrl, done: !pickingUp),
+      child: pickingUp
+          ? _StopCard(
+              eyebrow: 'RECOGIDA',
+              heading: 'Recoge el pedido',
+              title: order.order.store.name,
+              lines: [order.pickup.address, '${order.order.itemCount} productos · código $code'],
+              onCall: order.pickup.phone == null ? null : () => _open(() => ExternalLinks.call(order.pickup.phone!.replaceAll(' ', ''))),
+              onMap: () => _open(() => _map(order.pickup.location)),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  pickedAt == null ? 'RECOGISTE' : 'RECOGISTE · ${Formatters.clock(pickedAt)}',
+                  style: label?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                Text(order.order.store.name, style: place.copyWith(color: scheme.onSurfaceVariant)),
+                Text('${order.order.itemCount} productos · código $code', style: muted),
+              ],
+            ),
+    );
+
+    final arrival = PartnerStation(
+      node: StationNode(icon: Icons.home_rounded, size: 40, color: pickingUp ? scheme.outline : AppColors.hierba),
+      child: pickingUp
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('LUEGO · LLEGADA', style: label?.copyWith(color: scheme.onSurfaceVariant)),
+                Text(order.customerName, style: place.copyWith(color: scheme.onSurfaceVariant)),
+                Text(order.order.addressStreet, style: muted),
+              ],
+            )
+          : _StopCard(
+              eyebrow: 'LLEGADA',
+              heading: 'Entrega y cobra',
+              title: order.customerName,
+              lines: [order.order.addressStreet, if (order.order.addressReference.isNotEmpty) order.order.addressReference],
+              accent: AppColors.hierba,
+              onCall: () => _open(() => ExternalLinks.call(order.customerPhone)),
+              onMap: () => _open(() => _map(order.deliveryLocation)),
+            ),
+    );
+
+    return SafeArea(
+      top: false,
+      child: Column(
+        children: [
+          _DeliveryHeader(code: order.order.code, pickingUp: pickingUp, distance: distance),
+          Expanded(
+            child: PartnerContent(
+              maxWidth: 720,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.lg),
+                children: [
+                  PartnerStations(
+                    stations: pickingUp ? [you, storeCard, arrival] : [storeCard, you, arrival],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _CollectTicket(order: order),
+                ],
+              ),
+            ),
+          ),
+          PartnerContent(
+            maxWidth: 720,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.md),
+              child: pickingUp
+                  ? SlideToConfirm(
+                      key: const ValueKey('pickup'),
+                      label: 'Lo recogí',
+                      hint: 'Desliza cuando tengas todo',
+                      icon: Icons.shopping_bag_outlined,
+                      color: scheme.primary,
+                      busy: _busy,
+                      onConfirm: () => _pickedUp(order),
+                    )
+                  : SlideToConfirm(
+                      key: const ValueKey('deliver'),
+                      label: 'Entregado',
+                      hint: 'Desliza hasta la llegada',
+                      icon: Icons.check_rounded,
+                      color: AppColors.hierba,
+                      busy: _busy,
+                      onConfirm: () => _deliver(order),
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -247,88 +213,233 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> {
   static Future<bool> _map(GeoCoordinates at) => ExternalLinks.map(at.latitude, at.longitude);
 }
 
-class _Step extends StatelessWidget {
-  const _Step({
-    required this.number,
-    required this.done,
-    required this.current,
-    required this.label,
-    required this.title,
-    required this.subtitle,
-    required this.onMap,
-    this.onCall,
-  });
+/// "RECORRIDO #3104 · Llévalo, al toque." con la distancia a la derecha.
+class _DeliveryHeader extends StatelessWidget {
+  const _DeliveryHeader({required this.code, required this.pickingUp, required this.distance});
 
-  final int number;
-  final bool done;
-  final bool current;
-  final String label;
-  final String title;
-  final String subtitle;
-  final VoidCallback onMap;
-  final VoidCallback? onCall;
+  final String code;
+  final bool pickingUp;
+  final String distance;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return PartnerSurface(
-      highlighted: current,
+    final scheme = theme.colorScheme;
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(28)),
+      ),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 8, AppSpacing.gutter, 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 14,
-            backgroundColor: done || current ? theme.colorScheme.primary : theme.colorScheme.surfaceContainer,
-            child: done
-                ? Icon(
-                    Icons.check,
-                    size: 16,
-                    color: theme.colorScheme.onPrimary,
-                  )
-                : Text(
-                    '$number',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: current ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                    ),
-                  ),
+          IconButton(
+            tooltip: 'Volver',
+            onPressed: () => Navigator.of(context).maybePop(),
+            style: IconButton.styleFrom(backgroundColor: scheme.surface, fixedSize: const Size.square(44)),
+            icon: const Icon(Icons.arrow_back_rounded, size: 20),
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  label,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: current ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                    letterSpacing: 1,
-                  ),
+                  'RECORRIDO $code · PASO ${pickingUp ? 1 : 2} DE 2',
+                  style: theme.textTheme.labelSmall?.copyWith(color: scheme.onPrimaryContainer, letterSpacing: 1.2, fontWeight: FontWeight.w800),
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(title, style: theme.textTheme.titleMedium),
-                Text(subtitle, style: theme.textTheme.bodyMedium),
-                if (!done)
-                  Wrap(
-                    spacing: AppSpacing.xs,
-                    children: [
-                      if (onCall != null)
-                        TextButton.icon(
-                          onPressed: onCall,
-                          icon: const Icon(Icons.call_outlined),
-                          label: const Text('Llamar'),
-                        ),
-                      TextButton.icon(
-                        onPressed: onMap,
-                        icon: const Icon(Icons.near_me_outlined),
-                        label: const Text('Cómo llegar'),
-                      ),
-                    ],
+                Text.rich(
+                  TextSpan(
+                    text: pickingUp ? 'Recógelo, ' : 'Llévalo, ',
+                    children: [TextSpan(text: 'al toque.', style: TextStyle(color: scheme.primary))],
                   ),
+                  style: TextStyle(fontFamily: AppTypography.display, fontSize: 22, fontWeight: FontWeight.w800, height: 1.1, color: scheme.onSurface),
+                ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(pickingUp ? 'Entrega a' : 'Llegada a', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+              Text(distance, style: AppTypography.price(context, size: 22)),
+            ],
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// La parada actual: a dónde ir y cómo contactar.
+class _StopCard extends StatelessWidget {
+  const _StopCard({
+    required this.eyebrow,
+    required this.heading,
+    required this.title,
+    required this.lines,
+    required this.onMap,
+    this.onCall,
+    this.accent,
+  });
+
+  final String eyebrow;
+  final String heading;
+  final String title;
+  final List<String> lines;
+  final VoidCallback onMap;
+  final VoidCallback? onCall;
+  final Color? accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final color = accent ?? scheme.primary;
+    Widget action(IconData icon, String text, VoidCallback onTap) => Expanded(
+      child: Material(
+        color: scheme.primaryContainer,
+        borderRadius: AppRadius.button,
+        child: InkWell(
+          borderRadius: AppRadius.button,
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 18, color: scheme.onPrimaryContainer),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(text, style: theme.textTheme.labelLarge?.copyWith(color: scheme.onPrimaryContainer, fontWeight: FontWeight.w800)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.tileExit),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(eyebrow, style: theme.textTheme.labelSmall?.copyWith(color: color, letterSpacing: 1, fontWeight: FontWeight.w800)),
+          Text(heading, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: TextStyle(fontFamily: AppTypography.display, fontSize: 20, fontWeight: FontWeight.w700, color: scheme.onSurface, height: 1.2),
+          ),
+          for (final (i, line) in lines.indexed)
+            Text(
+              line,
+              style: i == 0
+                  ? theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)
+                  : theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+            ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              if (onCall != null) ...[action(Icons.call_outlined, 'Llamar', onCall!), const SizedBox(width: 8)],
+              action(Icons.near_me_outlined, 'Cómo llegar', onMap),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Boleta de lo que lleva y lo que cobra al entregar.
+class _CollectTicket extends StatelessWidget {
+  const _CollectTicket({required this.order});
+
+  final StaffOrder order;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final o = order.order;
+    final payment = o.payment;
+    final change = payment is CashPayment && payment.changeFor != null ? Money(payment.changeFor!.cents - o.total.cents) : null;
+    final row = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: scheme.onSurfaceVariant);
+    final item = theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700);
+    final eyebrow = theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant, letterSpacing: 1.2, fontWeight: FontWeight.w800);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const TicketEdge(top: true),
+        TicketSection(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('LO QUE LLEVAS', style: eyebrow),
+              for (final line in o.lines) ...[
+                const SizedBox(height: 6),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${line.quantity}×  ', style: item?.copyWith(color: scheme.primary)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(line.name, style: item),
+                          if (line.notes.isNotEmpty)
+                            Text('“${line.notes}”', style: theme.textTheme.bodySmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              if (o.notes.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('Nota: ${o.notes}', style: theme.textTheme.bodySmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w600)),
+              ],
+            ],
+          ),
+        ),
+        const TicketPerforation(),
+        TicketSection(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(child: Text('COBRA AL ENTREGAR', style: eyebrow)),
+                  Text(payment.label, style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800)),
+                ],
+              ),
+              const SizedBox(height: 6),
+              LeaderRow(label: Text('Pedido', style: row), value: Text(Formatters.money(Money(o.total.cents - o.deliveryFee.cents)), style: row)),
+              const SizedBox(height: 4),
+              LeaderRow(label: Text('Envío', style: row), value: Text(Formatters.money(o.deliveryFee), style: row)),
+              const SizedBox(height: 6),
+              LeaderRow(
+                label: Text('Total', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+                value: Text(Formatters.money(o.total), style: AppTypography.price(context, size: 28)),
+              ),
+              if (change != null && change.cents > 0) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Paga con ${Formatters.money((payment as CashPayment).changeFor!)} · lleva ${Formatters.money(change)} de vuelto',
+                  style: theme.textTheme.bodySmall?.copyWith(color: scheme.primary, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const TicketEdge(top: false),
+      ],
     );
   }
 }

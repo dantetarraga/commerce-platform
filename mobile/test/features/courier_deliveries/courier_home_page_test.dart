@@ -26,12 +26,12 @@ void main() {
     final container = await pumpPartner(tester, signedInAs: courier, alarm: alarm);
     expect(find.byType(CourierHomePage), findsOneWidget);
     expect(find.text('Desconectado'), findsOneWidget);
-    expect(find.text('Tomar pedido'), findsNothing);
+    expect(find.text('Tomar recorrido'), findsNothing);
 
     await tester.tap(find.byType(Switch));
     await settle(tester);
-    expect(find.text('Conectado'), findsOneWidget);
-    expect(find.text('Tomar pedido'), findsWidgets);
+    expect(find.text('En ruta · conectado'), findsOneWidget);
+    expect(find.text('Tomar recorrido'), findsWidgets);
     expect(alarm.rings, 1);
     expect(alarm.awake, isTrue);
     await unmountChaski(tester, container);
@@ -45,15 +45,15 @@ void main() {
     await tester.tap(find.byType(Switch));
     await settle(tester);
 
-    await tester.ensureVisible(find.text('Tomar pedido').first);
-    await tester.tap(find.text('Tomar pedido').first);
+    await tester.ensureVisible(find.text('Tomar recorrido').first);
+    await tester.tap(find.text('Tomar recorrido').first);
     await settle(tester);
     expect(find.byType(ActiveDeliveryPage), findsOneWidget);
-    expect(find.text('Cobrar al entregar'), findsOneWidget);
+    expect(find.text('COBRA AL ENTREGAR'), findsOneWidget);
 
-    await tester.tap(find.text('Lo recogí'));
+    await tester.drag(find.text('Lo recogí'), const Offset(600, 0));
     await settle(tester);
-    await tester.tap(find.text('Entregado'));
+    await tester.drag(find.text('Entregado'), const Offset(600, 0));
     await settle(tester);
     expect(find.text('Monto recibido (S/)'), findsOneWidget);
 

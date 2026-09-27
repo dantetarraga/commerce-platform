@@ -1,55 +1,22 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Colores de la boleta: papel blanco sobre la crema de la pantalla. En oscuro
-/// el papel sube un nivel para seguir separándose del fondo.
 extension TicketColors on BuildContext {
   Color get ticketPaper {
     final scheme = Theme.of(this).colorScheme;
-    return Theme.of(this).brightness == Brightness.dark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest;
+    return Theme.of(this).brightness == Brightness.dark
+        ? scheme.surfaceContainerHigh
+        : scheme.surfaceContainerLowest;
   }
 
-  /// Relleno de chips y bloques dentro de la boleta.
   Color get ticketInk {
     final scheme = Theme.of(this).colorScheme;
-    return Theme.of(this).brightness == Brightness.dark ? scheme.surfaceContainerHighest : chaski.raised;
+    return Theme.of(this).brightness == Brightness.dark
+        ? scheme.surfaceContainerHighest
+        : chaski.raised;
   }
 }
 
-/// Encabezado impreso de la boleta: franja terracota con las esquinas superiores redondeadas.
-class TicketHeader extends StatelessWidget {
-  const TicketHeader({required this.label, super.key});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: scheme.primary,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.eyebrow(context).copyWith(color: scheme.onPrimary),
-            ),
-          ),
-          SizedBox(width: 46, height: 18, child: ChaskiTrail(color: scheme.onPrimary, strokeWidth: 2.5)),
-        ],
-      ),
-    );
-  }
-}
-
-/// Corte en zigzag (arriba o abajo) de la boleta, como papel arrancado de la ticketera.
-/// Abajo lleva una sombra corta que despega los dientes del fondo.
 class TicketEdge extends StatelessWidget {
   const TicketEdge({required this.top, super.key});
 
@@ -65,7 +32,9 @@ class TicketEdge extends StatelessWidget {
       painter: _ZigzagPainter(
         color: context.ticketPaper,
         top: top,
-        shadow: Theme.of(context).brightness == Brightness.dark ? null : const Color(0x332A1A14),
+        shadow: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0x332A1A14),
       ),
     ),
   );
@@ -84,7 +53,6 @@ class _ZigzagPainter extends CustomPainter {
     final n = (size.width / tooth).round().clamp(1, 400);
     final step = size.width / n;
     final h = size.height;
-    // Dientes hacia afuera: la base toca el cuerpo de la boleta.
     final base = top ? h : 0.0;
     final tip = top ? 0.0 : h - 2;
     final path = Path()..moveTo(0, base);
@@ -93,21 +61,19 @@ class _ZigzagPainter extends CustomPainter {
         ..lineTo(step * i + step / 2, tip)
         ..lineTo(step * (i + 1), base);
     }
-    // Un pelo de solape evita una línea fina entre el borde y el cuerpo.
     path
       ..lineTo(size.width, top ? h + 0.5 : -0.5)
       ..lineTo(0, top ? h + 0.5 : -0.5)
       ..close();
-    if (shadow != null && !top) canvas.drawShadow(path, shadow!, 2.5, false);
+    if (shadow != null) canvas.drawShadow(path, shadow!, 2.5, false);
     canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_ZigzagPainter old) => old.color != color || old.top != top || old.shadow != shadow;
+  bool shouldRepaint(_ZigzagPainter old) =>
+      old.color != color || old.top != top || old.shadow != shadow;
 }
 
-/// Perforación entre secciones: muescas semicirculares a los lados y una
-/// línea punteada, como el troquel de una boleta.
 class TicketPerforation extends StatelessWidget {
   const TicketPerforation({super.key});
 
@@ -119,7 +85,10 @@ class TicketPerforation extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: CustomPaint(
-        painter: _PerforationPainter(paper: context.ticketPaper, dash: Theme.of(context).colorScheme.outline),
+        painter: _PerforationPainter(
+          paper: context.ticketPaper,
+          dash: Theme.of(context).colorScheme.outline,
+        ),
       ),
     ),
   );
@@ -135,11 +104,15 @@ class _PerforationPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final r = size.height / 2;
     final cy = size.height / 2;
-    final rect = Path()..addRect(Rect.fromLTWH(0, -0.5, size.width, size.height + 1));
+    final rect = Path()
+      ..addRect(Rect.fromLTWH(0, -0.5, size.width, size.height + 1));
     final holes = Path()
       ..addOval(Rect.fromCircle(center: Offset(0, cy), radius: r))
       ..addOval(Rect.fromCircle(center: Offset(size.width, cy), radius: r));
-    canvas.drawPath(Path.combine(PathOperation.difference, rect, holes), Paint()..color = paper);
+    canvas.drawPath(
+      Path.combine(PathOperation.difference, rect, holes),
+      Paint()..color = paper,
+    );
 
     final paint = Paint()
       ..color = dash
@@ -155,10 +128,10 @@ class _PerforationPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_PerforationPainter old) => old.paper != paper || old.dash != dash;
+  bool shouldRepaint(_PerforationPainter old) =>
+      old.paper != paper || old.dash != dash;
 }
 
-/// Sección de papel de la boleta.
 class TicketSection extends StatelessWidget {
   const TicketSection({required this.child, this.padding, super.key});
 
@@ -169,16 +142,24 @@ class TicketSection extends StatelessWidget {
   Widget build(BuildContext context) => ColoredBox(
     color: context.ticketPaper,
     child: Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.md),
+      padding:
+          padding ??
+          const EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter,
+            vertical: AppSpacing.md,
+          ),
       child: child,
     ),
   );
 }
 
-/// Fila "nombre ········ precio": los puntos guía corren bajo el nombre y el
-/// fondo del texto los tapa, así funcionan con cualquier largo.
 class LeaderRow extends StatelessWidget {
-  const LeaderRow({required this.label, required this.value, this.leading, super.key});
+  const LeaderRow({
+    required this.label,
+    required this.value,
+    this.leading,
+    super.key,
+  });
 
   final Widget label;
   final Widget value;
@@ -200,19 +181,30 @@ class LeaderRow extends StatelessWidget {
                 right: 0,
                 bottom: 5,
                 child: ExcludeSemantics(
-                  child: CustomPaint(size: const Size.fromHeight(2), painter: _DotsPainter(Theme.of(context).colorScheme.outline)),
+                  child: CustomPaint(
+                    size: const Size.fromHeight(2),
+                    painter: _DotsPainter(
+                      Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
                 ),
               ),
               DecoratedBox(
                 decoration: BoxDecoration(color: paper),
-                child: Padding(padding: const EdgeInsets.only(right: AppSpacing.xs), child: label),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: AppSpacing.xs),
+                  child: label,
+                ),
               ),
             ],
           ),
         ),
         DecoratedBox(
           decoration: BoxDecoration(color: paper),
-          child: Padding(padding: const EdgeInsets.only(left: AppSpacing.xs), child: value),
+          child: Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.xs),
+            child: value,
+          ),
         ),
       ],
     );
@@ -236,8 +228,6 @@ class _DotsPainter extends CustomPainter {
   bool shouldRepaint(_DotsPainter old) => old.color != color;
 }
 
-/// La boleta "sale de la impresora": se revela de arriba hacia abajo mientras
-/// el papel baja. Solo la primera vez y sin movimiento si se pidió reducirlo.
 class PrintIn extends StatefulWidget {
   const PrintIn({required this.child, super.key});
 
@@ -248,8 +238,14 @@ class PrintIn extends StatefulWidget {
 }
 
 class _PrintInState extends State<PrintIn> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 680));
-  late final Animation<double> _t = CurvedAnimation(parent: _controller, curve: AppMotion.arrive);
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 680),
+  );
+  late final Animation<double> _t = CurvedAnimation(
+    parent: _controller,
+    curve: AppMotion.arrive,
+  );
   var _started = false;
 
   @override

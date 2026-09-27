@@ -58,16 +58,16 @@ void main() {
         brightness: brightness,
       );
       expect(tester.takeException(), isNull);
-      expect(find.text('Tu operación'), findsOneWidget);
+      expect(find.textContaining('Tu cocina', findRichText: true), findsOneWidget);
       if (name == 'móvil') await _capture(find.byType(MerchantHomePage), 'tienda_pedidos');
-      await tester.ensureVisible(find.text('Aceptar'));
+      // Elegir el tiempo cambia el botón sin enviar el pedido al fogón.
+      await tester.ensureVisible(find.text('30 min'));
       await settle(tester);
-      await tester.tap(find.text('Aceptar'));
+      await tester.tap(find.text('30 min'));
       await settle(tester);
-      expect(find.text('¿En cuánto estará listo?'), findsOneWidget);
+      expect(find.text('Al fogón · 30 min'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      // Cierra la hoja para comprobar el catálogo sin cambiar el pedido.
-      Navigator.of(tester.element(find.text('¿En cuánto estará listo?'))).pop();
+      await tester.drag(find.byType(NestedScrollView), const Offset(0, 1000));
       await settle(tester);
       await tester.tap(find.byTooltip('Productos'));
       await settle(tester);
@@ -95,12 +95,12 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.tap(find.byType(Switch));
       await settle(tester);
-      expect(find.text('Conectado'), findsOneWidget);
+      expect(find.text('En ruta · conectado'), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (name == 'móvil') await _capture(find.byType(CourierHomePage), 'repartidor_pedidos');
-      await tester.ensureVisible(find.text('Tomar pedido').first);
+      await tester.ensureVisible(find.text('Tomar recorrido').first);
       await settle(tester);
-      await tester.tap(find.text('Tomar pedido').first);
+      await tester.tap(find.text('Tomar recorrido').first);
       await settle(tester);
       expect(find.byType(ActiveDeliveryPage), findsOneWidget);
       expect(find.text('Recoge el pedido'), findsOneWidget);
@@ -113,10 +113,10 @@ void main() {
       await settle(tester);
       await tester.tap(find.text('Continuar entrega'));
       await settle(tester);
-      await tester.tap(find.text('Lo recogí'));
+      await tester.drag(find.text('Lo recogí'), const Offset(600, 0));
       await settle(tester);
       expect(find.text('Entrega y cobra'), findsOneWidget);
-      await tester.tap(find.text('Entregado'));
+      await tester.drag(find.text('Entregado'), const Offset(600, 0));
       await settle(tester);
       expect(find.text('Medio de pago recibido'), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -132,24 +132,22 @@ void main() {
     });
   }
 
-  testWidgets('tablet: dos pedidos en paralelo y resumen de ventas', (tester) async {
+  testWidgets('tablet: riel de comandas y resumen de ventas', (tester) async {
     final container = await pumpPartner(
       tester,
       signedInAs: 'usr_owner_chaski_dorado',
       size: const Size(1024, 768),
       brightness: Brightness.dark,
     );
-    await tester.ensureVisible(find.text('Aceptar'));
+    // Las tres barras a la vista: la comanda nueva cuelga a la izquierda del fogón.
+    final fresh = find.text('Al fogón · 20 min');
+    final cooking = find.text('Lista para recoger');
+    expect(fresh, findsOneWidget);
+    expect(cooking, findsOneWidget);
+    expect(tester.getCenter(fresh).dx, lessThan(tester.getCenter(cooking).dx));
+    await tester.tap(fresh);
     await settle(tester);
-    await tester.tap(find.text('Aceptar'));
-    await settle(tester);
-    await tester.tap(find.text('Aceptar · 20 min'));
-    await settle(tester);
-    await tester.tap(find.text('Preparando (2)'));
-    await settle(tester);
-    final actions = find.text('Marcar listo');
-    expect(actions, findsNWidgets(2));
-    expect(tester.getCenter(actions.at(0)).dx, lessThan(tester.getCenter(actions.at(1)).dx));
+    expect(find.text('Lista para recoger'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
     await tester.pump(const Duration(seconds: 3));
     await tester.drag(find.byType(NestedScrollView), const Offset(0, 1000));
