@@ -117,7 +117,11 @@ class _MerchantHomePageState extends ConsumerState<MerchantHomePage> {
                         store: store,
                         waiting: fresh.length,
                         actions: actions,
-                        pill: stores.length == 1 ? _StoreSwitch(store: stores.single) : null,
+                        pill: stores.length == 1
+                            ? _StoreSwitch(store: stores.single)
+                            : ref.watch(merchantStoresProvider).isLoading && stores.isEmpty
+                            ? const PartnerStatusPillSkeleton()
+                            : null,
                       ),
               ),
               if (stores.length > 1) const SliverToBoxAdapter(child: _StoreSwitches()),
@@ -171,7 +175,8 @@ class _KitchenHero extends ConsumerWidget {
       greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
       title: 'Tu cocina,',
       accent: 'al toque.',
-      subtitle: parts.isEmpty ? null : parts.join(' · '),
+      subtitle: summary == null ? null : parts.join(' · '),
+      subtitleLoading: summary == null,
       imageUrl: store?.logoUrl,
       avatar: store == null || store!.logoUrl != null ? null : const _StoreMark(),
       actions: actions,
@@ -257,7 +262,21 @@ class _RailHero extends ConsumerWidget {
                     ],
                   ),
                 ),
-                if (summary != null) ...[
+                if (summary == null) ...[
+                  Container(
+                    width: 110,
+                    height: 52,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.button),
+                    child: const Skeleton(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [SkeletonBox(width: 60, height: 9), SizedBox(height: 6), SkeletonBox(width: 80)],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ] else ...[
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.button),
@@ -274,7 +293,10 @@ class _RailHero extends ConsumerWidget {
                   ),
                   const SizedBox(width: 8),
                 ],
-                if (store != null) SizedBox(width: 270, child: _StoreSwitch(store: store!, compact: true)),
+                if (store != null)
+                  SizedBox(width: 270, child: _StoreSwitch(store: store!, compact: true))
+                else if (ref.watch(merchantStoresProvider).isLoading)
+                  const SizedBox(width: 270, child: PartnerStatusPillSkeleton()),
                 ...actions,
               ],
             ),
@@ -311,7 +333,32 @@ class _RailBoard extends ConsumerWidget {
       child: AsyncValueView(
         value: value,
         onRetry: () => ref.invalidate(merchantActiveOrdersProvider),
-        loading: const Center(child: CircularProgressIndicator()),
+        loading: CustomScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          slivers: [
+            SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final (i, (title, dot)) in [('Nuevas', scheme.primary), ('En fogón', scheme.onSurface), ('Listas', AppColors.hierba)].indexed) ...[
+                      if (i > 0) const SizedBox(width: 20),
+                      Expanded(
+                        child: PartnerRail(
+                          title: title,
+                          dot: dot,
+                          children: [ComandaSkeleton(withActions: i == 0)],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
         data: (_) => CustomScrollView(
           key: const PageStorageKey('rails'),
           physics: const AlwaysScrollableScrollPhysics(),
@@ -427,7 +474,7 @@ class _StoreSwitches extends ConsumerWidget {
         value: stores,
         compactError: true,
         onRetry: () => ref.invalidate(merchantStoresProvider),
-        loading: const LinearProgressIndicator(),
+        loading: const PartnerStatusPillSkeleton(),
         data: (list) => Column(
           children: [
             for (final store in list)
@@ -499,7 +546,11 @@ class _OrdersTab extends ConsumerWidget {
       child: AsyncValueView(
         value: value,
         onRetry: () => ref.invalidate(merchantActiveOrdersProvider),
-        loading: const Center(child: CircularProgressIndicator()),
+        loading: _OrderListView(
+          storageKey: '$emptyTitle-loading',
+          itemCount: 2,
+          itemBuilder: (_, i) => ComandaSkeleton(withActions: i == 0),
+        ),
         isEmpty: (_) => orders.isEmpty,
         empty: _OrderListView(
           storageKey: emptyTitle,
@@ -582,7 +633,11 @@ class _TodayTab extends ConsumerWidget {
       child: AsyncValueView(
         value: today,
         onRetry: () => ref.invalidate(merchantTodayOrdersProvider),
-        loading: const Center(child: CircularProgressIndicator()),
+        loading: _OrderListView(
+          storageKey: 'today-loading',
+          itemCount: 4,
+          itemBuilder: (_, i) => i == 0 ? const _TodayMetricsSkeleton() : const _TodayRowSkeleton(),
+        ),
         data: (orders) => _OrderListView(
           storageKey: 'today',
           itemCount: orders.length + 1,
@@ -643,7 +698,7 @@ class _TodayMetrics extends ConsumerWidget {
       value: ref.watch(merchantSummaryProvider),
       compactError: true,
       onRetry: () => ref.invalidate(merchantSummaryProvider),
-      loading: const LinearProgressIndicator(),
+      loading: const _TodayMetricsSkeleton(),
       data: (summary) => Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
@@ -689,4 +744,47 @@ class _TodayMetrics extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// "Vendido hoy" mientras cargan los números: la misma tarjeta tostada.
+class _TodayMetricsSkeleton extends StatelessWidget {
+  const _TodayMetricsSkeleton();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(AppSpacing.lg),
+    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, borderRadius: AppRadius.card),
+    child: const Skeleton(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SkeletonBox(width: 90),
+          SizedBox(height: 10),
+          SkeletonBox(width: 150, height: 34),
+          SizedBox(height: AppSpacing.md),
+          Row(children: [SkeletonBox(width: 90), SizedBox(width: AppSpacing.lg), SkeletonBox(width: 90)]),
+        ],
+      ),
+    ),
+  );
+}
+
+class _TodayRowSkeleton extends StatelessWidget {
+  const _TodayRowSkeleton();
+
+  @override
+  Widget build(BuildContext context) => const PartnerSurface(
+    child: Skeleton(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [SkeletonBox(width: 80, height: 22), SizedBox(width: 8), SkeletonBox(width: 70, height: 20)]),
+          SizedBox(height: 8),
+          SkeletonBox(width: 120, height: 12),
+          SizedBox(height: 10),
+          Row(children: [SkeletonBox(width: 110), SizedBox(width: AppSpacing.lg), SkeletonBox(width: 60)]),
+        ],
+      ),
+    ),
+  );
 }

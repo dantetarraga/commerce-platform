@@ -15,7 +15,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
-/// Preferencias en memoria (onboarding visto o no).
 class MemoryPreferences implements PreferencesStorage {
   MemoryPreferences({this.onboardingSeen = true});
 
@@ -75,9 +74,11 @@ Future<ProviderContainer> pumpChaski(
   bool disableAnimations = false,
   double textScale = 1,
   Brightness brightness = Brightness.light,
+  Duration latency = const Duration(milliseconds: 10),
 }) => _pumpApp(
   tester,
   router: (c) => c.read(appRouterProvider),
+  latency: latency,
   onboardingSeen: onboardingSeen,
   signedInAs: signedIn ? 'usr_demo_customer' : null,
   size: size,
@@ -97,9 +98,11 @@ Future<ProviderContainer> pumpPartner(
   Duration orderStep = const Duration(seconds: 2),
   double textScale = 1,
   Brightness brightness = Brightness.light,
+  Duration latency = const Duration(milliseconds: 10),
 }) => _pumpApp(
   tester,
   router: (c) => c.read(partnerRouterProvider),
+  latency: latency,
   alarm: alarm,
   signedInAs: signedInAs,
   size: size,
@@ -119,6 +122,7 @@ Future<ProviderContainer> _pumpApp(
   bool disableAnimations = false,
   double textScale = 1,
   Brightness brightness = Brightness.light,
+  Duration latency = const Duration(milliseconds: 10),
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -127,17 +131,26 @@ Future<ProviderContainer> _pumpApp(
 
   final container = ProviderContainer(
     overrides: [
-      preferencesStorageProvider.overrideWithValue(MemoryPreferences(onboardingSeen: onboardingSeen)),
+      preferencesStorageProvider.overrideWithValue(
+        MemoryPreferences(onboardingSeen: onboardingSeen),
+      ),
       tokenStorageProvider.overrideWithValue(
         MemoryTokens(
-          signedInAs != null ? (accessToken: 'fake-access.$signedInAs', refreshToken: 'fake-refresh.x') : null,
+          signedInAs != null
+              ? (
+                  accessToken: 'fake-access.$signedInAs',
+                  refreshToken: 'fake-refresh.x',
+                )
+              : null,
         ),
       ),
       localJsonStoreProvider.overrideWithValue(MemoryJsonStore()),
       fakeBackendProvider.overrideWithValue(
-        FakeBackend(latency: const Duration(milliseconds: 10), orderStep: orderStep),
+        FakeBackend(latency: latency, orderStep: orderStep),
       ),
-      appEnvProvider.overrideWithValue(const AppEnv(apiBaseUrl: 'http://test', useFakeData: true)),
+      appEnvProvider.overrideWithValue(
+        const AppEnv(apiBaseUrl: 'http://test', useFakeData: true),
+      ),
       orderAlarmProvider.overrideWithValue(alarm ?? RecordingAlarm()),
     ],
   );
@@ -146,12 +159,18 @@ Future<ProviderContainer> _pumpApp(
       container: container,
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
-        theme: brightness == Brightness.dark ? AppTheme.dark() : AppTheme.light(),
+        theme: brightness == Brightness.dark
+            ? AppTheme.dark()
+            : AppTheme.light(),
         routerConfig: router(container),
         builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(disableAnimations: disableAnimations, textScaler: TextScaler.linear(textScale)),
+          data:
+              MediaQuery.of(
+                context,
+              ).copyWith(
+                disableAnimations: disableAnimations,
+                textScaler: TextScaler.linear(textScale),
+              ),
           child: child!,
         ),
       ),
@@ -164,7 +183,10 @@ Future<ProviderContainer> _pumpApp(
 
 /// Desmonta la app y libera providers (cancela temporizadores periódicos).
 /// Llamar al final de cada test que use [pumpChaski].
-Future<void> unmountChaski(WidgetTester tester, ProviderContainer container) async {
+Future<void> unmountChaski(
+  WidgetTester tester,
+  ProviderContainer container,
+) async {
   await tester.pumpWidget(const SizedBox());
   container.dispose();
   // Más que un aviso (AppToast dura 2.6 s), para que no quede su timer vivo.
@@ -173,12 +195,18 @@ Future<void> unmountChaski(WidgetTester tester, ProviderContainer container) asy
 
 /// `pumpAndSettle` no sirve con shimmer y animaciones en bucle: avanza el
 /// reloj un tiempo fijo.
-Future<void> settle(WidgetTester tester, {int frames = 20, Duration step = const Duration(milliseconds: 50)}) async {
+Future<void> settle(
+  WidgetTester tester, {
+  int frames = 20,
+  Duration step = const Duration(milliseconds: 50),
+}) async {
   for (var i = 0; i < frames; i++) {
     await tester.pump(step);
   }
 }
 
-String currentPath(ProviderContainer c) => c.read(appRouterProvider).routeInformationProvider.value.uri.path;
+String currentPath(ProviderContainer c) =>
+    c.read(appRouterProvider).routeInformationProvider.value.uri.path;
 
-String currentPartnerPath(ProviderContainer c) => c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;
+String currentPartnerPath(ProviderContainer c) =>
+    c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;

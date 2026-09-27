@@ -74,7 +74,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> {
       body: AsyncValueView(
         value: delivery,
         onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
-        loading: const Center(child: CircularProgressIndicator()),
+        loading: const _DeliverySkeleton(),
         isEmpty: (order) => order == null || order.id != widget.orderId,
         empty: const AppEmptyState(
           title: 'Este pedido ya no está en curso',
@@ -547,6 +547,130 @@ class _CollectSheetState extends State<_CollectSheet> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// El recorrido mientras carga: la cabecera, las tres paradas sobre el trazo y la
+/// boleta de cobro, en blanco y en su lugar.
+class _DeliverySkeleton extends StatelessWidget {
+  const _DeliverySkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    Widget stop({required double title, double? second}) => Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SkeletonBox(width: 110, height: 10),
+          const SizedBox(height: 6),
+          SkeletonBox(width: title, height: 16),
+          if (second != null) ...[const SizedBox(height: 6), SkeletonBox(width: second, height: 12)],
+        ],
+      ),
+    );
+    return SafeArea(
+      top: false,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: scheme.primaryContainer,
+              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 8, AppSpacing.gutter, 16),
+            child: Row(
+              children: [
+                IconButton(
+                  tooltip: 'Volver',
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  style: IconButton.styleFrom(backgroundColor: scheme.surface, fixedSize: const Size.square(44)),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Skeleton(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [SkeletonBox(width: 170, height: 10), SizedBox(height: 8), SkeletonBox(width: 180, height: 22)],
+                    ),
+                  ),
+                ),
+                const Skeleton(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [SkeletonBox(width: 56, height: 10), SizedBox(height: 8), SkeletonBox(width: 64, height: 22)],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: PartnerContent(
+              maxWidth: 720,
+              child: ListView(
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, 0),
+                children: [
+                  Skeleton(
+                    child: PartnerStations(
+                      stations: [
+                        PartnerStation(
+                          node: const SkeletonBox(width: 40, height: 40, borderRadius: AppRadius.button),
+                          child: stop(title: 200),
+                        ),
+                        PartnerStation(
+                          node: const SkeletonBox.circle(size: 44),
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.tileExit),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                stop(title: 140, second: 170),
+                                const SizedBox(height: 12),
+                                const Row(
+                                  children: [
+                                    Expanded(child: SkeletonBox(height: 48, borderRadius: AppRadius.button)),
+                                    SizedBox(width: 8),
+                                    Expanded(child: SkeletonBox(height: 48, borderRadius: AppRadius.button)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        PartnerStation(node: const SkeletonBox.circle(size: 40), child: stop(title: 150, second: 120)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  const TicketEdge(top: true),
+                  const TicketSection(
+                    padding: EdgeInsets.fromLTRB(16, 4, 16, 10),
+                    child: Skeleton(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonBox(width: 110, height: 10),
+                          SizedBox(height: 10),
+                          SkeletonBox(width: 150),
+                          SizedBox(height: 8),
+                          SkeletonBox(width: 120),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const TicketEdge(top: false),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

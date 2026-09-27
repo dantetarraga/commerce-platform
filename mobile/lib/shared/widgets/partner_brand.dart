@@ -22,6 +22,7 @@ class PartnerHero extends StatelessWidget {
     this.avatar,
     this.actions = const [],
     this.pill,
+    this.subtitleLoading = false,
     super.key,
   });
 
@@ -38,6 +39,9 @@ class PartnerHero extends StatelessWidget {
   final Widget? avatar;
   final List<Widget> actions;
   final Widget? pill;
+
+  /// Reserva la línea del subtítulo mientras llegan los números del día.
+  final bool subtitleLoading;
 
   static const _pillOverlap = 30.0;
 
@@ -133,7 +137,11 @@ class PartnerHero extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (subtitle != null) ...[
+                      if (subtitle == null && subtitleLoading) ...[
+                        const SizedBox(height: 10),
+                        const Skeleton(child: SkeletonBox(width: 210)),
+                        const SizedBox(height: 2),
+                      ] else if (subtitle != null) ...[
                         const SizedBox(height: 8),
                         Text(subtitle!.replaceAll('S/ ', 'S/ '), style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
                       ],
@@ -684,10 +692,12 @@ class StationNode extends StatelessWidget {
 
 /// Riel de cocina con su título: las comandas cuelgan debajo.
 class PartnerRail extends StatelessWidget {
-  const PartnerRail({required this.title, required this.count, required this.dot, required this.children, this.empty, super.key});
+  const PartnerRail({required this.title, required this.dot, required this.children, this.count, this.empty, super.key});
 
   final String title;
-  final int count;
+
+  /// Sin número mientras carga.
+  final int? count;
   final Color dot;
   final List<Widget> children;
   final Widget? empty;
@@ -707,7 +717,10 @@ class PartnerRail extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(child: Text(title, style: theme.textTheme.titleLarge)),
-            Text('$count', style: AppTypography.price(context)),
+            if (count case final n?)
+              Text('$n', style: AppTypography.price(context))
+            else
+              const Skeleton(child: SkeletonBox(width: 18, height: 20)),
           ],
         ),
         const SizedBox(height: 8),
@@ -1093,4 +1106,36 @@ class _Chevrons extends StatelessWidget {
     final x = t - t.floorToDouble();
     return math.max(0, math.sin(x * math.pi * 2));
   }
+}
+
+/// Lugar de la píldora de estado mientras carga (misma altura y esquina).
+class PartnerStatusPillSkeleton extends StatelessWidget {
+  const PartnerStatusPillSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 60,
+    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: AppRadius.tileExit,
+      boxShadow: AppShadows.raised(Theme.of(context).brightness),
+    ),
+    child: const Skeleton(
+      child: Row(
+        children: [
+          SkeletonBox.circle(size: 12),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [SkeletonBox(width: 170), SizedBox(height: 6), SkeletonBox(width: 130, height: 10)],
+            ),
+          ),
+          SkeletonBox(width: 52, height: 32, borderRadius: BorderRadius.all(Radius.circular(16))),
+        ],
+      ),
+    ),
+  );
 }

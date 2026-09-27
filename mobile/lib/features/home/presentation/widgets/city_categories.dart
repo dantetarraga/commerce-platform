@@ -436,3 +436,58 @@ class _CompactTile extends StatelessWidget {
     );
   }
 }
+
+/// Esqueleto con la misma geometría del mosaico: foto grande, dos mosaicos suaves,
+/// la franja de encargos y la fila compacta.
+class CityCategoriesSkeleton extends StatelessWidget {
+  const CityCategoriesSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final extra = (MediaQuery.textScalerOf(context).scale(16) - 16).clamp(0.0, 24.0) * 2;
+    final sideHeight = 112 + extra;
+    return Skeleton(
+      child: Column(
+        children: [
+          Padding(
+            padding: AppSpacing.screen,
+            child: Row(
+              children: [
+                Expanded(flex: 11, child: SkeletonBox(height: sideHeight * 2 + 12, borderRadius: AppRadius.card)),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 9,
+                  child: Column(
+                    children: [
+                      SkeletonBox(height: sideHeight, borderRadius: AppRadius.tileExit),
+                      const SizedBox(height: 12),
+                      SkeletonBox(height: sideHeight, borderRadius: AppRadius.tileExit),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(AppSpacing.gutter, 12, AppSpacing.gutter, 0),
+            child: SkeletonBox(height: 76, borderRadius: AppRadius.tileExit),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: AppSpacing.screen,
+            child: Row(
+              children: [
+                for (var i = 0; i < 4; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  Expanded(
+                    child: SkeletonBox(height: 70 + MediaQuery.textScalerOf(context).scale(16), borderRadius: AppRadius.button),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

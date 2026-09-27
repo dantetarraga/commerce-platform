@@ -82,7 +82,7 @@ class _CourierHomePageState extends ConsumerState<CourierHomePage> {
         child: AsyncValueView(
           value: me,
           onRetry: () => ref.invalidate(courierMeProvider),
-          loading: const Center(child: CircularProgressIndicator()),
+          loading: const _CourierHomeSkeleton(),
           data: (profile) => RefreshIndicator(
             onRefresh: () async {
               ref
@@ -122,7 +122,7 @@ class _CourierHomePageState extends ConsumerState<CourierHomePage> {
                           value: delivery,
                           compactError: true,
                           onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
-                          loading: const LinearProgressIndicator(),
+                          loading: const _RouteCardSkeleton(),
                           data: (_) => const SizedBox.shrink(),
                         ),
                         _ when profile.isOnline => const _AvailableOrders(),
@@ -166,8 +166,9 @@ class _CourierHero extends ConsumerWidget {
       greeting: '${partnerGreeting()}, ${profile.name.split(' ').first}',
       title: 'Yauri te',
       accent: 'espera.',
+      subtitleLoading: summary == null,
       subtitle: summary == null
-          ? profile.vehicleLabel
+          ? null
           : 'Hoy: ${summary.deliveredCount} ${summary.deliveredCount == 1 ? 'recorrido' : 'recorridos'} · cobraste ${Formatters.money(summary.total)}',
       avatar: SizedBox.square(
         dimension: 130,
@@ -368,9 +369,12 @@ class _AvailableOrdersState extends ConsumerState<_AvailableOrders> {
             value: orders,
             compactError: true,
             onRetry: () => ref.invalidate(courierAvailableOrdersProvider),
-            loading: const Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
-              child: Center(child: CircularProgressIndicator()),
+            loading: const Column(
+              children: [
+                _RouteCardSkeleton(),
+                SizedBox(height: AppSpacing.md),
+                _RouteCardSkeleton(),
+              ],
             ),
             data: (_) => const AppEmptyState(
               title: 'Nada por ahora',
@@ -436,7 +440,10 @@ class _RouteCard extends StatelessWidget {
                         child: Column(
                           children: [
                             Container(
-                              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: scheme.primary, width: 2)),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: scheme.primary, width: 2),
+                              ),
                               padding: const EdgeInsets.all(2),
                               child: AppNetworkImage(
                                 url: order.order.store.logoUrl,
@@ -527,7 +534,7 @@ class _TodaySummary extends ConsumerWidget {
       value: ref.watch(courierSummaryProvider),
       compactError: true,
       onRetry: () => ref.invalidate(courierSummaryProvider),
-      loading: const LinearProgressIndicator(),
+      loading: const _TodaySummarySkeleton(),
       data: (summary) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -560,7 +567,10 @@ class _TodaySummary extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 for (final (label, amount) in [('Yape', summary.yape), ('Plin', summary.plin), ('Efectivo', summary.cash)]) ...[
-                  LeaderRow(label: Text(label, style: row), value: Text(Formatters.money(amount), style: row)),
+                  LeaderRow(
+                    label: Text(label, style: row),
+                    value: Text(Formatters.money(amount), style: row),
+                  ),
                   const SizedBox(height: 6),
                 ],
                 LeaderRow(
@@ -581,6 +591,191 @@ class _TodaySummary extends ConsumerWidget {
           const TicketEdge(top: false),
         ],
       ),
+    );
+  }
+}
+
+/// Inicio del repartidor mientras llega su perfil: la portada, la píldora y los
+/// recorridos en blanco, en el mismo lugar donde aparecerán.
+class _CourierHomeSkeleton extends ConsumerWidget {
+  const _CourierHomeSkeleton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authSessionProvider).value;
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      children: [
+        PartnerHero(
+          eyebrow: 'CHASKI SOCIOS · REPARTO',
+          greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
+          title: 'Yauri te',
+          accent: 'espera.',
+          subtitleLoading: true,
+          avatar: Container(
+            width: 130,
+            height: 130,
+            padding: const EdgeInsets.all(12),
+            child: AppAvatar(imageUrl: user?.avatarUrl, initials: user?.initials, seed: user?.id, size: 106),
+          ),
+          actions: const [PartnerAccountButton()],
+          pill: const PartnerStatusPillSkeleton(),
+        ),
+        const PartnerContent(
+          maxWidth: 720,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(AppSpacing.gutter, 18, AppSpacing.gutter, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Align(alignment: Alignment.centerLeft, child: Skeleton(child: SkeletonBox(width: 190, height: 24))),
+                SizedBox(height: AppSpacing.sm),
+                _RouteCardSkeleton(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Recorrido en blanco: foto, trazo y casa a la izquierda; de dónde sale y a dónde
+/// llega; el cobro y el botón.
+class _RouteCardSkeleton extends StatelessWidget {
+  const _RouteCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.card),
+      child: Skeleton(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 128,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    width: 44,
+                    child: Column(
+                      children: [
+                        const SkeletonBox.circle(size: 44),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: DottedLine(vertical: true, gap: 8, radius: 1.8, color: context.chaski.shimmerBase),
+                          ),
+                        ),
+                        const SkeletonBox.circle(size: 28),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SkeletonBox(width: 110, height: 10),
+                                  SizedBox(height: 6),
+                                  SkeletonBox(width: 130, height: 18),
+                                  SizedBox(height: 6),
+                                  SkeletonBox(width: 120, height: 12),
+                                ],
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            SkeletonBox(width: 70, height: 28, borderRadius: AppRadius.tile),
+                          ],
+                        ),
+                        Spacer(),
+                        SkeletonBox(width: 90, height: 10),
+                        SizedBox(height: 6),
+                        SkeletonBox(width: 150, height: 18),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const SkeletonBox(height: 46, borderRadius: AppRadius.tile),
+            const SizedBox(height: 12),
+            const SkeletonBox(height: 52, borderRadius: AppRadius.button),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// La boleta de rendición en blanco: el mismo papel, con bloques por medio de pago.
+class _TodaySummarySkeleton extends StatelessWidget {
+  const _TodaySummarySkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget row(double label) => Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          SkeletonBox(width: label),
+          const Spacer(),
+          const SkeletonBox(width: 64),
+        ],
+      ),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Skeleton(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [SkeletonBox(width: 190, height: 24), SizedBox(height: 8), SkeletonBox(width: 150)],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        const TicketEdge(top: true),
+        TicketSection(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 2),
+          child: Skeleton(
+            child: Column(
+              children: [
+                const Row(
+                  children: [
+                    SkeletonBox(width: 120, height: 10),
+                    Spacer(),
+                    SkeletonBox(width: 86, height: 22, borderRadius: AppRadius.tile),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                row(50),
+                row(40),
+                row(70),
+                row(100),
+              ],
+            ),
+          ),
+        ),
+        const TicketPerforation(),
+        const TicketSection(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Skeleton(child: Row(children: [SkeletonBox(width: 120), Spacer(), SkeletonBox(width: 100, height: 26)])),
+        ),
+        const TicketEdge(top: false),
+      ],
     );
   }
 }

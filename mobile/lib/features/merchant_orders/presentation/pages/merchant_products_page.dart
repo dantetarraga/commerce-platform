@@ -87,7 +87,7 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
           child: AsyncValueView(
             value: products,
             onRetry: () => ref.invalidate(merchantProductsProvider(widget.storeId)),
-            loading: const Center(child: CircularProgressIndicator()),
+            loading: const _ProductsSkeleton(),
             isEmpty: (list) => list.isEmpty,
             empty: const AppEmptyState(
               title: 'Sin productos',
@@ -296,6 +296,74 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// La carta mientras carga: conteo, buscador, filtros y filas con foto y switch.
+class _ProductsSkeleton extends StatelessWidget {
+  const _ProductsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width >= 360;
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs + AppSpacing.sm, AppSpacing.gutter, 0),
+      children: [
+        Skeleton(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SkeletonBox(width: 240),
+              const SizedBox(height: AppSpacing.md),
+              const SkeletonBox(height: 52, borderRadius: AppRadius.button),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                children: [
+                  for (final w in [96.0, 128.0, 112.0]) ...[
+                    Flexible(child: SkeletonBox(width: w, height: 36, borderRadius: AppRadius.button)),
+                    const SizedBox(width: AppSpacing.xs),
+                  ],
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              const SkeletonBox(width: 110, height: 16),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+          ),
+        ),
+        for (var i = 0; i < 5; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: PartnerSurface(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Skeleton(
+                child: Row(
+                  children: [
+                    if (wide) ...[
+                      const SkeletonBox(width: 56, height: 64, borderRadius: AppRadius.tile),
+                      const SizedBox(width: AppSpacing.sm),
+                    ],
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SkeletonBox(width: 150),
+                          SizedBox(height: 8),
+                          SkeletonBox(width: 60, height: 12),
+                          SizedBox(height: 6),
+                          SkeletonBox(width: 70, height: 10),
+                        ],
+                      ),
+                    ),
+                    const SkeletonBox(width: 52, height: 32, borderRadius: BorderRadius.all(Radius.circular(16))),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

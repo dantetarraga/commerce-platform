@@ -2,6 +2,7 @@ import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/shared/design_system/components/app_network_image.dart';
 import 'package:chaski/shared/design_system/components/app_price.dart';
+import 'package:chaski/shared/design_system/components/app_skeleton.dart';
 import 'package:chaski/shared/design_system/components/app_toast.dart';
 import 'package:chaski/shared/design_system/components/fly_to_purchase_bar.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
@@ -325,17 +326,15 @@ class _QuickAddButtonState extends State<QuickAddButton> with SingleTickerProvid
 }
 
 /// Skeleton de fila de producto (misma geometría que [AppProductCardVariant.row]).
+/// Trae su propio [Skeleton] por dentro: la tarjeta queda de su color y solo
+/// brillan los bloques, así que no se envuelve en otro [Skeleton].
 class AppProductRowSkeleton extends StatelessWidget {
   const AppProductRowSkeleton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final base = context.chaski.shimmerBase;
-    Widget box(double? w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) => Container(
-      width: w,
-      height: h,
-      decoration: BoxDecoration(color: base, borderRadius: r),
-    );
+    Widget box(double? w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) =>
+        SkeletonBox(width: w, height: h, borderRadius: r);
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
       padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
@@ -343,25 +342,27 @@ class AppProductRowSkeleton extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : const Color(0xFFEBE7DC),
         borderRadius: AppRadius.card,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                box(160, 15),
-                const SizedBox(height: 8),
-                box(null, 12),
-                const SizedBox(height: 6),
-                box(120, 12),
-                const SizedBox(height: 10),
-                box(70, 15),
-              ],
+      child: Skeleton(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  box(160, 16),
+                  const SizedBox(height: 8),
+                  box(null, 12),
+                  const SizedBox(height: 6),
+                  box(120, 12),
+                  const SizedBox(height: 12),
+                  box(70, 18),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          box(84, 84, const BorderRadius.all(AppRadius.lg)),
-        ],
+            const SizedBox(width: AppSpacing.sm),
+            box(104, 116, const BorderRadius.all(AppRadius.lg)),
+          ],
+        ),
       ),
     );
   }

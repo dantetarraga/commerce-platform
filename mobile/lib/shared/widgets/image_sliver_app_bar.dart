@@ -32,13 +32,13 @@ class ImageSliverAppBar extends StatelessWidget {
     this.imageUrl,
     this.heroTag,
     this.leadingIcon = Icons.arrow_back_rounded,
+    this.edge,
+    this.edgeHeight = 0,
     super.key,
   }) : title = '',
        fallbackIcon = Icons.restaurant_rounded,
        actions = const [],
        trailing = null,
-       edge = null,
-       edgeHeight = 0,
        dimmed = false,
        loading = true;
 
@@ -75,7 +75,9 @@ class ImageSliverAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget background = loading && imageUrl == null
-        ? const Skeleton(child: SkeletonBox(height: double.infinity, borderRadius: BorderRadius.zero))
+        ? const Skeleton(
+            child: SkeletonBox(height: double.infinity, borderRadius: BorderRadius.zero),
+          )
         : AppNetworkImage(url: imageUrl, fallbackIcon: fallbackIcon);
     if (dimmed) background = ColorFiltered(colorFilter: _desaturate, child: background);
     if (heroTag != null) background = Hero(tag: heroTag!, child: background);
@@ -123,36 +125,36 @@ class ImageSliverAppBar extends StatelessWidget {
             children: [
               // Por defecto: parallax al colapsar y zoom al estirar.
               FlexibleSpaceBar(background: background),
-              if (!loading)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: -1,
-                  child: IgnorePointer(
-                    child: AnimatedOpacity(
-                      opacity: collapsed ? 0 : 1,
-                      duration: reduce ? Duration.zero : AppMotion.quick,
-                      child: SizedBox(
-                        height: (edge == null ? sheetLip : edgeHeight) + 1,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned(
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              height: sheetLip + 1,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(color: surface, borderRadius: AppRadius.sheet),
-                              ),
+              // La hoja y el logo también mientras carga: así no salta al llegar.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: -1,
+                child: IgnorePointer(
+                  child: AnimatedOpacity(
+                    opacity: collapsed ? 0 : 1,
+                    duration: reduce ? Duration.zero : AppMotion.quick,
+                    child: SizedBox(
+                      height: (edge == null ? sheetLip : edgeHeight) + 1,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            height: sheetLip + 1,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(color: surface, borderRadius: AppRadius.sheet),
                             ),
-                            if (edge != null) Positioned(left: AppSpacing.gutter, bottom: 1, child: edge!),
-                          ],
-                        ),
+                          ),
+                          if (edge != null) Positioned(left: AppSpacing.gutter, bottom: 1, child: edge!),
+                        ],
                       ),
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         );

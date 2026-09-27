@@ -123,19 +123,7 @@ class CategoryShelf extends ConsumerWidget {
             padding: AppSpacing.screen,
             child: AppEmptyState.fromError(error, compact: true, onRetry: () => ref.invalidate(categoriesProvider)),
           ),
-          _ => Padding(
-            padding: AppSpacing.screen,
-            child: Skeleton(
-              child: Row(
-                children: [
-                  for (var i = 0; i < 4; i++) ...[
-                    if (i > 0) const SizedBox(width: AppSpacing.xs),
-                    const Expanded(child: SkeletonBox(height: 92, borderRadius: BorderRadius.all(AppRadius.lg))),
-                  ],
-                ],
-              ),
-            ),
-          ),
+          _ => const CityCategoriesSkeleton(),
         },
       ),
     );
@@ -240,7 +228,7 @@ class PromoCarouselSection extends ConsumerWidget {
         LoadCrossFade(
           stateKey: items == null ? 'loading' : 'data',
           child: items == null
-              ? const Skeleton(child: PromotionsCarouselSkeleton())
+              ? const EditorialPromosSkeleton()
               : EditorialPromos(
                   promotions: items,
                   onTap: onTap,
@@ -556,8 +544,8 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
             child: AppEmptyState.fromError(error, compact: true, onRetry: () => ref.invalidate(provider)),
           ),
           _ => SliverList.builder(
-            itemCount: 3,
-            itemBuilder: (_, _) => const Skeleton(child: AppStoreCardSkeleton(variant: AppStoreCardVariant.row)),
+            itemCount: 2,
+            itemBuilder: (_, _) => const Skeleton(child: AppStoreCardSkeleton(variant: AppStoreCardVariant.editorial)),
           ),
         },
       ],

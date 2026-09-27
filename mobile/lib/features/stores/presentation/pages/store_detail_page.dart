@@ -222,7 +222,8 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
               ),
             ],
             _ => [
-              SliverList.builder(itemCount: 4, itemBuilder: (_, _) => const Skeleton(child: AppProductRowSkeleton())),
+              const SliverToBoxAdapter(child: _MenuHeadSkeleton()),
+              SliverList.builder(itemCount: 4, itemBuilder: (_, _) => const AppProductRowSkeleton()),
             ],
           },
           const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
@@ -886,8 +887,9 @@ class _SectionTabsState extends State<_SectionTabs> {
   }
 }
 
-/// Misma geometría que la pantalla real (portada, cabecera, bloques, menú)
-/// para que el crossfade no provoque saltos. Si la portada ya se conoce, se muestra.
+/// Misma geometría que la pantalla real (portada con el logo en el borde, nombre,
+/// estado, los tres datos y la carta) para que el crossfade no provoque saltos.
+/// Si la portada ya se conoce, se muestra.
 class _StoreDetailSkeleton extends StatelessWidget {
   const _StoreDetailSkeleton({this.coverUrl, this.heroTag});
 
@@ -896,47 +898,109 @@ class _StoreDetailSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
-          ImageSliverAppBar.loading(imageUrl: coverUrl, heroTag: heroTag),
+          ImageSliverAppBar.loading(
+            imageUrl: coverUrl,
+            heroTag: heroTag,
+            edgeHeight: _logoSize,
+            edge: Container(
+              width: _logoSize,
+              height: _logoSize,
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: const BorderRadius.all(AppRadius.lg),
+                boxShadow: AppShadows.raised(theme.brightness),
+              ),
+              child: const Skeleton(child: SkeletonBox(borderRadius: BorderRadius.all(Radius.circular(13)), height: 62)),
+            ),
+          ),
           const SliverToBoxAdapter(
-            child: Skeleton(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.xs),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, 0),
+                  Skeleton(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SkeletonBox(width: 200, height: 26),
-                        SizedBox(height: 8),
-                        SkeletonBox(width: 170),
-                        SizedBox(height: AppSpacing.md),
-                        Row(
-                          children: [
-                            Expanded(child: SkeletonBox(height: 56, borderRadius: AppRadius.tile)),
-                            SizedBox(width: AppSpacing.xs),
-                            Expanded(child: SkeletonBox(height: 56, borderRadius: AppRadius.tile)),
-                            SizedBox(width: AppSpacing.xs),
-                            Expanded(child: SkeletonBox(height: 56, borderRadius: AppRadius.tile)),
-                          ],
-                        ),
+                        SkeletonBox(width: 220, height: 32),
+                        SizedBox(height: 10),
+                        SkeletonBox(width: 200, height: 12),
+                        SizedBox(height: 12),
+                        SkeletonBox(width: 170, height: 12),
                       ],
                     ),
                   ),
-                  SizedBox(height: AppSpacing.lg),
-                  AppProductRowSkeleton(),
-                  AppProductRowSkeleton(),
-                  AppProductRowSkeleton(),
+                  SizedBox(height: AppSpacing.md),
+                  _StatBlocksSkeleton(),
                 ],
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: _MenuHeadSkeleton()),
+          SliverList.builder(itemCount: 3, itemBuilder: (_, _) => const AppProductRowSkeleton()),
         ],
       ),
     );
   }
+}
+
+/// Los tres datos (nota, tiempo, envío) con su fondo y el texto en blanco.
+class _StatBlocksSkeleton extends StatelessWidget {
+  const _StatBlocksSkeleton();
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      for (var i = 0; i < 3; i++) ...[
+        if (i > 0) const SizedBox(width: AppSpacing.xs),
+        Expanded(
+          child: Container(
+            height: 80,
+            decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+            child: const Skeleton(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [SkeletonBox(width: 56, height: 18), SizedBox(height: 6), SkeletonBox(width: 64, height: 10)],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ],
+  );
+}
+
+/// Pestañas de secciones y el título de la primera, antes de las filas.
+class _MenuHeadSkeleton extends StatelessWidget {
+  const _MenuHeadSkeleton();
+
+  @override
+  Widget build(BuildContext context) => const Skeleton(
+    child: Padding(
+      padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Flexible(child: SkeletonBox(width: 92, height: 40, borderRadius: AppRadius.button)),
+              SizedBox(width: AppSpacing.xs),
+              Flexible(child: SkeletonBox(width: 110, height: 40, borderRadius: AppRadius.button)),
+              SizedBox(width: AppSpacing.xs),
+              Flexible(child: SkeletonBox(width: 80, height: 40, borderRadius: AppRadius.button)),
+            ],
+          ),
+          SizedBox(height: AppSpacing.xl),
+          SkeletonBox(width: 130, height: 22),
+        ],
+      ),
+    ),
+  );
 }

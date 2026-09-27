@@ -680,3 +680,109 @@ class _RejectSheetState extends State<_RejectSheet> {
     );
   }
 }
+
+/// Comanda en blanco mientras cargan los pedidos: el mismo papel, cortes y
+/// perforaciones, con bloques donde irán el número, los productos y las acciones.
+class ComandaSkeleton extends StatelessWidget {
+  const ComandaSkeleton({this.withActions = true, super.key});
+
+  final bool withActions;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget line(double label) => Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          const SkeletonBox(width: 20),
+          const SizedBox(width: 8),
+          Flexible(child: SkeletonBox(width: label)),
+          const Spacer(),
+          const SkeletonBox(width: 56),
+        ],
+      ),
+    );
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        boxShadow: [BoxShadow(color: Color(0x142A1A14), blurRadius: 18, offset: Offset(0, 8))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const TicketEdge(top: true),
+          const TicketSection(
+            padding: EdgeInsets.fromLTRB(16, 6, 16, 4),
+            child: Skeleton(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonBox(width: 96, height: 10),
+                        SizedBox(height: 8),
+                        SkeletonBox(width: 110, height: 28),
+                        SizedBox(height: 8),
+                        SkeletonBox(width: 170, height: 12),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  SkeletonBox.circle(size: 64),
+                ],
+              ),
+            ),
+          ),
+          const TicketPerforation(),
+          TicketSection(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Skeleton(
+              child: Column(
+                children: [
+                  line(150),
+                  line(120),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Row(children: [SkeletonBox(width: 140, height: 12), Spacer(), SkeletonBox(width: 90, height: 20)]),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (withActions) ...[
+            const TicketPerforation(),
+            TicketSection(
+              padding: const EdgeInsets.fromLTRB(16, 2, 16, 14),
+              child: Skeleton(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SkeletonBox(width: 110, height: 12),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        for (var i = 0; i < 4; i++) ...[
+                          if (i > 0) const SizedBox(width: 6),
+                          const Flexible(child: SkeletonBox(width: 64, height: 36, borderRadius: AppRadius.button)),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Row(
+                      children: [
+                        Expanded(child: SkeletonBox(height: 52, borderRadius: AppRadius.button)),
+                        SizedBox(width: 8),
+                        Expanded(flex: 2, child: SkeletonBox(height: 52, borderRadius: AppRadius.button)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          const TicketEdge(top: false),
+        ],
+      ),
+    );
+  }
+}

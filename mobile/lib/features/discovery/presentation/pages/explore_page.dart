@@ -109,11 +109,9 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                     : AsyncValueView(
                         value: results,
                         onRetry: () => ref.invalidate(searchResultsProvider),
-                        loading: Skeleton(
-                          child: ListView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [for (var i = 0; i < 6; i++) const AppProductRowSkeleton()],
-                          ),
+                        loading: ListView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [for (var i = 0; i < 6; i++) const AppProductRowSkeleton()],
                         ),
                         isEmpty: (r) => r.isEmpty,
                         empty: _NoResults(query: query, onPick: _search),

@@ -67,6 +67,29 @@ class EditorialPromos extends StatelessWidget {
   }
 }
 
+/// Esqueleto del carril de promos: la tarjeta de producto y las promos con sus anchos.
+class EditorialPromosSkeleton extends StatelessWidget {
+  const EditorialPromosSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final height = 268 + (MediaQuery.textScalerOf(context).scale(16) - 16).clamp(0.0, 30.0) * 7;
+    return Skeleton(
+      child: SizedBox(
+        height: height,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: AppSpacing.screen,
+          itemCount: 3,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (_, i) => SkeletonBox(width: const [212.0, 176.0, 216.0][i], height: height, borderRadius: AppRadius.card),
+        ),
+      ),
+    );
+  }
+}
+
 class _PhotoPromo extends StatelessWidget {
   const _PhotoPromo({required this.promo});
 

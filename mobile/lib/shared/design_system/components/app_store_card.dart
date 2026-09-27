@@ -711,16 +711,28 @@ class AppStoreCardSkeleton extends StatelessWidget {
       decoration: BoxDecoration(color: base, borderRadius: r),
     );
     return switch (variant) {
+      // Misma geometría que la tarjeta editorial: foto al 52 % del ancho, nombre con
+      // la nota a la derecha, rubro y la línea de tiempo y envío.
       AppStoreCardVariant.editorial => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 6, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 6, 20, 26),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            box(double.infinity, 190, AppRadius.card),
+            LayoutBuilder(
+              builder: (context, constraints) => box(double.infinity, (constraints.maxWidth * 0.52).clamp(150, 240), AppRadius.card),
+            ),
             const SizedBox(height: 12),
-            box(200, 22),
-            const SizedBox(height: 8),
-            box(240, 14),
+            Row(
+              children: [
+                box(180, 22),
+                const Spacer(),
+                box(48, 24, AppRadius.button),
+              ],
+            ),
+            const SizedBox(height: 6),
+            box(120, 12),
+            const SizedBox(height: 10),
+            box(220, 14),
           ],
         ),
       ),
