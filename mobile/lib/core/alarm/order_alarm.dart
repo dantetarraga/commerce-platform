@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -5,9 +7,10 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 part 'order_alarm.g.dart';
 
-/// Alarma de pedidos de Chaski Socios mientras la app está abierta: suena en
-/// bucle hasta que alguien atiende y mantiene la pantalla encendida en los
-/// modos de trabajo. Con la app cerrada avisa el push (fase 4).
+/// Alarma de pedidos de Chaski Socios mientras la app está abierta: un tono
+/// corto que se repite cada pocos segundos hasta que alguien atiende, y la
+/// pantalla encendida en los modos de trabajo. Con la app cerrada avisa el
+/// push (fase 4).
 abstract interface class OrderAlarm {
   Future<void> ring();
 
@@ -23,26 +26,33 @@ class DeviceOrderAlarm implements OrderAlarm {
 
   static const _asset = 'sounds/new_order.wav';
 
+  /// Pausa entre tonos: insiste sin volverse una sirena.
+  static const _every = Duration(seconds: 5);
+
   final AudioPlayer _player;
-  var _ringing = false;
+  Timer? _repeat;
 
   @override
   Future<void> ring() async {
-    if (_ringing) return;
-    _ringing = true;
+    if (_repeat != null) return;
+    _repeat = Timer.periodic(_every, (_) => _play());
+    await _play();
+  }
+
+  Future<void> _play() async {
     try {
-      await _player.setReleaseMode(ReleaseMode.loop);
+      await _player.stop();
       await _player.play(AssetSource(_asset));
     } on Object catch (e) {
-      _ringing = false;
       debugPrint('No se pudo sonar la alarma: $e');
     }
   }
 
   @override
   Future<void> silence() async {
-    if (!_ringing) return;
-    _ringing = false;
+    if (_repeat == null) return;
+    _repeat?.cancel();
+    _repeat = null;
     try {
       await _player.stop();
     } on Object catch (e) {
@@ -59,7 +69,10 @@ class DeviceOrderAlarm implements OrderAlarm {
     }
   }
 
-  Future<void> dispose() => _player.dispose();
+  Future<void> dispose() {
+    _repeat?.cancel();
+    return _player.dispose();
+  }
 }
 
 @Riverpod(keepAlive: true)
