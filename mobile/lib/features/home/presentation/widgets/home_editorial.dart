@@ -671,19 +671,23 @@ class _MiniMapPainter extends CustomPainter {
     }
     canvas.drawLine(Offset(size.width * 0.3, size.height + 10), Offset(size.width * 0.72, -10), streets);
     final path = _miniRoute(size);
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = casing
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3,
-    );
-    final metric = path.computeMetrics().first;
-    final dots = Paint()..color = route;
-    for (var d = 0.0; d < metric.length; d += 9) {
-      final p = metric.getTangentForOffset(d)?.position;
-      if (p != null) canvas.drawCircle(p, 1.8, dots);
-    }
+    canvas
+      ..drawPath(
+        path,
+        Paint()
+          ..color = casing
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..strokeCap = StrokeCap.round,
+      )
+      ..drawPath(
+        path,
+        Paint()
+          ..color = route
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round,
+      );
   }
 
   @override
@@ -840,7 +844,10 @@ class _StepTrail extends StatelessWidget {
                     Positioned(
                       left: slot / 2,
                       right: slot / 2,
-                      child: CustomPaint(size: const Size.fromHeight(2), painter: _DottedLine(scheme.outline)),
+                      child: Container(
+                        height: 4,
+                        decoration: BoxDecoration(color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
+                      ),
                     ),
                     Positioned(
                       left: slot / 2,
@@ -897,21 +904,4 @@ class _StepTrail extends StatelessWidget {
       ),
     );
   }
-}
-
-class _DottedLine extends CustomPainter {
-  const _DottedLine(this.color);
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
-    for (var x = 0.0; x < size.width; x += 6) {
-      canvas.drawCircle(Offset(x, size.height / 2), 1.2, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DottedLine old) => old.color != color;
 }

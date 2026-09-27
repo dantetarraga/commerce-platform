@@ -456,7 +456,7 @@ class _RouteCard extends StatelessWidget {
                             const Expanded(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 6),
-                                child: DottedLine(vertical: true, gap: 8, radius: 1.8),
+                                child: TrackLine(vertical: true),
                               ),
                             ),
                             const StationNode(icon: Icons.home_rounded, color: AppColors.hierba, size: 28),
@@ -669,7 +669,7 @@ class _RouteCardSkeleton extends StatelessWidget {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: DottedLine(vertical: true, gap: 8, radius: 1.8, color: context.chaski.shimmerBase),
+                            child: TrackLine(vertical: true, color: context.chaski.shimmerBase),
                           ),
                         ),
                         const SkeletonBox.circle(size: 28),

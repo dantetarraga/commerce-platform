@@ -413,9 +413,7 @@ class _ProgressTrail extends StatelessWidget {
         final x = (constraints.maxWidth - 12) * progress;
         return Stack(
           children: [
-            Positioned.fill(
-              child: Center(child: DottedLine(color: Theme.of(context).colorScheme.outlineVariant, radius: 1.2, gap: 6)),
-            ),
+            const Positioned.fill(child: TrackLine(thickness: 4)),
             Positioned(
               left: 0,
               top: 4,
@@ -553,7 +551,7 @@ class _CourierRoute extends StatelessWidget {
           final x = 6 + (constraints.maxWidth - 36) * reach;
           return Stack(
             children: [
-              Positioned(left: 6, right: 6, top: 7, child: DottedLine(color: scheme.primary, gap: 6)),
+              Positioned(left: 6, right: 6, top: 8, child: TrackLine(color: scheme.primary.withValues(alpha: 0.35))),
               Positioned(
                 left: 0,
                 top: 3,

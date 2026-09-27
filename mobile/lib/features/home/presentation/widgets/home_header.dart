@@ -163,7 +163,6 @@ class _ExpandedContent extends ConsumerWidget {
           clipBehavior: Clip.none,
           children: [
             if (showArt) ...[
-              Positioned(left: 0, top: 0, width: w, height: 300, child: CustomPaint(painter: _RoutePainter(route: scheme.primary, start: context.chaski.accent, ring: scheme.primaryContainer))),
               _CoverArt(width: w),
             ],
             Padding(
@@ -224,9 +223,9 @@ class _ExpandedContent extends ConsumerWidget {
   }
 }
 
-/// Composición del lienzo, anclada al borde derecho: anillo punteado de 210, la comida
-/// en un círculo de 164 que se sale de la pantalla, el pan en un círculo de 48, el nodo
-/// de llegada y la etiqueta del negocio popular abierto sobre la foto.
+/// Composición del lienzo, anclada al borde derecho: un halo tostado de 210, la comida
+/// en un círculo de 164 que se sale de la pantalla, el pan en un círculo de 48 y la
+/// etiqueta del negocio popular abierto sobre la foto.
 class _CoverArt extends ConsumerWidget {
   const _CoverArt({required this.width});
 
@@ -253,7 +252,7 @@ class _CoverArt extends ConsumerWidget {
               top: 43,
               width: 210,
               height: 210,
-              child: CustomPaint(painter: _DashedRing(color: scheme.primary.withValues(alpha: 0.35))),
+              child: DecoratedBox(decoration: BoxDecoration(color: scheme.primary.withValues(alpha: 0.08), shape: BoxShape.circle)),
             ),
             Positioned(
               left: x + 251,
@@ -266,15 +265,6 @@ class _CoverArt extends ConsumerWidget {
               child: Container(
                 decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: hero, width: 3)),
                 child: const AppNetworkImage(url: 'assets/images/demo/bread.jpg', width: 42, height: 42, borderRadius: BorderRadius.all(Radius.circular(21))),
-              ),
-            ),
-            Positioned(
-              left: x + 247,
-              top: 62,
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(color: context.chaski.accent, shape: BoxShape.circle, border: Border.all(color: hero, width: 4)),
               ),
             ),
             if (nearest != null)
@@ -318,61 +308,6 @@ class _CoverArt extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// El trazo punteado que sale abajo a la izquierda y llega al pan.
-class _RoutePainter extends CustomPainter {
-  const _RoutePainter({required this.route, required this.start, required this.ring});
-
-  final Color route;
-  final Color start;
-  final Color ring;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final end = size.width - 168;
-    double x(double canvasX) => 30 + (canvasX - 30) * (end - 30) / (222 - 30);
-    final path = Path()
-      ..moveTo(30, 250)
-      ..cubicTo(x(110), 250, x(170), 242, end, 214);
-    final metric = path.computeMetrics().first;
-    final dot = Paint()..color = route;
-    for (var d = 0.0; d < metric.length; d += 9) {
-      final p = metric.getTangentForOffset(d)?.position;
-      if (p != null) canvas.drawCircle(p, 1.6, dot);
-    }
-    canvas
-      ..drawCircle(const Offset(30, 250), 7.5, Paint()..color = ring)
-      ..drawCircle(const Offset(30, 250), 6, Paint()..color = start);
-  }
-
-  @override
-  bool shouldRepaint(_RoutePainter old) => old.route != route || old.start != start || old.ring != ring;
-}
-
-class _DashedRing extends CustomPainter {
-  const _DashedRing({required this.color});
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
-    final side = math.min(size.width, size.height);
-    final rect = Rect.fromCenter(center: size.center(Offset.zero), width: side - 2, height: side - 2);
-    // 44 trazos cortos: el mismo punteado del lienzo.
-    const dashes = 44;
-    for (var i = 0; i < dashes; i++) {
-      canvas.drawArc(rect, i * 2 * math.pi / dashes, math.pi / dashes, false, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedRing old) => old.color != color;
 }
 
 /// "Entregar en · Jr. Tacna 248 ▾" en una píldora blanca; abre la hoja de direcciones.

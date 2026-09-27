@@ -68,7 +68,10 @@ class SplashPage extends StatelessWidget {
             FadeSlideIn(
               delay: const Duration(milliseconds: 600),
               offset: Offset.zero,
-              child: ThreadLoader(color: onPrimary, semanticLabel: 'Preparando Chaski'),
+              child: Semantics(
+                label: 'Preparando Chaski',
+                child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: onPrimary)),
+              ),
             ),
           ],
         ),

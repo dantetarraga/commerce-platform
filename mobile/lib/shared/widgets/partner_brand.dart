@@ -65,13 +65,6 @@ class PartnerHero extends StatelessWidget {
                 child: _HeroArt(imageUrl: imageUrl, avatar: avatar),
               ),
             ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: CustomPaint(
-                painter: _HeroTrail(color: scheme.primary, start: context.chaski.accent, ring: scheme.primaryContainer),
-              ),
-            ),
-          ),
           Padding(
             padding: EdgeInsets.fromLTRB(AppSpacing.gutter, top + 12, AppSpacing.gutter, pill == null ? 26 : _pillOverlap + 30),
             child: Column(
@@ -181,7 +174,7 @@ class _HeroArt extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: CustomPaint(painter: DashedRingPainter(color: scheme.primary.withValues(alpha: 0.35))),
+            child: DecoratedBox(decoration: BoxDecoration(color: scheme.primary.withValues(alpha: 0.08), shape: BoxShape.circle)),
           ),
           Positioned(
             left: 20,
@@ -196,79 +189,10 @@ class _HeroArt extends StatelessWidget {
                   fallbackIcon: Icons.storefront_rounded,
                 ),
           ),
-          Positioned(
-            left: 12,
-            top: 16,
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                color: context.chaski.accent,
-                shape: BoxShape.circle,
-                border: Border.all(color: scheme.primaryContainer, width: 4),
-              ),
-            ),
-          ),
         ],
       ),
     );
   }
-}
-
-/// Trazo punteado que sale abajo a la izquierda de la portada.
-class _HeroTrail extends CustomPainter {
-  const _HeroTrail({required this.color, required this.start, required this.ring});
-
-  final Color color;
-  final Color start;
-  final Color ring;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.width < 300) return;
-    final y = size.height - 40;
-    final from = Offset(24, y);
-    final path = Path()
-      ..moveTo(from.dx, from.dy)
-      ..cubicTo(size.width * 0.35, y, size.width * 0.5, y - 4, size.width * 0.7, y - 34);
-    final metric = path.computeMetrics().first;
-    final dot = Paint()..color = color;
-    for (var d = 0.0; d < metric.length; d += 9) {
-      final p = metric.getTangentForOffset(d)?.position;
-      if (p != null) canvas.drawCircle(p, 1.6, dot);
-    }
-    canvas
-      ..drawCircle(from, 7.5, Paint()..color = ring)
-      ..drawCircle(from, 6, Paint()..color = start);
-  }
-
-  @override
-  bool shouldRepaint(_HeroTrail old) => old.color != color || old.start != start || old.ring != ring;
-}
-
-/// Anillo punteado alrededor de una foto o un avatar.
-class DashedRingPainter extends CustomPainter {
-  const DashedRingPainter({required this.color, this.dashes = 40});
-
-  final Color color;
-  final int dashes;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
-    final side = math.min(size.width, size.height);
-    final rect = Rect.fromCenter(center: size.center(Offset.zero), width: side - 2, height: side - 2);
-    for (var i = 0; i < dashes; i++) {
-      canvas.drawArc(rect, i * 2 * math.pi / dashes, math.pi / dashes, false, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(DashedRingPainter old) => old.color != color || old.dashes != dashes;
 }
 
 /// "Cocina abierta · recibiendo" / "En ruta · conectado": verde cuando está activo.
@@ -547,41 +471,25 @@ class PartnerStamp extends StatelessWidget {
   }
 }
 
-/// Línea punteada del trazo (horizontal o vertical).
-class DottedLine extends StatelessWidget {
-  const DottedLine({this.color, this.vertical = false, this.gap = 7, this.radius = 1.6, super.key});
+/// Línea sólida y redondeada que une paradas o marca un recorrido.
+class TrackLine extends StatelessWidget {
+  const TrackLine({this.color, this.vertical = false, this.thickness = 2, super.key});
 
   final Color? color;
   final bool vertical;
-  final double gap;
-  final double radius;
+  final double thickness;
 
   @override
-  Widget build(BuildContext context) => CustomPaint(
-    size: vertical ? Size(radius * 2, double.infinity) : Size(double.infinity, radius * 2),
-    painter: _DotsPainter(color: color ?? Theme.of(context).colorScheme.primary, vertical: vertical, gap: gap, radius: radius),
+  Widget build(BuildContext context) => Center(
+    child: Container(
+      width: vertical ? thickness : double.infinity,
+      height: vertical ? double.infinity : thickness,
+      decoration: BoxDecoration(
+        color: color ?? Theme.of(context).colorScheme.outlineVariant,
+        borderRadius: BorderRadius.circular(thickness),
+      ),
+    ),
   );
-}
-
-class _DotsPainter extends CustomPainter {
-  const _DotsPainter({required this.color, required this.vertical, required this.gap, required this.radius});
-
-  final Color color;
-  final bool vertical;
-  final double gap;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
-    final length = vertical ? size.height : size.width;
-    for (var d = radius; d < length; d += gap) {
-      canvas.drawCircle(vertical ? Offset(size.width / 2, d) : Offset(d, size.height / 2), radius, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DotsPainter old) => old.color != color || old.vertical != vertical || old.gap != gap || old.radius != radius;
 }
 
 /// Una parada del recorrido: el nodo a la izquierda sobre el trazo y su contenido.
@@ -616,7 +524,7 @@ class PartnerStations extends StatelessWidget {
                     s.node,
                     if (i < stations.length - 1)
                       const Expanded(
-                        child: Padding(padding: EdgeInsets.symmetric(vertical: 4), child: DottedLine(vertical: true, gap: 8, radius: 1.8)),
+                        child: Padding(padding: EdgeInsets.symmetric(vertical: 4), child: TrackLine(vertical: true)),
                       ),
                   ],
                 ),

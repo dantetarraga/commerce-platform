@@ -217,14 +217,6 @@ class _RailHero extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          Positioned(
-            right: -40,
-            top: -60,
-            child: SizedBox.square(
-              dimension: 200,
-              child: CustomPaint(painter: DashedRingPainter(color: scheme.primary.withValues(alpha: 0.35))),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 14, 16, 16),
             child: Row(

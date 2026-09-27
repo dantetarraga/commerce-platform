@@ -73,11 +73,9 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                children: [
-                  Expanded(child: Text('Sigue tu antojo.', style: Theme.of(context).textTheme.headlineLarge)),
-                  const SizedBox(width: 54, height: 30, child: ChaskiTrail(strokeWidth: 3)),
-                ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Sigue tu antojo.', style: Theme.of(context).textTheme.headlineLarge),
               ),
             ),
             Padding(

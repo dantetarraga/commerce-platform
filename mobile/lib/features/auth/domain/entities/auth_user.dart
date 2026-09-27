@@ -4,8 +4,6 @@ import 'package:equatable/equatable.dart';
 
 enum UserRole { customer, merchant, courier, admin }
 
-/// Usuario autenticado. La identidad es el celular (se entra con código por
-/// SMS/WhatsApp); el correo es opcional.
 final class AuthUser extends Equatable {
   const AuthUser({
     required this.id,
@@ -28,7 +26,8 @@ final class AuthUser extends Equatable {
   String get fullName => '$firstName $lastName';
 
   String get initials =>
-      '${firstName.isEmpty ? '' : firstName[0]}${lastName.isEmpty ? '' : lastName[0]}'.toUpperCase();
+      '${firstName.isEmpty ? '' : firstName[0]}${lastName.isEmpty ? '' : lastName[0]}'
+          .toUpperCase();
 
   bool get isCustomer => roles.contains(UserRole.customer);
 
@@ -36,9 +35,16 @@ final class AuthUser extends Equatable {
 
   bool get isCourier => roles.contains(UserRole.courier);
 
-  /// Puede usar Chaski Socios (modo negocio o repartidor).
   bool get isPartner => isMerchant || isCourier;
 
   @override
-  List<Object?> get props => [id, phone, firstName, lastName, email, avatarUrl, roles];
+  List<Object?> get props => [
+    id,
+    phone,
+    firstName,
+    lastName,
+    email,
+    avatarUrl,
+    roles,
+  ];
 }

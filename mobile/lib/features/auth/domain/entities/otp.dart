@@ -4,7 +4,11 @@ import 'package:equatable/equatable.dart';
 
 /// Código enviado: a qué número, de cuántos dígitos y cuándo se puede reenviar.
 final class OtpChallenge extends Equatable {
-  const OtpChallenge({required this.phone, required this.resendAfter, this.codeLength = 6});
+  const OtpChallenge({
+    required this.phone,
+    required this.resendAfter,
+    this.codeLength = 6,
+  });
 
   final PhoneNumber phone;
   final Duration resendAfter;
@@ -29,10 +33,11 @@ final class OtpSignedIn extends OtpVerification {
   List<Object?> get props => [user];
 }
 
-/// Número nuevo: falta el nombre para crear la cuenta. El token prueba que el
-/// celular ya se verificó.
 final class OtpProfileRequired extends OtpVerification {
-  const OtpProfileRequired({required this.phone, required this.registrationToken});
+  const OtpProfileRequired({
+    required this.phone,
+    required this.registrationToken,
+  });
 
   final PhoneNumber phone;
   final String registrationToken;

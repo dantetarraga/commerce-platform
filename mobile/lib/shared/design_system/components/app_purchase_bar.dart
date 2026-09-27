@@ -1,6 +1,5 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/illustrations/chaski_trail.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
@@ -155,10 +154,7 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
                           ],
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      if (MediaQuery.sizeOf(context).width > 360 && MediaQuery.textScalerOf(context).scale(16) < 20)
-                        const SizedBox(width: 32, height: 25, child: ChaskiTrail(strokeWidth: 2)),
-                      const SizedBox(width: AppSpacing.xs),
+                      const SizedBox(width: AppSpacing.sm),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 10),
                         decoration: BoxDecoration(color: actionBg, borderRadius: AppRadius.button),

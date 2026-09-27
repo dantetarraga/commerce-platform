@@ -90,12 +90,7 @@ class CheckoutPage extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 20),
-            child: Row(
-              children: [
-                Expanded(child: Text('Todo listo para salir.', style: Theme.of(context).textTheme.headlineLarge)),
-                const SizedBox(width: 64, height: 44, child: ChaskiTrail(strokeWidth: 4)),
-              ],
-            ),
+            child: Text('Todo listo para salir.', style: Theme.of(context).textTheme.headlineLarge),
           ),
           PrintIn(
             child: _Boleta(cart: cart, address: address, draft: draft, issues: issues),
