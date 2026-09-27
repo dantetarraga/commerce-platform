@@ -16,8 +16,16 @@ class PartnerAccountButton extends ConsumerWidget {
     if (user == null) return const SizedBox.shrink();
     return IconButton(
       tooltip: 'Tu cuenta',
-      onPressed: () => showAppBottomSheet<void>(context, builder: (_) => const _AccountSheet()),
-      icon: AppAvatar(initials: user.initials, imageUrl: user.avatarUrl, size: 36),
+      onPressed: () => showAppBottomSheet<void>(
+        context,
+        builder: (_) => const _AccountSheet(),
+      ),
+      icon: AppAvatar(
+        initials: user.initials,
+        imageUrl: user.avatarUrl,
+        seed: user.id,
+        size: 36,
+      ),
     );
   }
 }
@@ -51,21 +59,61 @@ class _AccountSheet extends ConsumerWidget {
     final active = ref.watch(activePartnerModeProvider);
     return SafeArea(
       top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.md,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(user?.fullName.trim() ?? '', style: theme.textTheme.titleLarge),
-            if (user != null)
-              Text(formatPhone(user.phone.value), style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            Row(
+              children: [
+                AppAvatar(
+                  imageUrl: user?.avatarUrl,
+                  initials: user?.initials,
+                  seed: user?.id,
+                  size: 64,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (active != null)
+                        Text(
+                          _label(active),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      Text(
+                        user?.fullName.trim() ?? '',
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      if (user != null)
+                        Text(
+                          formatPhone(user.phone.value),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             if (modes.length > 1) ...[
               const SizedBox(height: AppSpacing.md),
               Text('Entrar como', style: theme.textTheme.labelLarge),
               const SizedBox(height: AppSpacing.xs),
               SegmentedButton<PartnerMode>(
-                segments: [for (final m in modes) ButtonSegment(value: m, label: Text(_label(m)))],
+                segments: [
+                  for (final m in modes) ButtonSegment(value: m, label: Text(_label(m))),
+                ],
                 selected: active == null ? const {} : {active},
                 onSelectionChanged: (selection) {
                   ref.read(partnerModePreferenceProvider.notifier).set(selection.first).ignore();
@@ -74,7 +122,10 @@ class _AccountSheet extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: AppSpacing.lg),
-            AppButton.secondary(label: 'Cerrar sesión', onPressed: () => _logout(context, ref)),
+            AppButton.secondary(
+              label: 'Cerrar sesión',
+              onPressed: () => _logout(context, ref),
+            ),
           ],
         ),
       ),

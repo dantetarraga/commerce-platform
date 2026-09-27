@@ -45,18 +45,19 @@ class AppCategory extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final highlighted = size == AppCategorySize.large;
-    final bg = highlighted ? scheme.primaryContainer : context.chaski.raised;
-    final fg = highlighted ? scheme.onPrimaryContainer : scheme.onSurface;
+    final bg = highlighted ? scheme.primary : (theme.brightness == Brightness.dark ? context.chaski.raised : AppColors.terracota50);
+    final fg = highlighted ? scheme.onPrimary : scheme.onSurface;
 
     return Semantics(
       button: true,
+      onTap: onTap,
       label: caption == null ? label : '$label. $caption',
       excludeSemantics: true,
       child: PressableScale(
         scale: 0.95,
         child: Material(
           color: bg,
-          borderRadius: const BorderRadius.all(AppRadius.lg),
+          borderRadius: AppRadius.card,
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
@@ -72,7 +73,10 @@ class AppCategory extends StatelessWidget {
                             borderRadius: const BorderRadius.all(AppRadius.sm),
                             child: Image(image: image!, fit: BoxFit.cover),
                           )
-                        : Icon(icon, color: highlighted ? scheme.primary : scheme.onSurface, size: 28),
+                        : Transform.rotate(
+                            angle: tilt,
+                            child: Icon(icon, color: fg, size: highlighted ? 34 : 28),
+                          ),
                   ),
                   const SizedBox(height: AppSpacing.xxs + 2),
                   Text(

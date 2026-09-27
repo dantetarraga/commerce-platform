@@ -124,7 +124,7 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
   void _openProduct(MenuItem item) => context.pushNamed(ProductDetailPage.name, pathParameters: {'productId': item.id});
 
   /// "+" rápido: solo productos sin variantes ni opciones, si se puede pedir.
-  VoidCallback? _quickAdd(MenuItem item, {required bool canAdd}) {
+  Future<bool> Function()? _quickAdd(MenuItem item, {required bool canAdd}) {
     if (item.hasChoices || !canAdd || !item.isAvailable) return null;
     return () => addToCart(
       context,
@@ -386,7 +386,7 @@ class _StoreHeader extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Semantics(header: true, child: Text(store.name, style: theme.textTheme.headlineSmall)),
+                        Semantics(header: true, child: Text(store.name, style: theme.textTheme.headlineLarge)),
                         const SizedBox(height: AppSpacing.xxs),
                         Text.rich(
                           TextSpan(
@@ -485,8 +485,7 @@ class _StoreHeader extends StatelessWidget {
                     : 'Hoy: ${today.map((h) => '${Formatters.timeOfDay(h.opensAt)} – ${Formatters.timeOfDay(h.closesAt)}').join(', ')}',
               ),
               row(Icons.place_outlined, '${store.addressLine} · a ${Formatters.distance(summary.distanceKm)}'),
-              if (!summary.minOrderAmount.isZero)
-                row(Icons.shopping_bag_outlined, 'Pedido mínimo ${Formatters.money(summary.minOrderAmount)}'),
+              if (!summary.minOrderAmount.isZero) row(Icons.shopping_bag_outlined, 'Pedido mínimo ${Formatters.money(summary.minOrderAmount)}'),
             ],
           ),
         ),
@@ -612,7 +611,7 @@ class _DealStrip extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: theme.textTheme.bodyMedium?.copyWith(color: chaski.onAccent, fontWeight: FontWeight.w600),
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSecondaryContainer, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -805,8 +804,7 @@ class _SectionTabsDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_SectionTabsDelegate oldDelegate) =>
-      oldDelegate.sections != sections || oldDelegate.active != active;
+  bool shouldRebuild(_SectionTabsDelegate oldDelegate) => oldDelegate.sections != sections || oldDelegate.active != active;
 }
 
 /// Chips de secciones: el activo (tinta) se centra solo en la fila.

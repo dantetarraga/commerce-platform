@@ -145,16 +145,37 @@ class PartnerAvailability extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final foreground = value ? scheme.onPrimaryContainer : scheme.onSurface;
-    return Container(
+    final statusColor = value ? context.chaski.success : scheme.onSurfaceVariant;
+    return AnimatedContainer(
+      duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
+      curve: AppMotion.arrive,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: value ? scheme.primaryContainer : context.chaski.raised,
+        color: scheme.surface,
         borderRadius: AppRadius.card,
+        border: Border.all(
+          color: value ? statusColor.withValues(alpha: 0.35) : scheme.outlineVariant,
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: foreground, size: 28),
+          AnimatedContainer(
+            duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: value ? statusColor.withValues(alpha: 0.1) : context.chaski.raised,
+              borderRadius: AppRadius.tile,
+            ),
+            child: AnimatedSwitcher(
+              duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
+              child: Icon(
+                icon,
+                key: ValueKey(icon),
+                color: statusColor,
+                size: 24,
+              ),
+            ),
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -163,13 +184,15 @@ class PartnerAvailability extends StatelessWidget {
                 Text(
                   title,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: foreground,
+                    color: scheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
                   message,
-                  style: theme.textTheme.bodySmall?.copyWith(color: foreground),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),

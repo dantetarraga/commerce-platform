@@ -93,18 +93,22 @@ GoRouter appRouter(Ref ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: RoutePaths.orders,
+                name: OrdersPage.name,
+                builder: (context, _) => OrdersPage(
+                  onExplore: () => context.goNamed(HomePage.name),
+                  onOpenStore: (storeId) => context.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': storeId}),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: RoutePaths.profile,
                 name: ProfilePage.name,
                 builder: (_, _) => const ProfilePage(),
                 routes: [
-                  GoRoute(
-                    path: RoutePaths.orders,
-                    name: OrdersPage.name,
-                    builder: (context, _) => OrdersPage(
-                      onExplore: () => context.goNamed(HomePage.name),
-                      onOpenStore: (storeId) => context.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': storeId}),
-                    ),
-                  ),
                   GoRoute(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
                 ],
               ),

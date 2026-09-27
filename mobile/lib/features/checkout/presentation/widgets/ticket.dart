@@ -1,12 +1,12 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Colores de la boleta: papel claro sobre el gris de la pantalla. En oscuro
+/// Colores de la boleta: papel blanco sobre la crema de la pantalla. En oscuro
 /// el papel sube un nivel para seguir separándose del fondo.
 extension TicketColors on BuildContext {
   Color get ticketPaper {
     final scheme = Theme.of(this).colorScheme;
-    return Theme.of(this).brightness == Brightness.dark ? scheme.surfaceContainerHigh : scheme.surface;
+    return Theme.of(this).brightness == Brightness.dark ? scheme.surfaceContainerHigh : scheme.surfaceContainerLowest;
   }
 
   /// Relleno de chips y bloques dentro de la boleta.
@@ -16,37 +16,77 @@ extension TicketColors on BuildContext {
   }
 }
 
-/// Borde dentado (arriba o abajo) de la boleta, como papel cortado.
+/// Encabezado impreso de la boleta: franja terracota con las esquinas superiores redondeadas.
+class TicketHeader extends StatelessWidget {
+  const TicketHeader({required this.label, super.key});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: scheme.primary,
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.eyebrow(context).copyWith(color: scheme.onPrimary),
+            ),
+          ),
+          SizedBox(width: 46, height: 18, child: ChaskiTrail(color: scheme.onPrimary, strokeWidth: 2.5)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Corte en zigzag (arriba o abajo) de la boleta, como papel arrancado de la ticketera.
+/// Abajo lleva una sombra corta que despega los dientes del fondo.
 class TicketEdge extends StatelessWidget {
   const TicketEdge({required this.top, super.key});
 
   final bool top;
 
-  static const height = 7.0;
+  static const height = 12.0;
 
   @override
   Widget build(BuildContext context) => SizedBox(
     height: height,
     width: double.infinity,
-    child: CustomPaint(painter: _ZigzagPainter(color: context.ticketPaper, top: top)),
+    child: CustomPaint(
+      painter: _ZigzagPainter(
+        color: context.ticketPaper,
+        top: top,
+        shadow: Theme.of(context).brightness == Brightness.dark ? null : const Color(0x332A1A14),
+      ),
+    ),
   );
 }
 
 class _ZigzagPainter extends CustomPainter {
-  const _ZigzagPainter({required this.color, required this.top});
+  const _ZigzagPainter({required this.color, required this.top, this.shadow});
 
   final Color color;
   final bool top;
+  final Color? shadow;
 
   @override
   void paint(Canvas canvas, Size size) {
-    const tooth = 11.0;
+    const tooth = 18.0;
     final n = (size.width / tooth).round().clamp(1, 400);
     final step = size.width / n;
     final h = size.height;
     // Dientes hacia afuera: la base toca el cuerpo de la boleta.
     final base = top ? h : 0.0;
-    final tip = top ? 0.0 : h;
+    final tip = top ? 0.0 : h - 2;
     final path = Path()..moveTo(0, base);
     for (var i = 0; i < n; i++) {
       path
@@ -58,11 +98,12 @@ class _ZigzagPainter extends CustomPainter {
       ..lineTo(size.width, top ? h + 0.5 : -0.5)
       ..lineTo(0, top ? h + 0.5 : -0.5)
       ..close();
+    if (shadow != null && !top) canvas.drawShadow(path, shadow!, 2.5, false);
     canvas.drawPath(path, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_ZigzagPainter old) => old.color != color || old.top != top;
+  bool shouldRepaint(_ZigzagPainter old) => old.color != color || old.top != top || old.shadow != shadow;
 }
 
 /// Perforación entre secciones: muescas semicirculares a los lados y una

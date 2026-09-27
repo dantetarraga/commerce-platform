@@ -19,7 +19,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Checkout "Tu boleta": todo el pedido en una boleta impresa sobre gris.
+/// Checkout "Tu boleta": todo el pedido en una boleta impresa sobre crema, con
+/// encabezado terracota y el corte en zigzag abajo.
 /// Lo último que usaste ya viene elegido; solo tocas lo que quieres cambiar.
 class CheckoutPage extends ConsumerWidget {
   const CheckoutPage({super.key});
@@ -88,7 +89,18 @@ class CheckoutPage extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.xl),
         children: [
-          PrintIn(child: _Boleta(cart: cart, address: address, draft: draft, issues: issues)),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Row(
+              children: [
+                Expanded(child: Text('Todo listo para salir.', style: Theme.of(context).textTheme.headlineLarge)),
+                const SizedBox(width: 64, height: 44, child: ChaskiTrail(strokeWidth: 4)),
+              ],
+            ),
+          ),
+          PrintIn(
+            child: _Boleta(cart: cart, address: address, draft: draft, issues: issues),
+          ),
         ],
       ),
       bottomNavigationBar: ColoredBox(
@@ -110,7 +122,10 @@ class CheckoutPage extends ConsumerWidget {
                 ),
                 AppButton(
                   label: label,
-                  trailing: _AnimatedTotal(total: total, style: const TextStyle(fontFeatures: AppTypography.tabularFigures)),
+                  trailing: _AnimatedTotal(
+                    total: total,
+                    style: const TextStyle(fontFeatures: AppTypography.tabularFigures),
+                  ),
                   loading: state.placing,
                   onPressed: onPressed,
                 ),
@@ -142,7 +157,12 @@ class _Notice extends StatelessWidget {
           children: [
             Icon(danger ? Icons.error_outline_rounded : Icons.info_outline_rounded, size: 18, color: color),
             const SizedBox(width: AppSpacing.xs),
-            Expanded(child: Text(message, style: theme.textTheme.bodyMedium?.copyWith(color: color, fontWeight: FontWeight.w600))),
+            Expanded(
+              child: Text(
+                message,
+                style: theme.textTheme.bodyMedium?.copyWith(color: color, fontWeight: FontWeight.w600),
+              ),
+            ),
           ],
         ),
       ),
@@ -203,7 +223,9 @@ class _Boleta extends ConsumerWidget {
       child: Row(
         children: [
           if (icon != null) ...[Icon(icon, size: 16, color: color), const SizedBox(width: AppSpacing.xxs)],
-          Expanded(child: Text(label, style: muted?.copyWith(color: color))),
+          Expanded(
+            child: Text(label, style: muted?.copyWith(color: color)),
+          ),
           Text(value, style: amount?.copyWith(color: color)),
         ],
       ),
@@ -212,7 +234,7 @@ class _Boleta extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const TicketEdge(top: true),
+        const TicketHeader(label: 'BOLETA DE PEDIDO'),
         TicketSection(
           padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.xs),
           child: Column(
@@ -233,8 +255,6 @@ class _Boleta extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('BOLETA DE PEDIDO', style: AppTypography.eyebrow(context)),
-                        const SizedBox(height: 2),
                         Text(store?.name ?? '', style: theme.textTheme.titleMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
                         Text(
                           address == null ? 'Aún sin dirección' : 'Pedido para ${address!.street}',
@@ -253,7 +273,8 @@ class _Boleta extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: Semantics(
-                    label: '${line.quantity.value} ${line.name}'
+                    label:
+                        '${line.quantity.value} ${line.name}'
                         '${line.description.isEmpty ? '' : ', ${line.description}'}, ${spokenMoney(line.total)}',
                     excludeSemantics: true,
                     child: Column(
@@ -289,10 +310,7 @@ class _Boleta extends ConsumerWidget {
                 ),
               const SizedBox(height: AppSpacing.xs),
               summary('Subtotal', Formatters.money(cart.subtotal)),
-              if (cart.deliveryFee.isZero)
-                summary('Envío', 'Gratis', color: chaski.success)
-              else
-                summary('Envío', Formatters.money(cart.deliveryFee)),
+              if (cart.deliveryFee.isZero) summary('Envío', 'Gratis', color: chaski.success) else summary('Envío', Formatters.money(cart.deliveryFee)),
               if (!cart.discount.isZero)
                 summary('Cupón ${cart.coupon!.code}', '− ${Formatters.money(cart.discount)}', color: chaski.success, icon: Icons.local_offer_rounded),
               summary('Propina para el repartidor', draft.tip.isZero ? '—' : Formatters.money(draft.tip)),
@@ -377,6 +395,7 @@ class _Boleta extends ConsumerWidget {
                     ],
                   ),
                 ),
+                const SizedBox(width: AppSpacing.sm),
                 _AnimatedTotal(total: total, style: AppTypography.price(context, size: 34)),
               ],
             ),
@@ -430,6 +449,7 @@ class _InfoRow extends StatelessWidget {
       button: true,
       label: '$caption: $title${subtitle == null ? '' : ', $subtitle'}${missing ? ', falta' : ''}',
       hint: action,
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
@@ -449,7 +469,9 @@ class _InfoRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        runSpacing: 4,
                         children: [
                           Text(caption.toUpperCase(), style: AppTypography.eyebrow(context).copyWith(fontSize: 10)),
                           if (missing) ...[

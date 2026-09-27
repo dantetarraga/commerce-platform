@@ -1,10 +1,11 @@
+import 'package:chaski/shared/design_system/components/app_navigation_dock.dart';
 import 'package:chaski/shared/design_system/components/app_network_image.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// El traspaso: la foto del producto viaja desde [from] hasta la barra de compra (abajo,
-/// al centro) encogiéndose, como el chaski que entrega el mensaje.
+/// El traspaso: la foto del producto viaja desde [from] hasta la bolsa (la pestaña o la
+/// barra de compra) encogiéndose, como el chaski que entrega el mensaje.
 ///
 /// [from] es el rectángulo global de origen (p. ej. la foto del detalle).
 /// Con movimiento reducido no hace nada.
@@ -13,7 +14,12 @@ Future<void> flyToPurchaseBar(BuildContext context, {required Rect from, String?
   final overlay = Overlay.of(context, rootOverlay: true);
   final size = MediaQuery.sizeOf(context);
   final bottomInset = MediaQuery.paddingOf(context).bottom;
-  final to = Rect.fromCenter(center: Offset(size.width / 2, size.height - bottomInset - 60), width: 36, height: 36);
+  // Si la pestaña Bolsa está a la vista, el producto vuela hacia ella; si no (detalle a
+  // pantalla completa), hacia la barra de compra al pie.
+  final bag = _visibleBagRect();
+  final to = bag != null
+      ? Rect.fromCenter(center: bag.center.translate(0, -8), width: 30, height: 30)
+      : Rect.fromCenter(center: Offset(size.width / 2, size.height - bottomInset - 60), width: 36, height: 36);
 
   final controller = AnimationController(vsync: Navigator.of(context), duration: AppMotion.move + const Duration(milliseconds: 120));
   final entry = OverlayEntry(
@@ -52,6 +58,12 @@ Future<void> flyToPurchaseBar(BuildContext context, {required Rect from, String?
     entry.remove();
     controller.dispose();
   }
+}
+
+Rect? _visibleBagRect() {
+  final context = AppNavigationDock.bagKey.currentContext;
+  if (context == null || !(ModalRoute.of(context)?.isCurrent ?? false)) return null;
+  return globalRectOf(AppNavigationDock.bagKey);
 }
 
 /// Rectángulo global de un widget (por su [GlobalKey]).

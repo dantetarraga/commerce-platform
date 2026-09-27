@@ -1,0 +1,4 @@
+
+# Capturas de pantalla generadas por los tests: se quedan en local, no se versionan.
+docs/ui/**/*.png
+docs/onboarding/*.png

@@ -82,6 +82,7 @@ void main() {
     expect(find.text('EN CAMINO'), findsOneWidget);
     expect(find.text('1:12 pm'), findsOneWidget);
     expect(find.text('~${clock12(eta)}'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Luis Quispe'), 100, scrollable: find.byType(Scrollable).last);
     expect(find.text('Luis Quispe'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('¿Algún problema con tu pedido?'), 120, scrollable: find.byType(Scrollable).last);
     expect(find.text('¿Algún problema con tu pedido?'), findsOneWidget);

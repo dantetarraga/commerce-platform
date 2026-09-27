@@ -1,54 +1,51 @@
-import 'package:chaski/app/purchase_bar/purchase_bar.dart';
+import 'package:chaski/app/purchase_bar/purchase_bar_controller.dart';
+import 'package:chaski/features/auth/auth.dart';
+import 'package:chaski/features/cart/cart.dart';
+import 'package:chaski/features/checkout/checkout.dart';
+import 'package:chaski/features/home/home.dart';
+import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Tres destinos (Cerca · Explorar · Tú) y la barra de compra flotando encima.
-///
-/// No hay pestaña de Pedidos: el pedido en curso vive en la barra de compra, visible en
-/// toda la app; el historial está dentro de "Tú".
-class ScaffoldWithNav extends StatelessWidget {
+/// Cinco accesos: Inicio · Buscar · Pedidos · Bolsa · Tú. La bolsa no es una pestaña
+/// sino la hoja del carrito, con su contador; el pedido en curso marca "Pedidos".
+class ScaffoldWithNav extends ConsumerWidget {
   const ScaffoldWithNav({required this.shell, super.key});
 
   final StatefulNavigationShell shell;
 
-  void _select(int index) {
+  void _select(int branch) {
     // Tocar la pestaña activa vuelve a su pantalla inicial.
-    shell.goBranch(index, initialLocation: index == shell.currentIndex);
+    shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
+  }
+
+  void _openBag(BuildContext context) {
+    final router = GoRouter.of(context);
+    showCartSheet(
+      context,
+      onCheckout: () => router.pushNamed(CheckoutPage.name).ignore(),
+      onExplore: () => router.goNamed(HomePage.name),
+    ).ignore();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(cartControllerProvider).value?.itemCount ?? 0;
+    final order = ref.watch(activeOrderProvider).value;
+    final pulse = ref.watch(purchaseBarControllerProvider.select((view) => view.pulse));
+    final user = ref.watch(authSessionProvider).value;
     return Scaffold(
       body: shell,
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const PurchaseBar(),
-          NavigationBar(
-            selectedIndex: shell.currentIndex,
-            onDestinationSelected: _select,
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.near_me_outlined),
-                selectedIcon: Icon(Icons.near_me_rounded),
-                label: 'Cerca',
-                tooltip: 'Cerca: lo que hay a tu alrededor',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.travel_explore_rounded),
-                selectedIcon: Icon(Icons.manage_search_rounded),
-                label: 'Explorar',
-                tooltip: 'Explorar: busca negocios y productos',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline_rounded),
-                selectedIcon: Icon(Icons.person_rounded),
-                label: 'Tú',
-                tooltip: 'Tú: pedidos, direcciones y ajustes',
-              ),
-            ],
-          ),
-        ],
+      bottomNavigationBar: AppNavigationDock(
+        index: shell.currentIndex,
+        onSelected: _select,
+        bagCount: count,
+        bagPulse: pulse,
+        onBag: () => _openBag(context),
+        liveOrder: order != null && order.isActive,
+        avatar: AppAvatar(imageUrl: user?.avatarUrl, initials: user?.initials, seed: user?.id, size: 28),
       ),
     );
   }

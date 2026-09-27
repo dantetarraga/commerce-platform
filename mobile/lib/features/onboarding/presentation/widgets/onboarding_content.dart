@@ -13,17 +13,17 @@ class OnboardingSlide {
 /// Una historia en tres pasos: descubre, pide, recibe.
 const onboardingSlides = [
   OnboardingSlide(
-    title: 'Tu cuadra tiene más de lo que parece.',
+    title: 'Un barrio entero.\nA un toque.',
     body: 'Picanterías, bodegas, boticas y ese pan que se acaba temprano. Todo a pocos minutos.',
     cta: 'Siguiente',
   ),
   OnboardingSlide(
-    title: 'Lo pides. Alguien de aquí lo prepara.',
+    title: 'Tu antojo tiene\nbuenas manos.',
     body: 'Detrás de cada pedido hay alguien con nombre: la señora del caldo, el panadero de la esquina.',
     cta: 'Siguiente',
   ),
   OnboardingSlide(
-    title: 'Te lo llevamos donde estés.',
+    title: 'La próxima parada:\ntu puerta.',
     body: 'En casa, en la chamba o en la plaza. Tú solo abre la puerta.',
     cta: 'Empezar a pedir',
   ),
@@ -70,7 +70,7 @@ class OnboardingCopy extends StatelessWidget {
           0,
           Semantics(
             header: true,
-            child: Text(slide.title, style: compact ? theme.textTheme.headlineSmall : theme.textTheme.headlineMedium),
+            child: Text(slide.title, style: compact ? theme.textTheme.headlineMedium : theme.textTheme.displaySmall),
           ),
         ),
         const SizedBox(height: AppSpacing.xs),

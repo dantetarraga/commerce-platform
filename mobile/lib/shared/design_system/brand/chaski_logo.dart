@@ -66,12 +66,12 @@ class ChaskiMark extends StatelessWidget {
       dimension: size,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: inverted ? AppColors.blanco : AppColors.cobalto,
+          color: inverted ? AppColors.blanco : AppColors.terracota,
           borderRadius: BorderRadius.circular(r),
         ),
         child: CustomPaint(
           painter: _MarkPainter(
-            thread: inverted ? AppColors.cobalto : AppColors.blanco,
+            thread: inverted ? AppColors.terracota : AppColors.blanco,
           ),
         ),
       ),
@@ -104,7 +104,7 @@ class _MarkPainter extends CustomPainter {
       ..drawCircle(
         Offset(s * 0.70, s * 0.40),
         s * 0.11,
-        Paint()..color = AppColors.lima,
+        Paint()..color = AppColors.hierba,
       );
   }
 

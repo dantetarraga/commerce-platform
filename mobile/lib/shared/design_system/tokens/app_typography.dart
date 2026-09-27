@@ -34,9 +34,9 @@ abstract final class AppTypography {
     );
 
     return TextTheme(
-      displayLarge: d(44, 50, FontWeight.w700, -0.02),
-      displayMedium: d(38, 44, FontWeight.w700, -0.02),
-      displaySmall: d(32, 38, FontWeight.w700, -0.015),
+      displayLarge: d(48, 50, FontWeight.w800, -0.035),
+      displayMedium: d(40, 42, FontWeight.w800, -0.03),
+      displaySmall: d(34, 36, FontWeight.w800, -0.025),
       headlineLarge: d(30, 36, FontWeight.w700, -0.015),
       headlineMedium: d(26, 32, FontWeight.w700, -0.01),
       headlineSmall: d(22, 28, FontWeight.w700, -0.01),

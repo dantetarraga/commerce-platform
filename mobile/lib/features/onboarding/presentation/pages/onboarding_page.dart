@@ -1,8 +1,8 @@
 import 'package:chaski/features/auth/presentation/pages/phone_entry_page.dart';
 import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
 import 'package:chaski/features/onboarding/presentation/providers/onboarding_status.dart';
+import 'package:chaski/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
 import 'package:chaski/features/onboarding/presentation/widgets/onboarding_content.dart';
-import 'package:chaski/features/onboarding/presentation/widgets/street_scene.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,6 +67,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     router.goNamed(PhoneEntryPage.name);
   }
 
+  void _dragScene(DragUpdateDetails details) {
+    if (_saving || !_controller.hasClients) return;
+    _controller.jumpTo((_controller.offset - details.delta.dx).clamp(0.0, _controller.position.maxScrollExtent));
+  }
+
+  void _endSceneDrag(DragEndDetails details) {
+    final velocity = details.primaryVelocity ?? 0;
+    final destination = velocity.abs() > 300 ? (velocity < 0 ? _cameraPage.floor() + 1 : _cameraPage.ceil() - 1) : _cameraPage.round();
+    _goTo(destination.clamp(0, onboardingSlides.length - 1));
+  }
+
   void _goTo(int page) {
     if (_saving) return;
     if (reduceMotionOf(context)) {
@@ -95,9 +106,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   // Contenido y acciones se desplazan juntos en pantallas bajas
                   // o con texto grande.
                   final compact = constraints.maxHeight < 650 || MediaQuery.textScalerOf(context).scale(16) > 20;
-                  final sceneHeight = compact
-                      ? (constraints.maxHeight * 0.3).clamp(150.0, 220.0)
-                      : (constraints.maxHeight * 0.4).clamp(240.0, 360.0);
+                  final sceneHeight = compact ? (constraints.maxHeight * 0.3).clamp(150.0, 220.0) : (constraints.maxHeight * 0.4).clamp(240.0, 360.0);
 
                   return Column(
                     children: [
@@ -107,9 +116,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           height: AppSpacing.minTouch,
                           child: Align(
                             alignment: Alignment.centerRight,
-                            child: _isLast
-                                ? null
-                                : AuthLink(label: 'Saltar', onTap: _saving ? null : _finish),
+                            child: _isLast ? null : AuthLink(label: 'Saltar', onTap: _saving ? null : _finish),
                           ),
                         ),
                       ),
@@ -123,8 +130,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                             offset: const Offset(0, 16),
                             child: AnimatedBuilder(
                               animation: _controller,
-                              builder: (context, _) =>
-                                  StreetScene(page: _cameraPage, pages: onboardingSlides.length, still: reduced),
+                              builder: (context, _) => GestureDetector(
+                                onHorizontalDragUpdate: _dragScene,
+                                onHorizontalDragEnd: _endSceneDrag,
+                                child: CityOnboardingScene(page: _cameraPage, still: reduced),
+                              ),
                             ),
                           ),
                         ),

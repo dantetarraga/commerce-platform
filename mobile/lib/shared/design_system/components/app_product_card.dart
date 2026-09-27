@@ -2,6 +2,8 @@ import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/shared/design_system/components/app_network_image.dart';
 import 'package:chaski/shared/design_system/components/app_price.dart';
+import 'package:chaski/shared/design_system/components/app_toast.dart';
+import 'package:chaski/shared/design_system/components/fly_to_purchase_bar.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/app_typography.dart';
@@ -65,7 +67,7 @@ class AppProductCard extends StatelessWidget {
   final ProductCardData data;
   final VoidCallback? onTap;
   final AppProductCardVariant variant;
-  final VoidCallback? onQuickAdd;
+  final Future<bool> Function()? onQuickAdd;
   final double? width;
   final Object? heroTag;
 
@@ -101,7 +103,7 @@ class AppProductCard extends StatelessWidget {
   }
 }
 
-class _Image extends StatelessWidget {
+class _Image extends StatefulWidget {
   const _Image({required this.card, required this.width, required this.height});
 
   final AppProductCard card;
@@ -109,20 +111,47 @@ class _Image extends StatelessWidget {
   final double height;
 
   @override
+  State<_Image> createState() => _ImageState();
+}
+
+class _ImageState extends State<_Image> {
+  final GlobalKey _imageKey = GlobalKey();
+  bool _adding = false;
+
+  Future<void> _add() async {
+    if (_adding) return;
+    setState(() => _adding = true);
+    final from = globalRectOf(_imageKey);
+    try {
+      final added = await widget.card.onQuickAdd!();
+      if (added && mounted && from != null) await flyToPurchaseBar(context, from: from, imageUrl: widget.card.data.imageUrl);
+    } on Exception {
+      if (mounted) AppToast.show(context, 'No pudimos agregar el producto. Inténtalo otra vez.', kind: AppToastKind.error);
+    } finally {
+      if (mounted) setState(() => _adding = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final image = AppNetworkImage(
-      url: card.data.imageUrl,
-      width: width,
-      height: height,
-      borderRadius: const BorderRadius.all(AppRadius.lg),
+      key: _imageKey,
+      url: widget.card.data.imageUrl,
+      width: widget.width,
+      height: widget.height,
+      borderRadius: AppRadius.card,
       fallbackIcon: Icons.fastfood_rounded,
     );
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        if (card.heroTag == null) image else Hero(tag: card.heroTag!, child: image),
-        if (card.onQuickAdd != null && card.data.isAvailable)
-          Positioned(right: -6, bottom: -6, child: QuickAddButton(onPressed: card.onQuickAdd!)),
+        if (widget.card.heroTag == null) image else Hero(tag: widget.card.heroTag!, child: image),
+        if (widget.card.onQuickAdd != null && widget.card.data.isAvailable)
+          Positioned(
+            right: -6,
+            bottom: -6,
+            child: QuickAddButton(onPressed: _add, loading: _adding),
+          ),
       ],
     );
   }
@@ -137,8 +166,13 @@ class _RowBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final data = card.data;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : const Color(0xFFEBE7DC),
+        borderRadius: AppRadius.card,
+      ),
       child: Row(
         children: [
           Expanded(
@@ -152,12 +186,13 @@ class _RowBody extends StatelessWidget {
                     Text(data.description!, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall),
                   ],
                   const SizedBox(height: AppSpacing.xs),
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       AppPrice(
                         data.price,
                         variant: data.fromPrice ? AppPriceVariant.from : AppPriceVariant.regular,
-                        size: 15,
+                        size: 18,
                       ),
                       if (!data.isAvailable) ...[
                         const SizedBox(width: AppSpacing.xs),
@@ -170,7 +205,7 @@ class _RowBody extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          _Image(card: card, width: 84, height: 84),
+          _Image(card: card, width: 104, height: 116),
         ],
       ),
     );
@@ -190,23 +225,20 @@ class _TileBody extends StatelessWidget {
     final w = card.width ?? (featured ? 200.0 : 150.0);
     return SizedBox(
       width: w,
-      child: ExcludeSemantics(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _Image(card: card, width: w, height: featured ? w * 0.75 : w),
-            const SizedBox(height: AppSpacing.xs),
-            Text(data.name, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
-            if (data.subtitle != null)
-              Text(data.subtitle!, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 2),
-            Text(
-              '${data.fromPrice ? 'Desde ' : ''}${Formatters.money(data.price)}',
-              style: AppTypography.price(context, size: 15),
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _Image(card: card, width: w, height: featured ? w * 0.75 : w),
+          const SizedBox(height: AppSpacing.xs),
+          Text(data.name, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
+          if (data.subtitle != null) Text(data.subtitle!, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 2),
+          Text(
+            '${data.fromPrice ? 'Desde ' : ''}${Formatters.money(data.price)}',
+            style: AppTypography.price(context, size: 15),
+          ),
+        ],
       ),
     );
   }
@@ -214,7 +246,9 @@ class _TileBody extends StatelessWidget {
 
 /// Botón "+" que agrega directo. Responde con un pulso y vibración leve.
 class QuickAddButton extends StatefulWidget {
-  const QuickAddButton({required this.onPressed, super.key});
+  const QuickAddButton({required this.onPressed, this.loading = false, super.key});
+
+  final bool loading;
 
   final VoidCallback onPressed;
 
@@ -223,7 +257,10 @@ class QuickAddButton extends StatefulWidget {
 }
 
 class _QuickAddButtonState extends State<QuickAddButton> with SingleTickerProviderStateMixin {
-  late final _pulse = AnimationController(vsync: this, duration: AppMotion.base);
+  late final _pulse = AnimationController(
+    vsync: this,
+    duration: AppMotion.base,
+  );
 
   @override
   void dispose() {
@@ -243,23 +280,41 @@ class _QuickAddButtonState extends State<QuickAddButton> with SingleTickerProvid
     return Semantics(
       button: true,
       label: 'Agregar a la bolsa',
-      child: SizedBox.square(
-        dimension: AppSpacing.minTouch,
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _pulse,
-            builder: (context, child) {
-              final t = _pulse.value;
-              final scale = 1 + 0.18 * (t < 0.5 ? t * 2 : (1 - t) * 2);
-              return Transform.scale(scale: scale, child: child);
-            },
-            child: Material(
-              color: scheme.primary,
-              shape: CircleBorder(side: BorderSide(color: Theme.of(context).scaffoldBackgroundColor, width: 3)),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: _tap,
-                child: SizedBox.square(dimension: 34, child: Icon(Icons.add_rounded, color: scheme.onPrimary, size: 21)),
+      onTap: widget.loading ? null : _tap,
+      excludeSemantics: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: widget.loading ? null : _tap,
+          excludeFromSemantics: true,
+          child: SizedBox.square(
+            dimension: AppSpacing.minTouch,
+            child: Center(
+              child: AnimatedBuilder(
+                animation: _pulse,
+                builder: (context, child) {
+                  final t = _pulse.value;
+                  final scale = 1 + 0.18 * (t < 0.5 ? t * 2 : (1 - t) * 2);
+                  return Transform.scale(scale: scale, child: child);
+                },
+                child: Material(
+                  color: scheme.primary,
+                  shape: CircleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      width: 3,
+                    ),
+                  ),
+                  child: SizedBox.square(
+                    dimension: 34,
+                    child: Icon(
+                      widget.loading ? Icons.more_horiz_rounded : Icons.add_rounded,
+                      color: scheme.onPrimary,
+                      size: 21,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -276,10 +331,18 @@ class AppProductRowSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final base = context.chaski.shimmerBase;
-    Widget box(double? w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) =>
-        Container(width: w, height: h, decoration: BoxDecoration(color: base, borderRadius: r));
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
+    Widget box(double? w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) => Container(
+      width: w,
+      height: h,
+      decoration: BoxDecoration(color: base, borderRadius: r),
+    );
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
+      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : const Color(0xFFEBE7DC),
+        borderRadius: AppRadius.card,
+      ),
       child: Row(
         children: [
           Expanded(

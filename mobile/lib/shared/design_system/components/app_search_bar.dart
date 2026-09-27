@@ -79,12 +79,18 @@ class _AppSearchBarState extends State<AppSearchBar> {
     final hero = widget.variant == AppSearchBarVariant.hero;
     final hint = widget.hints[_hintIndex % widget.hints.length];
     final hasText = widget.controller?.text.isNotEmpty ?? false;
-    final hintStyle = theme.textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant);
+    // En portada (botón que abre Explorar) el buscador va relleno de terracota.
+    final filled = hero && widget.controller == null;
+    final fg = filled ? scheme.onPrimary : scheme.onSurface;
+    final hintStyle = theme.textTheme.bodyLarge?.copyWith(
+      color: filled ? scheme.onPrimary : scheme.onSurfaceVariant,
+      fontWeight: filled ? FontWeight.w600 : null,
+    );
 
     final focused = widget.focusNode?.hasFocus ?? false;
     final decoration = BoxDecoration(
-      color: focused ? scheme.surface : context.chaski.raised,
-      borderRadius: AppRadius.button,
+      color: filled ? scheme.primary : (focused ? scheme.surface : context.chaski.raised),
+      borderRadius: filled ? AppRadius.tileExit : AppRadius.button,
       border: Border.all(color: focused ? scheme.primary : Colors.transparent, width: 2),
     );
 
@@ -125,12 +131,12 @@ class _AppSearchBarState extends State<AppSearchBar> {
           );
 
     final bar = Container(
-      height: hero ? 50 : 48,
+      height: hero ? 54 : 48,
       decoration: decoration,
       padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.xxs),
       child: Row(
         children: [
-          Icon(Icons.search_rounded, color: scheme.onSurface),
+          Icon(Icons.search_rounded, color: fg),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: field),
           if (hasText)
@@ -141,6 +147,13 @@ class _AppSearchBarState extends State<AppSearchBar> {
                 widget.controller!.clear();
                 widget.onClear?.call();
               },
+            )
+          else if (filled)
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.button),
+              child: Icon(Icons.tune_rounded, size: 20, color: scheme.primary),
             )
           else
             const SizedBox(width: AppSpacing.sm),
@@ -159,7 +172,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
           color: Colors.transparent,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: hero ? AppRadius.card : const BorderRadius.all(AppRadius.lg),
+            borderRadius: hero ? AppRadius.tileExit : const BorderRadius.all(AppRadius.lg),
             child: bar,
           ),
         ),

@@ -92,6 +92,11 @@ class _FadeSlideInState extends State<FadeSlideIn> with SingleTickerProviderStat
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    if (reduceMotionOf(context)) {
+      _started = true;
+      _controller.value = 1;
+      return;
+    }
     if (_started) return;
     _started = true;
     if (!widget.enabled || reduceMotionOf(context)) {
@@ -173,7 +178,7 @@ class _PressableScaleState extends State<PressableScale> {
       onPointerCancel: (_) => _set(false),
       child: AnimatedScale(
         scale: _pressed && !reduceMotionOf(context) ? widget.scale : 1,
-        duration: _pressed ? const Duration(milliseconds: 90) : AppMotion.quick,
+        duration: reduceMotionOf(context) ? Duration.zero : (_pressed ? AppMotion.tap : AppMotion.quick),
         curve: Curves.easeOut,
         child: widget.child,
       ),

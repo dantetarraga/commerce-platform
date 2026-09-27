@@ -97,7 +97,7 @@ class _Tracking extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final height = MediaQuery.sizeOf(context).height;
-    final mapHeight = height * 0.5;
+    final mapHeight = height * 0.56;
 
     return Scaffold(
       body: Stack(
@@ -109,6 +109,8 @@ class _Tracking extends StatelessWidget {
             height: mapHeight,
             child: RouteMap(
               progress: _routeProgress,
+              storeLabel: order.store.name,
+              destinationLabel: order.addressTitle,
               showCourier: order.courier != null && order.reached(OrderStatus.courierAssigned),
             ),
           ),
@@ -135,8 +137,7 @@ class _Tracking extends StatelessWidget {
             ),
           ),
           DraggableScrollableSheet(
-            initialChildSize: 0.56,
-            minChildSize: 0.56,
+            minChildSize: 0.50,
             maxChildSize: 0.94,
             builder: (context, controller) => DecoratedBox(
               decoration: BoxDecoration(borderRadius: AppRadius.sheet, boxShadow: AppShadows.raised(theme.brightness)),
@@ -193,7 +194,7 @@ class _Tracking extends StatelessWidget {
       OrderStatus.confirmed => 'Confirmado por $owner',
       OrderStatus.preparing => order.reached(OrderStatus.ready) ? 'Preparado por $owner' : '$owner lo está preparando',
       OrderStatus.ready => 'Listo para salir',
-      OrderStatus.courierAssigned => rider == null ? 'Repartidor asignado' : '$rider lo recogió',
+      OrderStatus.courierAssigned => rider == null ? 'Repartidor asignado' : '$rider va a recogerlo',
       OrderStatus.onTheWay => rider == null ? 'En camino' : '$rider va en camino',
       OrderStatus.delivered => 'Entregado',
       OrderStatus.cancelled => 'Cancelado',
@@ -207,8 +208,7 @@ class _Tracking extends StatelessWidget {
             trailing: switch (order.timeOf(s)) {
               final at? => clock12(at),
               // Solo la entrega tiene hora estimada.
-              null when s == OrderStatus.delivered && order.estimatedArrival != null && order.isActive =>
-                '~${clock12(order.estimatedArrival!)}',
+              null when s == OrderStatus.delivered && order.estimatedArrival != null && order.isActive => '~${clock12(order.estimatedArrival!)}',
               null => null,
             },
             knot: order.status == s && !s.isFinal
@@ -420,8 +420,7 @@ class _Summary extends StatelessWidget {
             ),
           const SizedBox(height: AppSpacing.sm),
           _kv('Envío', Formatters.money(order.deliveryFee), muted),
-          if (!order.discount.isZero)
-            _kv('Descuento', '− ${Formatters.money(order.discount)}', muted?.copyWith(color: context.chaski.success)),
+          if (!order.discount.isZero) _kv('Descuento', '− ${Formatters.money(order.discount)}', muted?.copyWith(color: context.chaski.success)),
           if (!order.tip.isZero) _kv('Propina', Formatters.money(order.tip), muted),
           _kv('Total', Formatters.money(order.total), AppTypography.price(context, size: 16)),
           const SizedBox(height: AppSpacing.sm),

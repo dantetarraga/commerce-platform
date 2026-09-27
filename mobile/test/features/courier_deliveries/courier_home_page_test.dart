@@ -1,11 +1,25 @@
 import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
+import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rive/rive.dart' as rive;
 
 import '../../helpers/app_harness.dart';
 
 void main() {
   const courier = 'usr_courier_luis';
+
+  setUpAll(() async {
+    expect(await rive.RiveNative.init(), isTrue);
+    for (final (family, asset) in [
+      ('Jakarta', 'assets/fonts/PlusJakartaSans-Variable.ttf'),
+      ('Outfit', 'assets/fonts/Outfit-Variable.ttf'),
+      ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
+    ]) {
+      await (FontLoader(family)..addFont(rootBundle.load(asset))).load();
+    }
+  });
 
   testWidgets('desconectado no ve pedidos; al conectarse suenan los listos', (tester) async {
     final alarm = RecordingAlarm();
@@ -46,6 +60,17 @@ void main() {
     await tester.tap(find.text('Confirmar entrega'));
     await settle(tester);
     expect(find.byType(ActiveDeliveryPage), findsNothing);
+    expect(find.text('Entregado. ¡Buen trabajo!'), findsOneWidget);
+    expect(find.byType(AppRiveSuccess), findsOneWidget);
+    for (var i = 0; i < 50 && find.byType(rive.RiveArtboardWidget).evaluate().isEmpty; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await tester.pump();
+    }
+    expect(find.byType(rive.RiveArtboardWidget), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 500));
+    if (const bool.fromEnvironment('CAPTURE_RIVE')) {
+      await expectLater(find.byType(Overlay).first, matchesGoldenFile('../../../../docs/ui/rive/socios_entrega.png'));
+    }
     await tester.scrollUntilVisible(find.text('Tu jornada de hoy'), 350, scrollable: find.byType(Scrollable).first);
     await settle(tester);
     expect(find.textContaining('${deliveredBefore + 1} entrega'), findsOneWidget);

@@ -20,14 +20,13 @@ Future<void> showCartSheet(BuildContext context, {required VoidCallback onChecko
 }
 
 /// Pregunta antes de reemplazar una bolsa de otro negocio. `true` = vaciar.
-Future<bool> confirmReplaceCart(BuildContext context, {required CartStore current, required CartStore incoming}) =>
-    showAppConfirmDialog(
-      context,
-      title: '¿Empezamos otra bolsa?',
-      message: 'Tu bolsa tiene productos de ${current.name}. Para pedir en ${incoming.name} la vaciamos primero.',
-      confirmLabel: 'Vaciar y agregar',
-      cancelLabel: 'Mantener mi bolsa',
-    );
+Future<bool> confirmReplaceCart(BuildContext context, {required CartStore current, required CartStore incoming}) => showAppConfirmDialog(
+  context,
+  title: '¿Empezamos otra bolsa?',
+  message: 'Tu bolsa tiene productos de ${current.name}. Para pedir en ${incoming.name} la vaciamos primero.',
+  confirmLabel: 'Vaciar y agregar',
+  cancelLabel: 'Mantener mi bolsa',
+);
 
 /// Hoja de texto corto (nota del negocio o de un producto). Devuelve el texto
 /// o null si se cierra sin guardar.
@@ -96,7 +95,12 @@ class _CartSheetState extends ConsumerState<CartSheet> {
       final silent = _dismissed.remove(old.id);
       list.removeItem(
         i,
-        (context, animation) => silent ? const SizedBox.shrink() : _Appear(animation: animation, child: IgnorePointer(child: _CartLineTile(line: old))),
+        (context, animation) => silent
+            ? const SizedBox.shrink()
+            : _Appear(
+                animation: animation,
+                child: IgnorePointer(child: _CartLineTile(line: old)),
+              ),
         duration: silent ? Duration.zero : _duration,
       );
     }
@@ -167,7 +171,9 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Semantics(header: true, child: Text('Tu bolsa', style: theme.textTheme.headlineSmall)),
+                    Text('TU PRÓXIMA PARADA', style: AppTypography.eyebrow(context)),
+                    const SizedBox(height: 6),
+                    Semantics(header: true, child: Text('Tu bolsa', style: theme.textTheme.headlineLarge)),
                     if (store != null)
                       Text(
                         '${store.name} · ${Formatters.eta(store.etaMinutes)}',
@@ -209,13 +215,18 @@ class _CartSheetState extends ConsumerState<CartSheet> {
                       curve: AppMotion.arrive,
                       child: cart.reachesMinimum
                           ? const SizedBox(width: double.infinity)
-                          : Padding(padding: const EdgeInsets.only(bottom: AppSpacing.md), child: _MinimumStrip(cart: cart)),
+                          : Padding(
+                              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                              child: _MinimumStrip(cart: cart),
+                            ),
                     ),
                     const _CouponRow(),
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
-                        Expanded(child: Text('Subtotal', style: theme.textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant))),
+                        Expanded(
+                          child: Text('Subtotal', style: theme.textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant)),
+                        ),
                         AppPrice(cart.subtotal, size: 18),
                       ],
                     ),
@@ -253,9 +264,7 @@ class _CartSheetState extends ConsumerState<CartSheet> {
           padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.md + MediaQuery.paddingOf(context).bottom),
           child: AppButton(
             label: cart.canCheckout ? 'Continuar' : 'Agrega ${Formatters.money(cart.missingForMinimum)} más',
-            trailing: cart.canCheckout
-                ? Text(Formatters.money(cart.subtotal), style: const TextStyle(fontFeatures: AppTypography.tabularFigures))
-                : null,
+            trailing: cart.canCheckout ? Text(Formatters.money(cart.subtotal), style: const TextStyle(fontFeatures: AppTypography.tabularFigures)) : null,
             onPressed: cart.canCheckout
                 ? () {
                     Navigator.of(context).pop();
@@ -355,8 +364,7 @@ class _CartLineTile extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(line.name, style: theme.textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      if (line.description.isNotEmpty)
-                        Text(line.description, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+                      if (line.description.isNotEmpty) Text(line.description, style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
                       if (line.notes.isNotEmpty)
                         Text(
                           '“${line.notes}”',
@@ -470,7 +478,12 @@ class _StoreNoteRow extends StatelessWidget {
                         ? Text.rich(
                             TextSpan(
                               text: 'Nota para el negocio',
-                              children: [TextSpan(text: ' (opcional)', style: TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w500))],
+                              children: [
+                                TextSpan(
+                                  text: ' (opcional)',
+                                  style: TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+                                ),
+                              ],
                             ),
                             style: theme.textTheme.labelLarge,
                           )
@@ -513,7 +526,11 @@ class _MinimumStrip extends StatelessWidget {
                 Container(
                   width: 10,
                   height: 10,
-                  decoration: BoxDecoration(color: chaski.accent, shape: BoxShape.circle, border: Border.all(color: chaski.onAccent, width: 1.5)),
+                  decoration: BoxDecoration(
+                    color: chaski.accent,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: chaski.onAccent, width: 1.5),
+                  ),
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
@@ -543,8 +560,8 @@ class _MinimumStrip extends StatelessWidget {
                 builder: (context, p, _) => LinearProgressIndicator(
                   value: p,
                   minHeight: 5,
-                  color: chaski.onAccent,
-                  backgroundColor: chaski.accent.withValues(alpha: 0.45),
+                  color: chaski.accent,
+                  backgroundColor: chaski.accent.withValues(alpha: 0.2),
                 ),
               ),
             ),
@@ -608,7 +625,9 @@ class _CouponRowState extends ConsumerState<_CouponRow> {
             children: [
               Icon(Icons.local_offer_rounded, color: chaski.onAccent, size: 18),
               const SizedBox(width: AppSpacing.xs),
-              Expanded(child: Text('${coupon.code} · ${coupon.label}', style: theme.textTheme.labelLarge?.copyWith(color: chaski.onAccent))),
+              Expanded(
+                child: Text('${coupon.code} · ${coupon.label}', style: theme.textTheme.labelLarge?.copyWith(color: chaski.onAccent)),
+              ),
               IconButton(
                 tooltip: 'Quitar cupón',
                 color: chaski.onAccent,

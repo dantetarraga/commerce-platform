@@ -55,6 +55,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> {
       context,
       'Entregado. ¡Buen trabajo!',
       kind: AppToastKind.success,
+      leading: const AppRiveSuccess(size: 40),
     );
     Navigator.of(context).pop();
   }

@@ -66,8 +66,7 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
     final target = missingId == null ? null : _groupKeys[missingId]?.currentContext;
     HapticFeedback.mediumImpact().ignore();
     if (target != null) {
-      Scrollable.ensureVisible(target, duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move, curve: AppMotion.arrive)
-          .ignore();
+      Scrollable.ensureVisible(target, duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move, curve: AppMotion.arrive).ignore();
     }
   }
 
@@ -130,7 +129,9 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Semantics(header: true, child: Text(product.name, style: theme.textTheme.headlineSmall)),
+                  Text('ARMA TU PEDIDO', style: AppTypography.eyebrow(context)),
+                  const SizedBox(height: 8),
+                  Semantics(header: true, child: Text(product.name, style: theme.textTheme.headlineLarge)),
                   const SizedBox(height: AppSpacing.xxs),
                   Text(product.storeName, style: theme.textTheme.bodySmall),
                   if (product.description != null) ...[
@@ -139,7 +140,7 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
                   ],
                   const SizedBox(height: AppSpacing.sm),
                   // El dominio aún no trae precio anterior: cuando llegue, AppPriceVariant.discount.
-                  AppPrice(selection.unitPrice, size: 22),
+                  AppPrice(selection.unitPrice, size: 28),
                   if (!product.isAvailable) ...[
                     const SizedBox(height: AppSpacing.xs),
                     const AppBadge(AppBadgeStatus.closed, label: 'Agotado por hoy'),
@@ -226,8 +227,7 @@ class _AddBar extends StatelessWidget {
         color: theme.colorScheme.surface,
         // La sombra suave, hacia arriba.
         boxShadow: [
-          for (final s in AppShadows.soft(theme.brightness))
-            BoxShadow(color: s.color, blurRadius: s.blurRadius, offset: Offset(0, -s.offset.dy)),
+          for (final s in AppShadows.soft(theme.brightness)) BoxShadow(color: s.color, blurRadius: s.blurRadius, offset: Offset(0, -s.offset.dy)),
         ],
       ),
       child: SafeArea(
@@ -245,23 +245,39 @@ class _AddBar extends StatelessWidget {
                     ? const SizedBox(width: double.infinity)
                     : Padding(
                         padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                        child: SizedBox(width: double.infinity, child: Text(hint, style: theme.textTheme.bodySmall)),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Text(hint, style: theme.textTheme.bodySmall),
+                        ),
                       ),
               ),
-              Row(
-                children: [
-                  QuantityStepper(quantity: selection.quantity, onChanged: onQuantityChanged, enabled: canTry),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: _AddButton(
-                      total: Formatters.money(selection.total),
-                      enabled: canTry,
-                      valid: selection.isValid,
-                      loading: adding,
-                      onAdd: onAdd,
-                    ),
-                  ),
-                ],
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final quantity = QuantityStepper(quantity: selection.quantity, onChanged: onQuantityChanged, enabled: canTry);
+                  final add = _AddButton(total: Formatters.money(selection.total), enabled: canTry, valid: selection.isValid, loading: adding, onAdd: onAdd);
+                  if (constraints.maxWidth < 340 && MediaQuery.textScalerOf(context).scale(16) > 19) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(child: Text('Cantidad', style: theme.textTheme.labelLarge)),
+                            quantity,
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        add,
+                      ],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      quantity,
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(child: add),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -301,6 +317,7 @@ class _AddButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       label: 'Agregar a la bolsa, $total',
+      onTap: enabled && !loading ? onAdd : null,
       excludeSemantics: true,
       child: Material(
         color: bg,

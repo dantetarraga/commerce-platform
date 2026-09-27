@@ -1,5 +1,6 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
+import 'package:chaski/shared/design_system/illustrations/chaski_trail.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
@@ -37,9 +38,8 @@ final class PurchaseBarOrder extends PurchaseBarState {
   final bool delivered;
 }
 
-/// El elemento vivo de Chaski: una píldora oscura sobre la barra que cambia de
-/// forma según el contexto y solo existe cuando hay algo que hacer. Es oscura
-/// (tinta) para distinguirse del resto de la pantalla; la acción va en cobalto.
+/// Bolsa flotante en terracota con acción blanca. Cambia de tamaño según su
+/// contenido y aparece cuando hay productos o un pedido activo.
 ///
 /// Incrementar [pulse] hace "saltar" el contador (al recibir un producto).
 class AppPurchaseBar extends StatefulWidget {
@@ -86,16 +86,17 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
     final state = widget.state;
     final visible = state is! PurchaseBarHidden;
     final delivered = state is PurchaseBarOrder && state.delivered;
-    final bg = scheme.inverseSurface;
-    final fg = scheme.onInverseSurface;
-    final actionBg = delivered ? chaski.success : scheme.primary;
-    final actionFg = delivered ? scheme.onTertiary : scheme.onPrimary;
+    const bg = AppColors.terracota;
+    const fg = AppColors.blanco;
+    final actionBg = delivered ? chaski.success : AppColors.blanco;
+    final actionFg = delivered ? scheme.onTertiary : AppColors.terracota;
     final (title, subtitle, action) = _texts(state);
     final reduce = reduceMotionOf(context);
     final count = state is PurchaseBarCart ? state.count : null;
 
     final pill = Semantics(
       button: true,
+      onTap: widget.onTap,
       liveRegion: true,
       label: [
         if (count != null) '$count ${count == 1 ? 'producto' : 'productos'}',
@@ -107,12 +108,12 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
       child: PressableScale(
         child: Material(
           color: bg,
-          borderRadius: const BorderRadius.all(AppRadius.lg),
+          borderRadius: AppRadius.card,
           child: InkWell(
             onTap: widget.onTap,
-            borderRadius: const BorderRadius.all(AppRadius.lg),
+            borderRadius: AppRadius.card,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 56),
+              constraints: BoxConstraints(minHeight: count != null && count > 2 ? 72 : 60),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
                 child: AnimatedSwitcher(
@@ -128,10 +129,7 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
                   child: Row(
                     key: ValueKey('$title$subtitle$action$count'),
                     children: [
-                      if (count != null)
-                        _Count(pulse: _pulse, count: count, bg: fg, fg: bg)
-                      else
-                        _Knot(pulse: _pulse, ring: fg),
+                      if (count != null) _Count(pulse: _pulse, count: count, bg: fg, fg: bg) else _Knot(pulse: _pulse, ring: fg),
                       const SizedBox(width: AppSpacing.sm),
                       Expanded(
                         child: Column(
@@ -152,15 +150,18 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
                                 subtitle,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(color: fg.withValues(alpha: 0.7)),
+                                style: theme.textTheme.bodySmall?.copyWith(color: fg.withValues(alpha: 0.92)),
                               ),
                           ],
                         ),
                       ),
                       const SizedBox(width: AppSpacing.xs),
+                      if (MediaQuery.sizeOf(context).width > 360 && MediaQuery.textScalerOf(context).scale(16) < 20)
+                        const SizedBox(width: 32, height: 25, child: ChaskiTrail(strokeWidth: 2)),
+                      const SizedBox(width: AppSpacing.xs),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 10),
-                        decoration: BoxDecoration(color: actionBg, borderRadius: AppRadius.tile),
+                        decoration: BoxDecoration(color: actionBg, borderRadius: AppRadius.button),
                         child: Text(action, style: theme.textTheme.labelLarge?.copyWith(color: actionFg, fontSize: 14)),
                       ),
                     ],
@@ -173,13 +174,20 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
       ),
     );
 
+    final content = visible
+        ? Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+            child: pill,
+          )
+        : const SizedBox(width: double.infinity);
+    // Sin movimiento, cambiar el tamaño directamente evita iniciar un ticker
+    // de duración cero durante el layout de la barra inferior.
+    if (reduce) return content;
     return AnimatedSize(
-      duration: reduce ? Duration.zero : AppMotion.move,
+      duration: AppMotion.move,
       curve: AppMotion.arrive,
       alignment: Alignment.bottomCenter,
-      child: visible
-          ? Padding(padding: const EdgeInsets.only(bottom: AppSpacing.xs), child: pill)
-          : const SizedBox(width: double.infinity),
+      child: content,
     );
   }
 }

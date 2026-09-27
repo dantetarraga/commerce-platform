@@ -17,6 +17,8 @@ void main() {
     expect(alarm.awake, isTrue);
     expect(find.text('“Sin ají, por favor”'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('Aceptar'));
+    await settle(tester);
     await tester.tap(find.text('Aceptar'));
     await settle(tester);
     await tester.tap(find.text('30 min'));
@@ -32,6 +34,8 @@ void main() {
 
   testWidgets('rechazar exige un motivo y avisa al cliente', (tester) async {
     final container = await pumpPartner(tester, signedInAs: merchant);
+    await tester.ensureVisible(find.text('Rechazar'));
+    await settle(tester);
     await tester.tap(find.text('Rechazar'));
     await settle(tester);
 

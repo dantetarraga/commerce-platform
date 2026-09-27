@@ -106,7 +106,7 @@ class ProfilePage extends ConsumerWidget {
                   icon: Icons.shopping_bag_outlined,
                   title: 'Mis pedidos',
                   trailing: activeCount == 0 ? null : _LimeTag('$activeCount EN CURSO'),
-                  onTap: () => context.pushNamed(OrdersPage.name),
+                  onTap: () => context.goNamed(OrdersPage.name),
                 ),
                 _Row(
                   icon: Icons.place_outlined,
@@ -117,7 +117,7 @@ class ProfilePage extends ConsumerWidget {
                 _Row(
                   icon: Icons.credit_card_rounded,
                   title: 'Pagos',
-                  subtitle: 'Yape, Plin, efectivo o tarjeta al recibir',
+                  subtitle: 'Yape, Plin o efectivo al recibir',
                   onTap: () => AppToast.show(context, 'Eliges cómo pagar en cada pedido. Recordamos el último.'),
                 ),
                 _Row(

@@ -11,7 +11,8 @@ import 'package:flutter/material.dart';
 class PromotionsCarousel extends StatefulWidget {
   const PromotionsCarousel({required this.promotions, required this.onTap, super.key});
 
-  static const height = 150.0;
+  static const height = 260.0;
+  static double heightOf(BuildContext context) => 88 + MediaQuery.textScalerOf(context).scale(height - 88);
   static const viewportFraction = 0.88;
 
   /// Espacio entre banners.
@@ -46,7 +47,7 @@ class _PromotionsCarouselState extends State<PromotionsCarousel> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: PromotionsCarousel._leading),
           child: SizedBox(
-            height: PromotionsCarousel.height,
+            height: PromotionsCarousel.heightOf(context),
             child: PageView.builder(
               controller: _controller,
               // Alineado al margen (no centrado); sin recortar para que el
@@ -57,14 +58,17 @@ class _PromotionsCarouselState extends State<PromotionsCarousel> {
               onPageChanged: (page) => setState(() => _page = page),
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: PromotionsCarousel._gap / 2),
-                child: _PromotionBanner(promotion: promotions[index], onTap: () => widget.onTap(promotions[index])),
+                child: _PromotionBanner(promotion: promotions[index], alternate: index.isOdd, onTap: () => widget.onTap(promotions[index])),
               ),
             ),
           ),
         ),
         if (promotions.length > 1) ...[
           const SizedBox(height: AppSpacing.xs),
-          _Dots(count: promotions.length, current: _page),
+          Semantics(
+            label: 'Promoción ${(_page + 1).clamp(1, promotions.length)} de ${promotions.length}',
+            child: _Dots(count: promotions.length, current: _page),
+          ),
         ],
       ],
     );
@@ -103,73 +107,91 @@ class _Dots extends StatelessWidget {
 }
 
 class _PromotionBanner extends StatelessWidget {
-  const _PromotionBanner({required this.promotion, required this.onTap});
+  const _PromotionBanner({required this.promotion, required this.onTap, required this.alternate});
 
   final Promotion promotion;
   final VoidCallback onTap;
+  final bool alternate;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
-    return PressableScale(
-      child: ClipRRect(
-        borderRadius: AppRadius.card,
+    final background = alternate ? AppColors.hierba : AppColors.terracota700;
+    const foreground = AppColors.blanco;
+    return Semantics(
+      button: true,
+      label: [
+        promotion.title,
+        if (promotion.subtitle != null) promotion.subtitle!,
+        if (promotion.couponCode != null) 'Código ${promotion.couponCode}',
+      ].join('. '),
+      onTap: onTap,
+      excludeSemantics: true,
+      child: PressableScale(
         child: Material(
+          color: background,
+          borderRadius: AppRadius.card,
+          clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
-            child: Stack(
-              fit: StackFit.expand,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AppNetworkImage(url: promotion.imageUrl),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [chaski.scrim, chaski.scrim.withValues(alpha: 0)],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
+                SizedBox(
+                  height: 88,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      SizedBox(
-                        width: 190,
-                        child: Text(
-                          promotion.title,
-                          style: theme.textTheme.titleLarge?.copyWith(color: chaski.onPhoto),
+                      AppNetworkImage(url: promotion.imageUrl),
+                      Positioned(
+                        left: 14,
+                        top: 14,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          decoration: const BoxDecoration(color: AppColors.blanco, borderRadius: AppRadius.button),
+                          child: Text('BUENA OPORTUNIDAD', style: theme.textTheme.labelSmall?.copyWith(color: AppColors.terracota700, letterSpacing: 0.5)),
                         ),
                       ),
-                      if (promotion.subtitle != null)
-                        SizedBox(
-                          width: 190,
-                          child: Text(
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          promotion.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleLarge?.copyWith(color: foreground, height: 1.12),
+                        ),
+                        if (promotion.subtitle != null) ...[
+                          const SizedBox(height: 4),
+                          Text(
                             promotion.subtitle!,
                             maxLines: 2,
-                            style: theme.textTheme.bodySmall?.copyWith(color: chaski.onPhoto.withValues(alpha: 0.8)),
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(color: foreground),
                           ),
-                        ),
-                      if (promotion.couponCode != null) ...[
-                        const SizedBox(height: AppSpacing.xs),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: chaski.accent,
-                            borderRadius: const BorderRadius.all(AppRadius.sm),
-                          ),
-                          child: Text(
-                            promotion.couponCode!,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: chaski.onAccent,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1,
+                        ],
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                promotion.couponCode == null ? 'Conocer oferta' : 'Código: ${promotion.couponCode}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelLarge?.copyWith(color: foreground),
+                              ),
                             ),
-                          ),
+                            const Icon(Icons.arrow_forward_rounded, size: 20, color: foreground),
+                          ],
                         ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ],
@@ -192,7 +214,7 @@ class PromotionsCarouselSkeleton extends StatelessWidget {
       final page = (constraints.maxWidth - PromotionsCarousel._leading * 2) * PromotionsCarousel.viewportFraction;
       final banner = page - PromotionsCarousel._gap;
       return SizedBox(
-        height: PromotionsCarousel.height + AppSpacing.xs + 6,
+        height: PromotionsCarousel.heightOf(context) + AppSpacing.xs + 6,
         child: ClipRect(
           child: OverflowBox(
             alignment: Alignment.topLeft,
@@ -201,9 +223,9 @@ class PromotionsCarouselSkeleton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(width: AppSpacing.gutter),
-                SkeletonBox(width: banner, height: PromotionsCarousel.height, borderRadius: AppRadius.card),
+                SkeletonBox(width: banner, height: PromotionsCarousel.heightOf(context), borderRadius: AppRadius.card),
                 const SizedBox(width: PromotionsCarousel._gap),
-                SkeletonBox(width: banner, height: PromotionsCarousel.height, borderRadius: AppRadius.card),
+                SkeletonBox(width: banner, height: PromotionsCarousel.heightOf(context), borderRadius: AppRadius.card),
               ],
             ),
           ),

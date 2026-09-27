@@ -89,7 +89,7 @@ class AppButton extends StatelessWidget {
   double get _height => switch (size) {
     AppButtonSize.lg => 52,
     AppButtonSize.md => 48,
-    AppButtonSize.sm => 40,
+    AppButtonSize.sm => 48,
   };
 
   @override

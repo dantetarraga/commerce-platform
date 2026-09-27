@@ -25,6 +25,7 @@ abstract final class AppToast {
     String? actionLabel,
     VoidCallback? onAction,
     Duration? duration,
+    Widget? leading,
   }) {
     dismiss();
     final overlay = Overlay.maybeOf(context, rootOverlay: true);
@@ -33,6 +34,7 @@ abstract final class AppToast {
       builder: (_) => _ToastView(
         message: message,
         kind: kind,
+        leading: leading,
         actionLabel: actionLabel ?? (kind == AppToastKind.undo ? 'Deshacer' : null),
         onAction: onAction == null
             ? null
@@ -58,23 +60,23 @@ abstract final class AppToast {
 }
 
 class _ToastView extends StatelessWidget {
-  const _ToastView({required this.message, required this.kind, this.actionLabel, this.onAction});
+  const _ToastView({required this.message, required this.kind, this.actionLabel, this.onAction, this.leading});
 
   final String message;
   final AppToastKind kind;
   final String? actionLabel;
   final VoidCallback? onAction;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
     // El toast usa la superficie inversa: tinta en claro, casi blanco en oscuro.
     final lightUi = theme.brightness == Brightness.light;
     final (IconData icon, Color iconColor) = switch (kind) {
       AppToastKind.info => (Icons.info_outline_rounded, scheme.onInverseSurface),
-      AppToastKind.success => (Icons.check_circle_rounded, lightUi ? chaski.accent : AppColors.exito),
+      AppToastKind.success => (Icons.check_circle_rounded, lightUi ? AppColors.hierba300 : AppColors.exito),
       AppToastKind.undo => (Icons.undo_rounded, scheme.onInverseSurface),
       AppToastKind.error => (Icons.error_outline_rounded, lightUi ? AppColors.peligro300 : AppColors.peligro),
     };
@@ -105,7 +107,7 @@ class _ToastView extends StatelessWidget {
                 constraints: const BoxConstraints(minHeight: 40),
                 child: Row(
                   children: [
-                    Icon(icon, color: iconColor, size: 20),
+                    leading ?? Icon(icon, color: iconColor, size: 20),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(message, style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onInverseSurface)),

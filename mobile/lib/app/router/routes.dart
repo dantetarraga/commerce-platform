@@ -9,12 +9,12 @@ abstract final class RoutePaths {
   static const otp = 'codigo'; // hija de /entrar
   static const profileSetup = 'nombre'; // hija de /entrar/codigo
 
-  // Shell: Cerca · Explorar · Tú.
+  // Shell: Inicio · Buscar · Pedidos · (Bolsa) · Tú.
   static const home = '/cerca';
   static const categoryStores = 'categoria/:categoryId'; // hija de /cerca
   static const explore = '/explorar';
   static const profile = '/tu';
-  static const orders = 'pedidos'; // hija de /tu
+  static const orders = '/pedidos';
   static const favorites = 'favoritos'; // hija de /tu
 
   // Detalle a pantalla completa (sobre la barra).

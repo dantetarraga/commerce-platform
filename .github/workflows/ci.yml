@@ -60,6 +60,8 @@ jobs:
           cache: true
       - run: flutter pub get
       - run: flutter analyze
+      - name: Runtime Rive para las pruebas de Flutter
+        run: dart run rive_native:setup --platform linux
       - run: flutter test
       - uses: actions/setup-java@v4
         with:

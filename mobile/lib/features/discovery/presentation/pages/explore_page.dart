@@ -72,6 +72,15 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
         child: Column(
           children: [
             Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: Row(
+                children: [
+                  Expanded(child: Text('Sigue tu antojo.', style: Theme.of(context).textTheme.headlineLarge)),
+                  const SizedBox(width: 54, height: 30, child: ChaskiTrail(strokeWidth: 3)),
+                ],
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.xs),
               child: AppSearchBar(
                 variant: AppSearchBarVariant.compact,
@@ -125,7 +134,9 @@ Widget _groupTitle(BuildContext context, String text, {Widget? action}) => Paddi
     height: action == null ? null : AppSpacing.minTouch,
     child: Row(
       children: [
-        Expanded(child: Semantics(header: true, child: Text(text, style: AppTypography.eyebrow(context)))),
+        Expanded(
+          child: Semantics(header: true, child: Text(text, style: AppTypography.eyebrow(context))),
+        ),
         ?action,
       ],
     ),
@@ -163,8 +174,7 @@ class _Idle extends ConsumerWidget {
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               children: [
-                for (final q in recent)
-                  AppChip(label: q, icon: Icons.schedule_rounded, variant: AppChipVariant.suggestion, onTap: () => onPick(q)),
+                for (final q in recent) AppChip(label: q, icon: Icons.schedule_rounded, variant: AppChipVariant.suggestion, onTap: () => onPick(q)),
               ],
             ),
           ),
@@ -275,8 +285,7 @@ class _NoResults extends ConsumerWidget {
                 spacing: AppSpacing.xs,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  for (final s in suggestions)
-                    AppChip(label: s.toLowerCase(), variant: AppChipVariant.suggestion, onTap: () => onPick(s)),
+                  for (final s in suggestions) AppChip(label: s.toLowerCase(), variant: AppChipVariant.suggestion, onTap: () => onPick(s)),
                 ],
               ),
             ),
@@ -315,15 +324,15 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
   }
 
   /// "+" rápido: agrega sin entrar al negocio (solo si está abierto y entrega).
-  Future<void> _quickAdd(ProductHit p, StoreSummary? known) async {
+  Future<bool> _quickAdd(ProductHit p, StoreSummary? known) async {
     widget.onOpen();
     final summary = known ?? (await ref.read(storeDetailProvider(p.storeId).future)).summary;
-    if (!mounted) return;
+    if (!mounted) return false;
     if (!summary.canOrder) {
       AppToast.show(context, summary.isOpenNow ? '${summary.name} no llega a tu dirección' : '${summary.name} está cerrado ahora');
-      return;
+      return false;
     }
-    await addToCart(
+    return addToCart(
       context,
       ref,
       line: quickCartLine(productId: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl),
@@ -338,7 +347,10 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
     final results = widget.results;
     // Negocios cercanos ya cargados: dan el tiempo de entrega y la bolsa.
     final nearby = {for (final s in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[]) s.id: s};
-    final stores = [for (final s in results.stores) if (!_openOnly || s.isOpenNow) s];
+    final stores = [
+      for (final s in results.stores)
+        if (!_openOnly || s.isOpenNow) s,
+    ];
 
     return Column(
       children: [
@@ -442,7 +454,11 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
     void open() {
       widget.onOpen();
       context
-          .pushNamed(StoreDetailPage.name, pathParameters: {'storeId': hit.id}, extra: StoreRouteArgs(coverUrl: summary?.coverUrl))
+          .pushNamed(
+            StoreDetailPage.name,
+            pathParameters: {'storeId': hit.id},
+            extra: StoreRouteArgs(coverUrl: summary?.coverUrl),
+          )
           .ignore();
     }
 

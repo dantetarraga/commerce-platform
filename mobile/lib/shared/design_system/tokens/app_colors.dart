@@ -1,47 +1,41 @@
 import 'package:flutter/material.dart';
 
-/// Paleta Chaski · "Cobalto".
-///
-/// El cobalto es el único color que manda: acción principal, lo seleccionado y
-/// la promo. La lima solo celebra (ofertas, cupones, logros) y siempre va como
-/// relleno con texto tinta encima, nunca como texto. El fondo es blanco limpio
-/// y los grises son neutros, sin tinte beige.
-///
-/// Los widgets no usan esta clase directamente: leen `ColorScheme` y
-/// [ChaskiColors] (vía `context.chaski`), que ya resuelven claro/oscuro.
+/// Terracota: crema cálida, terracota de marca y verde hierba de acento.
 abstract final class AppColors {
   // Marca
-  static const cobalto = Color(0xFF1D5BFF);
-  static const cobalto700 = Color(0xFF1240C2);
-  static const cobalto50 = Color(0xFFE6EDFF);
-  static const cobalto300 = Color(0xFF7C9DFF); // cobalto sobre fondos oscuros
-  static const cobaltoNight = Color(0xFF172245); // contenedor cobalto en oscuro
-  static const lima = Color(0xFFC5F25A);
-  static const limaSoft = Color(0xFFF2FBDB);
+  static const terracota = Color(0xFFB84A2B);
+  static const terracota700 = Color(0xFF8F3920);
+  static const terracota50 = Color(0xFFF7E6DC); // portadas y fondos de marca suaves
+  static const terracota300 = Color(0xFFF09A7B); // terracota sobre fondos oscuros
+  static const terracotaNight = Color(0xFF3A1E16); // contenedor terracota en oscuro
+  static const hierba = Color(0xFF4E7A40); // ofertas, en vivo, envío gratis. Texto blanco encima
+  static const hierbaSoft = Color(0xFFE6EFE0);
+  static const hierba300 = Color(0xFF8CC07A); // hierba sobre fondos oscuros
 
   // Neutros claros
+  static const papel = Color(0xFFFBF7F2); // fondo crema
   static const blanco = Color(0xFFFFFFFF);
-  static const gris = Color(0xFFF4F4F6); // bloques agrupados, campos
-  static const grisAlto = Color(0xFFE9E9EE);
-  static const tinta = Color(0xFF16151C);
-  static const piedra = Color(0xFF6A6975);
-  static const linea = Color(0xFFECEBF0);
+  static const gris = Color(0xFFF3ECE3); // bloques agrupados, campos
+  static const grisAlto = Color(0xFFEADFD3);
+  static const tinta = Color(0xFF2A1A14); // texto principal, café muy oscuro
+  static const piedra = Color(0xFF6E5F56);
+  static const linea = Color(0xFFEDE3D8);
 
-  // Neutros oscuros
-  static const noche = Color(0xFF0E0E12);
-  static const nocheSurface = Color(0xFF18181E);
-  static const nocheRaised = Color(0xFF202027);
-  static const nocheHigh = Color(0xFF2B2B34);
-  static const nocheLinea = Color(0xFF2A2A32);
-  static const nocheTexto = Color(0xFFF3F2F6);
-  static const nochePiedra = Color(0xFFA4A3AE);
+  // Neutros oscuros (modo oscuro del sistema, en cafés cálidos)
+  static const noche = Color(0xFF140F0D);
+  static const nocheSurface = Color(0xFF1C1613);
+  static const nocheRaised = Color(0xFF261E1A);
+  static const nocheHigh = Color(0xFF312722);
+  static const nocheLinea = Color(0xFF33281F);
+  static const nocheTexto = Color(0xFFF6EFEA);
+  static const nochePiedra = Color(0xFFB3A59C);
 
   // Estados
-  static const exito = Color(0xFF12805C); // abierto · envío gratis · descuento
-  static const exito300 = Color(0xFF4FD1A0);
-  static const peligro = Color(0xFFC0392B); // error · eliminar · cerrado
+  static const exito = Color(0xFF3F7A3A); // abierto · envío gratis · descuento
+  static const exito300 = Color(0xFF8CC07A);
+  static const peligro = Color(0xFFB3261E); // error · eliminar · cerrado
   static const peligro300 = Color(0xFFFF8A7A);
-  static const rating = Color(0xFFE8A317);
+  static const rating = Color(0xFFB84A2B);
 }
 
 /// Colores semánticos que `ColorScheme` no cubre, resueltos por tema.
@@ -63,36 +57,36 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   });
 
   static const light = ChaskiColors(
-    accent: AppColors.lima,
-    onAccent: AppColors.tinta,
-    accentSoft: AppColors.limaSoft,
+    accent: AppColors.hierba,
+    onAccent: AppColors.blanco,
+    accentSoft: AppColors.hierbaSoft,
     success: AppColors.exito,
     danger: AppColors.peligro,
     raised: AppColors.gris,
-    thread: AppColors.cobalto,
+    thread: AppColors.terracota,
     shimmerBase: AppColors.gris,
-    shimmerHighlight: Color(0xFFFAFAFB),
+    shimmerHighlight: Color(0xFFFDFAF6),
     onPhoto: AppColors.blanco,
-    scrim: Color(0x7316151C),
+    scrim: Color(0x732A1A14),
     rating: AppColors.rating,
   );
 
   static const dark = ChaskiColors(
-    accent: AppColors.lima,
-    onAccent: AppColors.tinta,
-    accentSoft: Color(0xFF27301A),
+    accent: AppColors.hierba300,
+    onAccent: AppColors.noche,
+    accentSoft: Color(0xFF22301D),
     success: AppColors.exito300,
     danger: AppColors.peligro300,
     raised: AppColors.nocheRaised,
-    thread: AppColors.cobalto300,
+    thread: AppColors.terracota300,
     shimmerBase: AppColors.nocheRaised,
     shimmerHighlight: AppColors.nocheHigh,
     onPhoto: AppColors.blanco,
     scrim: Color(0x99000000),
-    rating: AppColors.rating,
+    rating: AppColors.terracota300,
   );
 
-  /// Lima: cintas de oferta, cupones, logros. Solo relleno.
+  /// Hierba: cintas de oferta, envío gratis, lo que pasa ahora.
   final Color accent;
   final Color onAccent;
   final Color accentSoft;

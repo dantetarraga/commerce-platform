@@ -42,17 +42,14 @@ class AppPrice extends StatelessWidget {
     final theme = Theme.of(context);
     final style = AppTypography.price(context, size: size).copyWith(color: color);
     final isFree = variant == AppPriceVariant.free && money.isZero;
-    final text = isFree
-        ? 'Gratis'
-        : '${variant == AppPriceVariant.from ? 'Desde ' : ''}${Formatters.money(money)}';
+    final text = isFree ? 'Gratis' : '${variant == AppPriceVariant.from ? 'Desde ' : ''}${Formatters.money(money)}';
 
     return Semantics(
       label: isFree ? 'Gratis' : spokenMoney(money, from: variant == AppPriceVariant.from),
       excludeSemantics: true,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.baseline,
-        textBaseline: TextBaseline.alphabetic,
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runSpacing: 2,
         children: [
           Text(text, style: isFree ? style.copyWith(color: context.chaski.success) : style),
           if (variant == AppPriceVariant.discount && previous != null) ...[

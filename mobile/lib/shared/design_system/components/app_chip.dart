@@ -45,7 +45,7 @@ class AppChip extends StatelessWidget {
       button: true,
       selected: variant == AppChipVariant.suggestion ? null : selected,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 40),
+        constraints: const BoxConstraints(minHeight: AppSpacing.minTouch),
         child: Material(
           color: Colors.transparent,
           child: InkWell(

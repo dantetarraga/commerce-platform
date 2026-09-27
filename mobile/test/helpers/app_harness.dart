@@ -73,6 +73,8 @@ Future<ProviderContainer> pumpChaski(
   Size size = const Size(390, 844),
   Duration orderStep = const Duration(seconds: 2),
   bool disableAnimations = false,
+  double textScale = 1,
+  Brightness brightness = Brightness.light,
 }) => _pumpApp(
   tester,
   router: (c) => c.read(appRouterProvider),
@@ -81,6 +83,8 @@ Future<ProviderContainer> pumpChaski(
   size: size,
   orderStep: orderStep,
   disableAnimations: disableAnimations,
+  textScale: textScale,
+  brightness: brightness,
 );
 
 /// Monta Chaski Socios. [signedInAs] es el id de un usuario del fake de auth
@@ -141,6 +145,7 @@ Future<ProviderContainer> _pumpApp(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
         theme: brightness == Brightness.dark ? AppTheme.dark() : AppTheme.light(),
         routerConfig: router(container),
         builder: (context, child) => MediaQuery(

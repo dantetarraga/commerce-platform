@@ -131,7 +131,7 @@ class NoticeTile extends StatelessWidget {
                     color: order ? scheme.primaryContainer : chaski.accentSoft,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(_icon, size: 22, color: order ? scheme.primary : chaski.onAccent),
+                  child: Icon(_icon, size: 22, color: order ? scheme.primary : scheme.onSecondaryContainer),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
