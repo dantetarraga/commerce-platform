@@ -33,6 +33,9 @@ void main() {
       expect(cart.lines.any((line) => line.productId == card.data.id), isTrue);
       // La bolsa es una pestaña con contador; arriba queda la barra compacta.
       expect(find.bySemanticsLabel(RegExp(r'^Bolsa, \d+ productos?')), findsOneWidget);
+      // El aviso "va en tu bolsa" baja sobre la cabecera unos segundos y se va solo.
+      await tester.pump(const Duration(seconds: 3));
+      await settle(tester);
       expect(find.bySemanticsLabel(RegExp('^Entregar en')).hitTestable(), findsOneWidget);
       await tester.tap(find.byTooltip('Buscar').hitTestable().first);
       await settle(tester);

@@ -21,14 +21,36 @@ void main() {
         child: MaterialApp(theme: AppTheme.light(), home: const NotificationsPage()),
       ),
     );
-    await tester.pumpAndSettle();
+    // El nudo del pedido en curso late sin parar: se avanza el reloj a mano.
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('HOY'), findsOneWidget);
+    // Los avisos del pedido van en EN CURSO; HOY/AYER dependen de la hora del reloj.
+    expect(find.text('EN CURSO'), findsOneWidget);
+    expect(find.text('AYER'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('^Sin leer. Pedido en curso')), findsOneWidget);
     expect(find.text('Luis está a la vuelta 👀'), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('^Sin leer')), findsWidgets);
 
     await tester.tap(find.text('Marcar leídos'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
     expect(find.bySemanticsLabel(RegExp('^Sin leer')), findsNothing);
+  });
+
+  testWidgets('el filtro Ofertas deja solo las promociones', (tester) async {
+    final c = container();
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: c,
+        child: MaterialApp(theme: AppTheme.light(), home: const NotificationsPage()),
+      ),
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.tap(find.text('Ofertas'));
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('EN CURSO'), findsNothing);
+    expect(find.text('Luis está a la vuelta 👀'), findsNothing);
+    expect(find.text('2x1 en café de altura hasta las 5'), findsOneWidget);
   });
 }

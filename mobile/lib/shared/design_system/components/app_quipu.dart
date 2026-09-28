@@ -53,17 +53,17 @@ class AppQuipu extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (var i = 0; i < steps.length; i++)
-          _QuipuRow(step: steps[i], isLast: i == steps.length - 1, next: i + 1 < steps.length ? steps[i + 1] : null, dense: dense),
+          _QuipuRow(step: steps[i], previous: i > 0 ? steps[i - 1] : null, isLast: i == steps.length - 1, dense: dense),
       ],
     );
   }
 }
 
 class _QuipuRow extends StatelessWidget {
-  const _QuipuRow({required this.step, required this.isLast, required this.next, required this.dense});
+  const _QuipuRow({required this.step, required this.previous, required this.isLast, required this.dense});
 
   final QuipuStep step;
-  final QuipuStep? next;
+  final QuipuStep? previous;
   final bool isLast;
   final bool dense;
 
@@ -73,7 +73,8 @@ class _QuipuRow extends StatelessWidget {
     final scheme = theme.colorScheme;
     final chaski = context.chaski;
     // El tramo hacia el siguiente paso va en cobalto si este ya se cumplió.
-    final lineColor = step.knot == QuipuKnot.done ? chaski.thread : scheme.outlineVariant;
+    Color cordColor(QuipuStep from) => from.knot == QuipuKnot.done ? chaski.thread : scheme.outlineVariant;
+    final lineColor = cordColor(step);
     final todo = step.knot == QuipuKnot.todo;
 
     final state = switch (step.knot) {
@@ -134,22 +135,16 @@ class _QuipuRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // La cuerda pasa por detrás de los nudos, de centro a centro, sin cortes.
               SizedBox(
                 width: 32,
-                child: Column(
+                child: Stack(
+                  alignment: Alignment.topCenter,
                   children: [
-                    const SizedBox(height: 3),
-                    _KnotDot(knot: step.knot),
-                    if (!isLast)
-                      Expanded(
-                        child: Center(
-                          child: AnimatedContainer(
-                            duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
-                            width: 2,
-                            color: lineColor,
-                          ),
-                        ),
-                      ),
+                    if (previous != null)
+                      Positioned(top: 0, height: _knotCenter, child: _Cord(color: cordColor(previous!))),
+                    if (!isLast) Positioned(top: _knotCenter, bottom: 0, child: _Cord(color: lineColor)),
+                    Positioned(top: 3, child: _KnotDot(knot: step.knot)),
                   ],
                 ),
               ),
@@ -161,6 +156,22 @@ class _QuipuRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Centro del nudo desde el borde superior de la fila (3 de margen + 26 / 2).
+const double _knotCenter = 16;
+
+class _Cord extends StatelessWidget {
+  const _Cord({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => AnimatedContainer(
+    duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
+    width: 2,
+    color: color,
+  );
 }
 
 class _KnotDot extends StatefulWidget {

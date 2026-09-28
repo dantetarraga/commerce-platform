@@ -106,6 +106,9 @@ void main() {
     await tester.tap(find.text('Enviar'));
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(milliseconds: 500));
+    // El aviso llega un cuadro después y crece durante la entrada.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Te escribimos en menos de 10 minutos'), findsOneWidget);
     AppToast.dismiss();
     await tester.pumpWidget(const SizedBox());
@@ -134,6 +137,9 @@ void main() {
       await tester.tap(find.text('Sí, cancelar'));
       await tester.pump(const Duration(milliseconds: 400));
       verify(() => repository.cancel('o1', reason: any(named: 'reason'))).called(1);
+      // El aviso llega un cuadro después y crece durante la entrada.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('Cancelamos tu pedido. No se te cobró nada.'), findsOneWidget);
 
       AppToast.dismiss();
@@ -153,6 +159,9 @@ void main() {
       await tester.tap(find.text('Cancelar pedido'));
       await tester.pump(const Duration(milliseconds: 400));
       await tester.tap(find.text('Sí, cancelar'));
+      await tester.pump(const Duration(milliseconds: 400));
+      // El aviso llega un cuadro después y crece durante la entrada.
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.textContaining('escríbenos para cancelarlo'), findsOneWidget);
 

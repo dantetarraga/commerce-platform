@@ -11,8 +11,11 @@ enum NoticeKind {
   orderCancelled,
   promotion;
 
-  /// Avisos del pedido (se pintan en cobalto suave; las promos, en lima).
+  /// Avisos del pedido (terracota suave; las promos, en hierba).
   bool get isOrder => this != promotion;
+
+  /// El pedido terminó: ya no hay nada que seguir.
+  bool get closesOrder => this == delivered || this == orderCancelled;
 }
 
 /// Un aviso del centro de avisos (la campana de Cerca).
@@ -81,6 +84,28 @@ Map<NoticeDay, List<Notice>> groupNotices(List<Notice> notices, DateTime now) {
     (groups[NoticeDay.of(n.at, now)] ??= []).add(n);
   }
   return {for (final day in NoticeDay.values) day: ?groups[day]};
+}
+
+/// Avisos del pedido que sigue en camino, del más antiguo al más reciente, para
+/// mostrarlos juntos como un solo hilo. Vacío si no hay pedido en curso o si
+/// tiene un único aviso (entonces se muestra como uno más). Los avisos sin
+/// [Notice.orderId] (los de prueba) cuentan como el mismo pedido.
+List<Notice> activeOrderThread(List<Notice> notices) {
+  final byOrder = <String?, List<Notice>>{};
+  for (final n in notices.where((n) => n.kind.isOrder)) {
+    (byOrder[n.orderId] ??= []).add(n);
+  }
+  List<Notice>? latest;
+  for (final group in byOrder.values) {
+    group.sort((a, b) => a.at.compareTo(b.at));
+    if (group.last.kind.closesOrder) continue;
+    if (latest == null || group.last.at.isAfter(latest.last.at)) latest = group;
+  }
+  if (latest == null || latest.length < 2) return const [];
+  // Solo el tramo desde el último cierre (un pedido anterior sin orderId).
+  final start = latest.lastIndexWhere((n) => n.kind.closesOrder) + 1;
+  final thread = latest.sublist(start);
+  return thread.length < 2 ? const [] : thread;
 }
 
 abstract interface class NotificationsRepository {

@@ -153,7 +153,11 @@ void main() {
   testWidgets('si falla el guardado permite reintentar sin abandonar la historia', (tester) async {
     when(preferences.markOnboardingSeen).thenAnswer((_) async => throw Exception('storage unavailable'));
     final container = await pumpOnboarding(tester);
-    await tapVisible(tester, 'Saltar');
+    // Sin pumpAndSettle: el aviso tiene una barra de tiempo y se iría antes de verlo.
+    await tester.tap(find.text('Saltar').hitTestable().first);
+    await tester.pump();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('No pudimos guardar tu avance. Inténtalo de nuevo.'), findsOneWidget);
     expect(find.byType(OnboardingPage), findsOneWidget);
     AppToast.dismiss();

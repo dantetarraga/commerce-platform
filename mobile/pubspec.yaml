@@ -29,6 +29,12 @@ dependencies:
   skeletonizer: ^3.0.0
   lottie: ^3.6.1
   flutter_animate: ^4.5.2
+  toastification: ^3.2.0
+
+# toastification 3.2.0 pide equatable ^2, pero solo usa `extends Equatable`,
+# que no cambió en la 3 (la 3 quitó EquatableMixin). Quitar cuando lo actualicen.
+dependency_overrides:
+  equatable: ^3.0.0
 
 dev_dependencies:
   flutter_test:
