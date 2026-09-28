@@ -1,4 +1,4 @@
-# Revisión de UI/UX de Chaski y Chaski Socios
+# Revisión de UI/UX de Apamuy y Apamuy Socios
 
 2026-09-26. Revisión de código, capturas renderizadas por Flutter y pruebas con el backend de demostración. No sustituye una prueba de uso con clientes, negocios y repartidores de Espinar.
 

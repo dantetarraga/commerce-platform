@@ -1,4 +1,4 @@
-# Chaski · Ciudad en movimiento
+# Apamuy · Ciudad en movimiento
 
 ## Diagnóstico
 
@@ -6,7 +6,7 @@ La base funcional es sólida: ya existen carrito persistente, Hero, estados de c
 
 ## Dirección artística
 
-Chaski es una conexión rápida y cercana entre los lugares y las personas de Espinar. La personalidad es curiosa, enérgica, precisa y humana. La tecnología aparece en la claridad del recorrido y el feedback, sin imitar un tablero de ciencia ficción ni convertir la identidad local en un adorno folclórico.
+Apamuy es una conexión rápida y cercana entre los lugares y las personas de Espinar. La personalidad es curiosa, enérgica, precisa y humana. La tecnología aparece en la claridad del recorrido y el feedback, sin imitar un tablero de ciencia ficción ni convertir la identidad local en un adorno folclórico.
 
 1. **Personalidad:** un explorador urbano que conoce su barrio. Frases breves, directas y cálidas; estados verificables y precios claros.
 2. **Paleta Terracota (2026-09-27):** crema `#FBF7F2` de fondo, terracota `#B84A2B` como color de marca (portada suave `#F7E6DC`, acción, pestaña activa) y verde hierba `#4E7A40` como único acento (ofertas, envío gratis, lo que pasa ahora; texto blanco encima). Texto en café `#2A1A14`. Sin amarillos, sin lima y sin fondos oscuros en el diseño; el modo oscuro del sistema usa cafés cálidos.
@@ -15,7 +15,7 @@ Chaski es una conexión rápida y cercana entre los lugares y las personas de Es
 5. **Iconos:** trazos redondeados, detalles mínimos y áreas interactivas de al menos 48 px. Un pequeño sistema de pictogramas de recorrido identifica la navegación.
 6. **Ilustración:** mapas y escenas vectoriales propias, con calles, estaciones y objetos geométricos; fotografías de comida amplias y de buena calidad como material provisional sustituible.
 7. **Movimiento:** tocar comprime; elegir conecta; agregar traslada; un estado nuevo avanza. 90–160 ms para respuesta, 240–360 para cambio, 520 para una escena. Movimiento reducido conserva toda la información sin traslaciones ni pulsos.
-8. **Forma:** el **trazo Chaski**, una línea con dos giros suaves y nodos de salida/llegada. Aparece en el inicio, onboarding, carrito y mapa. Es una conexión reconocible, no un estampado omnipresente.
+8. **Forma:** la esquina de salida (una esquina corta abajo a la izquierda) en tarjetas, botones e íconos. El trazo punteado que había antes se quitó el 2026-09-27: los recorridos y avances usan líneas sólidas simples.
 9. **Componentes:** portada clara en terracota con la comida en círculo y el trazo, buscador relleno de terracota, categorías de proporciones desiguales, barra inferior clásica (ícono y texto) cuyo indicador activo tiene la esquina de salida, barra de compra terracota y boleta con encabezado terracota y corte en zigzag abajo.
 10. **Reconocimiento:** papel + tinta + fotografía recortada, titulares compactos de gran escala, la esquina de salida (una esquina corta abajo a la izquierda: L 24/8, M 22/6, S 16/5) y la línea de recorrido. La combinación debe sobrevivir al quitar el logo.
 

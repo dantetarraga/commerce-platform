@@ -34,12 +34,12 @@ android {
     productFlavors {
         create("customer") {
             dimension = "app"
-            applicationId = "pe.chaski.chaski"
+            applicationId = "pe.apamuy.app"
             manifestPlaceholders["appName"] = "Apamuy"
         }
         create("partner") {
             dimension = "app"
-            applicationId = "pe.chaski.socios"
+            applicationId = "pe.apamuy.socios"
             manifestPlaceholders["appName"] = "Apamuy Socios"
         }
     }

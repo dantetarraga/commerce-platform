@@ -1,10 +1,10 @@
-# Chaski · Tu ciudad, a un toque
+# Apamuy · Tu ciudad, a un toque
 
 Propuesta e implementación del onboarding · 23 de septiembre de 2026.
 
 ## Producto y público
 
-Chaski conecta a clientes con restaurantes, bodegas, farmacias y otros negocios de su ciudad. Espinar es la primera ciudad del catálogo; la arquitectura contempla expansión a otras ciudades. La identidad existente es andina, cálida y moderna: achiote, quinua y noche andina, con tipografía Plus Jakarta Sans.
+Apamuy conecta a clientes con restaurantes, bodegas, farmacias y otros negocios de su ciudad. Espinar es la primera ciudad del catálogo; la arquitectura contempla expansión a otras ciudades. La identidad existente es andina, cálida y moderna: achiote, quinua y noche andina, con tipografía Plus Jakarta Sans.
 
 El público se define por una necesidad, sin inventar un perfil demográfico: personas de Espinar que quieren resolver compras cotidianas y descubrir opciones locales desde el teléfono. Para ellas, el onboarding debe responder rápidamente qué encontrarán, por qué les resulta útil y cómo empezar.
 
@@ -34,9 +34,9 @@ Tres pantallas mantienen el recorrido breve. Cada una cumple una función distin
 
 | Pantalla | Intención | Antetítulo | Título | Subtítulo | CTA principal |
 | --- | --- | --- | --- | --- | --- |
-| 1 · Ciudad | Entender la oferta y reconocer Espinar | HOLA, ESPINAR | **Tu ciudad, a un toque.** | Restaurantes, bodegas y farmacias de Espinar. Descubre lo que necesitas en un solo lugar. | Descubrir Chaski |
+| 1 · Ciudad | Entender la oferta y reconocer Espinar | HOLA, ESPINAR | **Tu ciudad, a un toque.** | Restaurantes, bodegas y farmacias de Espinar. Descubre lo que necesitas en un solo lugar. | Descubrir Apamuy |
 | 2 · Descubrimiento | Despertar interés y mostrar utilidad | ENCUENTRA TU PRÓXIMO FAVORITO | **Se te antoja. Lo encuentras.** | Explora menús, descubre productos y compara precios. Tu próximo favorito está más cerca. | Continuar |
-| 3 · Comunidad | Convertir la curiosidad en registro | MUY NUESTRO. MUY CERCA. | **Lo mejor de aquí empieza contigo.** | Crea tu cuenta y descubre los negocios de tu ciudad. Dale más sabor a tus días con Chaski. | Crear mi cuenta |
+| 3 · Comunidad | Convertir la curiosidad en registro | MUY NUESTRO. MUY CERCA. | **Lo mejor de aquí empieza contigo.** | Crea tu cuenta y descubre los negocios de tu ciudad. Dale más sabor a tus días con Apamuy. | Crear mi cuenta |
 
 Los sellos de las ilustraciones son «De aquí, para ti», «Antojos y mucho más» y «Conecta con lo local». «Compara precios» se refiere a consultar los precios del catálogo; no se presenta un comparador automático.
 

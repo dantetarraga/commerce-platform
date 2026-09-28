@@ -1,8 +1,8 @@
-# Chaski — Operación con negocios y repartidores
+# Apamuy — Operación con negocios y repartidores
 
 Versión 0.1 · 2026-09-25 · Complementa [ARQUITECTURA.md](ARQUITECTURA.md) y [PENDIENTES.md](PENDIENTES.md).
 
-Este documento define cómo se opera Chaski del lado de los socios: cómo recibe un pedido la tienda, cómo lo lleva el repartidor, cómo se cobra y cómo se da de alta a un socio.
+Este documento define cómo se opera Apamuy del lado de los socios: cómo recibe un pedido la tienda, cómo lo lleva el repartidor, cómo se cobra y cómo se da de alta a un socio.
 
 ## 1. Las piezas
 
@@ -10,9 +10,9 @@ Hay un solo backend y tres clientes, al estilo de Rappi o PedidosYa:
 
 | Pieza | Quién la usa | Roles | Qué hace |
 |---|---|---|---|
-| **App Chaski** (`mobile/`, flavor `customer`) | Clientes | `CUSTOMER` | Pedir, pagar al recibir, seguir el pedido |
-| **App Chaski Socios** (`mobile/`, flavor `partner`) | Negocios y repartidores | `MERCHANT`, `COURIER` | Modo Negocio o modo Repartidor según el rol |
-| **Panel admin** (web, más adelante) | El equipo de Chaski | `ADMIN` | Alta de socios, pedidos en vivo, catálogo, soporte |
+| **App Apamuy** (`mobile/`, flavor `customer`) | Clientes | `CUSTOMER` | Pedir, pagar al recibir, seguir el pedido |
+| **App Apamuy Socios** (`mobile/`, flavor `partner`) | Negocios y repartidores | `MERCHANT`, `COURIER` | Modo Negocio o modo Repartidor según el rol |
+| **Panel admin** (web, más adelante) | El equipo de Apamuy | `ADMIN` | Alta de socios, pedidos en vivo, catálogo, soporte |
 
 - **Una sola cuenta por celular.** Una persona con tienda que también pide comida usa el mismo número en las dos apps (`UserRole` admite varios roles).
 - **Por qué dos apps y no una:** la alarma de pedidos necesita permisos especiales de Android que no corresponde pedirles a los clientes. Además, los socios reciben actualizaciones más seguido.
@@ -22,20 +22,20 @@ Hay un solo backend y tres clientes, al estilo de Rappi o PedidosYa:
 ## 2. Cómo recibe el pedido una tienda
 
 ```
-Cliente pide ─► RECEIVED ─► 🔔 alarma en Chaski Socios (push + sonido en bucle)
+Cliente pide ─► RECEIVED ─► 🔔 alarma en Apamuy Socios (push + sonido en bucle)
                    │
                    ├─ Acepta con tiempo (10/20/30/45 min) ─► PREPARING (pasa por CONFIRMED)
                    ├─ Rechaza con motivo ─► CANCELLED, se avisa al cliente
                    └─ No responde:
                         · 3 min  → alerta al admin (lo llamamos)
-                        · 8 min  → Chaski lo cancela y avisa al cliente
+                        · 8 min  → Apamuy lo cancela y avisa al cliente
 PREPARING ─► "Listo para recoger" (READY) ─► lo toma un repartidor
 ```
 
 - **Aceptar** hace RECEIVED → CONFIRMED → PREPARING de una vez y recalcula la hora estimada. El cliente recibe un solo aviso.
 - **Rechazar** exige un motivo ("Sin stock: Pollo a la brasa", "Cerrado", otro). Restaura el stock y el cupón.
 - **Pedidos programados:** el plazo de aceptación empieza 60 min antes de la hora programada, no al crearlo.
-- **Cancelación automática:** se registra sin rol (`cancelledBy = null`). El cliente ve "Cancelado por Chaski: el negocio no respondió a tiempo".
+- **Cancelación automática:** se registra sin rol (`cancelledBy = null`). El cliente ve "Cancelado por Apamuy: el negocio no respondió a tiempo".
 - **Pausa:** el negocio puede dejar de recibir pedidos con un interruptor. Mientras está pausado, la app del cliente lo muestra cerrado.
 - **Productos agotados:** el negocio los marca como no disponibles desde su app.
 
@@ -55,7 +55,7 @@ Hoy los pedidos se muestran a los repartidores recién en `READY`. Mostrarlos de
 - **Quién cobra:** el repartidor, el total del pedido.
 - **Registro:** al marcar "Entregado", el repartidor indica el método y el monto recibido. Queda guardado en el pago (`collectedById`, `collectedMethod`, `collectedAmount`, `collectedAt`). Si el monto no coincide con el total, se permite pero queda registrado.
 - **Rendición:** el repartidor y el negocio ven un resumen del día (entregas, total, efectivo frente a Yape o Plin).
-- **Pendiente de definir:** la comisión de Chaski, el costo de envío para el repartidor y las liquidaciones semanales a los negocios. Durante la prueba no se modelan.
+- **Pendiente de definir:** la comisión de Apamuy, el costo de envío para el repartidor y las liquidaciones semanales a los negocios. Durante la prueba no se modelan.
 
 ## 5. Alta de socios
 
@@ -66,9 +66,9 @@ Hoy los pedidos se muestran a los repartidores recién en `READY`. Mostrarlos de
    - negocio: RUC o RUS, DNI del responsable, local;
    - repartidor: DNI, licencia, SOAT, vehículo.
 3. El admin lo da de alta por su celular: `POST admin/merchants` o `POST admin/couriers`. Si el celular no tiene cuenta, se crea.
-4. El socio instala Chaski Socios, entra con su celular y el código SMS, y ya ve su modo.
+4. El socio instala Apamuy Socios, entra con su celular y el código SMS, y ya ve su modo.
 
-Si alguien sin rol de socio entra a Chaski Socios, ve "Aún no eres socio de Chaski" y un botón para escribirnos.
+Si alguien sin rol de socio entra a Apamuy Socios, ve "Aún no eres socio de Apamuy" y un botón para escribirnos.
 
 **Suspensión:** `POST admin/users/:id/suspend-partner` quita el rol y cierra sus sesiones. Un repartidor con un pedido activo no se puede suspender hasta resolver ese pedido. Las tiendas de un negocio suspendido dejan de recibir pedidos.
 
@@ -84,7 +84,7 @@ Antes de abrir al público:
 
 Los textos los tiene que revisar un abogado.
 
-## 7. Contrato de la API para Chaski Socios
+## 7. Contrato de la API para Apamuy Socios
 
 Prefijo `/api/v1`. Montos como `{ amount, currency }` en céntimos. Fechas ISO-8601 UTC; `date=YYYY-MM-DD` es el día en hora de Lima (por defecto, hoy). Los datasources `Api*`/`Fake*` de `merchant_orders` y `courier_deliveries` en la app son la fuente de verdad de este contrato.
 

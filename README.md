@@ -1,13 +1,15 @@
-# Chaski
+# Apamuy
 
-> Nombre provisional. App de delivery multi-negocio (restaurantes, tiendas, farmacias) pensada para una ciudad pequeña y preparada para escalar a varias ciudades.
+> Apamuy es "tráelo" en quechua. El código usa el nombre interno `chaski` (paquete Dart, carpetas y repo).
+
+> App de delivery multi-negocio (restaurantes, tiendas, farmacias) pensada para una ciudad pequeña y preparada para escalar a varias ciudades.
 
 ## Monorepo
 
 ```
 chaski/
 ├── backend/     # API NestJS + Prisma + PostgreSQL
-├── mobile/      # Flutter: app del cliente y Chaski Socios (negocio y repartidor)
+├── mobile/      # Flutter: app del cliente y Apamuy Socios (negocio y repartidor)
 ├── docs/        # Arquitectura, operación y pendientes
 └── docker-compose.yml   # Postgres 16 para desarrollo (puerto 5433)
 ```
@@ -16,8 +18,8 @@ Del proyecto `mobile/` salen **dos apps** que se instalan por separado:
 
 | App | Para quién | Entrada | Flavor Android |
 |---|---|---|---|
-| **Chaski** | Clientes | `lib/main.dart` | `customer` (`pe.chaski.chaski`) |
-| **Chaski Socios** | Negocios y repartidores | `lib/main_partner.dart` | `partner` (`pe.chaski.socios`) |
+| **Apamuy** | Clientes | `lib/main.dart` | `customer` (`pe.apamuy.app`) |
+| **Apamuy Socios** | Negocios y repartidores | `lib/main_partner.dart` | `partner` (`pe.apamuy.socios`) |
 
 ## Cómo probarlo
 
@@ -32,7 +34,7 @@ flutter pub get
 # App del cliente
 flutter run --flavor customer --dart-define-from-file=env/fake.json
 
-# Chaski Socios (negocio / repartidor)
+# Apamuy Socios (negocio / repartidor)
 flutter run --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/fake.json
 ```
 
@@ -100,6 +102,6 @@ cd mobile && flutter analyze && flutter test
 
 ## Estado
 
-- **mobile**: flujo completo del cliente (solo contraentrega) y **Chaski Socios**: el negocio acepta, rechaza, marca listo, pausa y agota productos; el repartidor toma, recoge y entrega registrando el cobro. Datos de demo (`env/fake.json`) o contra la API (`env/dev.json`).
+- **mobile**: flujo completo del cliente (solo contraentrega) y **Apamuy Socios**: el negocio acepta, rechaza, marca listo, pausa y agota productos; el repartidor toma, recoge y entrega registrando el cobro. Datos de demo (`env/fake.json`) o contra la API (`env/dev.json`).
 - **backend**: auth por OTP, catálogo, pedidos, cupones, avisos, direcciones y la API de socios (`merchant/*`, `courier/*`).
 - **Siguiente**: alta de socios por admin y push con plazo de aceptación. Ver [PENDIENTES](docs/PENDIENTES.md).

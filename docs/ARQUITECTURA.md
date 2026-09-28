@@ -1,4 +1,4 @@
-# Chaski — Arquitectura y diseño inicial
+# Apamuy — Arquitectura y diseño inicial
 
 Versión 0.5 · 2026-09-24 · Estado: **en implementación** · [Cambios v0.4 → v0.5](#cambios-v04--v05) · [Cambios v0.3 → v0.4](#cambios-v03--v04) · [Cambios v0.2 → v0.3](#cambios-v02--v03) · [Cambios v0.1 → v0.2](#cambios-v01--v02)
 
@@ -1075,7 +1075,7 @@ DELIVERED y CANCELLED son estados finales. En Flutter, "Repartidor asignado" es 
 23. **Tiempo real**: `RealtimeClient` abstracto con implementación `socket_io_client`. El tracking combina el fetch inicial, los eventos y un polling de respaldo cada 30 s si el socket se cae. Si el token expira, reconecta con el token nuevo y se vuelve a suscribir.
 24. **Testing Flutter**: `mocktail` para mocks, tests de use cases y repositories (datasource mockeado), tests de controllers con `ProviderContainer`, y widget tests donde aportan (ProductDetail, Cart, Login).
 25. **Entornos** con `--dart-define-from-file` (dev/prod), sin secretos en el código. La API key de Maps se restringe por package/SHA.
-26. **Identidad visual propia**: se define en `app/theme` (paleta, tipografía, radios, espaciado) con tokens, sin copiar Rappi ni PedidosYa. La propuesta de identidad (andina, cálida y moderna, coherente con "Chaski") se presenta en la Fase 1 antes de construir pantallas.
+26. **Identidad visual propia**: se define en `app/theme` (paleta, tipografía, radios, espaciado) con tokens, sin copiar Rappi ni PedidosYa. La propuesta de identidad (andina, cálida y moderna, coherente con "Apamuy") se presenta en la Fase 1 antes de construir pantallas.
 
 **Lo que NO se hace en el MVP (a propósito)**: microservicios, CQRS, event sourcing, Redis, colas, PostGIS, i18n completo, panel web de merchant (el merchant opera vía endpoints y Swagger/seed hasta la Fase 3+), multi-tenant de marcas.
 
@@ -1124,7 +1124,7 @@ Cada paso termina con código compilando, tests verdes y un commit.
 **Flutter**: aplicar cupón en checkout, pago con tarjeta/Yape, calificar pedido.
 
 ### Después del MVP (según tracción)
-Panel web de merchant/admin · app Chaski Socios para negocios y repartidores (mismo proyecto Flutter, flavor `partner`; ver [OPERACION.md](OPERACION.md)) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
+Panel web de merchant/admin · app Apamuy Socios para negocios y repartidores (mismo proyecto Flutter, flavor `partner`; ver [OPERACION.md](OPERACION.md)) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
 
 ---
 
