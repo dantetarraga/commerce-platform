@@ -9,4 +9,5 @@ export 'presentation/pages/profile_setup_page.dart';
 export 'presentation/pages/splash_page.dart';
 export 'presentation/providers/auth_session.dart';
 export 'presentation/providers/phone_auth_flow.dart' show phoneAuthFlowProvider;
+export 'presentation/providers/splash_gate.dart';
 export 'presentation/widgets/auth_widgets.dart' show AuthHeader, AuthScaffold, formatPhone;

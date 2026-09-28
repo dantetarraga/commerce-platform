@@ -9,6 +9,7 @@ import 'package:chaski/core/storage/local_json_store.dart';
 import 'package:chaski/core/storage/preferences_storage.dart';
 import 'package:chaski/core/storage/storage_providers.dart';
 import 'package:chaski/core/storage/token_storage.dart';
+import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -75,10 +76,12 @@ Future<ProviderContainer> pumpChaski(
   double textScale = 1,
   Brightness brightness = Brightness.light,
   Duration latency = const Duration(milliseconds: 10),
+  bool playSplash = false,
 }) => _pumpApp(
   tester,
   router: (c) => c.read(appRouterProvider),
   latency: latency,
+  playSplash: playSplash,
   onboardingSeen: onboardingSeen,
   signedInAs: signedIn ? 'usr_demo_customer' : null,
   size: size,
@@ -88,7 +91,7 @@ Future<ProviderContainer> pumpChaski(
   brightness: brightness,
 );
 
-/// Monta Chaski Socios. [signedInAs] es el id de un usuario del fake de auth
+/// Monta Apamuy Socios. [signedInAs] es el id de un usuario del fake de auth
 /// (p. ej. `usr_owner_chaski_dorado` o `usr_courier_luis`).
 Future<ProviderContainer> pumpPartner(
   WidgetTester tester, {
@@ -99,10 +102,12 @@ Future<ProviderContainer> pumpPartner(
   double textScale = 1,
   Brightness brightness = Brightness.light,
   Duration latency = const Duration(milliseconds: 10),
+  bool playSplash = false,
 }) => _pumpApp(
   tester,
   router: (c) => c.read(partnerRouterProvider),
   latency: latency,
+  playSplash: playSplash,
   alarm: alarm,
   signedInAs: signedInAs,
   size: size,
@@ -123,6 +128,7 @@ Future<ProviderContainer> _pumpApp(
   double textScale = 1,
   Brightness brightness = Brightness.light,
   Duration latency = const Duration(milliseconds: 10),
+  bool playSplash = false,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -152,6 +158,8 @@ Future<ProviderContainer> _pumpApp(
         const AppEnv(apiBaseUrl: 'http://test', useFakeData: true),
       ),
       orderAlarmProvider.overrideWithValue(alarm ?? RecordingAlarm()),
+      // La animación de arranque se prueba aparte; aquí no hace esperar a cada test.
+      if (!playSplash) splashGateProvider.overrideWith(_OpenSplashGate.new),
     ],
   );
   await tester.pumpWidget(
@@ -210,3 +218,8 @@ String currentPath(ProviderContainer c) =>
 
 String currentPartnerPath(ProviderContainer c) =>
     c.read(partnerRouterProvider).routeInformationProvider.value.uri.path;
+
+class _OpenSplashGate extends SplashGate {
+  @override
+  bool build() => true;
+}

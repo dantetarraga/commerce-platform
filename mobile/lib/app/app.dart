@@ -1,5 +1,6 @@
 import 'package:chaski/app/config/theme_mode_provider.dart';
 import 'package:chaski/app/router/app_router.dart';
+import 'package:chaski/shared/design_system/brand/brand_logo.dart';
 import 'package:chaski/shared/design_system/theme/app_theme.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,7 @@ class ChaskiApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'Chaski',
+      title: brandName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

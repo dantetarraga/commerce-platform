@@ -118,7 +118,7 @@ class AuthScaffold extends StatelessWidget {
                           ? const BackButton()
                           : const Padding(
                               padding: EdgeInsets.only(left: AppSpacing.md),
-                              child: ChaskiLogo(size: 28),
+                              child: BrandLogo(size: 28),
                             ),
                     ),
                   ),
@@ -411,7 +411,7 @@ class AuthLegalNote extends StatelessWidget {
           TextSpan(text: 'términos', style: link),
           const TextSpan(text: ' y la '),
           TextSpan(text: 'privacidad', style: link),
-          const TextSpan(text: ' de Chaski.'),
+          const TextSpan(text: ' de $brandName.'),
         ],
       ),
       style: theme.textTheme.bodySmall,

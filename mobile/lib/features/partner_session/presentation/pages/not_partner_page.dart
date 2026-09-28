@@ -25,7 +25,7 @@ class NotPartnerPage extends ConsumerWidget {
   }
 
   Future<void> _contact(BuildContext context, String phone) async {
-    final opened = await ExternalLinks.whatsapp(phone, text: 'Hola, quiero ser socio de Chaski.');
+    final opened = await ExternalLinks.whatsapp(phone, text: 'Hola, quiero ser socio de $brandName.');
     if (!opened && context.mounted) AppToast.show(context, 'No pudimos abrir WhatsApp.');
   }
 
@@ -45,9 +45,9 @@ class NotPartnerPage extends ConsumerWidget {
       ),
       children: const [
         AuthHeader(
-          title: 'Aún no eres socio de Chaski',
+          title: 'Aún no eres socio de $brandName',
           subtitle: Text(
-            'Chaski Socios es para negocios y repartidores afiliados. '
+            '$brandName Socios es para negocios y repartidores afiliados. '
             'Si quieres vender o repartir con nosotros, escríbenos y te damos de alta.',
           ),
         ),

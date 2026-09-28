@@ -3,7 +3,7 @@
 /// Un solo import para tokens, tema, componentes, marca e ilustraciones.
 library;
 
-export 'brand/chaski_logo.dart';
+export 'brand/brand_logo.dart';
 export 'components/app_avatar.dart';
 export 'components/app_badge.dart';
 export 'components/app_button.dart';

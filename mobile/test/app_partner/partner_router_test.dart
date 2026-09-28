@@ -24,7 +24,7 @@ void main() {
   testWidgets('sin sesión abre la entrada de socios', (tester) async {
     final container = await pumpPartner(tester);
     expect(currentPartnerPath(container), PartnerRoutePaths.login);
-    expect(find.text('Entra a Chaski Socios'), findsOneWidget);
+    expect(find.text('Entra a Apamuy Socios'), findsOneWidget);
     await unmountChaski(tester, container);
   });
 

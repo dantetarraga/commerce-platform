@@ -14,7 +14,8 @@ class UserDto {
     this.avatarUrl,
   });
 
-  factory UserDto.fromJson(Map<String, dynamic> json) => _$UserDtoFromJson(json);
+  factory UserDto.fromJson(Map<String, dynamic> json) =>
+      _$UserDtoFromJson(json);
 
   final String id;
   final String phone;
@@ -25,12 +26,16 @@ class UserDto {
   final List<String> roles;
 }
 
-/// Respuesta de `POST /auth/otp/request`.
 @JsonSerializable()
 class OtpChallengeDto {
-  const OtpChallengeDto({required this.phone, required this.resendAfterSeconds, required this.codeLength});
+  const OtpChallengeDto({
+    required this.phone,
+    required this.resendAfterSeconds,
+    required this.codeLength,
+  });
 
-  factory OtpChallengeDto.fromJson(Map<String, dynamic> json) => _$OtpChallengeDtoFromJson(json);
+  factory OtpChallengeDto.fromJson(Map<String, dynamic> json) =>
+      _$OtpChallengeDtoFromJson(json);
 
   final String phone;
   final int resendAfterSeconds;
@@ -51,7 +56,8 @@ class OtpVerifyResponseDto {
     this.registrationToken,
   });
 
-  factory OtpVerifyResponseDto.fromJson(Map<String, dynamic> json) => _$OtpVerifyResponseDtoFromJson(json);
+  factory OtpVerifyResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$OtpVerifyResponseDtoFromJson(json);
 
   static const authenticated = 'AUTHENTICATED';
   static const profileRequired = 'PROFILE_REQUIRED';
@@ -66,9 +72,14 @@ class OtpVerifyResponseDto {
 /// Respuesta de `POST /auth/register` (sesión ya iniciada).
 @JsonSerializable()
 class AuthResponseDto {
-  const AuthResponseDto({required this.user, required this.accessToken, required this.refreshToken});
+  const AuthResponseDto({
+    required this.user,
+    required this.accessToken,
+    required this.refreshToken,
+  });
 
-  factory AuthResponseDto.fromJson(Map<String, dynamic> json) => _$AuthResponseDtoFromJson(json);
+  factory AuthResponseDto.fromJson(Map<String, dynamic> json) =>
+      _$AuthResponseDtoFromJson(json);
 
   final UserDto user;
   final String accessToken;

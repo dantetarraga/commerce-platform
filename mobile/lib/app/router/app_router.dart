@@ -29,6 +29,7 @@ GoRouter appRouter(Ref ref) {
   ref
     ..listen(authSessionProvider, (_, _) => refresh.value++)
     ..listen(onboardingStatusProvider, (_, _) => refresh.value++)
+    ..listen(splashGateProvider, (_, _) => refresh.value++)
     ..onDispose(refresh.dispose);
 
   final router = GoRouter(
@@ -176,8 +177,8 @@ String? _redirect(Ref ref, String location) {
   final session = ref.read(authSessionProvider);
   final onboarding = ref.read(onboardingStatusProvider);
 
-  // Todavía restaurando la sesión o leyendo preferencias.
-  if (!session.hasValue || !onboarding.hasValue) {
+  // Todavía restaurando la sesión, leyendo preferencias o terminando la animación de arranque.
+  if (!session.hasValue || !onboarding.hasValue || !ref.read(splashGateProvider)) {
     return location == RoutePaths.splash ? null : RoutePaths.splash;
   }
 

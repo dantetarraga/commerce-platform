@@ -29,5 +29,5 @@ UserRole? _roleFromApi(String role) => switch (role) {
   'MERCHANT' => UserRole.merchant,
   'COURIER' => UserRole.courier,
   'ADMIN' => UserRole.admin,
-  _ => null, // roles nuevos del backend no rompen versiones viejas de la app
+  _ => null,
 };

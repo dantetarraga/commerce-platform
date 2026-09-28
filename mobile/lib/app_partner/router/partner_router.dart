@@ -3,6 +3,7 @@ import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
 import 'package:chaski/features/merchant_orders/merchant_orders.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
+import 'package:chaski/shared/design_system/brand/brand_logo.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,6 +20,7 @@ GoRouter partnerRouter(Ref ref) {
   ref
     ..listen(authSessionProvider, (_, _) => refresh.value++)
     ..listen(partnerModePreferenceProvider, (_, _) => refresh.value++)
+    ..listen(splashGateProvider, (_, _) => refresh.value++)
     ..onDispose(refresh.dispose);
 
   final router = GoRouter(
@@ -36,7 +38,7 @@ GoRouter partnerRouter(Ref ref) {
         path: PartnerRoutePaths.login,
         name: PhoneEntryPage.name,
         builder: (_, _) => const PhoneEntryPage(
-          title: 'Entra a Chaski Socios',
+          title: 'Entra a $brandName Socios',
           subtitle: 'Usa el celular con el que te afiliamos. Te mandamos un código por SMS.',
           demoAccounts: [
             (label: 'Negocio', phone: FakeAuthRemoteDataSource.demoMerchantPhone),
@@ -89,7 +91,7 @@ GoRouter partnerRouter(Ref ref) {
 
 String? _redirect(Ref ref, String location) {
   final session = ref.read(authSessionProvider);
-  if (!session.hasValue) {
+  if (!session.hasValue || !ref.read(splashGateProvider)) {
     return location == PartnerRoutePaths.splash ? null : PartnerRoutePaths.splash;
   }
 

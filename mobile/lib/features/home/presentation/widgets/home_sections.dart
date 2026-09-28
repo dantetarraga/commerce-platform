@@ -309,7 +309,7 @@ class RecommendedStores extends ConsumerWidget {
                         children: [
                           Text(store.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
                           Text(
-                            store.rating.hasReviews ? '★ ${store.rating.average.toStringAsFixed(1)} · ${store.rating.count} opiniones' : 'Nuevo en Chaski',
+                            store.rating.hasReviews ? '★ ${store.rating.average.toStringAsFixed(1)} · ${store.rating.count} opiniones' : 'Nuevo en $brandName',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall,

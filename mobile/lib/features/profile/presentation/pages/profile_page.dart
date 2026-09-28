@@ -167,7 +167,7 @@ class ProfilePage extends ConsumerWidget {
             Center(
               child: Column(
                 children: [
-                  const ChaskiLogo(size: 24),
+                  const BrandLogo(size: 24),
                   const SizedBox(height: AppSpacing.xs),
                   Text('Hecho en Espinar · v0.1.0', style: theme.textTheme.bodySmall),
                 ],
