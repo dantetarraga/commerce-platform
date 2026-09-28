@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chaski/shared/design_system/components/app_loader.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
@@ -29,6 +30,7 @@ class AppSearchBar extends StatefulWidget {
     this.onSubmitted,
     this.onClear,
     this.autofocus = false,
+    this.loading = false,
     super.key,
   });
 
@@ -41,6 +43,9 @@ class AppSearchBar extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final VoidCallback? onClear;
   final bool autofocus;
+
+  /// Buscando: la lupa se vuelve el indicador de la marca.
+  final bool loading;
 
   @override
   State<AppSearchBar> createState() => _AppSearchBarState();
@@ -136,7 +141,15 @@ class _AppSearchBarState extends State<AppSearchBar> {
       padding: const EdgeInsets.only(left: AppSpacing.md, right: AppSpacing.xxs),
       child: Row(
         children: [
-          Icon(Icons.search_rounded, color: fg),
+          SizedBox.square(
+            dimension: 24,
+            child: AnimatedSwitcher(
+              duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
+              child: widget.loading
+                  ? AppLoader(key: const ValueKey('loading'), color: fg, semanticsLabel: 'Buscando')
+                  : Icon(Icons.search_rounded, key: const ValueKey('idle'), color: fg),
+            ),
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: field),
           if (hasText)

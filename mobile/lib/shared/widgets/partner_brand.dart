@@ -258,7 +258,7 @@ class PartnerStatusPill extends StatelessWidget {
                 const SizedBox(
                   width: 48,
                   height: 48,
-                  child: Center(child: SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2))),
+                  child: Center(child: AppLoader(size: 22)),
                 )
               else
                 Semantics(
@@ -968,12 +968,7 @@ class _SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvid
                             boxShadow: [BoxShadow(color: Color(0x332A1A14), blurRadius: 6, offset: Offset(0, 2))],
                           ),
                           child: widget.busy
-                              ? Center(
-                                  child: SizedBox.square(
-                                    dimension: 22,
-                                    child: CircularProgressIndicator(strokeWidth: 2.4, color: widget.color),
-                                  ),
-                                )
+                              ? Center(child: AppLoader(size: 22, color: widget.color, dot: widget.color))
                               : Icon(_armed ? Icons.check_rounded : widget.icon, color: widget.color),
                         ),
                       ),

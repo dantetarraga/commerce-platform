@@ -1,7 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chaski/shared/design_system/components/app_skeleton.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:skeletonizer/skeletonizer.dart' show Skeletonizer;
 
 /// Imagen remota con caché, placeholder y fallback consistentes.
 class AppNetworkImage extends StatelessWidget {
@@ -24,47 +25,41 @@ class AppNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dentro de un skeleton, la foto es un bloque entero (no su ícono de respaldo).
+    if (Skeletonizer.maybeOf(context)?.enabled ?? false) {
+      return SizedBox(width: width, height: height, child: SkeletonBox.expand(borderRadius: borderRadius));
+    }
     final fallback = _Fallback(icon: fallbackIcon);
     final source = url?.trim();
     final reduced = reduceMotionOf(context);
     final image = source == null || source.isEmpty
         ? fallback
         : source.startsWith('assets/')
-        ? Image.asset(source, width: width, height: height, fit: fit, errorBuilder: (_, _, _) => fallback)
+        ? Image.asset(
+            source,
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: (_, _, _) => fallback,
+          )
         : CachedNetworkImage(
             imageUrl: source,
             width: width,
             height: height,
             fit: fit,
-            memCacheWidth: width != null && width!.isFinite && width! > 0 ? (width! * MediaQuery.devicePixelRatioOf(context)).ceil().clamp(1, 1600) : null,
+            memCacheWidth: width != null && width!.isFinite && width! > 0
+                ? (width! * MediaQuery.devicePixelRatioOf(context))
+                      .ceil()
+                      .clamp(1, 1600)
+                : null,
             fadeInDuration: reduced ? Duration.zero : AppMotion.base,
             fadeOutDuration: reduced ? Duration.zero : AppMotion.quick,
-            // Mientras descarga: shimmer, igual que los skeletons.
-            placeholder: (_, _) => const _Loading(),
+            placeholder: (_, _) => const Skeleton(child: SkeletonBox.expand()),
             errorWidget: (_, _, _) => fallback,
           );
     return ClipRRect(
       borderRadius: borderRadius,
       child: SizedBox(width: width, height: height, child: image),
-    );
-  }
-}
-
-class _Loading extends StatelessWidget {
-  const _Loading();
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final block = ColoredBox(
-      color: scheme.surfaceContainer,
-      child: const SizedBox.expand(),
-    );
-    if (reduceMotionOf(context)) return block;
-    return Shimmer.fromColors(
-      baseColor: scheme.surfaceContainer,
-      highlightColor: scheme.surfaceContainerLowest,
-      child: block,
     );
   }
 }
@@ -79,7 +74,8 @@ class _Fallback extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final roomy = constraints.maxWidth >= 120 && constraints.maxHeight >= 88;
+        final roomy =
+            constraints.maxWidth >= 120 && constraints.maxHeight >= 88;
         return ExcludeSemantics(
           child: DecoratedBox(
             decoration: BoxDecoration(

@@ -78,6 +78,7 @@ class BrandMarkPainter extends CustomPainter {
     this.dotScale = 1,
     this.dotOpacity = 1,
     this.drawDot = true,
+    this.angle = 0,
   });
 
   final Color body;
@@ -86,6 +87,9 @@ class BrandMarkPainter extends CustomPainter {
   final double dotScale;
   final double dotOpacity;
   final bool drawDot;
+
+  /// Giro de la "a" (radianes) alrededor del centro de su panza.
+  final double angle;
 
   /// Centro del pedido en la grilla de 100.
   static const dotCenter = Offset(46, 54);
@@ -96,6 +100,12 @@ class BrandMarkPainter extends CustomPainter {
     canvas
       ..save()
       ..scale(k);
+    if (angle != 0) {
+      canvas
+        ..translate(dotCenter.dx, dotCenter.dy)
+        ..rotate(angle)
+        ..translate(-dotCenter.dx, -dotCenter.dy);
+    }
     final bowl = Path()
       ..fillType = PathFillType.evenOdd
       ..addOval(Rect.fromCircle(center: dotCenter, radius: 26))
@@ -123,5 +133,6 @@ class BrandMarkPainter extends CustomPainter {
       old.dotOffset != dotOffset ||
       old.dotScale != dotScale ||
       old.dotOpacity != dotOpacity ||
-      old.drawDot != drawDot;
+      old.drawDot != drawDot ||
+      old.angle != angle;
 }

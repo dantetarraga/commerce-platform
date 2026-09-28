@@ -263,14 +263,7 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
                                       if (_saving.contains(product.id))
                                         const SizedBox(
                                           width: 48,
-                                          child: Center(
-                                            child: SizedBox.square(
-                                              dimension: 22,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                          ),
+                                          child: Center(child: AppLoader(size: 22, semanticsLabel: 'Guardando')),
                                         )
                                       else
                                         Semantics(

@@ -461,7 +461,7 @@ class _InkButton extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: busy
-                ? SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: fg))
+                ? AppLoader(size: 22, color: fg, dot: fg)
                 : Text(label, style: Theme.of(context).textTheme.labelLarge?.copyWith(color: fg, fontWeight: FontWeight.w800)),
           ),
         ),

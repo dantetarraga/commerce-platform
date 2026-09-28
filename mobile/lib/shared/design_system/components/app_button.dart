@@ -1,3 +1,4 @@
+import 'package:chaski/shared/design_system/components/app_loader.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
@@ -126,11 +127,7 @@ class AppButton extends StatelessWidget {
         child: ScaleTransition(scale: Tween<double>(begin: 0.85, end: 1).animate(animation), child: child),
       ),
       child: loading
-          ? SizedBox.square(
-              key: const ValueKey('loading'),
-              dimension: 22,
-              child: CircularProgressIndicator(strokeWidth: 2.5, color: fg),
-            )
+          ? AppLoader(key: const ValueKey('loading'), size: 22, color: fg, dot: fg, semanticsLabel: null)
           : Row(
               key: const ValueKey('content'),
               mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,

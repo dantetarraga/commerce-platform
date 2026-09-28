@@ -14,8 +14,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// "Explorar": sé lo que quiero. Abre con el buscador listo; los resultados
-/// van en pestañas Productos · Negocios.
 class ExplorePage extends ConsumerStatefulWidget {
   const ExplorePage({super.key});
 
@@ -44,7 +42,9 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     super.dispose();
   }
 
-  void _onChanged(String value) => _debouncer.run(() => ref.read(searchQueryProvider.notifier).update(value));
+  void _onChanged(String value) => _debouncer.run(
+    () => ref.read(searchQueryProvider.notifier).update(value),
+  );
 
   void _search(String value) {
     _controller
@@ -55,7 +55,8 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     _focus.unfocus();
   }
 
-  void _remember() => ref.read(recentSearchesProvider.notifier).add(_controller.text).ignore();
+  void _remember() =>
+      ref.read(recentSearchesProvider.notifier).add(_controller.text).ignore();
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +64,8 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
     final query = ref.watch(searchQueryProvider).trim();
     final results = ref.watch(searchResultsProvider);
     final searching = query.length >= SearchCatalog.minQueryLength;
-    // Con resultados previos en pantalla, una barra fina avisa que se actualizan.
+    // Con resultados previos en pantalla, la lupa hace el relevo y los
+    // resultados viejos se atenúan mientras llegan los nuevos.
     final refreshing = searching && results.isLoading && results.hasValue;
 
     return Scaffold(
@@ -75,11 +77,19 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Sigue tu antojo.', style: Theme.of(context).textTheme.headlineLarge),
+                child: Text(
+                  'Sigue tu antojo.',
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.xs),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.gutter,
+                AppSpacing.sm,
+                AppSpacing.gutter,
+                AppSpacing.xs,
+              ),
               child: AppSearchBar(
                 variant: AppSearchBarVariant.compact,
                 hints: const ['Negocios, platos o productos'],
@@ -89,16 +99,10 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                 onChanged: _onChanged,
                 onSubmitted: _search,
                 onClear: () => _search(''),
+                loading: searching && results.isLoading,
               ),
             ),
-            SizedBox(
-              height: 2,
-              child: AnimatedOpacity(
-                opacity: refreshing ? 1 : 0,
-                duration: AppMotion.quick,
-                child: refreshing ? const LinearProgressIndicator(minHeight: 2) : null,
-              ),
-            ),
+            const SizedBox(height: 2),
             Expanded(
               child: LoadCrossFade(
                 stateKey: searching ? 'results' : 'idle',
@@ -109,11 +113,27 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
                         onRetry: () => ref.invalidate(searchResultsProvider),
                         loading: ListView(
                           physics: const NeverScrollableScrollPhysics(),
-                          children: [for (var i = 0; i < 6; i++) const AppProductRowSkeleton()],
+                          children: [
+                            for (var i = 0; i < 6; i++)
+                              const AppProductRowSkeleton(),
+                          ],
                         ),
                         isEmpty: (r) => r.isEmpty,
                         empty: _NoResults(query: query, onPick: _search),
-                        data: (r) => _Results(key: ValueKey(query), results: r, onOpen: _remember),
+                        data: (r) => AnimatedOpacity(
+                          opacity: refreshing ? 0.45 : 1,
+                          duration: reduceMotionOf(context)
+                              ? Duration.zero
+                              : AppMotion.quick,
+                          child: IgnorePointer(
+                            ignoring: refreshing,
+                            child: _Results(
+                              key: ValueKey(query),
+                              results: r,
+                              onOpen: _remember,
+                            ),
+                          ),
+                        ),
                       ),
               ),
             ),
@@ -124,20 +144,29 @@ class _ExplorePageState extends ConsumerState<ExplorePage> {
   }
 }
 
-Widget _groupTitle(BuildContext context, String text, {Widget? action}) => Padding(
-  padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.lg, action == null ? AppSpacing.gutter : AppSpacing.xs, AppSpacing.xs),
-  child: SizedBox(
-    height: action == null ? null : AppSpacing.minTouch,
-    child: Row(
-      children: [
-        Expanded(
-          child: Semantics(header: true, child: Text(text, style: AppTypography.eyebrow(context))),
+Widget _groupTitle(BuildContext context, String text, {Widget? action}) =>
+    Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.gutter,
+        AppSpacing.lg,
+        action == null ? AppSpacing.gutter : AppSpacing.xs,
+        AppSpacing.xs,
+      ),
+      child: SizedBox(
+        height: action == null ? null : AppSpacing.minTouch,
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                header: true,
+                child: Text(text, style: AppTypography.eyebrow(context)),
+              ),
+            ),
+            ?action,
+          ],
         ),
-        ?action,
-      ],
-    ),
-  ),
-);
+      ),
+    );
 
 /// Estado inicial: RECIENTES (chips con reloj) y LO MÁS PEDIDO EN ESPINAR.
 class _Idle extends ConsumerWidget {
@@ -162,7 +191,12 @@ class _Idle extends ConsumerWidget {
           _groupTitle(
             context,
             'RECIENTES',
-            action: AppButton.ghost(label: 'Borrar', size: AppButtonSize.sm, onPressed: () => ref.read(recentSearchesProvider.notifier).clear()),
+            action: AppButton.ghost(
+              label: 'Borrar',
+              size: AppButtonSize.sm,
+              onPressed: () =>
+                  ref.read(recentSearchesProvider.notifier).clear(),
+            ),
           ),
           Padding(
             padding: AppSpacing.screen,
@@ -170,7 +204,13 @@ class _Idle extends ConsumerWidget {
               spacing: AppSpacing.xs,
               runSpacing: AppSpacing.xs,
               children: [
-                for (final q in recent) AppChip(label: q, icon: Icons.schedule_rounded, variant: AppChipVariant.suggestion, onTap: () => onPick(q)),
+                for (final q in recent)
+                  AppChip(
+                    label: q,
+                    icon: Icons.schedule_rounded,
+                    variant: AppChipVariant.suggestion,
+                    onTap: () => onPick(q),
+                  ),
               ],
             ),
           ),
@@ -187,14 +227,23 @@ class _Idle extends ConsumerWidget {
                   child: InkWell(
                     onTap: () => onPick(p.term),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.xs + 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.gutter,
+                        vertical: AppSpacing.xs + 2,
+                      ),
                       child: Row(
                         children: [
                           Container(
                             width: 44,
                             height: 44,
-                            decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
-                            child: Icon(Icons.trending_up_rounded, color: theme.colorScheme.onSurface),
+                            decoration: BoxDecoration(
+                              color: context.chaski.raised,
+                              borderRadius: AppRadius.tile,
+                            ),
+                            child: Icon(
+                              Icons.trending_up_rounded,
+                              color: theme.colorScheme.onSurface,
+                            ),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
@@ -202,7 +251,10 @@ class _Idle extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(p.term, style: theme.textTheme.titleSmall),
-                                Text('en ${_storesLabel(p.storeCount)}', style: theme.textTheme.bodySmall),
+                                Text(
+                                  'en ${_storesLabel(p.storeCount)}',
+                                  style: theme.textTheme.bodySmall,
+                                ),
                               ],
                             ),
                           ),
@@ -234,7 +286,10 @@ class _Idle extends ConsumerWidget {
               children: [
                 for (var i = 0; i < 4; i++)
                   const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.xs + 2),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.gutter,
+                      vertical: AppSpacing.xs + 2,
+                    ),
                     child: Row(
                       children: [
                         SkeletonBox(width: 44, height: 44),
@@ -254,7 +309,6 @@ class _Idle extends ConsumerWidget {
 
 String _storesLabel(int count) => count == 1 ? '1 negocio' : '$count negocios';
 
-/// Sin resultados: "No encontramos “sushi”" + sugerencias en chips.
 class _NoResults extends ConsumerWidget {
   const _NoResults({required this.query, required this.onPick});
 
@@ -263,7 +317,10 @@ class _NoResults extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final suggestions = (ref.watch(popularSearchesProvider).value ?? const []).take(4).map((p) => p.term).toList();
+    final suggestions = (ref.watch(popularSearchesProvider).value ?? const [])
+        .take(4)
+        .map((p) => p.term)
+        .toList();
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
       child: Column(
@@ -271,7 +328,8 @@ class _NoResults extends ConsumerWidget {
           AppEmptyState(
             kind: AppEmptyKind.noResults,
             title: 'No encontramos “$query”',
-            message: 'Todavía no hay negocios que lo vendan cerca. Prueba con otra palabra o mira lo más pedido.',
+            message:
+                'Todavía no hay negocios que lo vendan cerca. Prueba con otra palabra o mira lo más pedido.',
           ),
           if (suggestions.isNotEmpty)
             Padding(
@@ -281,7 +339,12 @@ class _NoResults extends ConsumerWidget {
                 spacing: AppSpacing.xs,
                 runSpacing: AppSpacing.xs,
                 children: [
-                  for (final s in suggestions) AppChip(label: s.toLowerCase(), variant: AppChipVariant.suggestion, onTap: () => onPick(s)),
+                  for (final s in suggestions)
+                    AppChip(
+                      label: s.toLowerCase(),
+                      variant: AppChipVariant.suggestion,
+                      onTap: () => onPick(s),
+                    ),
                 ],
               ),
             ),
@@ -304,7 +367,8 @@ class _Results extends ConsumerStatefulWidget {
   ConsumerState<_Results> createState() => _ResultsState();
 }
 
-class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderStateMixin {
+class _ResultsState extends ConsumerState<_Results>
+    with SingleTickerProviderStateMixin {
   late final _tabs = TabController(
     length: 2,
     vsync: this,
@@ -319,19 +383,30 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
     super.dispose();
   }
 
-  /// "+" rápido: agrega sin entrar al negocio (solo si está abierto y entrega).
   Future<bool> _quickAdd(ProductHit p, StoreSummary? known) async {
     widget.onOpen();
-    final summary = known ?? (await ref.read(storeDetailProvider(p.storeId).future)).summary;
+    final summary =
+        known ??
+        (await ref.read(storeDetailProvider(p.storeId).future)).summary;
     if (!mounted) return false;
     if (!summary.canOrder) {
-      AppToast.show(context, summary.isOpenNow ? '${summary.name} no llega a tu dirección' : '${summary.name} está cerrado ahora');
+      AppToast.show(
+        context,
+        summary.isOpenNow
+            ? '${summary.name} no llega a tu dirección'
+            : '${summary.name} está cerrado ahora',
+      );
       return false;
     }
     return addToCart(
       context,
       ref,
-      line: quickCartLine(productId: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl),
+      line: quickCartLine(
+        productId: p.id,
+        name: p.name,
+        price: p.price,
+        imageUrl: p.imageUrl,
+      ),
       store: summary.toCartStore(),
     );
   }
@@ -342,7 +417,11 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
     final scheme = theme.colorScheme;
     final results = widget.results;
     // Negocios cercanos ya cargados: dan el tiempo de entrega y la bolsa.
-    final nearby = {for (final s in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[]) s.id: s};
+    final nearby = {
+      for (final s
+          in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[])
+        s.id: s,
+    };
     final stores = [
       for (final s in results.stores)
         if (!_openOnly || s.isOpenNow) s,
@@ -354,12 +433,16 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
           controller: _tabs,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter - AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter - AppSpacing.sm,
+          ),
           labelPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
           labelColor: scheme.onSurface,
           unselectedLabelColor: scheme.onSurfaceVariant,
           labelStyle: theme.textTheme.titleSmall,
-          unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
           indicatorColor: scheme.primary,
           indicatorWeight: 3,
           indicatorSize: TabBarIndicatorSize.label,
@@ -383,10 +466,15 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
                 )
               else
                 ListView.separated(
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.xxl),
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.only(
+                    top: AppSpacing.xs,
+                    bottom: AppSpacing.xxl,
+                  ),
                   itemCount: results.products.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.xxs),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.xxs),
                   itemBuilder: (context, i) {
                     final p = results.products[i];
                     final store = nearby[p.storeId];
@@ -399,14 +487,23 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
                           name: p.name,
                           price: p.price,
                           imageUrl: p.imageUrl,
-                          description: store == null ? p.storeName : '${p.storeName} · ${Formatters.eta(store.etaMinutes)}',
+                          description: store == null
+                              ? p.storeName
+                              : '${p.storeName} · ${Formatters.eta(store.etaMinutes)}',
                           subtitle: p.storeName,
                           fromPrice: p.hasChoices,
                         ),
-                        onQuickAdd: p.hasChoices ? null : () => _quickAdd(p, store),
+                        onQuickAdd: p.hasChoices
+                            ? null
+                            : () => _quickAdd(p, store),
                         onTap: () {
                           widget.onOpen();
-                          context.pushNamed(ProductDetailPage.name, pathParameters: {'productId': p.id}).ignore();
+                          context
+                              .pushNamed(
+                                ProductDetailPage.name,
+                                pathParameters: {'productId': p.id},
+                              )
+                              .ignore();
                         },
                       ),
                     );
@@ -414,21 +511,37 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
                 ),
               // Negocios.
               ListView(
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
                 children: [
                   if (results.stores.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.xxs),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.gutter,
+                        AppSpacing.sm,
+                        AppSpacing.gutter,
+                        AppSpacing.xxs,
+                      ),
                       child: Row(
-                        children: [AppChip(label: 'Abierto ahora', selected: _openOnly, onTap: () => setState(() => _openOnly = !_openOnly))],
+                        children: [
+                          AppChip(
+                            label: 'Abierto ahora',
+                            selected: _openOnly,
+                            onTap: () => setState(() => _openOnly = !_openOnly),
+                          ),
+                        ],
                       ),
                     ),
                   if (stores.isEmpty)
                     AppEmptyState(
                       kind: AppEmptyKind.noResults,
-                      title: _openOnly ? 'Ninguno abierto ahora' : 'Ningún negocio con ese nombre',
-                      message: _openOnly ? 'Quita el filtro o programa tu pedido.' : 'Mira la pestaña Productos.',
+                      title: _openOnly
+                          ? 'Ninguno abierto ahora'
+                          : 'Ningún negocio con ese nombre',
+                      message: _openOnly
+                          ? 'Quita el filtro o programa tu pedido.'
+                          : 'Mira la pestaña Productos.',
                       compact: true,
                     ),
                   for (final (i, s) in stores.indexed)
@@ -459,13 +572,16 @@ class _ResultsState extends ConsumerState<_Results> with SingleTickerProviderSta
     }
 
     if (summary != null) {
-      return AppStoreCard(variant: AppStoreCardVariant.row, data: summary.toCardData(withDistance: true), onTap: open);
+      return AppStoreCard(
+        variant: AppStoreCardVariant.row,
+        data: summary.toCardData(withDistance: true),
+        onTap: open,
+      );
     }
     return _StoreHitRow(hit: hit, onTap: open);
   }
 }
 
-/// Respaldo cuando el negocio no está entre los cercanos ya cargados.
 class _StoreHitRow extends StatelessWidget {
   const _StoreHitRow({required this.hit, required this.onTap});
 
@@ -477,12 +593,16 @@ class _StoreHitRow extends StatelessWidget {
     final theme = Theme.of(context);
     return Semantics(
       button: true,
-      label: '${hit.name}. ${hit.isOpenNow ? 'Abierto' : 'Cerrado'}. ${Formatters.eta(hit.etaMinutes)}',
+      label:
+          '${hit.name}. ${hit.isOpenNow ? 'Abierto' : 'Cerrado'}. ${Formatters.eta(hit.etaMinutes)}',
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.gutter,
+            vertical: AppSpacing.sm,
+          ),
           child: Row(
             children: [
               Opacity(
@@ -504,9 +624,16 @@ class _StoreHitRow extends StatelessWidget {
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        AppBadge(hit.isOpenNow ? AppBadgeStatus.open : AppBadgeStatus.closed),
+                        AppBadge(
+                          hit.isOpenNow
+                              ? AppBadgeStatus.open
+                              : AppBadgeStatus.closed,
+                        ),
                         const SizedBox(width: AppSpacing.xs),
-                        Text(Formatters.eta(hit.etaMinutes), style: theme.textTheme.bodySmall),
+                        Text(
+                          Formatters.eta(hit.etaMinutes),
+                          style: theme.textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ],

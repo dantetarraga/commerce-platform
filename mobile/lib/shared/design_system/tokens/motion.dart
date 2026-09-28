@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 /// Sistema de movimiento: rápido al tocar, suave al llegar, siempre hacia adelante.
 abstract final class AppMotion {
@@ -76,56 +77,19 @@ class FadeSlideIn extends StatefulWidget {
   State<FadeSlideIn> createState() => _FadeSlideInState();
 }
 
-class _FadeSlideInState extends State<FadeSlideIn> with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(vsync: this, duration: widget.duration + widget.delay);
-  late final Animation<double> _progress;
-  var _started = false;
-
-  @override
-  void initState() {
-    super.initState();
-    final total = widget.duration + widget.delay;
-    final start = total == Duration.zero ? 0.0 : widget.delay.inMicroseconds / total.inMicroseconds;
-    _progress = CurvedAnimation(parent: _controller, curve: Interval(start, 1, curve: AppMotion.arrive));
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (reduceMotionOf(context)) {
-      _started = true;
-      _controller.value = 1;
-      return;
-    }
-    if (_started) return;
-    _started = true;
-    if (!widget.enabled || reduceMotionOf(context)) {
-      _controller.value = 1;
-    } else {
-      _controller.forward();
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _FadeSlideInState extends State<FadeSlideIn> {
+  // [FadeSlideIn.enabled] se lee al montarse: si luego cambia, la entrada no
+  // se corta ni se repite (y el hijo no pierde su estado).
+  late final bool _enabled = widget.enabled;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _progress,
-      builder: (context, child) {
-        final t = _progress.value;
-        if (t == 1) return child!;
-        return Opacity(
-          opacity: t,
-          child: Transform.translate(offset: widget.offset * (1 - t), child: child),
-        );
-      },
-      child: widget.child,
-    );
+    // Activar movimiento reducido a mitad de la entrada la termina al instante.
+    if (!_enabled || reduceMotionOf(context)) return widget.child;
+    return widget.child
+        .animate(delay: widget.delay)
+        .fadeIn(duration: widget.duration, curve: AppMotion.arrive)
+        .move(begin: widget.offset, end: Offset.zero, duration: widget.duration, curve: AppMotion.arrive);
   }
 }
 

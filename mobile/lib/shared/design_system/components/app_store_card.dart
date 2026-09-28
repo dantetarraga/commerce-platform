@@ -2,6 +2,7 @@ import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/shared/design_system/components/app_badge.dart';
 import 'package:chaski/shared/design_system/components/app_network_image.dart';
+import 'package:chaski/shared/design_system/components/app_skeleton.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
@@ -695,76 +696,29 @@ class _Repeat extends StatelessWidget {
   }
 }
 
-/// Skeletons con la misma geometría que cada variante.
+/// Skeleton de cada variante: la misma tarjeta con datos de relleno, así la
+/// geometría nunca se desfasa de la real.
 class AppStoreCardSkeleton extends StatelessWidget {
   const AppStoreCardSkeleton({this.variant = AppStoreCardVariant.feature, this.width = 248, super.key});
 
   final AppStoreCardVariant variant;
   final double width;
 
+  static const _placeholder = StoreCardData(
+    id: 'skeleton',
+    name: 'Picantería Espinar',
+    subtitle: 'Caldos · Sopas',
+    etaMinutes: 25,
+    deliveryFee: Money(300),
+    isOpen: true,
+    rating: 4.8,
+    distanceKm: 1.2,
+  );
+
+  static void _noop() {}
+
   @override
-  Widget build(BuildContext context) {
-    final base = context.chaski.shimmerBase;
-    Widget box(double w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) => Container(
-      width: w,
-      height: h,
-      decoration: BoxDecoration(color: base, borderRadius: r),
-    );
-    return switch (variant) {
-      // Misma geometría que la tarjeta editorial: foto al 52 % del ancho, nombre con
-      // la nota a la derecha, rubro y la línea de tiempo y envío.
-      AppStoreCardVariant.editorial => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 6, 20, 26),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LayoutBuilder(
-              builder: (context, constraints) => box(double.infinity, (constraints.maxWidth * 0.52).clamp(150, 240), AppRadius.card),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                box(180, 22),
-                const Spacer(),
-                box(48, 24, AppRadius.button),
-              ],
-            ),
-            const SizedBox(height: 6),
-            box(120, 12),
-            const SizedBox(height: 10),
-            box(220, 14),
-          ],
-        ),
-      ),
-      AppStoreCardVariant.feature => SizedBox(
-        width: width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            box(width, width * 0.56, AppRadius.card),
-            const SizedBox(height: AppSpacing.xs),
-            box(width * 0.6, 16),
-            const SizedBox(height: 6),
-            box(width * 0.75, 12),
-          ],
-        ),
-      ),
-      AppStoreCardVariant.row => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
-        child: Row(
-          children: [
-            box(68, 68, const BorderRadius.all(AppRadius.lg)),
-            const SizedBox(width: AppSpacing.sm),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [box(150, 15), const SizedBox(height: 8), box(190, 12)],
-            ),
-          ],
-        ),
-      ),
-      AppStoreCardVariant.repeat => Column(
-        children: [box(64, 64, AppRadius.tile), const SizedBox(height: 6), box(56, 10)],
-      ),
-    };
-  }
+  Widget build(BuildContext context) => AppSkeletonizer(
+    child: AppStoreCard(data: _placeholder, onTap: _noop, variant: variant, width: width),
+  );
 }

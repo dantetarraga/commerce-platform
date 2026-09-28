@@ -325,45 +325,19 @@ class _QuickAddButtonState extends State<QuickAddButton> with SingleTickerProvid
   }
 }
 
-/// Skeleton de fila de producto (misma geometría que [AppProductCardVariant.row]).
-/// Trae su propio [Skeleton] por dentro: la tarjeta queda de su color y solo
-/// brillan los bloques, así que no se envuelve en otro [Skeleton].
+/// Skeleton de fila de producto: la misma tarjeta con datos de relleno, así
+/// la geometría es siempre la de [AppProductCardVariant.row].
 class AppProductRowSkeleton extends StatelessWidget {
   const AppProductRowSkeleton({super.key});
 
+  static const _placeholder = ProductCardData(
+    id: 'skeleton',
+    name: 'Caldo de gallina',
+    description: 'Presa, papa amarilla y fideos, con hierbabuena',
+    price: Money(1800),
+  );
+
   @override
-  Widget build(BuildContext context) {
-    Widget box(double? w, double h, [BorderRadius r = const BorderRadius.all(AppRadius.sm)]) =>
-        SkeletonBox(width: w, height: h, borderRadius: r);
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
-      padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : const Color(0xFFEBE7DC),
-        borderRadius: AppRadius.card,
-      ),
-      child: Skeleton(
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  box(160, 16),
-                  const SizedBox(height: 8),
-                  box(null, 12),
-                  const SizedBox(height: 6),
-                  box(120, 12),
-                  const SizedBox(height: 12),
-                  box(70, 18),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            box(104, 116, const BorderRadius.all(AppRadius.lg)),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      const AppSkeletonizer(child: AppProductCard(data: _placeholder, onTap: null));
 }

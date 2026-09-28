@@ -17,7 +17,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-void _openStore(BuildContext context, String storeId, {String? coverUrl, Object? heroTag}) => context.pushNamed(
+void _openStore(
+  BuildContext context,
+  String storeId, {
+  String? coverUrl,
+  Object? heroTag,
+}) => context.pushNamed(
   StoreDetailPage.name,
   pathParameters: {'storeId': storeId},
   extra: StoreRouteArgs(coverUrl: coverUrl, heroTag: heroTag),
@@ -36,7 +41,12 @@ class HomeSectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.section, onSeeAll == null ? AppSpacing.gutter : AppSpacing.xs, AppSpacing.sm),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.gutter,
+        AppSpacing.section,
+        onSeeAll == null ? AppSpacing.gutter : AppSpacing.xs,
+        AppSpacing.sm,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -44,7 +54,10 @@ class HomeSectionTitle extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Semantics(header: true, child: Text(title, style: theme.textTheme.titleLarge)),
+                Semantics(
+                  header: true,
+                  child: Text(title, style: theme.textTheme.titleLarge),
+                ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
                   Text(subtitle!, style: theme.textTheme.bodySmall),
@@ -55,11 +68,18 @@ class HomeSectionTitle extends StatelessWidget {
           if (onSeeAll != null)
             TextButton(
               onPressed: onSeeAll,
-              style: TextButton.styleFrom(minimumSize: const Size(AppSpacing.minTouch, AppSpacing.minTouch)),
+              style: TextButton.styleFrom(
+                minimumSize: const Size(
+                  AppSpacing.minTouch,
+                  AppSpacing.minTouch,
+                ),
+              ),
               child: Text(
                 'Ver todo',
                 semanticsLabel: 'Ver todo: $title',
-                style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
               ),
             ),
         ],
@@ -73,10 +93,22 @@ class CategoryShelf extends ConsumerWidget {
   const CategoryShelf({super.key});
 
   /// Orden de los 4 principales (por `slug`); si falta alguno, entra el siguiente.
-  static const _main = ['restaurantes', 'mercado', 'farmacia', 'bodegas', 'postres', 'licores', 'regalos', 'encargos'];
+  static const _main = [
+    'restaurantes',
+    'mercado',
+    'farmacia',
+    'bodegas',
+    'postres',
+    'licores',
+    'regalos',
+    'encargos',
+  ];
 
   /// Elige los 4 accesos y cuál resaltar según el momento.
-  static ({List<Category> main, List<Category> rest, String? highlighted}) pick(List<Category> all, Moment moment) {
+  static ({List<Category> main, List<Category> rest, String? highlighted}) pick(
+    List<Category> all,
+    Moment moment,
+  ) {
     int rank(Category c) {
       final i = _main.indexOf(c.slug);
       return i < 0 ? _main.length : i;
@@ -85,8 +117,12 @@ class CategoryShelf extends ConsumerWidget {
     final sorted = [...all]..sort((a, b) => rank(a).compareTo(rank(b)));
     final main = sorted.take(4).toList();
     // Si la categoría del momento no está entre las 4, reemplaza a la última.
-    final featured = moment.featuredCategories.map((slug) => all.where((c) => c.slug == slug).firstOrNull).nonNulls.firstOrNull;
-    if (featured != null && !main.contains(featured) && main.length == 4) main[3] = featured;
+    final featured = moment.featuredCategories
+        .map((slug) => all.where((c) => c.slug == slug).firstOrNull)
+        .nonNulls
+        .firstOrNull;
+    if (featured != null && !main.contains(featured) && main.length == 4)
+      main[3] = featured;
     return (
       main: main,
       rest: [
@@ -102,7 +138,8 @@ class CategoryShelf extends ConsumerWidget {
     final moment = ref.watch(currentMomentProvider);
     final categories = ref.watch(categoriesProvider);
     final openCount = <String, int>{};
-    for (final store in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[]) {
+    for (final store
+        in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[]) {
       if (!store.isOpenNow) continue;
       for (final id in store.categoryIds) {
         openCount[id] = (openCount[id] ?? 0) + 1;
@@ -112,16 +149,25 @@ class CategoryShelf extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.lg),
       child: LoadCrossFade(
-        stateKey: categories.hasValue ? 'data' : (categories.hasError ? 'error' : 'loading'),
+        stateKey: categories.hasValue
+            ? 'data'
+            : (categories.hasError ? 'error' : 'loading'),
         child: switch (categories) {
           AsyncValue(:final value?) => CityCategories(
-            categories: [...pick(value, moment).main, ...pick(value, moment).rest],
+            categories: [
+              ...pick(value, moment).main,
+              ...pick(value, moment).rest,
+            ],
             highlighted: pick(value, moment).highlighted,
             openCount: openCount,
           ),
           AsyncError(:final error) => Padding(
             padding: AppSpacing.screen,
-            child: AppEmptyState.fromError(error, compact: true, onRetry: () => ref.invalidate(categoriesProvider)),
+            child: AppEmptyState.fromError(
+              error,
+              compact: true,
+              onRetry: () => ref.invalidate(categoriesProvider),
+            ),
           ),
           _ => const CityCategoriesSkeleton(),
         },
@@ -142,7 +188,8 @@ class RepeatRow extends ConsumerWidget {
     final history = ref.watch(ordersHistoryProvider).value ?? const [];
     final times = <String, int>{};
     for (final o in history) {
-      if (o.status == OrderStatus.delivered) times[o.store.id] = (times[o.store.id] ?? 0) + 1;
+      if (o.status == OrderStatus.delivered)
+        times[o.store.id] = (times[o.store.id] ?? 0) + 1;
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,13 +216,19 @@ class _BarrioStoreCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tag = storeCoverHeroTag(store.id, 'barrio');
-    final closedLabel = store.isOpenNow ? null : ref.watch(storeDetailProvider(store.id)).value?.nextOpeningLabel;
-    void open() => _openStore(context, store.id, coverUrl: store.coverUrl, heroTag: tag);
+    final closedLabel = store.isOpenNow
+        ? null
+        : ref.watch(storeDetailProvider(store.id)).value?.nextOpeningLabel;
+    void open() =>
+        _openStore(context, store.id, coverUrl: store.coverUrl, heroTag: tag);
     return AppStoreCard(
       variant: AppStoreCardVariant.editorial,
       heroTag: tag,
       isFavorite: ref.watch(isFavoriteStoreProvider(store.id)),
-      onFavoriteToggle: () => ref.read(favoritesProvider.notifier).toggle(FavoriteKind.store, store.id).ignore(),
+      onFavoriteToggle: () => ref
+          .read(favoritesProvider.notifier)
+          .toggle(FavoriteKind.store, store.id)
+          .ignore(),
       data: store.toCardData(withDistance: true, closedLabel: closedLabel),
       onSchedule: store.isOpenNow ? null : open,
       onTap: open,
@@ -184,17 +237,33 @@ class _BarrioStoreCard extends ConsumerWidget {
 }
 
 /// Agrega a la bolsa un producto sin opciones desde el inicio.
-Future<bool> _quickAddProduct(BuildContext context, WidgetRef ref, ProductHit product) async {
-  final store = (await ref.read(storeDetailProvider(product.storeId).future)).summary;
+Future<bool> _quickAddProduct(
+  BuildContext context,
+  WidgetRef ref,
+  ProductHit product,
+) async {
+  final store = (await ref.read(
+    storeDetailProvider(product.storeId).future,
+  )).summary;
   if (!context.mounted) return false;
   if (!store.canOrder) {
-    AppToast.show(context, store.isOpenNow ? '${store.name} no llega a tu dirección' : '${store.name} está cerrado ahora');
+    AppToast.show(
+      context,
+      store.isOpenNow
+          ? '${store.name} no llega a tu dirección'
+          : '${store.name} está cerrado ahora',
+    );
     return false;
   }
   return addToCart(
     context,
     ref,
-    line: quickCartLine(productId: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl),
+    line: quickCartLine(
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+    ),
     store: store.toCartStore(),
   );
 }
@@ -210,13 +279,17 @@ class PromoCarouselSection extends ConsumerWidget {
     final items = promotions.value;
     final products = ref.watch(localProductsProvider).value ?? const [];
     final lead = products.where((p) => !p.hasChoices).firstOrNull;
-    if (promotions.hasError || (items != null && items.isEmpty && lead == null)) return const SizedBox.shrink();
+    if (promotions.hasError || (items != null && items.isEmpty && lead == null))
+      return const SizedBox.shrink();
 
     void onTap(Promotion promo) {
       if (promo.storeId != null) {
         _openStore(context, promo.storeId!);
       } else if (promo.couponCode != null) {
-        AppToast.show(context, 'Usa el código ${promo.couponCode} en tu bolsa.');
+        AppToast.show(
+          context,
+          'Usa el código ${promo.couponCode} en tu bolsa.',
+        );
       }
     }
 
@@ -224,7 +297,10 @@ class PromoCarouselSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        HomeSectionTitle(night ? 'Esta noche en Yauri' : 'Hoy en Yauri', subtitle: 'Promos de negocios cerca de ti'),
+        HomeSectionTitle(
+          night ? 'Esta noche en Yauri' : 'Hoy en Yauri',
+          subtitle: 'Promos de negocios cerca de ti',
+        ),
         LoadCrossFade(
           stateKey: items == null ? 'loading' : 'data',
           child: items == null
@@ -238,7 +314,10 @@ class PromoCarouselSection extends ConsumerWidget {
                           width: 212,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : AppColors.blanco,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? context.chaski.raised
+                                : AppColors.blanco,
                             borderRadius: AppRadius.card,
                           ),
                           child: AppProductCard(
@@ -251,8 +330,12 @@ class PromoCarouselSection extends ConsumerWidget {
                               imageUrl: lead.imageUrl,
                               subtitle: lead.storeName,
                             ),
-                            onQuickAdd: () => _quickAddProduct(context, ref, lead),
-                            onTap: () => context.pushNamed(ProductDetailPage.name, pathParameters: {'productId': lead.id}),
+                            onQuickAdd: () =>
+                                _quickAddProduct(context, ref, lead),
+                            onTap: () => context.pushNamed(
+                              ProductDetailPage.name,
+                              pathParameters: {'productId': lead.id},
+                            ),
                           ),
                         ),
                 ),
@@ -269,7 +352,13 @@ class RecommendedStores extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stores = ref.watch(storesProvider(sort: StoreSort.popular)).value?.items.where((s) => s.isOpenNow).take(3).toList();
+    final stores = ref
+        .watch(storesProvider(sort: StoreSort.popular))
+        .value
+        ?.items
+        .where((s) => s.isOpenNow)
+        .take(3)
+        .toList();
     if (stores == null || stores.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
@@ -278,16 +367,22 @@ class RecommendedStores extends ConsumerWidget {
       children: [
         const HomeSectionTitle('Recomendados para ti'),
         for (final (i, store) in stores.indexed) ...[
-          if (i > 0) const Padding(padding: AppSpacing.screen, child: Divider()),
+          if (i > 0)
+            const Padding(padding: AppSpacing.screen, child: Divider()),
           Semantics(
             button: true,
             label: store.toCardData(withDistance: true).name,
-            onTap: () => _openStore(context, store.id, coverUrl: store.coverUrl),
+            onTap: () =>
+                _openStore(context, store.id, coverUrl: store.coverUrl),
             excludeSemantics: true,
             child: InkWell(
-              onTap: () => _openStore(context, store.id, coverUrl: store.coverUrl),
+              onTap: () =>
+                  _openStore(context, store.id, coverUrl: store.coverUrl),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.gutter,
+                  vertical: 10,
+                ),
                 child: Row(
                   children: [
                     AppNetworkImage(
@@ -307,9 +402,16 @@ class RecommendedStores extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(store.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
                           Text(
-                            store.rating.hasReviews ? '★ ${store.rating.average.toStringAsFixed(1)} · ${store.rating.count} opiniones' : 'Nuevo en $brandName',
+                            store.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          Text(
+                            store.rating.hasReviews
+                                ? '★ ${store.rating.average.toStringAsFixed(1)} · ${store.rating.count} opiniones'
+                                : 'Nuevo en $brandName',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall,
@@ -318,18 +420,36 @@ class RecommendedStores extends ConsumerWidget {
                           Text.rich(
                             TextSpan(
                               children: [
-                                TextSpan(text: '${Formatters.eta(store.etaMinutes)} · '),
+                                TextSpan(
+                                  text:
+                                      '${Formatters.eta(store.etaMinutes)} · ',
+                                ),
                                 if (store.deliveryFee.isZero)
                                   WidgetSpan(
                                     alignment: PlaceholderAlignment.middle,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                                      decoration: BoxDecoration(color: context.chaski.accent, borderRadius: AppRadius.button),
-                                      child: Text('Envío gratis', style: theme.textTheme.labelMedium?.copyWith(color: context.chaski.onAccent)),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: context.chaski.accent,
+                                        borderRadius: AppRadius.button,
+                                      ),
+                                      child: Text(
+                                        'Envío gratis',
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                              color: context.chaski.onAccent,
+                                            ),
+                                      ),
                                     ),
                                   )
                                 else
-                                  TextSpan(text: '${Formatters.money(store.deliveryFee)} envío'),
+                                  TextSpan(
+                                    text:
+                                        '${Formatters.money(store.deliveryFee)} envío',
+                                  ),
                               ],
                             ),
                             style: theme.textTheme.titleSmall,
@@ -337,7 +457,9 @@ class RecommendedStores extends ConsumerWidget {
                           Text(
                             '${Formatters.distance(store.distanceKm)} · '
                             '${store.minOrderAmount.isZero ? 'sin mínimo' : 'mínimo ${Formatters.money(store.minOrderAmount)}'}',
-                            style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
@@ -357,7 +479,8 @@ class RecommendedStores extends ConsumerWidget {
 class WhileYouWait extends ConsumerWidget {
   const WhileYouWait({super.key});
 
-  static String _waitLabel(Category c) => c.slug == 'restaurantes' ? 'Comida' : categoryShelfLabel(c.slug, c.name);
+  static String _waitLabel(Category c) =>
+      c.slug == 'restaurantes' ? 'Comida' : categoryShelfLabel(c.slug, c.name);
 
   static const _slugs = ['restaurantes', 'bodegas', 'farmacia', 'encargos'];
 
@@ -365,23 +488,38 @@ class WhileYouWait extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final categories = ref.watch(categoriesProvider).value ?? const [];
     final picked = [
-      for (final slug in _slugs) ?categories.where((c) => c.slug == slug).firstOrNull,
+      for (final slug in _slugs)
+        ?categories.where((c) => c.slug == slug).firstOrNull,
     ];
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.gutter,
+        AppSpacing.md,
+        AppSpacing.gutter,
+        0,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppSearchBar(
-            hints: const ['¿Algo más mientras esperas?', 'Busca comida, tiendas o productos'],
+            hints: const [
+              '¿Algo más mientras esperas?',
+              'Busca comida, tiendas o productos',
+            ],
             variant: AppSearchBarVariant.compact,
             onTap: () => context.goNamed(ExplorePage.name),
           ),
           if (picked.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.lg),
-            Semantics(header: true, child: Text('Mientras esperas', style: theme.textTheme.titleLarge)),
+            Semantics(
+              header: true,
+              child: Text(
+                'Mientras esperas',
+                style: theme.textTheme.titleLarge,
+              ),
+            ),
             const SizedBox(height: AppSpacing.sm),
             Row(
               children: [
@@ -392,34 +530,58 @@ class WhileYouWait extends ConsumerWidget {
                       button: true,
                       label: 'Explorar ${_waitLabel(c)}',
                       excludeSemantics: true,
-                      onTap: () => context.pushNamed(CategoryStoresPage.name, pathParameters: {'categoryId': c.id}),
+                      onTap: () => context.pushNamed(
+                        CategoryStoresPage.name,
+                        pathParameters: {'categoryId': c.id},
+                      ),
                       child: Material(
                         color: c.slug == 'encargos'
                             ? AppColors.terracota
-                            : (dark ? context.chaski.raised : (i.isOdd ? AppColors.hierbaSoft : AppColors.terracota50)),
+                            : (dark
+                                  ? context.chaski.raised
+                                  : (i.isOdd
+                                        ? AppColors.hierbaSoft
+                                        : AppColors.terracota50)),
                         borderRadius: AppRadius.button,
                         child: InkWell(
                           borderRadius: AppRadius.button,
-                          onTap: () => context.pushNamed(CategoryStoresPage.name, pathParameters: {'categoryId': c.id}),
+                          onTap: () => context.pushNamed(
+                            CategoryStoresPage.name,
+                            pathParameters: {'categoryId': c.id},
+                          ),
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(minHeight: 76),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 4,
+                              ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     categoryVisuals(c.slug).icon,
-                                    color: c.slug == 'encargos' ? AppColors.blanco : (dark ? theme.colorScheme.onSurface : AppColors.tinta),
+                                    color: c.slug == 'encargos'
+                                        ? AppColors.blanco
+                                        : (dark
+                                              ? theme.colorScheme.onSurface
+                                              : AppColors.tinta),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     _waitLabel(c),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.labelMedium?.copyWith(
-                                      color: c.slug == 'encargos' ? AppColors.blanco : (dark ? theme.colorScheme.onSurface : AppColors.tinta),
-                                    ),
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: c.slug == 'encargos'
+                                              ? AppColors.blanco
+                                              : (dark
+                                                    ? theme
+                                                          .colorScheme
+                                                          .onSurface
+                                                    : AppColors.tinta),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -472,7 +634,9 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
     final stores = ref.watch(provider);
     final all = stores.value?.items ?? const <StoreSummary>[];
     final open = all.where((s) => s.isOpenNow).length;
-    final shown = all.where((s) => _filters.every((f) => f.accepts(s))).toList();
+    final shown = all
+        .where((s) => _filters.every((f) => f.accepts(s)))
+        .toList();
     final scheme = Theme.of(context).colorScheme;
     return SliverMainAxisGroup(
       slivers: [
@@ -480,7 +644,12 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              HomeSectionTitle('Cerca de ti', subtitle: stores.hasValue ? '$open ${open == 1 ? 'negocio abierto' : 'negocios abiertos'} ahora' : null),
+              HomeSectionTitle(
+                'Cerca de ti',
+                subtitle: stores.hasValue
+                    ? '$open ${open == 1 ? 'negocio abierto' : 'negocios abiertos'} ahora'
+                    : null,
+              ),
               SizedBox(
                 height: 44,
                 child: ListView.separated(
@@ -496,22 +665,34 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
                       toggled: on,
                       label: 'Filtro ${f.label}',
                       excludeSemantics: true,
-                      onTap: () => setState(() => on ? _filters.remove(f) : _filters.add(f)),
+                      onTap: () => setState(
+                        () => on ? _filters.remove(f) : _filters.add(f),
+                      ),
                       child: Material(
                         color: on ? scheme.primary : Colors.transparent,
                         shape: RoundedRectangleBorder(
                           borderRadius: AppRadius.button,
-                          side: BorderSide(color: on ? scheme.primary : scheme.outlineVariant, width: 1.5),
+                          side: BorderSide(
+                            color: on ? scheme.primary : scheme.outlineVariant,
+                            width: 1.5,
+                          ),
                         ),
                         child: InkWell(
                           borderRadius: AppRadius.button,
-                          onTap: () => setState(() => on ? _filters.remove(f) : _filters.add(f)),
+                          onTap: () => setState(
+                            () => on ? _filters.remove(f) : _filters.add(f),
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14),
                             child: Center(
                               child: Text(
                                 f.label,
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: on ? scheme.onPrimary : scheme.onSurface),
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(
+                                      color: on
+                                          ? scheme.onPrimary
+                                          : scheme.onSurface,
+                                    ),
                               ),
                             ),
                           ),
@@ -526,12 +707,17 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
           ),
         ),
         switch (stores) {
-          AsyncValue(hasValue: true) when shown.isEmpty => const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.all(AppSpacing.gutter),
-              child: AppEmptyState(title: 'Nada con esos filtros', message: 'Prueba quitando alguno.', compact: true),
+          AsyncValue(hasValue: true) when shown.isEmpty =>
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(AppSpacing.gutter),
+                child: AppEmptyState(
+                  title: 'Nada con esos filtros',
+                  message: 'Prueba quitando alguno.',
+                  compact: true,
+                ),
+              ),
             ),
-          ),
           AsyncValue(hasValue: true) => SliverList.builder(
             itemCount: shown.length,
             itemBuilder: (context, index) => FadeSlideIn.staggered(
@@ -541,11 +727,17 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
             ),
           ),
           AsyncError(:final error) => SliverToBoxAdapter(
-            child: AppEmptyState.fromError(error, compact: true, onRetry: () => ref.invalidate(provider)),
+            child: AppEmptyState.fromError(
+              error,
+              compact: true,
+              onRetry: () => ref.invalidate(provider),
+            ),
           ),
           _ => SliverList.builder(
             itemCount: 2,
-            itemBuilder: (_, _) => const Skeleton(child: AppStoreCardSkeleton(variant: AppStoreCardVariant.editorial)),
+            itemBuilder: (_, _) => const AppStoreCardSkeleton(
+              variant: AppStoreCardVariant.editorial,
+            ),
           ),
         },
       ],
@@ -553,20 +745,34 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
   }
 }
 
-/// "Repetir": vuelve a poner en la bolsa lo que pediste, con la misma variante y
-/// opciones y los precios de hoy. Lo que ya no está disponible se omite y se avisa.
-Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) async {
+Future<void> _repeatOrder(
+  BuildContext context,
+  WidgetRef ref,
+  Order order,
+) async {
   final router = GoRouter.of(context);
   final StoreSummary store;
   try {
-    store = (await ref.read(storeDetailProvider(order.store.id).future)).summary;
+    store = (await ref.read(
+      storeDetailProvider(order.store.id).future,
+    )).summary;
   } on Object {
-    if (context.mounted) AppToast.show(context, 'No pudimos cargar ${order.store.name}. Intenta de nuevo.', kind: AppToastKind.error);
+    if (context.mounted)
+      AppToast.show(
+        context,
+        'No pudimos cargar ${order.store.name}. Intenta de nuevo.',
+        kind: AppToastKind.error,
+      );
     return;
   }
   if (!context.mounted) return;
   if (!store.canOrder) {
-    AppToast.show(context, store.isOpenNow ? '${store.name} no llega a tu dirección' : '${store.name} está cerrado ahora');
+    AppToast.show(
+      context,
+      store.isOpenNow
+          ? '${store.name} no llega a tu dirección'
+          : '${store.name} está cerrado ahora',
+    );
     _openStore(context, store.id, coverUrl: store.coverUrl);
     return;
   }
@@ -586,9 +792,15 @@ Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) asyn
       missing++;
       continue;
     }
-    final parts = line.description.split(' · ').map((p) => p.trim()).where((p) => p.isNotEmpty).toSet();
+    final parts = line.description
+        .split(' · ')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toSet();
     // Por nombre; si el pedido no lo guardó, la del precio pagado o la primera disponible.
-    final paid = line.quantity > 0 ? line.total.cents ~/ line.quantity : line.total.cents;
+    final paid = line.quantity > 0
+        ? line.total.cents ~/ line.quantity
+        : line.total.cents;
     final available = product.variants.where((v) => v.isAvailable);
     final variant =
         product.variants.where((v) => parts.contains(v.name)).firstOrNull ??
@@ -598,14 +810,24 @@ Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) asyn
       for (final option in product.options)
         for (final value in option.values)
           if (parts.contains(value.name) && value.isAvailable)
-            CartChoice(optionId: option.id, valueId: value.id, label: value.name, priceDelta: value.priceDelta),
+            CartChoice(
+              optionId: option.id,
+              valueId: value.id,
+              label: value.name,
+              priceDelta: value.priceDelta,
+            ),
     ];
     final quantity = Quantity.create(line.quantity);
-    if (!product.isAvailable || (variant != null && !variant.isAvailable) || quantity is! Valid<Quantity>) {
+    if (!product.isAvailable ||
+        (variant != null && !variant.isAvailable) ||
+        quantity is! Valid<Quantity>) {
       missing++;
       continue;
     }
-    final unit = choices.fold(variant?.price ?? product.basePrice, (sum, c) => sum + c.priceDelta);
+    final unit = choices.fold(
+      variant?.price ?? product.basePrice,
+      (sum, c) => sum + c.priceDelta,
+    );
     lines.add(
       CartLine(
         id: '$productId.${DateTime.now().microsecondsSinceEpoch}.$i',
@@ -623,7 +845,10 @@ Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) asyn
   }
   if (!context.mounted) return;
   if (lines.isEmpty) {
-    AppToast.show(context, 'Lo de ese pedido ya no está disponible. Mira qué hay hoy.');
+    AppToast.show(
+      context,
+      'Lo de ese pedido ya no está disponible. Mira qué hay hoy.',
+    );
     _openStore(context, store.id, coverUrl: store.coverUrl);
     return;
   }
@@ -633,7 +858,11 @@ Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) asyn
   final first = await controller.add(lines.first, cartStore);
   if (!context.mounted) return;
   if (first case StoreConflict(:final current, :final incoming)) {
-    final replace = await confirmReplaceCart(context, current: current, incoming: incoming);
+    final replace = await confirmReplaceCart(
+      context,
+      current: current,
+      incoming: incoming,
+    );
     if (!replace || !context.mounted) return;
     await controller.replaceWith(lines.first, cartStore);
   }
@@ -644,7 +873,9 @@ Future<void> _repeatOrder(BuildContext context, WidgetRef ref, Order order) asyn
   HapticFeedback.lightImpact().ignore();
   AppToast.show(
     context,
-    missing == 0 ? 'Tu pedido de ${store.name} va en tu bolsa' : 'Agregamos lo disponible; $missing ${missing == 1 ? 'producto ya no está' : 'productos ya no están'}',
+    missing == 0
+        ? 'Tu pedido de ${store.name} va en tu bolsa'
+        : 'Agregamos lo disponible; $missing ${missing == 1 ? 'producto ya no está' : 'productos ya no están'}',
     kind: AppToastKind.success,
   );
   showCartSheet(

@@ -21,12 +21,14 @@ dependencies:
   go_router: ^18.0.1
   intl: any
   json_annotation: ^4.12.0
-  shimmer: ^3.0.0
   shared_preferences: ^2.5.5
   url_launcher: ^6.3.2
   audioplayers: ^6.8.1
   wakelock_plus: ^1.8.0
   rive: 0.14.11
+  skeletonizer: ^3.0.0
+  lottie: ^3.6.1
+  flutter_animate: ^4.5.2
 
 dev_dependencies:
   flutter_test:
@@ -44,6 +46,7 @@ flutter:
   assets:
     - assets/images/demo/
     - assets/animations/
+    - assets/animations/empty/
     - assets/avatars/
     - assets/fixtures/
     - assets/icons/

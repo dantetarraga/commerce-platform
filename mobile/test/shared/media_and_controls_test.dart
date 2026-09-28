@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:skeletonizer/skeletonizer.dart' as sk;
 
 Widget _app(Widget child, {bool reduced = false}) => MaterialApp(
   theme: AppTheme.light(),
@@ -117,7 +117,8 @@ void main() {
     expect(image.fadeOutDuration, Duration.zero);
     final placeholder = image.placeholder!(tester.element(find.byType(CachedNetworkImage)), image.imageUrl);
     await tester.pumpWidget(_app(SizedBox(width: 120, height: 90, child: placeholder), reduced: true));
-    expect(find.byType(Shimmer), findsNothing);
+    // Con movimiento reducido el placeholder es un bloque quieto, sin barrido.
+    expect(find.byWidgetPredicate((w) => w is sk.Skeletonizer && w.effect is sk.SolidColorEffect), findsOneWidget);
   });
 
   testWidgets('favorito recibe toques en los bordes de su área de 48 puntos', (tester) async {

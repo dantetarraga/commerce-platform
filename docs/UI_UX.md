@@ -4,7 +4,7 @@
 
 ## Diagnóstico
 
-Las dos apps son entradas del mismo proyecto: `main.dart` y `main_partner.dart`. Comparten un sistema visual con cobalto, lima, fuentes locales, componentes de catálogo y estados vacíos. La base ya incluye `cached_network_image`, `flutter_svg`, `shimmer`, DiceBear remoto y animaciones nativas. Agregar paquetes por sí solo no resuelve las principales fricciones.
+Las dos apps son entradas del mismo proyecto: `main.dart` y `main_partner.dart`. Comparten un sistema visual con cobalto, lima, fuentes locales, componentes de catálogo y estados vacíos. La base ya incluye `cached_network_image`, `flutter_svg`, `skeletonizer`, DiceBear remoto y animaciones nativas. Agregar paquetes por sí solo no resuelve las principales fricciones.
 
 | Área | Hallazgo | Cambio realizado |
 |---|---|---|
@@ -26,9 +26,11 @@ Las dos apps son entradas del mismo proyecto: `main.dart` y `main_partner.dart`.
 | [DiceBear Notionists](https://www.dicebear.com/styles/notionists/) + `flutter_svg` | Avatares ilustrados | Integrado mediante assets locales. El estilo es CC0; procedencia en `mobile/assets/avatars/README.md`. Las ilustraciones pueden repetirse y no representan la apariencia real del usuario |
 | `cached_network_image` | Fotos reales de productos y negocios | Mantener el paquete existente. El origen y la calidad de las fotos requieren trabajo de catálogo |
 | Animaciones nativas + `AppMotion` | Disponibilidad, botones, transiciones y cargas | Mantener la base existente, con movimiento reducido |
-| [flutter_animate](https://pub.dev/packages/flutter_animate) | Componer efectos como fade, escala y desplazamiento | Útil si aumenta mucho la cantidad de secuencias; hoy duplicaría funciones de `FadeSlideIn`, `PressableScale` y `LoadCrossFade` |
+| [flutter_animate](https://pub.dev/packages/flutter_animate) | Componer efectos como fade, escala y desplazamiento | Integrado (2026-09-27). `FadeSlideIn`, `AppLoader` y el medallón de los estados vacíos lo usan; `PressableScale` y `LoadCrossFade` siguen con widgets implícitos de Flutter, que ya son cortos |
+| [skeletonizer](https://pub.dev/packages/skeletonizer) | Skeletons de carga | Integrado; reemplaza a `shimmer`. `Skeleton`/`SkeletonBox` conservan su API sobre `Skeletonizer.zone`/`Bone`. `AppSkeletonizer` convierte la tarjeta real con datos de relleno (`AppProductRowSkeleton`, `AppStoreCardSkeleton`), así la geometría no se desfasa |
+| `AppLoader` | Indicador de carga | El relevo del arranque en miniatura (la "a" pasa el pedido). Reemplaza la barra fina del buscador y los spinners circulares de botones y acciones |
 | [Rive](https://rive.app/docs/runtimes/flutter/flutter) | Confirmación de pedido y aviso de entrega | Integrado con `rive 0.14.11`, un `.riv` propio local de 2795 bytes y una reproducción de 1,2 s. Componente compartido, alternativa estática, carga diferida y liberación de recursos |
-| [Lottie](https://pub.dev/packages/lottie) | Reproducir una animación preparada en After Effects | Alternativa si ya existe ese material. Evitar sumar dos runtimes para la misma necesidad |
+| [Lottie](https://pub.dev/packages/lottie) | Estados vacíos (`AppEmptyArt`) | Integrado con 7 animaciones planas gratuitas de LottieFiles (5 de un mismo autor), recoloreadas a la paleta con `tool/brand/recolor_empty_lotties.py`. Se reproducen una vez; con movimiento reducido muestran el último cuadro. Rive queda para las piezas propias de marca. Procedencia en `mobile/assets/animations/empty/README.md` |
 
 La integración de Rive usa cobalto/lima y mantiene los textos y acciones en Flutter. Con movimiento reducido muestra un check estático y no inicia el runtime. La confirmación ahora dice «Pedido enviado», sin dar por hecha la aceptación del negocio. [Capturas y pruebas](ui/rive/README.md); [fuente editable y preparación del runtime](../mobile/assets/animations/README.md). Todavía no se midieron el peso añadido por el runtime, su memoria ni su fluidez en un teléfono de gama baja.
 

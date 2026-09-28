@@ -204,7 +204,7 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
             AsyncData(:final value) when value.isEmpty => [
               const SliverToBoxAdapter(
                 child: AppEmptyState(
-                  scene: ThreadScene.receipt,
+                  scene: AppEmptyArt.receipt,
                   title: 'Menú en preparación',
                   message: 'Este negocio aún no publicó sus productos.',
                   compact: true,
@@ -745,7 +745,7 @@ class _MenuSearchState extends State<_MenuSearch> {
         Expanded(
           child: items.isEmpty
               ? const AppEmptyState(
-                  scene: ThreadScene.search,
+                  scene: AppEmptyArt.search,
                   title: 'No está en la carta',
                   message: 'Prueba con otra palabra.',
                   compact: true,

@@ -94,7 +94,8 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
     final discount = couponCents > subtotal ? subtotal : couponCents;
     // La propina nunca es negativa ni absurda (tope S/ 50).
     final tip = tipCents.clamp(0, 5000);
-    final id = 'ord_${placed.microsecondsSinceEpoch}';
+    // El reloj de Windows puede repetir microsegundos: el correlativo desempata.
+    final id = 'ord_${placed.microsecondsSinceEpoch}_$_nextCode';
     return {
       'id': id,
       'code': '#${_nextCode++}',

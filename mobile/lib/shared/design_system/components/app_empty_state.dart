@@ -1,6 +1,6 @@
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/shared/design_system/components/app_button.dart';
-import 'package:chaski/shared/design_system/illustrations/thread_illustration.dart';
+import 'package:chaski/shared/design_system/illustrations/empty_art.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +21,7 @@ enum AppEmptyKind {
   success,
 }
 
-/// Estado vacío con personalidad: escena de hilo + una frase + una acción.
+/// Estado vacío con personalidad: arte (Lottie o medallón) + una frase + una acción.
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
     required this.title,
@@ -54,20 +54,20 @@ class AppEmptyState extends StatelessWidget {
   final String message;
   final AppEmptyKind kind;
 
-  /// Escena propia; si es nula se deriva de [kind].
-  final ThreadScene? scene;
+  /// Arte propio; si es nulo se deriva de [kind].
+  final AppEmptyArt? scene;
   final String? actionLabel;
   final VoidCallback? onAction;
   final bool compact;
 
-  ThreadScene get _scene =>
+  AppEmptyArt get _scene =>
       scene ??
       switch (kind) {
-        AppEmptyKind.empty => ThreadScene.emptyBag,
-        AppEmptyKind.noResults => ThreadScene.search,
-        AppEmptyKind.offline => ThreadScene.cut,
-        AppEmptyKind.error => ThreadScene.tangle,
-        AppEmptyKind.success => ThreadScene.knot,
+        AppEmptyKind.empty => AppEmptyArt.emptyBag,
+        AppEmptyKind.noResults => AppEmptyArt.search,
+        AppEmptyKind.offline => AppEmptyArt.cut,
+        AppEmptyKind.error => AppEmptyArt.tangle,
+        AppEmptyKind.success => AppEmptyArt.knot,
       };
 
   @override
@@ -84,7 +84,7 @@ class AppEmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ThreadIllustration(_scene, size: compact ? 120 : 180),
+              EmptyArtView(_scene, size: compact ? 112 : 160),
               SizedBox(height: compact ? AppSpacing.sm : AppSpacing.lg),
               Semantics(
                 header: true,

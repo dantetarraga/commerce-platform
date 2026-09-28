@@ -329,7 +329,7 @@ class _AddButton extends StatelessWidget {
             height: 56,
             child: Center(
               child: loading
-                  ? SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: fg))
+                  ? AppLoader(size: 22, color: fg, dot: fg)
                   : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

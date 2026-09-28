@@ -36,7 +36,7 @@ class OrdersPage extends ConsumerWidget {
                 loading: const _OrdersSkeleton(),
                 isEmpty: (orders) => orders.isEmpty,
                 empty: AppEmptyState(
-                  scene: ThreadScene.receipt,
+                  scene: AppEmptyArt.receipt,
                   title: 'Aún no tienes pedidos',
                   message: 'Cuando pidas algo, aquí podrás seguirlo y volver a pedirlo en un toque.',
                   actionLabel: onExplore == null ? null : 'Ver qué hay cerca',

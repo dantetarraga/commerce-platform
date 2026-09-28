@@ -141,7 +141,7 @@ void main() {
     final container = await pumpOnboarding(tester);
     await tester.tap(find.text('Saltar'));
     await tester.pump();
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(AppLoader), findsOneWidget);
     await tester.tap(find.text('Saltar'));
     await tester.pump();
     verify(preferences.markOnboardingSeen).called(1);

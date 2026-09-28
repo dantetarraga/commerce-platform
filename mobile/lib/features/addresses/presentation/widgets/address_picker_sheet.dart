@@ -40,7 +40,7 @@ class AddressPicker extends ConsumerWidget {
             if (book.addresses.isEmpty)
               const AppEmptyState(
                 compact: true,
-                scene: ThreadScene.door,
+                scene: AppEmptyArt.door,
                 title: 'Aún no guardas direcciones',
                 message: 'Agrega la primera y los negocios calcularán tiempo y envío hasta tu puerta.',
               ),

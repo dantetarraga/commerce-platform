@@ -151,7 +151,7 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
                 ),
                 _ => SliverList.builder(
                   itemCount: 6,
-                  itemBuilder: (_, _) => const Skeleton(child: AppStoreCardSkeleton(variant: AppStoreCardVariant.row)),
+                  itemBuilder: (_, _) => const AppStoreCardSkeleton(variant: AppStoreCardVariant.row),
                 ),
               },
               const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
