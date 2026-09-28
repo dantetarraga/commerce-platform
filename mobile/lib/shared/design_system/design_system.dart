@@ -28,6 +28,7 @@ export 'components/fly_to_purchase_bar.dart';
 export 'illustrations/app_rive_success.dart';
 export 'illustrations/thread_illustration.dart';
 export 'theme/app_theme.dart';
+export 'theme/page_transitions.dart';
 export 'tokens/app_colors.dart';
 export 'tokens/app_spacing.dart';
 export 'tokens/app_typography.dart';

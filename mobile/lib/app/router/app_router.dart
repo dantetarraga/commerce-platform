@@ -13,7 +13,8 @@ import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/features/products/products.dart';
 import 'package:chaski/features/profile/profile.dart';
 import 'package:chaski/features/stores/stores.dart';
-import 'package:flutter/widgets.dart';
+import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -53,12 +54,12 @@ GoRouter appRouter(Ref ref) {
         name: PhoneEntryPage.name,
         pageBuilder: (_, state) => _fadeThroughPage(state, const PhoneEntryPage()),
         routes: [
-          GoRoute(
+          _route(
             path: RoutePaths.otp,
             name: OtpPage.name,
             builder: (_, _) => const OtpPage(),
             routes: [
-              GoRoute(
+              _route(
                 path: RoutePaths.profileSetup,
                 name: ProfileSetupPage.name,
                 builder: (_, _) => const ProfileSetupPage(),
@@ -67,17 +68,19 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
         pageBuilder: (_, state, shell) => _fadeThroughPage(state, ScaffoldWithNav(shell: shell)),
+        // Cambiar de pestaña: fundido con una subida leve; cada pestaña conserva su estado.
+        navigatorContainerBuilder: (_, shell, children) => AnimatedBranchContainer(currentIndex: shell.currentIndex, children: children),
         branches: [
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              _route(
                 path: RoutePaths.home,
                 name: HomePage.name,
                 builder: (_, _) => const HomePage(),
                 routes: [
-                  GoRoute(
+                  _route(
                     path: RoutePaths.categoryStores,
                     name: CategoryStoresPage.name,
                     builder: (_, state) => CategoryStoresPage(categoryId: state.pathParameters['categoryId']!),
@@ -88,12 +91,12 @@ GoRouter appRouter(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(path: RoutePaths.explore, name: ExplorePage.name, builder: (_, _) => const ExplorePage()),
+              _route(path: RoutePaths.explore, name: ExplorePage.name, builder: (_, _) => const ExplorePage()),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              _route(
                 path: RoutePaths.orders,
                 name: OrdersPage.name,
                 builder: (context, _) => OrdersPage(
@@ -105,12 +108,12 @@ GoRouter appRouter(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              GoRoute(
+              _route(
                 path: RoutePaths.profile,
                 name: ProfilePage.name,
                 builder: (_, _) => const ProfilePage(),
                 routes: [
-                  GoRoute(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
+                  _route(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
                 ],
               ),
             ],
@@ -118,7 +121,7 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
       // Pantallas de detalle: a pantalla completa, sobre la barra de navegación.
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.storeDetail,
         name: StoreDetailPage.name,
@@ -129,25 +132,25 @@ GoRouter appRouter(Ref ref) {
           ),
         ),
       ),
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.productDetail,
         name: ProductDetailPage.name,
         builder: (_, state) => ProductDetailPage(productId: state.pathParameters['productId']!),
       ),
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.checkout,
         name: CheckoutPage.name,
         builder: (_, _) => const CheckoutPage(),
       ),
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.orderTracking,
         name: OrderTrackingPage.name,
         builder: (_, state) => OrderTrackingPage(orderId: state.pathParameters['orderId']!),
         routes: [
-          GoRoute(
+          _route(
             parentNavigatorKey: rootNavigatorKey,
             path: RoutePaths.orderHelp,
             name: OrderHelpPage.name,
@@ -155,13 +158,13 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.notifications,
         name: NotificationsPage.name,
         builder: (_, _) => const NotificationsPage(),
       ),
-      GoRoute(
+      _route(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.addressForm,
         name: AddressFormPage.name,
@@ -213,3 +216,19 @@ CustomTransitionPage<void> _fadeThroughPage(GoRouterState state, Widget child) {
     },
   );
 }
+
+/// Pantalla normal: `MaterialPage` explícita para que use la transición del tema
+/// (go_router, por su cuenta, puede armarla sin transición).
+GoRoute _route({
+  required String path,
+  required String name,
+  required Widget Function(BuildContext context, GoRouterState state) builder,
+  GlobalKey<NavigatorState>? parentNavigatorKey,
+  List<RouteBase> routes = const [],
+}) => GoRoute(
+  path: path,
+  name: name,
+  parentNavigatorKey: parentNavigatorKey,
+  routes: routes,
+  pageBuilder: (context, state) => MaterialPage<void>(key: state.pageKey, name: state.name, child: builder(context, state)),
+);

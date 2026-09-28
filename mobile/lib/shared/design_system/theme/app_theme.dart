@@ -1,3 +1,4 @@
+import 'package:chaski/shared/design_system/theme/page_transitions.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/app_typography.dart';
@@ -186,11 +187,11 @@ abstract final class AppTheme {
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: scheme.onInverseSurface),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.tile),
       ),
-      // Push a detalle: nativo en cada plataforma (fade-forwards en Android,
-      // deslizamiento con gesto de regreso en iOS).
+      // Push a detalle: en Android la pantalla sube como tarjeta con la esquina de
+      // salida; en iOS se mantiene el deslizamiento con gesto de regreso.
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
+          TargetPlatform.android: RisingCardPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),
