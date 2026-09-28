@@ -1,0 +1,8 @@
+# Arranque nativo de iOS (sin flavor).
+# Regenerar: dart run flutter_native_splash:create --path=tool/brand/ios_splash.yaml
+flutter_native_splash:
+  color: "#B84A2B"
+  image: assets/brand/splash_mark.png
+  android: false
+  ios: true
+  web: false

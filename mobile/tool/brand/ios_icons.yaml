@@ -1,0 +1,7 @@
+# iOS publica solo la app del cliente y se compila sin flavor.
+# Regenerar: dart run flutter_launcher_icons -f tool/brand/ios_icons.yaml
+flutter_launcher_icons:
+  android: false
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/brand/icon_customer.png"

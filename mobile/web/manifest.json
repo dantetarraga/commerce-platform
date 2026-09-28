@@ -1,11 +1,11 @@
 {
-    "name": "chaski",
-    "short_name": "chaski",
+    "name": "Apamuy",
+    "short_name": "Apamuy",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#B84A2B",
+    "theme_color": "#B84A2B",
+    "description": "Lo de tu barrio, en minutos.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

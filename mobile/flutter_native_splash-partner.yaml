@@ -1,0 +1,11 @@
+# Arranque nativo de Apamuy Socios (solo Android).
+# Regenerar: dart run flutter_native_splash:create --flavor partner
+flutter_native_splash:
+  color: "#B84A2B"
+  image: assets/brand/splash_mark.png
+  android_12:
+    color: "#B84A2B"
+    image: assets/brand/splash_mark_android12.png
+  ios: false
+  web: false
+  fullscreen: false

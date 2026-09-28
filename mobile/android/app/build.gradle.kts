@@ -28,19 +28,19 @@ android {
         versionName = flutter.versionName
     }
 
-    // Dos apps desde el mismo código: la del cliente y Chaski Socios (negocio y
+    // Dos apps desde el mismo código: la del cliente y Apamuy Socios (negocio y
     // repartidor). Cada una se instala por separado. Ver docs/OPERACION.md.
     flavorDimensions += "app"
     productFlavors {
         create("customer") {
             dimension = "app"
             applicationId = "pe.chaski.chaski"
-            manifestPlaceholders["appName"] = "Chaski"
+            manifestPlaceholders["appName"] = "Apamuy"
         }
         create("partner") {
             dimension = "app"
             applicationId = "pe.chaski.socios"
-            manifestPlaceholders["appName"] = "Chaski Socios"
+            manifestPlaceholders["appName"] = "Apamuy Socios"
         }
     }
 
