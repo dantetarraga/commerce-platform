@@ -15,7 +15,7 @@ La **app Apamuy Socios** (negocio y repartidor) ya opera pedidos contra la API. 
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). Editar nombre y correo. **Apamuy Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 281 tests | Ubicación real (GPS/mapa), push |
-| Backend (`backend/`) | Alta y suspensión de socios y CRUD de catálogo (`admin/*`). Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; la hora estimada se recalcula al aceptar y al salir el repartidor; 92 unit + 91 e2e | Promociones y cupones desde admin, push, imágenes |
+| Backend (`backend/`) | Alta y suspensión de socios, CRUD de catálogo, cupones y banners (`admin/*`). Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; la hora estimada se recalcula al aceptar y al salir el repartidor; 96 unit + 97 e2e | Push, imágenes |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker + APK de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
 | Repo | `feat/backend-fase-1` ya se integró a `main` y se borró. Todo commiteado | Push de `main` (los commits de Apamuy Socios están solo en local) |
 
@@ -29,7 +29,7 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 | Negocio | ✅ Ver sus pedidos con datos del cliente, avanzar, cancelar con motivo, pausar pedidos |
 | Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
 | Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
-| Catálogo | ✅ El admin crea y edita negocios, horarios, secciones, productos (variantes y opciones) y categorías desde Swagger (OPERACION.md §5). Faltan promociones y cupones |
+| Catálogo | ✅ El admin crea y edita negocios, horarios, secciones, productos (variantes y opciones) y categorías desde Swagger (OPERACION.md §5). Cupones y banners del inicio también (`admin/coupons`, `admin/promotions`) |
 | Paneles | ✅ App **Apamuy Socios**: el negocio acepta con tiempo, rechaza, marca listo, pausa y agota productos; el repartidor se conecta, toma, recoge y entrega registrando el cobro. Alarma con la app abierta. Alta y suspensión de socios por admin (`admin/*`). Faltan el push y el panel admin web |
 
 ## Backend
@@ -37,7 +37,6 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 | Pendiente | Detalle |
 |---|---|
 | `nextOpeningAt` | La app ya lo lee en el resumen y el detalle del negocio (`GET /stores`, `/stores/:id`, ISO 8601) para decir cuándo abre un negocio cerrado; sin él no lo muestra |
-| Promociones y cupones | El CRUD de catálogo ya existe; faltan las promociones del inicio y los cupones, que hoy salen del seed |
 | Push (FCM) | Los avisos in-app ya se crean en cada cambio de estado; falta enviarlos como push (tabla `Device` lista) |
 | Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
 | Favoritos | Guardados en el dispositivo. Opcional: sincronizar para no perderlos al cambiar de teléfono |

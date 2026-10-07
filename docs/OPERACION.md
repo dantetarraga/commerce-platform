@@ -84,6 +84,10 @@ Si alguien sin rol de socio entra a Apamuy Socios, ve "Aún no eres socio de Apa
 
 Para editar: `PATCH admin/products/:id` reemplaza `variants` y `options` si vienen; los elementos que traen `id` se editan y conservan su id (las bolsas guardadas en los teléfonos siguen valiendo), los nuevos van sin `id` y los que faltan se borran. El horario se reemplaza entero con `PUT admin/stores/:id/schedules` y se rechazan turnos que se pisan. Quitar un producto o un negocio (`DELETE`) lo oculta sin tocar los pedidos pasados; un negocio con pedidos en curso no se puede quitar. Las categorías se crean con `POST admin/categories`.
 
+**Cupones y banners del inicio:**
+- `POST admin/coupons` `{ code, label, type, percentOff | amountOff, maxDiscount?, minOrderAmount?, cityId?, storeId?, startsAt, endsAt, usageLimit?, perUserLimit?, firstOrderOnly? }`. El código se guarda en mayúsculas y no se cambia. `percentOff` es para `PERCENTAGE` (con `maxDiscount` como tope), `amountOff` para `FIXED_AMOUNT`, y `FREE_DELIVERY` no lleva monto. Para darlo de baja: `PATCH admin/coupons/:id` `{ isActive: false }`; no se borra porque hay pedidos que lo usaron.
+- `POST admin/promotions` `{ cityId, title, subtitle?, imageUrl, startsAt, endsAt, storeId?, couponId?, sortOrder? }`: el banner sale en el inicio mientras esté vigente; al tocarlo abre el negocio y muestra el cupón si siguen activos. `DELETE admin/promotions/:id` lo quita.
+
 **Después:** registro desde la app con solicitud, documentos en un bucket privado y aprobación desde el panel admin.
 
 ## 6. Lo legal pendiente
