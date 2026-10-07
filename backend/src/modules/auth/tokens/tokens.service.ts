@@ -149,6 +149,11 @@ export class TokensService {
     return { id, refreshToken };
   }
 
+  /** Cierra todas sus sesiones; el access token vigente dura hasta que vence. */
+  async revokeAllForUser(userId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } });
+  }
+
   private async revokeFamily(familyId: string): Promise<void> {
     await this.prisma.refreshToken.updateMany({
       where: { familyId, revokedAt: null },

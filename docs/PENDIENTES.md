@@ -8,20 +8,20 @@ Estado al 2026-09-26. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [O
 2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
 3. Hacer **push** de `main`: los commits de Apamuy Socios están solo en local y la CI todavía no los probó.
 
-La **app Apamuy Socios** (negocio y repartidor) ya opera pedidos contra la API. Lo que sigue en código es el alta de socios por admin y el push con plazo de aceptación. Después, la ubicación real y el panel admin web.
+La **app Apamuy Socios** (negocio y repartidor) ya opera pedidos contra la API. El equipo da de alta y suspende socios desde Swagger (`admin/*`). Lo que sigue en código es el push con plazo de aceptación. Después, la ubicación real y el panel admin web.
 
 ## Estado actual
 
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). **Apamuy Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 277 tests | Ubicación real (GPS/mapa), editar perfil, push |
-| Backend (`backend/`) | Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; 76 unit + 73 e2e | Alta de socios por admin, CRUD de catálogo, push, imágenes |
+| Backend (`backend/`) | Alta y suspensión de socios (`admin/*`). Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; 76 unit + 73 e2e | CRUD de catálogo, push, imágenes |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker + APK de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
 | Repo | `feat/backend-fase-1` ya se integró a `main` y se borró. Todo commiteado | Push de `main` (los commits de Apamuy Socios están solo en local) |
 
 ## Operación de pedidos
 
-El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/courier/*` por debajo; contrato en [OPERACION.md](OPERACION.md) §7). Mientras no exista el alta por admin, los socios son los del seed (ver `backend/README.md`).
+El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/courier/*` por debajo; contrato en [OPERACION.md](OPERACION.md) §7). Los socios se dan de alta con `admin/*` (ver [OPERACION.md](OPERACION.md) §5); el seed trae socios de demo (ver `backend/README.md`).
 
 | Pieza | Estado |
 |---|---|
@@ -30,7 +30,7 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 | Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
 | Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
 | Catálogo | Falta el CRUD de negocios, productos, horarios y promociones: hoy todo sale del seed |
-| Paneles | ✅ App **Apamuy Socios**: el negocio acepta con tiempo, rechaza, marca listo, pausa y agota productos; el repartidor se conecta, toma, recoge y entrega registrando el cobro. Alarma con la app abierta. Faltan el alta de socios por admin, el push y el panel admin web |
+| Paneles | ✅ App **Apamuy Socios**: el negocio acepta con tiempo, rechaza, marca listo, pausa y agota productos; el repartidor se conecta, toma, recoge y entrega registrando el cobro. Alarma con la app abierta. Alta y suspensión de socios por admin (`admin/*`). Faltan el push y el panel admin web |
 
 ## Backend
 
@@ -82,7 +82,7 @@ Esfuerzos aproximados, para una persona.
 | 7 | ✅ Avisos in-app, direcciones en la API, cancelar en la app, endurecimiento | 2 días | Seguimiento y datos entre dispositivos |
 | 8 | Ubicación real: GPS, mapa y geocodificación | 3–4 días | Fee y cobertura correctos |
 | 9 | ✅ App Apamuy Socios: base, modo Negocio y modo Repartidor con cobro contraentrega (app + API) | 2–3 semanas | Operar sin Swagger (demo con el seed) |
-| 10 | Alta y suspensión de socios por admin | 1–2 días | Piloto con socios reales |
+| 10 | ✅ Alta y suspensión de socios por admin (`admin/*`, desde Swagger) | 1–2 días | Piloto con socios reales |
 | 11 | Push con FCM, alarma con la app cerrada y plazo de aceptación | 4–5 días | Que ningún pedido quede sin atender |
 | 12 | Panel admin web y CRUD de catálogo | 1–2 semanas | Sumar negocios sin tocar el seed |
 

@@ -65,12 +65,15 @@ Hoy los pedidos se muestran a los repartidores recién en `READY`. Mostrarlos de
 2. Verificamos:
    - negocio: RUC o RUS, DNI del responsable, local;
    - repartidor: DNI, licencia, SOAT, vehículo.
-3. El admin lo da de alta por su celular: `POST admin/merchants` o `POST admin/couriers`. Si el celular no tiene cuenta, se crea.
+3. El admin lo da de alta por su celular desde Swagger (`/docs`, sesión con rol `ADMIN`). Si el celular no tiene cuenta, se crea como cliente y se le suma el rol; repetir el alta no duplica nada.
+   - `POST admin/merchants` `{ phone, firstName, lastName, storeIds? }`: `storeIds` pasa esos negocios a su nombre (mientras no haya CRUD de catálogo, los negocios salen del seed).
+   - `POST admin/couriers` `{ phone, firstName, lastName, cityId, vehicleType: MOTO|BICI|AUTO, vehicleLabel, plate?, activeSince? }`: volver a llamarlo actualiza el vehículo.
+   - `GET admin/users?phone=` muestra la cuenta con sus roles, negocios y vehículo (sirve para obtener el `id`).
 4. El socio instala Apamuy Socios, entra con su celular y el código SMS, y ya ve su modo.
 
 Si alguien sin rol de socio entra a Apamuy Socios, ve "Aún no eres socio de Apamuy" y un botón para escribirnos.
 
-**Suspensión:** `POST admin/users/:id/suspend-partner` quita el rol y cierra sus sesiones. Un repartidor con un pedido activo no se puede suspender hasta resolver ese pedido. Las tiendas de un negocio suspendido dejan de recibir pedidos.
+**Suspensión:** `POST admin/users/:id/suspend-partner` `{ roles? }` quita los roles de socio (sin `roles`, los dos) y cierra sus sesiones; el access token que ya tenía sigue valiendo hasta que vence (15 min). Un repartidor con un pedido activo no se puede suspender hasta resolver ese pedido. Las tiendas de un negocio suspendido dejan de recibir pedidos.
 
 **Después:** registro desde la app con solicitud, documentos en un bucket privado y aprobación desde el panel admin. La tienda se crea en borrador (`DRAFT`) y se publica cuando su menú está listo.
 

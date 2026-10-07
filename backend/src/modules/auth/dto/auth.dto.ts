@@ -5,7 +5,7 @@ const stripSeparators = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.replace(/[\s-]/g, '') : value;
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
-class PhoneDto {
+export class PhoneDto {
   /** Celular peruano: 9 dígitos que empiezan con 9. */
   @Transform(stripSeparators)
   @IsString()
