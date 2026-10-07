@@ -1,11 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
-import { PrismaService } from '../../database/prisma.service';
-import { Prisma } from '../../generated/prisma/client';
-import { CourierStatus, Role } from '../../generated/prisma/enums';
-import { TokensService } from '../auth/tokens/tokens.service';
-import { FINAL_STATUSES } from '../orders/order-list-scope';
-import { CreateCourierDto, CreateMerchantDto, PARTNER_ROLES, PartnerRole } from './dto/admin.dto';
+import { AppException, ErrorCode } from '../../../common/exceptions/app.exception';
+import { PrismaService } from '../../../database/prisma.service';
+import { Prisma } from '../../../generated/prisma/client';
+import { CourierStatus, Role } from '../../../generated/prisma/enums';
+import { TokensService } from '../../auth/tokens/tokens.service';
+import { FINAL_STATUSES } from '../../orders/order-list-scope';
+import { CreateCourierDto, CreateMerchantDto, PARTNER_ROLES, PartnerRole } from './partners.dto';
 
 const partnerInclude = {
   roles: { select: { role: true } },
@@ -30,7 +30,7 @@ function toPartner(user: PartnerUser) {
 
 /** Alta y suspensión de socios (OPERACION.md §5); el equipo lo usa desde Swagger. */
 @Injectable()
-export class AdminService {
+export class AdminPartnersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly tokens: TokensService,

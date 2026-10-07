@@ -75,7 +75,16 @@ Si alguien sin rol de socio entra a Apamuy Socios, ve "Aún no eres socio de Apa
 
 **Suspensión:** `POST admin/users/:id/suspend-partner` `{ roles? }` quita los roles de socio (sin `roles`, los dos) y cierra sus sesiones; el access token que ya tenía sigue valiendo hasta que vence (15 min). Un repartidor con un pedido activo no se puede suspender hasta resolver ese pedido. Las tiendas de un negocio suspendido dejan de recibir pedidos.
 
-**Después:** registro desde la app con solicitud, documentos en un bucket privado y aprobación desde el panel admin. La tienda se crea en borrador (`DRAFT`) y se publica cuando su menú está listo.
+**Cargar un negocio nuevo** (Swagger, sesión `ADMIN`; precios en céntimos como `{ amount, currency }`):
+
+1. `POST admin/merchants` con el celular del dueño → su `id`.
+2. `POST admin/stores` `{ cityId, ownerId, name, addressLine, latitude, longitude, categoryIds?, schedules?, … }`. Queda **en borrador** (`isActive: false`): la app del cliente no lo muestra.
+3. `POST admin/stores/:id/sections` por cada sección de la carta y `POST admin/stores/:id/products` por cada producto, con `variants` (cada una con su precio) y `options` (grupos con `minSelect`/`maxSelect` y sus valores).
+4. Revisar con `GET admin/stores/:id` y publicar con `PATCH admin/stores/:id` `{ isActive: true }`.
+
+Para editar: `PATCH admin/products/:id` reemplaza `variants` y `options` si vienen; los elementos que traen `id` se editan y conservan su id (las bolsas guardadas en los teléfonos siguen valiendo), los nuevos van sin `id` y los que faltan se borran. El horario se reemplaza entero con `PUT admin/stores/:id/schedules` y se rechazan turnos que se pisan. Quitar un producto o un negocio (`DELETE`) lo oculta sin tocar los pedidos pasados; un negocio con pedidos en curso no se puede quitar. Las categorías se crean con `POST admin/categories`.
+
+**Después:** registro desde la app con solicitud, documentos en un bucket privado y aprobación desde el panel admin.
 
 ## 6. Lo legal pendiente
 
