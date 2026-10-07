@@ -1,6 +1,6 @@
 import { GeoPoint } from '../../common/utils/geo';
 import { Money, money } from '../../common/utils/money';
-import { isOpenAt, localTime, OpeningHours } from '../../common/utils/schedule';
+import { isOpenAt, localTime, nextOpeningAt, OpeningHours } from '../../common/utils/schedule';
 import { Prisma } from '../../generated/prisma/client';
 import type { CityContext } from '../cities/cities.service';
 import { DeliveryEstimate, estimateDelivery } from '../delivery/delivery';
@@ -32,6 +32,8 @@ export interface StoreSummary {
   deliversToYou: boolean;
   tags: string[];
   promoLabel: string | null;
+  /** Si está cerrado, la próxima apertura según su horario (ISO 8601). */
+  nextOpeningAt: string | null;
 }
 
 export function storeDelivery(store: StoreForSummary, city: CityContext, point: GeoPoint): DeliveryEstimate {
@@ -53,6 +55,7 @@ export function isStoreOpen(store: StoreForSummary, city: CityContext, now: Date
 
 export function toStoreSummary(store: StoreForSummary, city: CityContext, point: GeoPoint, now: Date): StoreSummary {
   const delivery = storeDelivery(store, city, point);
+  const isOpenNow = isStoreOpen(store, city, now);
   return {
     id: store.id,
     name: store.name,
@@ -65,10 +68,11 @@ export function toStoreSummary(store: StoreForSummary, city: CityContext, point:
     etaMinutes: delivery.etaMinutes,
     estimatedDeliveryFee: money(delivery.fee, city.currency),
     minOrderAmount: money(store.minOrderAmount, city.currency),
-    isOpenNow: isStoreOpen(store, city, now),
+    isOpenNow,
     deliversToYou: delivery.deliversToYou,
     tags: store.tags,
     promoLabel: store.promoLabel,
+    nextOpeningAt: isOpenNow ? null : (nextOpeningAt(store.schedules, now, city.timezone)?.toISOString() ?? null),
   };
 }
 

@@ -34,7 +34,7 @@ final class WeeklySchedule extends Equatable {
   /// o `null` si no abre en la próxima semana.
   ({int inDays, int opensAt})? nextOpening(DateTime now) {
     final minutes = now.hour * 60 + now.minute;
-    for (var offset = 0; offset < 7; offset++) {
+    for (var offset = 0; offset <= 7; offset++) {
       final day = (now.weekday + offset) % 7;
       final candidates = hours.where((h) => h.dayOfWeek == day && (offset > 0 || h.opensAt > minutes)).toList()
         ..sort((a, b) => a.opensAt.compareTo(b.opensAt));

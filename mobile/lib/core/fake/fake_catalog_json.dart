@@ -27,7 +27,7 @@ extension FakeCatalogJson on FakeBackend {
     if (store['isOpenNow'] == true) return null;
     final schedules = (store['schedules'] as List<dynamic>? ?? const []).cast<Map<String, dynamic>>();
     final minutes = now.hour * 60 + now.minute;
-    for (var offset = 0; offset < 7; offset++) {
+    for (var offset = 0; offset <= 7; offset++) {
       final day = (now.weekday + offset) % 7;
       final opens = [
         for (final h in schedules)

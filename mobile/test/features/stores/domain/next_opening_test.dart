@@ -23,6 +23,11 @@ void main() {
     expect(schedule.opensPhrase(DateTime(2026, 9, 24, 13)), 'el sábado a las 9:00 am');
   });
 
+  test('si abre un solo día y hoy ya cerró, abre en una semana', () {
+    const onlyTuesday = WeeklySchedule([OpeningHours(dayOfWeek: 2, opensAt: 18 * 60, closesAt: 22 * 60)]);
+    expect(onlyTuesday.nextOpeningAt(tuesday.add(const Duration(hours: 23))), DateTime(2026, 9, 29, 18));
+  });
+
   test('sin horarios no hay próxima apertura', () {
     expect(const WeeklySchedule([]).nextOpeningLabel(tuesday), isNull);
   });
