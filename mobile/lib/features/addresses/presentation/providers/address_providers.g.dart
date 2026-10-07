@@ -63,21 +63,18 @@ final class AddressRepositoryProvider
 
 String _$addressRepositoryHash() => r'062c5e88901e84d78ae79dcf2681a5b43031799a';
 
-/// Libreta de direcciones. La seleccionada define dónde se entregan los
-/// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app
-/// (negocios cercanos, tiempos y envío se recalculan).
+/// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
+/// la app (negocios cercanos, tiempos y envío).
 
 @ProviderFor(AddressBookController)
 final addressBookControllerProvider = AddressBookControllerProvider._();
 
-/// Libreta de direcciones. La seleccionada define dónde se entregan los
-/// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app
-/// (negocios cercanos, tiempos y envío se recalculan).
+/// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
+/// la app (negocios cercanos, tiempos y envío).
 final class AddressBookControllerProvider
     extends $AsyncNotifierProvider<AddressBookController, AddressBook> {
-  /// Libreta de direcciones. La seleccionada define dónde se entregan los
-  /// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app
-  /// (negocios cercanos, tiempos y envío se recalculan).
+  /// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
+  /// la app (negocios cercanos, tiempos y envío).
   AddressBookControllerProvider._()
     : super(
         from: null,
@@ -98,11 +95,10 @@ final class AddressBookControllerProvider
 }
 
 String _$addressBookControllerHash() =>
-    r'037673e6d51c1b86928741bf605e254e858aeaeb';
+    r'962a65fad88ad248ac0cecf41a59fb3a59df36fc';
 
-/// Libreta de direcciones. La seleccionada define dónde se entregan los
-/// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app
-/// (negocios cercanos, tiempos y envío se recalculan).
+/// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
+/// la app (negocios cercanos, tiempos y envío).
 
 abstract class _$AddressBookController extends $AsyncNotifier<AddressBook> {
   FutureOr<AddressBook> build();

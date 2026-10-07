@@ -1,6 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/notifications/domain/notice.dart';
 import 'package:chaski/features/notifications/presentation/providers/notifications_providers.dart';
+import 'package:chaski/features/notifications/presentation/widgets/notice_tile.dart';
+import 'package:chaski/features/notifications/presentation/widgets/order_thread_card.dart';
 import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/features/stores/stores.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
@@ -9,55 +10,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-enum _Filter {
-  all('Todos'),
-  orders('Pedidos'),
-  offers('Ofertas');
-
-  const _Filter(this.label);
-
-  final String label;
-
-  bool accepts(Notice n) => switch (this) {
-    all => true,
-    orders => n.kind.isOrder,
-    offers => !n.kind.isOrder,
-  };
-}
-
-/// Centro de avisos. El pedido en curso va arriba como un solo hilo (sus
-/// avisos, anudados); el resto se agrupa por HOY / AYER / ANTES y se puede
-/// filtrar entre pedidos y ofertas.
-class NotificationsPage extends ConsumerStatefulWidget {
+/// Centro de avisos: el pedido en curso arriba como un solo hilo; el resto,
+/// por HOY / AYER / ANTES y filtrable entre pedidos y ofertas.
+class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
 
   static const name = 'notifications';
 
-  @override
-  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
-}
-
-class _NotificationsPageState extends ConsumerState<NotificationsPage> {
-  _Filter _filter = _Filter.all;
-
-  void _open(Notice notice) {
+  void _open(BuildContext context, WidgetRef ref, Notice notice) {
     if (notice.storeId case final storeId?) {
       context.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': storeId}).ignore();
       return;
     }
-    // Avisos de un pedido: llevan a su seguimiento (el aviso dice cuál; los
-    // de prueba no lo traen y usan el pedido en curso).
+    // Los avisos de prueba no traen pedido: usan el que está en curso.
     final orderId = notice.orderId ?? ref.read(activeOrderIdProvider).value;
     if (notice.kind.isOrder && notice.kind != NoticeKind.delivered && orderId != null) {
       context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': orderId}).ignore();
     }
   }
 
+  Future<void> _markAllRead(BuildContext context, WidgetRef ref) async {
+    final failure = await ref.read(notificationsProvider.notifier).markAllRead();
+    if (failure != null && context.mounted) {
+      AppToast.show(context, 'No pudimos marcarlos como leídos. Inténtalo otra vez.', kind: AppToastKind.error);
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final notices = ref.watch(notificationsProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final feed = ref.watch(noticeFeedProvider);
     final unread = ref.watch(unreadNoticesCountProvider);
+    final hasNotices = ref.watch(notificationsProvider.select((s) => s.value?.isNotEmpty ?? false));
 
     return Scaffold(
       appBar: AppBar(
@@ -65,7 +48,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           AppButton.ghost(
             label: 'Marcar leídos',
             size: AppButtonSize.sm,
-            onPressed: unread == 0 ? null : () => ref.read(notificationsProvider.notifier).markAllRead(),
+            onPressed: unread == 0 ? null : () => _markAllRead(context, ref),
           ),
           const SizedBox(width: AppSpacing.xs),
         ],
@@ -73,280 +56,125 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(notificationsProvider.future),
         child: AsyncValueView(
-          value: notices,
+          value: feed,
           onRetry: () => ref.invalidate(notificationsProvider),
           loading: const Skeleton(child: _NoticesSkeleton()),
-          isEmpty: (list) => list.isEmpty,
+          isEmpty: (_) => !hasNotices,
           empty: const AppEmptyState(
             title: 'Todo tranquilo por aquí',
             message: 'Cuando tu pedido avance o haya una oferta cerca, te avisamos aquí.',
           ),
-          data: (list) {
-            final thread = _filter == _Filter.offers ? const <Notice>[] : activeOrderThread(list);
-            final inThread = {for (final n in thread) n.id};
-            final rest = list.where((n) => !inThread.contains(n.id) && _filter.accepts(n)).toList();
-            final groups = groupNotices(rest, DateTime.now());
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.xxs),
-                  child: Semantics(header: true, child: Text('Avisos', style: theme.textTheme.headlineLarge)),
-                ),
-                Padding(
-                  padding: AppSpacing.screen,
-                  child: Text(
-                    switch (unread) {
-                      0 => 'Estás al día.',
-                      1 => '1 aviso sin leer',
-                      _ => '$unread avisos sin leer',
-                    },
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: AppSpacing.screen,
-                  child: Row(
-                    children: [
-                      for (final f in _Filter.values) ...[
-                        AppChip(
-                          label: f.label,
-                          variant: AppChipVariant.choice,
-                          selected: f == _filter,
-                          onTap: () => setState(() => _filter = f),
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
-                      ],
-                    ],
-                  ),
-                ),
-                if (thread.isNotEmpty) ...[
-                  _groupTitle(context, 'EN CURSO'),
-                  Padding(
-                    padding: AppSpacing.screen,
-                    child: OrderThreadCard(notices: thread, onTap: () => _open(thread.last)),
-                  ),
-                ],
-                for (final MapEntry(key: day, value: items) in groups.entries) ...[
-                  _groupTitle(context, day.label),
-                  for (final n in items) NoticeTile(notice: n, onTap: () => _open(n)),
-                ],
-                if (thread.isEmpty && rest.isEmpty)
-                  AppEmptyState(
-                    compact: true,
-                    scene: _filter == _Filter.offers ? AppEmptyArt.emptyBag : AppEmptyArt.receipt,
-                    title: _filter == _Filter.offers ? 'Sin ofertas por ahora' : 'Sin avisos de pedidos',
-                    message: 'Te avisamos aquí apenas haya algo nuevo.',
-                  ),
-              ],
-            );
-          },
+          data: (feed) => _NoticeList(feed: feed, unread: unread, onOpen: (n) => _open(context, ref, n)),
         ),
       ),
     );
   }
 }
 
-Widget _groupTitle(BuildContext context, String label) => Padding(
-  padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.lg, AppSpacing.gutter, AppSpacing.xs),
-  child: Semantics(header: true, child: Text(label, style: AppTypography.eyebrow(context))),
-);
-
-/// "7:03" si es de hoy; "Ayer, 7:03" o la fecha si no.
-String _time(DateTime at) {
-  final label = Formatters.relativeDay(at);
-  return label.startsWith('Hoy, ') ? label.substring(5) : label;
+/// Encabezados, hilo y avisos aplanados para construirlos de a uno (lista lazy).
+sealed class _Item {
+  const _Item();
 }
 
-/// El pedido en curso: sus avisos anudados en un hilo, el último latiendo.
-class OrderThreadCard extends StatelessWidget {
-  const OrderThreadCard({required this.notices, required this.onTap, super.key});
+class _Header extends _Item {
+  const _Header(this.label);
 
-  /// Del más antiguo al más reciente.
+  final String label;
+}
+
+class _Thread extends _Item {
+  const _Thread(this.notices);
+
   final List<Notice> notices;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final latest = notices.last;
-    final unread = notices.any((n) => !n.read);
-
-    return Semantics(
-      button: true,
-      label: '${unread ? 'Sin leer. ' : ''}Pedido en curso. ${latest.title}. ${latest.body}',
-      hint: 'Abre el seguimiento',
-      excludeSemantics: true,
-      child: PressableScale(
-        child: Material(
-          color: scheme.primaryContainer,
-          borderRadius: AppRadius.card,
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AppQuipu(
-                    dense: true,
-                    steps: [
-                      for (final n in notices)
-                        QuipuStep(
-                          title: n.title,
-                          subtitle: identical(n, latest) ? n.body : null,
-                          trailing: _time(n.at),
-                          knot: identical(n, latest) ? QuipuKnot.current : QuipuKnot.done,
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Row(
-                    children: [
-                      if (unread) ...[
-                        const _UnreadDot(),
-                        const SizedBox(width: AppSpacing.xs),
-                        Text('Novedades', style: theme.textTheme.labelMedium?.copyWith(color: scheme.primary)),
-                      ],
-                      const Spacer(),
-                      Text('Ver seguimiento', style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary)),
-                      Icon(Icons.chevron_right_rounded, color: scheme.primary),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-/// Un aviso: ícono con su esquina de salida (terracota para pedidos, hierba
-/// para ofertas), título con la hora a la derecha y cuerpo. Sin leer, la fila
-/// va tintada y con el punto de la marca.
-class NoticeTile extends StatelessWidget {
-  const NoticeTile({required this.notice, required this.onTap, super.key});
+class _Row extends _Item {
+  const _Row(this.notice);
 
   final Notice notice;
-  final VoidCallback onTap;
-
-  IconData get _icon => switch (notice.kind) {
-    NoticeKind.orderConfirmed => Icons.check_rounded,
-    NoticeKind.preparing => Icons.soup_kitchen_rounded,
-    NoticeKind.courierAssigned => Icons.two_wheeler_rounded,
-    NoticeKind.courierNearby => Icons.delivery_dining_rounded,
-    NoticeKind.delivered => Icons.shopping_bag_rounded,
-    NoticeKind.orderCancelled => Icons.cancel_outlined,
-    NoticeKind.promotion => Icons.local_offer_rounded,
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final chaski = context.chaski;
-    final order = notice.kind.isOrder;
-    final time = _time(notice.at);
-    final unread = !notice.read;
-    final quick = reduceMotionOf(context) ? Duration.zero : AppMotion.quick;
-
-    return Semantics(
-      button: true,
-      label: '${unread ? 'Sin leer. ' : ''}${notice.title}. ${notice.body}. $time',
-      excludeSemantics: true,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 2),
-        child: AnimatedContainer(
-          duration: quick,
-          decoration: BoxDecoration(
-            color: unread ? scheme.primaryContainer.withValues(alpha: 0.5) : Colors.transparent,
-            borderRadius: AppRadius.card,
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: AppRadius.card,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: order ? scheme.primaryContainer : chaski.accentSoft,
-                        borderRadius: AppRadius.button,
-                      ),
-                      child: Icon(_icon, size: 22, color: order ? scheme.primary : chaski.accent),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  notice.title,
-                                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: unread ? FontWeight.w800 : FontWeight.w600),
-                                ),
-                              ),
-                              const SizedBox(width: AppSpacing.xs),
-                              Text(
-                                time,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: unread ? scheme.primary : scheme.onSurfaceVariant,
-                                  fontFeatures: const [FontFeature.tabularFigures()],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(notice.body, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
-                          if (!order) ...[
-                            const SizedBox(height: AppSpacing.xxs),
-                            Text('Ver negocio', style: theme.textTheme.labelMedium?.copyWith(color: chaski.accent)),
-                          ],
-                        ],
-                      ),
-                    ),
-                    AnimatedOpacity(
-                      opacity: unread ? 1 : 0,
-                      duration: quick,
-                      child: const Padding(padding: EdgeInsets.only(left: AppSpacing.xs, top: 4), child: _UnreadDot()),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-/// El punto verde del pedido de la marca: marca lo que no se ha leído.
-class _UnreadDot extends StatelessWidget {
-  const _UnreadDot();
+class _Empty extends _Item {
+  const _Empty();
+}
+
+class _NoticeList extends ConsumerWidget {
+  const _NoticeList({required this.feed, required this.unread, required this.onOpen});
+
+  final NoticeFeed feed;
+  final int unread;
+  final ValueChanged<Notice> onOpen;
+
+  /// Título, contador y filtros van antes de los avisos.
+  static const _leading = 3;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: 9,
-    height: 9,
-    decoration: BoxDecoration(color: context.chaski.accent, shape: BoxShape.circle),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final filter = ref.watch(noticeFilterSelectionProvider);
+    final items = <_Item>[
+      if (feed.thread.isNotEmpty) ...[const _Header('EN CURSO'), _Thread(feed.thread)],
+      for (final MapEntry(key: day, value: notices) in feed.groups.entries) ...[
+        _Header(day.label),
+        for (final n in notices) _Row(n),
+      ],
+      if (feed.thread.isEmpty && feed.groups.isEmpty) const _Empty(),
+    ];
+
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+      itemCount: _leading + items.length,
+      itemBuilder: (context, index) => switch (index) {
+        0 => Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.xxs),
+          child: Semantics(header: true, child: Text('Avisos', style: theme.textTheme.headlineLarge)),
+        ),
+        1 => Padding(
+          padding: AppSpacing.screen,
+          child: Text(
+            switch (unread) {
+              0 => 'Estás al día.',
+              1 => '1 aviso sin leer',
+              _ => '$unread avisos sin leer',
+            },
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ),
+        2 => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: AppSpacing.screen.copyWith(top: AppSpacing.sm),
+          child: Row(
+            children: [
+              for (final f in NoticeFilter.values) ...[
+                AppChip(
+                  label: f.label,
+                  variant: AppChipVariant.choice,
+                  selected: f == filter,
+                  onTap: () => ref.read(noticeFilterSelectionProvider.notifier).select(f),
+                ),
+                const SizedBox(width: AppSpacing.xs),
+              ],
+            ],
+          ),
+        ),
+        _ => switch (items[index - _leading]) {
+          _Header(:final label) => AppSectionHeader.eyebrow(label),
+          _Thread(:final notices) => Padding(
+            padding: AppSpacing.screen,
+            child: OrderThreadCard(notices: notices, onTap: () => onOpen(notices.last)),
+          ),
+          _Row(:final notice) => NoticeTile(notice: notice, onTap: () => onOpen(notice)),
+          _Empty() => AppEmptyState(
+            compact: true,
+            scene: filter == NoticeFilter.offers ? AppEmptyArt.emptyBag : AppEmptyArt.receipt,
+            title: filter == NoticeFilter.offers ? 'Sin ofertas por ahora' : 'Sin avisos de pedidos',
+            message: 'Te avisamos aquí apenas haya algo nuevo.',
+          ),
+        },
+      },
+    );
+  }
 }
 
 class _NoticesSkeleton extends StatelessWidget {

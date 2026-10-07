@@ -4,7 +4,9 @@ import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/core/result/result.dart';
+import 'package:chaski/core/utils/text_utils.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
+import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/merchant_repository_impl.dart';
 import 'package:chaski/features/orders/orders.dart';
@@ -12,8 +14,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'merchant_providers.g.dart';
 
-/// Cada cuánto se refrescan los pedidos mientras el negocio tiene la app
-/// abierta (hasta que llegue el push).
+/// Cada cuánto se refrescan los pedidos con la app abierta (hasta que llegue
+/// el push).
 const merchantPollEvery = Duration(seconds: 10);
 
 @Riverpod(keepAlive: true)
@@ -55,6 +57,11 @@ Future<List<StaffOrder>> merchantActiveOrders(Ref ref) async {
   return (await ref.watch(merchantRepositoryProvider).activeOrders()).getOrThrow();
 }
 
+/// Los pedidos en curso repartidos en las tres columnas del riel.
+@riverpod
+AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> merchantBoard(Ref ref) =>
+    ref.watch(merchantActiveOrdersProvider).whenData(MerchantBoardColumn.group);
+
 @riverpod
 Future<List<StaffOrder>> merchantTodayOrders(Ref ref) =>
     ref.watch(merchantRepositoryProvider).todayOrders().then((r) => r.getOrThrow());
@@ -64,8 +71,7 @@ Future<MerchantSummary> merchantSummary(Ref ref) =>
     ref.watch(merchantRepositoryProvider).summary().then((r) => r.getOrThrow());
 
 /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 @Riverpod(keepAlive: true)
 class MerchantOrderActions extends _$MerchantOrderActions {
   @override
@@ -116,3 +122,45 @@ class MerchantProducts extends _$MerchantProducts {
     };
   }
 }
+
+enum ProductFilter { all, available, soldOut }
+
+/// La carta filtrada para la pantalla de productos.
+final class MerchantCatalog {
+  const MerchantCatalog({required this.total, required this.available, required this.visible});
+
+  final int total;
+  final int available;
+  int get soldOut => total - available;
+
+  /// Lo que coincide con la búsqueda y el filtro, agrupado por sección.
+  final List<MerchantProduct> visible;
+}
+
+/// Sección de un producto en la carta ("Otros" si no tiene).
+String productSection(MerchantProduct product) => product.section ?? 'Otros';
+
+/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+@riverpod
+AsyncValue<MerchantCatalog> merchantProductsFiltered(
+  Ref ref,
+  String storeId, {
+  String query = '',
+  ProductFilter filter = ProductFilter.all,
+}) => ref.watch(merchantProductsProvider(storeId)).whenData((list) {
+  final needle = normalizeForSearch(query);
+  final visible = [
+    for (final p in list)
+      if (foldAccents(p.name).contains(needle) &&
+          switch (filter) {
+            ProductFilter.all => true,
+            ProductFilter.available => p.isAvailable,
+            ProductFilter.soldOut => !p.isAvailable,
+          })
+        p,
+  ];
+  // Por sección y, dentro de cada una, en el orden de la carta.
+  final sections = visible.map(productSection).toSet().toList()..sort();
+  final grouped = [for (final s in sections) ...visible.where((p) => productSection(p) == s)];
+  return MerchantCatalog(total: list.length, available: list.where((p) => p.isAvailable).length, visible: grouped);
+});

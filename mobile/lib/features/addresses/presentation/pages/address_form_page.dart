@@ -1,5 +1,3 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
 import 'package:chaski/features/addresses/presentation/widgets/neighborhood_plan.dart';
@@ -28,11 +26,8 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
   var _saving = false;
   var _seed = '';
 
-  /// Cuánto se movió el plano (px lógicos) respecto del punto de entrega actual.
+  /// Cuánto se movió el plano (px lógicos) desde el punto de entrega actual.
   Offset _moved = Offset.zero;
-
-  /// Grados por px del plano esquemático (~1 m por px en Espinar).
-  static const _degreesPerPx = 0.00001;
 
   @override
   void dispose() {
@@ -45,21 +40,24 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
-    // Sin geocodificación todavía: se parte del punto de entrega actual y se
-    // corre según cuánto se movió el plano (arrastrar a la derecha = ir al oeste).
-    final center = ref.read(currentDeliveryLocationProvider).coordinates;
-    final address = Address(
-      id: 'adr_${DateTime.now().microsecondsSinceEpoch}',
-      kind: _kind,
-      label: _kind == AddressKind.other ? _label.text.trim() : null,
-      street: StreetLine.create(_street.text).valueOrNull!.value,
-      reference: _reference.text.trim(),
-      coordinates: GeoCoordinates.trusted(
-        center.latitude + _moved.dy * _degreesPerPx,
-        center.longitude - _moved.dx * _degreesPerPx,
-      ),
-    );
-    await ref.read(addressBookControllerProvider.notifier).save(address);
+    final Address address;
+    try {
+      address = await ref
+          .read(addressBookControllerProvider.notifier)
+          .addFromPlan(
+            kind: _kind,
+            street: StreetLine.create(_street.text).valueOrNull!,
+            reference: _reference.text,
+            label: _label.text,
+            movedX: _moved.dx,
+            movedY: _moved.dy,
+          );
+    } on Object {
+      if (mounted) AppToast.show(context, 'No pudimos guardar la dirección. Inténtalo otra vez.', kind: AppToastKind.error);
+      return;
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
     if (!mounted) return;
     AppToast.show(context, 'Dirección guardada. Tus pedidos llegarán ahí.', kind: AppToastKind.success);
     context.pop(address);
@@ -86,7 +84,12 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                 bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.xs),
-                  child: _MapButton(onPressed: () => Navigator.of(context).maybePop()),
+                  child: AppCircleButton(
+                    icon: Icons.arrow_back_rounded,
+                    tooltip: 'Volver',
+                    elevated: true,
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
                 ),
               ),
             ],
@@ -111,8 +114,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                             hint: 'Jr. Tacna 214',
                             textCapitalization: TextCapitalization.words,
                             onChanged: (value) {
-                              // El plano se acomoda cuando la calle ya se puede leer.
-                              if (value.trim().length >= StreetLine.minLength) setState(() => _seed = value);
+                                if (value.trim().length >= StreetLine.minLength) setState(() => _seed = value);
                             },
                             validator: (v) => StreetLine.create(v ?? '').failureOrNull?.message,
                           ),
@@ -151,6 +153,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                               controller: _label,
                               hint: 'Casa de mi mamá',
                               textCapitalization: TextCapitalization.sentences,
+                              validator: (v) => (v ?? '').trim().isEmpty ? 'Ponle un nombre para reconocerla.' : null,
                             ),
                           ],
                         ],
@@ -169,27 +172,6 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Botón circular claro sobre el mapa.
-class _MapButton extends StatelessWidget {
-  const _MapButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return DecoratedBox(
-      decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: AppShadows.soft(theme.brightness)),
-      child: IconButton(
-        tooltip: 'Volver',
-        style: IconButton.styleFrom(backgroundColor: theme.colorScheme.surface, foregroundColor: theme.colorScheme.onSurface),
-        icon: const Icon(Icons.arrow_back_rounded),
-        onPressed: onPressed,
       ),
     );
   }

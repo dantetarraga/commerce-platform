@@ -93,3 +93,8 @@ final class PrepProgress {
     final m => isLate ? 'se pasó $m min' : 'faltan $m min',
   };
 }
+
+/// Bolsas que entrega el negocio: más de 3 productos no caben en una.
+extension StaffOrderBags on StaffOrder {
+  int get bagCount => order.itemCount > 3 ? 2 : 1;
+}

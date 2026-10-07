@@ -3,7 +3,8 @@ import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/discovery/infrastructure/search_infrastructure.dart';
+import 'package:chaski/features/discovery/infrastructure/datasources/search_remote_data_source.dart';
+import 'package:chaski/features/discovery/infrastructure/repositories/discovery_repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search_providers.g.dart';

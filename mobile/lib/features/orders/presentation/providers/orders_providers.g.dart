@@ -57,20 +57,20 @@ final class OrdersRemoteDataSourceProvider
 String _$ordersRemoteDataSourceHash() =>
     r'026fa6e867dd29d80ed08f5f5efe23dcb24f919c';
 
-/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Pedidos fake de Apamuy Socios, compartidos por los modos Negocio y
 /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
 
 @ProviderFor(fakeStaffOrders)
 final fakeStaffOrdersProvider = FakeStaffOrdersProvider._();
 
-/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Pedidos fake de Apamuy Socios, compartidos por los modos Negocio y
 /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
 
 final class FakeStaffOrdersProvider
     extends
         $FunctionalProvider<FakeStaffOrders, FakeStaffOrders, FakeStaffOrders>
     with $Provider<FakeStaffOrders> {
-  /// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+  /// Pedidos fake de Apamuy Socios, compartidos por los modos Negocio y
   /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
   FakeStaffOrdersProvider._()
     : super(

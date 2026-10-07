@@ -33,15 +33,14 @@ final class CheckoutState extends Equatable {
   List<Object?> get props => [draft, placing, error];
 }
 
-@riverpod
+/// Vive toda la sesión: la hora programada a veces se elige en el negocio
+/// (cerrado) antes de llegar al checkout.
+@Riverpod(keepAlive: true)
 class CheckoutController extends _$CheckoutController {
   final _idempotency = IdempotencyKeys<PlaceOrderRequest>();
 
   @override
   CheckoutState build() {
-    // Vive mientras dure la sesión: la hora programada se elige a veces en el
-    // negocio (cerrado) antes de llegar al checkout.
-    ref.keepAlive();
     // Precarga el último método de pago usado.
     ref.read(checkoutPreferencesProvider).lastPayment().then((kind) {
       if (kind != null && ref.mounted && state.draft.paymentKind == null) {

@@ -1,12 +1,15 @@
-import 'dart:async';
-
+import 'package:chaski/core/time/clock_provider.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/orders/domain/order.dart';
+import 'package:chaski/features/orders/presentation/order_status_labels.dart';
 import 'package:chaski/features/orders/presentation/pages/order_help_page.dart';
 import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/order_bits.dart';
+import 'package:chaski/features/orders/presentation/widgets/courier_card.dart';
+import 'package:chaski/features/orders/presentation/widgets/order_receipt_summary.dart';
+import 'package:chaski/features/orders/presentation/widgets/order_timeline.dart';
 import 'package:chaski/features/orders/presentation/widgets/rating_sheet.dart';
 import 'package:chaski/features/orders/presentation/widgets/route_map.dart';
+import 'package:chaski/features/orders/presentation/widgets/tracking_skeleton.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,27 +30,11 @@ class OrderTrackingPage extends ConsumerStatefulWidget {
 }
 
 class _OrderTrackingPageState extends ConsumerState<OrderTrackingPage> {
-  Timer? _clock;
-  var _now = DateTime.now();
   var _ratingOffered = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Refresca los minutos restantes y el avance del repartidor.
-    _clock = Timer.periodic(const Duration(seconds: 15), (_) => setState(() => _now = DateTime.now()));
-  }
-
-  @override
-  void dispose() {
-    _clock?.cancel();
-    super.dispose();
-  }
 
   void _onStatusChange(Order? previous, Order next) {
     if (previous == null || previous.status == next.status) return;
     HapticFeedback.mediumImpact().ignore();
-    // Al entregarse: una sola celebración y la calificación a mano.
     if (next.status == OrderStatus.delivered && next.rating == null && !_ratingOffered) {
       _ratingOffered = true;
       Future<void>.delayed(const Duration(milliseconds: 900), () {
@@ -63,70 +50,50 @@ class _OrderTrackingPageState extends ConsumerState<OrderTrackingPage> {
     });
     final order = ref.watch(orderWatchProvider(widget.orderId));
     return switch (order) {
-      AsyncValue(:final value?) => _Tracking(order: value, now: _now),
+      AsyncValue(:final value?) => _Tracking(order: value),
       AsyncError(:final error) => Scaffold(
         appBar: AppBar(title: const Text('Tu pedido')),
-        body: orderLoadError(error, what: 'tu pedido', onRetry: () => ref.invalidate(orderWatchProvider(widget.orderId))),
+        body: AppEmptyState.fromError(error, onRetry: () => ref.invalidate(orderWatchProvider(widget.orderId))),
       ),
-      _ => const _TrackingSkeleton(),
+      _ => const TrackingSkeleton(),
     };
   }
 }
 
+/// La hora para lo que avanza solo (minutos, repartidor en el mapa). Con el
+/// pedido terminado no se escucha el reloj, así deja de latir.
+DateTime _liveNow(WidgetRef ref, Order order) =>
+    order.status.isFinal ? DateTime.now() : ref.watch(clockProvider).value ?? DateTime.now();
+
 class _Tracking extends StatelessWidget {
-  const _Tracking({required this.order, required this.now});
+  const _Tracking({required this.order});
 
   final Order order;
-  final DateTime now;
-
-  /// Avance estimado del repartidor entre la salida y la llegada.
-  double get _routeProgress {
-    final left = order.timeOf(OrderStatus.onTheWay);
-    final eta = order.estimatedArrival;
-    if (order.status == OrderStatus.delivered) return 1;
-    if (!order.reached(OrderStatus.onTheWay)) return 0;
-    if (left == null || eta == null) return 0.05;
-    final total = eta.difference(left).inSeconds;
-    if (total <= 0) return 0.9;
-    return (now.difference(left).inSeconds / total).clamp(0.05, 0.95);
-  }
 
   void _openHelp(BuildContext context) => context.pushNamed(OrderHelpPage.name, pathParameters: {'orderId': order.id});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final height = MediaQuery.sizeOf(context).height;
-    final mapHeight = height * 0.56;
+    final mapHeight = MediaQuery.sizeOf(context).height * 0.56;
 
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: mapHeight,
-            child: RouteMap(
-              progress: _routeProgress,
-              storeLabel: order.store.name,
-              destinationLabel: order.addressTitle,
-              showCourier: order.courier != null && order.reached(OrderStatus.courierAssigned),
-            ),
-          ),
+          Positioned(top: 0, left: 0, right: 0, height: mapHeight, child: _TrackingMap(order: order)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
               child: Row(
                 children: [
-                  CircleAction(
+                  AppCircleButton(
                     icon: Icons.arrow_back_rounded,
                     tooltip: 'Volver',
                     elevated: true,
                     onPressed: () => Navigator.of(context).maybePop(),
                   ),
                   const Spacer(),
-                  CircleAction(
+                  AppCircleButton(
                     icon: Icons.help_outline_rounded,
                     tooltip: 'Ayuda con tu pedido',
                     elevated: true,
@@ -141,7 +108,7 @@ class _Tracking extends StatelessWidget {
             maxChildSize: 0.94,
             builder: (context, controller) => DecoratedBox(
               decoration: BoxDecoration(borderRadius: AppRadius.sheet, boxShadow: AppShadows.raised(theme.brightness)),
-              // Material propio: las filas (ExpansionTile) pintan su tinta aquí.
+              // Material propio: el ExpansionTile del detalle pinta su tinta aquí.
               child: Material(
                 color: theme.colorScheme.surface,
                 borderRadius: AppRadius.sheet,
@@ -158,12 +125,12 @@ class _Tracking extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    _EtaHeader(order: order, now: now),
+                    _EtaHeader(order: order),
                     const SizedBox(height: AppSpacing.lg),
-                    AppQuipu(dense: true, steps: _steps()),
+                    OrderTimeline(order: order),
                     if (order.courier case final courier?) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      _CourierCard(courier: courier),
+                      CourierCard(courier: courier),
                     ],
                     if (order.status == OrderStatus.delivered) ...[
                       const SizedBox(height: AppSpacing.lg),
@@ -173,9 +140,13 @@ class _Tracking extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: AppSpacing.sm),
-                    _HelpRow(label: '¿Algún problema con tu pedido?', onTap: () => _openHelp(context)),
+                    AppGroupedRow.link(
+                      icon: Icons.help_outline_rounded,
+                      title: '¿Algún problema con tu pedido?',
+                      onTap: () => _openHelp(context),
+                    ),
                     const SizedBox(height: AppSpacing.xs),
-                    _Summary(order: order),
+                    OrderReceiptSummary(order: order),
                   ],
                 ),
               ),
@@ -185,71 +156,45 @@ class _Tracking extends StatelessWidget {
       ),
     );
   }
-
-  List<QuipuStep> _steps() {
-    final owner = order.store.ownerName ?? order.store.name;
-    final rider = order.courier?.firstName;
-    String title(OrderStatus s) => switch (s) {
-      OrderStatus.received => 'Recibido',
-      OrderStatus.confirmed => 'Confirmado por $owner',
-      OrderStatus.preparing => order.reached(OrderStatus.ready) ? 'Preparado por $owner' : '$owner lo está preparando',
-      OrderStatus.ready => 'Listo para salir',
-      OrderStatus.courierAssigned => rider == null ? 'Repartidor asignado' : '$rider va a recogerlo',
-      OrderStatus.onTheWay => rider == null ? 'En camino' : '$rider va en camino',
-      OrderStatus.delivered => 'Entregado',
-      OrderStatus.cancelled => 'Cancelado',
-    };
-    final cancelled = order.status == OrderStatus.cancelled;
-    return [
-      for (final s in OrderStatus.timeline)
-        if (!cancelled || order.timeOf(s) != null)
-          QuipuStep(
-            title: title(s),
-            trailing: switch (order.timeOf(s)) {
-              final at? => clock12(at),
-              // Solo la entrega tiene hora estimada.
-              null when s == OrderStatus.delivered && order.estimatedArrival != null && order.isActive => '~${clock12(order.estimatedArrival!)}',
-              null => null,
-            },
-            knot: order.status == s && !s.isFinal
-                ? QuipuKnot.current
-                : order.reached(s)
-                ? QuipuKnot.done
-                : QuipuKnot.todo,
-          ),
-      if (cancelled) QuipuStep(title: 'Cancelado', trailing: _clockOf(order.timeOf(OrderStatus.cancelled)), knot: QuipuKnot.done),
-    ];
-  }
 }
 
-String? _clockOf(DateTime? at) => at == null ? null : clock12(at);
-
-/// "Llega en" + ETA grande + etiqueta viva; el mensaje humano cambia con el estado.
-class _EtaHeader extends StatelessWidget {
-  const _EtaHeader({required this.order, required this.now});
+class _TrackingMap extends ConsumerWidget {
+  const _TrackingMap({required this.order});
 
   final Order order;
-  final DateTime now;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) => RouteMap(
+    progress: order.routeProgress(_liveNow(ref, order)),
+    storeLabel: order.store.name,
+    destinationLabel: order.addressTitle,
+    showCourier: order.courier != null && order.reached(OrderStatus.courierAssigned),
+  );
+}
+
+/// "Llega en" + ETA grande + etiqueta viva; el mensaje humano cambia con el estado.
+class _EtaHeader extends ConsumerWidget {
+  const _EtaHeader({required this.order});
+
+  final Order order;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final chaski = context.chaski;
-    final minutes = order.minutesLeft(now);
-    final delivered = order.status == OrderStatus.delivered;
-    final cancelled = order.status == OrderStatus.cancelled;
+    final minutes = order.minutesLeft(_liveNow(ref, order));
+    final deliveredAt = order.timeOf(OrderStatus.delivered);
     final (String caption, String big) = switch (order.status) {
-      OrderStatus.delivered => ('Llegó a las', _clockOf(order.timeOf(OrderStatus.delivered)) ?? '¡Listo!'),
+      OrderStatus.delivered => ('Llegó a las', deliveredAt == null ? '¡Listo!' : Formatters.clock(deliveredAt)),
       OrderStatus.cancelled => ('Tu pedido', 'Cancelado'),
       _ when minutes != null => ('Llega en', '$minutes min'),
       _ => ('Llega en', 'Calculando…'),
     };
-    final duration = reduceMotionOf(context) ? Duration.zero : AppMotion.move;
 
     return Semantics(
       liveRegion: true,
       child: AnimatedSwitcher(
-        duration: duration,
+        duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
         switchInCurve: AppMotion.arrive,
         transitionBuilder: (child, animation) => FadeTransition(
           opacity: animation,
@@ -270,19 +215,20 @@ class _EtaHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(caption, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                      Text(
-                        big,
-                        style: theme.textTheme.displaySmall?.copyWith(fontFeatures: AppTypography.tabularFigures, height: 1.1),
-                      ),
+                      Text(big, style: theme.textTheme.displaySmall?.copyWith(fontFeatures: AppTypography.tabularFigures, height: 1.1)),
                     ],
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child: LiveTag(
-                    label: statusTag(order.status),
+                  child: AppLiveTag(
+                    label: order.status.tag,
                     live: !order.status.isFinal,
-                    color: delivered ? chaski.success : (cancelled ? chaski.danger : null),
+                    color: switch (order.status) {
+                      OrderStatus.delivered => chaski.success,
+                      OrderStatus.cancelled => chaski.danger,
+                      _ => null,
+                    },
                   ),
                 ),
               ],
@@ -291,187 +237,6 @@ class _EtaHeader extends StatelessWidget {
             Text(order.headline, style: theme.textTheme.titleMedium),
             Text(order.detail, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CourierCard extends StatelessWidget {
-  const _CourierCard({required this.courier});
-
-  final Courier courier;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.xxs, AppSpacing.xs),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
-      child: Row(
-        children: [
-          AppAvatar(
-            imageUrl: courier.avatarUrl,
-            initials: courier.name.split(' ').map((p) => p.isEmpty ? '' : p[0]).take(2).join(),
-            seed: courier.name,
-            variant: AppAvatarVariant.courier,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(courier.name, style: theme.textTheme.titleSmall),
-                Text(
-                  [courier.vehicle, if (courier.since != null) 'Reparte en Espinar desde ${courier.since}'].join(' · '),
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          CircleAction(
-            icon: Icons.chat_bubble_outline_rounded,
-            tooltip: 'Escribir a ${courier.firstName}',
-            onPressed: () => AppToast.show(context, 'Muy pronto: mensajes con ${courier.firstName} sin salir de la app.'),
-          ),
-          CircleAction(
-            icon: Icons.call_rounded,
-            tooltip: 'Llamar a ${courier.firstName}',
-            onPressed: () => AppToast.show(context, 'Muy pronto: llamadas sin compartir tu número.'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HelpRow extends StatelessWidget {
-  const _HelpRow({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Semantics(
-      button: true,
-      child: InkWell(
-        borderRadius: AppRadius.tile,
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: AppSpacing.minTouch),
-          child: Row(
-            children: [
-              Icon(Icons.help_outline_rounded, size: 20, color: theme.colorScheme.onSurfaceVariant),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(child: Text(label, style: theme.textTheme.labelLarge)),
-              Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Summary extends StatelessWidget {
-  const _Summary({required this.order});
-
-  final Order order;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final muted = theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant);
-    return Theme(
-      data: theme.copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.zero,
-        title: Text('Detalle del pedido · ${order.code}', style: theme.textTheme.titleMedium),
-        subtitle: Text(
-          '${order.itemCount} productos · ${Formatters.money(order.total)} · ${order.payment.label}',
-          style: theme.textTheme.bodySmall,
-        ),
-        childrenPadding: const EdgeInsets.only(bottom: AppSpacing.md),
-        children: [
-          for (final line in order.lines)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(width: 28, child: Text('${line.quantity}×', style: theme.textTheme.labelLarge)),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(line.name, style: theme.textTheme.bodyMedium),
-                        if (line.description.isNotEmpty) Text(line.description, style: theme.textTheme.bodySmall),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    Formatters.money(line.total),
-                    style: theme.textTheme.bodyMedium?.copyWith(fontFeatures: AppTypography.tabularFigures),
-                  ),
-                ],
-              ),
-            ),
-          const SizedBox(height: AppSpacing.sm),
-          _kv('Envío', Formatters.money(order.deliveryFee), muted),
-          if (!order.discount.isZero) _kv('Descuento', '− ${Formatters.money(order.discount)}', muted?.copyWith(color: context.chaski.success)),
-          if (!order.tip.isZero) _kv('Propina', Formatters.money(order.tip), muted),
-          _kv('Total', Formatters.money(order.total), AppTypography.price(context, size: 16)),
-          const SizedBox(height: AppSpacing.sm),
-          _kv('Entregar en', '${order.addressTitle} · ${order.addressStreet}', muted),
-          if (order.payment case CashPayment(:final changeFor?)) _kv('Vuelto de', Formatters.money(changeFor), muted),
-        ],
-      ),
-    );
-  }
-
-  Widget _kv(String k, String v, TextStyle? style) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: Text(k, style: style)),
-        Flexible(
-          child: Text(v, style: style, textAlign: TextAlign.right),
-        ),
-      ],
-    ),
-  );
-}
-
-/// Carga: mapa gris y la hoja con bloques que brillan.
-class _TrackingSkeleton extends StatelessWidget {
-  const _TrackingSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Tu pedido')),
-      body: Semantics(
-        label: 'Buscando tu pedido',
-        child: Skeleton(
-          child: ListView(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: AppSpacing.screen,
-            children: [
-              SkeletonBox(height: height * 0.3, borderRadius: AppRadius.card),
-              const SizedBox(height: AppSpacing.lg),
-              const SkeletonBox(width: 80),
-              const SizedBox(height: AppSpacing.xs),
-              const SkeletonBox(width: 160, height: 32),
-              const SizedBox(height: AppSpacing.lg),
-              const SkeletonLines(lines: 4),
-              const SizedBox(height: AppSpacing.lg),
-              const SkeletonBox(height: 64, borderRadius: AppRadius.card),
-            ],
-          ),
         ),
       ),
     );

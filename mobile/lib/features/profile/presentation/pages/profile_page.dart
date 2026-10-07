@@ -1,16 +1,22 @@
 import 'package:chaski/core/config/theme_mode_provider.dart';
-import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/domain/phone_number.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/addresses/addresses.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/favorites/favorites.dart';
+import 'package:chaski/features/notifications/notifications.dart';
 import 'package:chaski/features/orders/orders_customer.dart';
+import 'package:chaski/features/profile/presentation/providers/profile_summary.dart';
+import 'package:chaski/features/profile/presentation/widgets/theme_mode_sheet.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// "Tú": lo mío. Pedidos, direcciones, pagos, favoritos y ajustes.
+/// Versión que se muestra al pie; el build la pasa con `--dart-define=APP_VERSION=…`.
+const appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '0.1.0');
+
+/// "Tú": pedidos, direcciones, pagos, favoritos y ajustes.
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
@@ -28,22 +34,18 @@ class ProfilePage extends ConsumerWidget {
     if (confirmed) await ref.read(authSessionProvider.notifier).logout();
   }
 
+  Future<void> _pickTheme(BuildContext context, WidgetRef ref, ThemeMode current) async {
+    final picked = await showThemeModeSheet(context, current: current);
+    if (picked != null) await ref.read(appThemeModeProvider.notifier).set(picked);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = ref.watch(authSessionProvider).value;
-    final history = ref.watch(ordersHistoryProvider).value;
-    final active = ref.watch(activeOrderProvider).value;
-    final addresses = ref.watch(addressBookControllerProvider).value?.addresses.length ?? 0;
+    final summary = ref.watch(profileSummaryProvider);
     final themeMode = ref.watch(appThemeModeProvider);
-    final favorites = ref.watch(favoritesProvider).value;
-    final favoriteCount = favorites == null ? 0 : favorites.storeIds.length + favorites.productIds.length;
-
-    final activeCount = {
-      ...?history?.where((o) => o.isActive).map((o) => o.id),
-      if (active != null && active.isActive) active.id,
-    }.length;
-    final saved = history?.fold(const Money.zero(), (sum, o) => sum + o.discount);
+    final addresses = summary.addressCount;
 
     return Scaffold(
       body: SafeArea(
@@ -62,7 +64,7 @@ class ProfilePage extends ConsumerWidget {
                       children: [
                         Semantics(header: true, child: Text(user.fullName, style: theme.textTheme.headlineSmall)),
                         Text(
-                          '+51 ${_phone(user.phone.value)}',
+                          '+51 ${PhoneNumber.displayOf(user.phone.value)}',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontFeatures: AppTypography.tabularFigures,
@@ -79,78 +81,78 @@ class ProfilePage extends ConsumerWidget {
                   ),
                 ],
               ),
-            if (history != null && history.isNotEmpty) ...[
+            if (summary.orderCount > 0) ...[
               const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
                   Expanded(
-                    child: _Stat(value: '${history.length}', label: history.length == 1 ? 'pedido' : 'pedidos'),
+                    child: _Stat(value: '${summary.orderCount}', label: summary.orderCount == 1 ? 'pedido' : 'pedidos'),
                   ),
-                  if (favoriteCount > 0) ...[
-                    const SizedBox(width: AppSpacing.xs),
-                    Expanded(child: _Stat(value: '$favoriteCount', label: favoriteCount == 1 ? 'favorito' : 'favoritos')),
-                  ],
-                  if (saved != null && !saved.isZero) ...[
+                  if (summary.favoriteCount > 0) ...[
                     const SizedBox(width: AppSpacing.xs),
                     Expanded(
-                      child: _Stat(value: _shortMoney(saved), label: 'ahorrado'),
+                      child: _Stat(value: '${summary.favoriteCount}', label: summary.favoriteCount == 1 ? 'favorito' : 'favoritos'),
                     ),
+                  ],
+                  if (!summary.saved.isZero) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(child: _Stat(value: Formatters.shortMoney(summary.saved), label: 'ahorrado')),
                   ],
                 ],
               ),
             ],
             const SizedBox(height: AppSpacing.lg),
-            _Group(
+            AppGroupedCard(
               children: [
-                _Row(
+                AppGroupedRow(
                   icon: Icons.shopping_bag_outlined,
                   title: 'Mis pedidos',
-                  trailing: activeCount == 0 ? null : _LimeTag('$activeCount EN CURSO'),
+                  trailing: summary.activeCount == 0 ? null : AppCinta('${summary.activeCount} EN CURSO', dense: true),
                   onTap: () => context.goNamed(OrdersPage.name),
                 ),
-                _Row(
+                AppGroupedRow(
                   icon: Icons.place_outlined,
                   title: 'Direcciones',
                   subtitle: addresses == 0 ? 'Agrega dónde te llevamos los pedidos' : '$addresses guardada${addresses == 1 ? '' : 's'}',
                   onTap: () => showAddressPicker(context),
                 ),
-                _Row(
+                AppGroupedRow(
                   icon: Icons.credit_card_rounded,
                   title: 'Pagos',
                   subtitle: 'Yape, Plin o efectivo al recibir',
                   onTap: () => AppToast.show(context, 'Eliges cómo pagar en cada pedido. Recordamos el último.'),
                 ),
-                _Row(
+                AppGroupedRow(
                   icon: Icons.favorite_outline_rounded,
                   title: 'Favoritos',
-                  onTap: () => context.pushNamed('favorites'),
+                  onTap: () => context.pushNamed(FavoritesPage.name),
                 ),
-                _Row(
+                AppGroupedRow(
                   icon: Icons.notifications_none_rounded,
                   title: 'Avisos',
-                  onTap: () => context.pushNamed('notifications'),
+                  onTap: () => context.pushNamed(NotificationsPage.name),
                 ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            _Group(
+            AppGroupedCard(
               children: [
-                _Row(
+                AppGroupedRow(
                   icon: Icons.dark_mode_outlined,
                   title: 'Tema',
-                  subtitle: _themeLabel(themeMode),
+                  subtitle: themeModeLabel(themeMode),
                   onTap: () => _pickTheme(context, ref, themeMode),
                 ),
-                _Row(
+                AppGroupedRow(
                   icon: Icons.help_outline_rounded,
                   title: 'Ayuda',
                   subtitle: 'Problemas con un pedido, pagos o tu cuenta',
                   // Con pedidos, la ayuda arranca desde el más reciente.
                   onTap: () {
-                    if (history == null || history.isEmpty) {
-                      AppToast.show(context, 'Muy pronto: ayuda por WhatsApp con alguien de aquí.');
+                    if (summary.latestOrderId case final orderId?) {
+                      context.pushNamed(OrderHelpPage.name, pathParameters: {'orderId': orderId}).ignore();
                     } else {
-                      context.pushNamed(OrderHelpPage.name, pathParameters: {'orderId': history.first.id}).ignore();
+                      AppToast.show(context, 'Muy pronto: ayuda por WhatsApp con alguien de aquí.');
                     }
                   },
                 ),
@@ -169,7 +171,7 @@ class ProfilePage extends ConsumerWidget {
                 children: [
                   const BrandLogo(size: 24),
                   const SizedBox(height: AppSpacing.xs),
-                  Text('Hecho en Espinar · v0.1.0', style: theme.textTheme.bodySmall),
+                  Text('Hecho en Espinar · v$appVersion', style: theme.textTheme.bodySmall),
                 ],
               ),
             ),
@@ -177,49 +179,6 @@ class ProfilePage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _themeLabel(ThemeMode mode) => switch (mode) {
-    ThemeMode.system => 'Igual que tu teléfono',
-    ThemeMode.light => 'Claro',
-    ThemeMode.dark => 'Oscuro',
-  };
-
-  Future<void> _pickTheme(BuildContext context, WidgetRef ref, ThemeMode current) async {
-    final picked = await showAppBottomSheet<ThemeMode>(
-      context,
-      title: 'Tema',
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RadioGroup<ThemeMode>(
-            groupValue: current,
-            onChanged: (mode) => Navigator.of(context).pop(mode),
-            child: Column(
-              children: [
-                for (final mode in ThemeMode.values)
-                  RadioListTile<ThemeMode>(
-                    value: mode,
-                    title: Text(_themeLabel(mode)),
-                    contentPadding: AppSpacing.screen,
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-        ],
-      ),
-    );
-    if (picked != null) await ref.read(appThemeModeProvider.notifier).set(picked);
-  }
-
-  String _phone(String digits) =>
-      digits.length == 9 ? '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6)}' : digits;
-
-  /// "S/ 18" si no hay céntimos; si no, el monto completo.
-  String _shortMoney(Money m) {
-    final text = Formatters.money(m);
-    return text.endsWith('.00') ? text.substring(0, text.length - 3) : text;
   }
 }
 
@@ -243,104 +202,6 @@ class _Stat extends StatelessWidget {
             Text(value, style: AppTypography.price(context)),
             Text(label, style: theme.textTheme.bodySmall),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Etiqueta lima con texto tinta ("1 EN CURSO").
-class _LimeTag extends StatelessWidget {
-  const _LimeTag(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final chaski = context.chaski;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(color: chaski.accent, borderRadius: const BorderRadius.all(AppRadius.sm)),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: chaski.onAccent, fontWeight: FontWeight.w800),
-      ),
-    );
-  }
-}
-
-/// Tarjeta con borde que agrupa filas separadas por líneas finas.
-class _Group extends StatelessWidget {
-  const _Group({required this.children});
-
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: scheme.surface,
-        borderRadius: AppRadius.card,
-        border: Border.all(color: scheme.outlineVariant),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Material(
-        type: MaterialType.transparency,
-        child: Column(
-          children: [
-            for (var i = 0; i < children.length; i++) ...[
-              if (i > 0) Divider(height: 1, thickness: 1, color: scheme.outlineVariant),
-              children[i],
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Row extends StatelessWidget {
-  const _Row({required this.icon, required this.title, required this.onTap, this.subtitle, this.trailing});
-
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 56),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(color: context.chaski.raised, shape: BoxShape.circle),
-                child: Icon(icon, size: 18, color: theme.colorScheme.onSurface),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: theme.textTheme.titleSmall),
-                    if (subtitle != null) Text(subtitle!, style: theme.textTheme.bodySmall),
-                  ],
-                ),
-              ),
-              ?trailing,
-              const SizedBox(width: AppSpacing.xxs),
-              Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant),
-            ],
-          ),
         ),
       ),
     );

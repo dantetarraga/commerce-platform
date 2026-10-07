@@ -36,8 +36,6 @@ extension OrderStatusLabels on OrderStatus {
   };
 
   /// Nombre corto del estado para los socios ("Nuevo", "Listo para recoger").
-  /// Mismo texto que `StaffStatusLabel.staffLabel` del dominio, que queda
-  /// hasta que sus usuarios pasen a este.
   String get partnerLabel => switch (this) {
     OrderStatus.received => 'Nuevo',
     OrderStatus.confirmed => 'Aceptado',

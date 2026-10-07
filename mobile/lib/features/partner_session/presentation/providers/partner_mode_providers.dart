@@ -10,16 +10,21 @@ part 'partner_mode_providers.g.dart';
 class PartnerModePreference extends _$PartnerModePreference {
   static const _key = 'chaski.partnerMode';
 
+  /// Ya eligió en esta sesión: lo guardado (que llega después) no lo pisa.
+  var _chosen = false;
+
   @override
   PartnerMode? build() {
     ref.read(localJsonStoreProvider).read(_key).then((value) {
       final saved = PartnerMode.values.where((m) => m.name == value).firstOrNull;
-      if (saved != null && ref.mounted) state = saved;
+      // Solo avisa (y redirige) si lo guardado cambia algo.
+      if (saved != null && !_chosen && ref.mounted && state != saved) state = saved;
     }).ignore();
     return null;
   }
 
   Future<void> set(PartnerMode mode) async {
+    _chosen = true;
     state = mode;
     await ref.read(localJsonStoreProvider).write(_key, mode.name);
   }

@@ -1,8 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/cart/cart.dart';
 import 'package:chaski/features/stores/domain/entities/store_detail.dart';
+import 'package:chaski/features/stores/domain/entities/store_menu.dart';
 import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 
 /// Argumentos opcionales al abrir un negocio: la portada ya conocida (se
@@ -16,6 +15,10 @@ class StoreRouteArgs {
 
 /// Tag del elemento compartido portada-card → portada-detalle.
 String storeCoverHeroTag(String storeId, String source) => 'store-cover-$source-$storeId';
+
+/// Por qué no se puede pedir ahora a [store] (cerrado o fuera de zona).
+String cannotOrderMessage(StoreSummary store) =>
+    store.isOpenNow ? '${store.name} no llega a tu dirección' : '${store.name} está cerrado ahora';
 
 extension StoreSummaryCard on StoreSummary {
   StoreCardData toCardData({bool withDistance = false, String? closedLabel}) => StoreCardData(
@@ -33,6 +36,12 @@ extension StoreSummaryCard on StoreSummary {
     minOrder: minOrderAmount,
   );
 
+  /// "Abre mañana a las 7:00 am", o `null` si está abierto o no se sabe.
+  String? opensLabel(DateTime now) => switch (opensPhrase(now)) {
+    final phrase? => 'Abre $phrase',
+    null => null,
+  };
+
   CartStore toCartStore() => CartStore(
     id: id,
     name: name,
@@ -43,10 +52,19 @@ extension StoreSummaryCard on StoreSummary {
   );
 }
 
-extension StoreDetailLabels on StoreDetail {
-  /// "Abre hoy a las 18:00" · "Abre mañana 7:00" · "Abre el sábado 9:00".
-  String? get nextOpeningLabel => nextOpeningLabelFor(schedule, DateTime.now());
+extension MenuItemCard on MenuItem {
+  ProductCardData toCardData() => ProductCardData(
+    id: id,
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
+    price: price,
+    isAvailable: isAvailable,
+    fromPrice: hasChoices,
+  );
+}
 
+extension StoreDetailLabels on StoreDetail {
   /// "Atiende Rosa desde 2009".
   String? get attendedByLabel => switch ((ownerName, attendingSince)) {
     (final owner?, final since?) => 'Atiende $owner desde $since',
@@ -54,18 +72,3 @@ extension StoreDetailLabels on StoreDetail {
     _ => null,
   };
 }
-
-/// "Abre hoy a las 6:00 pm" · "Abre mañana a las 7:00 am". Delegado a
-/// [WeeklyScheduleLabels.nextOpeningLabel].
-String? nextOpeningLabelFor(WeeklySchedule schedule, DateTime now) => schedule.nextOpeningLabel(now);
-
-/// Fecha y hora de la próxima apertura (para programar un pedido), o null.
-/// Delegado a [WeeklySchedule.nextOpeningAt].
-DateTime? nextOpeningAt(WeeklySchedule schedule, DateTime now) => schedule.nextOpeningAt(now);
-
-/// "Cierra 10:00 pm" si ahora está dentro de un turno; null si no. Delegado a
-/// [WeeklyScheduleLabels.closingLabel].
-String? closingLabelFor(WeeklySchedule schedule, DateTime now) => schedule.closingLabel(now);
-
-/// "hoy a las 6:30 pm" · "mañana a las 7:00 am" · "el sábado a las 9:00 am".
-String scheduledAtLabel(DateTime at, DateTime now) => Formatters.whenPhrase(at, now: now);

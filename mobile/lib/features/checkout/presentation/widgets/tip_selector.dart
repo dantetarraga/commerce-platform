@@ -1,7 +1,6 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/widgets/checkout_format.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,11 +102,11 @@ class _TipChip extends StatelessWidget {
   }
 }
 
-/// Entrada simple de monto para "Otro".
 Future<Money?> _askCustomTip(BuildContext context, {Money? initial}) {
   return showAppBottomSheet<Money>(
     context,
     title: 'Otra propina',
+    subtitle: 'Va completa para quien te lo lleva.',
     builder: (_) => _CustomTipForm(initial: initial),
   );
 }
@@ -134,7 +133,7 @@ class _CustomTipFormState extends State<_CustomTipForm> {
   }
 
   void _submit() {
-    final amount = CheckoutFormat.parseSoles(_text.text);
+    final amount = Money.tryParse(_text.text);
     if (amount == null) {
       setState(() => _error = 'Escribe un monto, por ejemplo 4.50');
       return;
@@ -148,15 +147,12 @@ class _CustomTipFormState extends State<_CustomTipForm> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Va completa para quien te lo lleva.', style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          const SizedBox(height: AppSpacing.md),
           AppInput(
             label: 'Monto en soles',
             controller: _text,

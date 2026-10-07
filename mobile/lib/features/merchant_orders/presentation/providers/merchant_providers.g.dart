@@ -201,6 +201,62 @@ final class MerchantActiveOrdersProvider
 String _$merchantActiveOrdersHash() =>
     r'2e8b0da3c95bf0079f5c95e3193e805cc3033ffa';
 
+/// Los pedidos en curso repartidos en las tres columnas del riel.
+
+@ProviderFor(merchantBoard)
+final merchantBoardProvider = MerchantBoardProvider._();
+
+/// Los pedidos en curso repartidos en las tres columnas del riel.
+
+final class MerchantBoardProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>,
+          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>,
+          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>
+        >
+    with $Provider<AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>> {
+  /// Los pedidos en curso repartidos en las tres columnas del riel.
+  MerchantBoardProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'merchantBoardProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$merchantBoardHash();
+
+  @$internal
+  @override
+  $ProviderElement<AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>>
+  $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+
+  @override
+  AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> create(Ref ref) {
+    return merchantBoard(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(
+    AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> value,
+  ) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<
+            AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>
+          >(value),
+    );
+  }
+}
+
+String _$merchantBoardHash() => r'0e47f4422eac4997f8f20a612ded8cce6e4291c0';
+
 @ProviderFor(merchantTodayOrders)
 final merchantTodayOrdersProvider = MerchantTodayOrdersProvider._();
 
@@ -281,20 +337,17 @@ final class MerchantSummaryProvider
 String _$merchantSummaryHash() => r'4b180be3c93202ecf07e17fef7cf5905a1696a7f';
 
 /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 
 @ProviderFor(MerchantOrderActions)
 final merchantOrderActionsProvider = MerchantOrderActionsProvider._();
 
 /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 final class MerchantOrderActionsProvider
     extends $NotifierProvider<MerchantOrderActions, void> {
   /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
-  // keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-  // mitad de una acción (se perdería el refresco de las listas).
+  // keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
   MerchantOrderActionsProvider._()
     : super(
         from: null,
@@ -326,8 +379,7 @@ String _$merchantOrderActionsHash() =>
     r'ed9d7f58ed78a77b8a032b137e66284960ce20b3';
 
 /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 
 abstract class _$MerchantOrderActions extends $Notifier<void> {
   void build();
@@ -450,4 +502,114 @@ abstract class _$MerchantProducts
             >;
     return element.handleCreate(ref, () => build(_$args));
   }
+}
+
+/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+
+@ProviderFor(merchantProductsFiltered)
+final merchantProductsFilteredProvider = MerchantProductsFilteredFamily._();
+
+/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+
+final class MerchantProductsFilteredProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<MerchantCatalog>,
+          AsyncValue<MerchantCatalog>,
+          AsyncValue<MerchantCatalog>
+        >
+    with $Provider<AsyncValue<MerchantCatalog>> {
+  /// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+  MerchantProductsFilteredProvider._({
+    required MerchantProductsFilteredFamily super.from,
+    required (String, {String query, ProductFilter filter}) super.argument,
+  }) : super(
+         retry: null,
+         name: r'merchantProductsFilteredProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$merchantProductsFilteredHash();
+
+  @override
+  String toString() {
+    return r'merchantProductsFilteredProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<AsyncValue<MerchantCatalog>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AsyncValue<MerchantCatalog> create(Ref ref) {
+    final argument =
+        this.argument as (String, {String query, ProductFilter filter});
+    return merchantProductsFiltered(
+      ref,
+      argument.$1,
+      query: argument.query,
+      filter: argument.filter,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<MerchantCatalog> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<MerchantCatalog>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MerchantProductsFilteredProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$merchantProductsFilteredHash() =>
+    r'23f4fbd4307306dc1eae4a54f7ad389806ca1bef';
+
+/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+
+final class MerchantProductsFilteredFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+          AsyncValue<MerchantCatalog>,
+          (String, {String query, ProductFilter filter})
+        > {
+  MerchantProductsFilteredFamily._()
+    : super(
+        retry: null,
+        name: r'merchantProductsFilteredProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+
+  MerchantProductsFilteredProvider call(
+    String storeId, {
+    String query = '',
+    ProductFilter filter = ProductFilter.all,
+  }) => MerchantProductsFilteredProvider._(
+    argument: (storeId, query: query, filter: filter),
+    from: this,
+  );
+
+  @override
+  String toString() => r'merchantProductsFilteredProvider';
 }

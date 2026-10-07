@@ -1,9 +1,11 @@
+import 'package:chaski/core/utils/formatters.dart';
+import 'package:chaski/features/cart/domain/entities/cart.dart';
 import 'package:chaski/features/checkout/domain/checkout.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Colores de marca de los medios de pago. Son parte del logo (se reconocen
-/// por su color) y no cambian con el tema, por eso viven aquí y no en tokens.
+/// Colores de marca de Yape y Plin: son parte de su logo y no cambian con el
+/// tema, por eso no están en los tokens.
 abstract final class _BrandColors {
   static const yape = Color(0xFF742284);
   static const plin = Color(0xFF00A3E0);
@@ -32,6 +34,20 @@ extension PaymentKindCopy on PaymentKind {
   };
 }
 
+extension CheckoutDraftPaymentCopy on CheckoutDraft {
+  /// Bajada de la fila "Pago" de la boleta.
+  String paymentHint(Cart cart) => switch (paymentKind) {
+    PaymentKind.yape || PaymentKind.plin => 'Al número de quien te lo lleva',
+    PaymentKind.cash => switch ((cashChangeFor, change(cart))) {
+      (null, _) => 'Con el monto exacto',
+      (final paysWith?, final change?) => 'Pagas con ${Formatters.money(paysWith)} · vuelto ${Formatters.money(change)}',
+      (final paysWith?, null) => 'Con ${Formatters.money(paysWith)} no alcanza',
+    },
+    PaymentKind.card => 'El repartidor lleva POS',
+    null => 'Yape, Plin, efectivo o tarjeta',
+  };
+}
+
 /// Mosaico con el "logo" del medio de pago.
 class PaymentLogo extends StatelessWidget {
   const PaymentLogo(this.kind, {this.size = 36, super.key});
@@ -49,7 +65,7 @@ class PaymentLogo extends StatelessWidget {
       PaymentKind.cash => (chaski.success, scheme.surface),
       PaymentKind.card => (scheme.inverseSurface, scheme.onInverseSurface),
     };
-    final text = TextStyle(fontFamily: AppTypography.display, fontWeight: FontWeight.w800, color: fg, height: 1);
+    final text = AppTypography.displayStyle(context, size: size * 0.3, weight: FontWeight.w800, color: fg, height: 1);
     return ExcludeSemantics(
       child: Container(
         width: size,

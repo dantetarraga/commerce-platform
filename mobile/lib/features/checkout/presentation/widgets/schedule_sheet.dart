@@ -1,16 +1,14 @@
+import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/checkout/domain/checkout.dart';
 import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
-import 'package:chaski/features/checkout/presentation/widgets/checkout_format.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Hoja "¿Para cuándo?": día y hora (cada 15 min) para programar el pedido.
-///
 /// [notBefore] es la primera hora posible (p. ej. cuando abre un negocio
-/// cerrado). Devuelve la hora elegida, o null si se cierra sin elegir. La
-/// elección queda guardada en el checkout (`scheduledDeliveryProvider`).
+/// cerrado). La elección queda en el checkout (`scheduledDeliveryProvider`).
 Future<DateTime?> showScheduleSheet(BuildContext context, {String? storeName, DateTime? notBefore}) {
   return showAppBottomSheet<DateTime>(
     context,
@@ -37,7 +35,7 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
   DateTime? _selected;
 
   List<DateTime> get _dayOptions {
-    final today = CheckoutFormat.dateOnly(widget.now);
+    final today = _dateOnly(widget.now);
     return [for (var i = 0; i < _days; i++) DateTime(today.year, today.month, today.day + i)];
   }
 
@@ -85,7 +83,7 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
     final store = widget.storeName;
     final opens = widget.notBefore;
     if (store != null && opens != null && opens.isAfter(widget.now)) {
-      return '$store abre ${CheckoutFormat.whenPhrase(opens, widget.now)}';
+      return '$store abre ${Formatters.whenPhrase(opens, now: widget.now)}';
     }
     if (store != null) return 'Tu pedido de $store, a la hora que te acomode';
     return 'Elige el día y la hora de llegada';
@@ -98,25 +96,18 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
     final slots = _slotsFor(_day);
     final hasAvailable = slots.any((s) => s.available);
     final selected = _selected;
-    final canGoAsap = widget.notBefore == null && ref.watch(checkoutControllerProvider).draft.deliveryTime is DeliverAt;
+    final canGoAsap = widget.notBefore == null && ref.watch(checkoutControllerProvider.select((s) => s.draft.deliveryTime is DeliverAt));
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(0, 0, 0, AppSpacing.md + MediaQuery.paddingOf(context).bottom),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Semantics(header: true, child: Text('¿Para cuándo?', style: theme.textTheme.headlineSmall)),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(_subtitle, style: muted),
-              ],
-            ),
+          AppSheetHeader(
+            title: '¿Para cuándo?',
+            subtitle: _subtitle,
+            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.md),
           ),
-          const SizedBox(height: AppSpacing.md),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
@@ -124,7 +115,7 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
               children: [
                 for (final day in _dayOptions) ...[
                   AppChip(
-                    label: CheckoutFormat.day(day, widget.now),
+                    label: _scheduleDay(day, widget.now).label,
                     variant: AppChipVariant.choice,
                     selected: day == _day,
                     onTap: () => _pickDay(day),
@@ -169,8 +160,8 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
                 key: ValueKey(selected),
                 selected == null
                     ? (hasAvailable ? 'Elige una hora.' : 'Ese día ya no alcanzamos. Prueba otro día.')
-                    : 'Llega entre ${CheckoutFormat.hour12(selected)} y '
-                          '${CheckoutFormat.clock(selected.add(const Duration(minutes: deliveryWindowMinutes)))}. '
+                    : 'Llega entre ${Formatters.hour12(selected)} y '
+                          '${Formatters.clock(selected.add(const Duration(minutes: deliveryWindowMinutes)))}. '
                           'Puedes cancelar hasta que empiecen a prepararlo.',
                 style: muted,
               ),
@@ -199,13 +190,28 @@ class _ScheduleSheetState extends ConsumerState<_ScheduleSheet> {
   }
 
   String _confirmLabel(DateTime at) {
-    final day = CheckoutFormat.day(at, widget.now);
-    return switch (day) {
-      'Hoy' => 'Programar para las ${CheckoutFormat.clock(at)}',
-      'Mañana' => 'Programar para mañana, ${CheckoutFormat.clock(at)}',
-      _ => 'Programar para el ${day.toLowerCase()}, ${CheckoutFormat.clock(at)}',
+    final day = _scheduleDay(at, widget.now);
+    final clock = Formatters.clock(at);
+    return switch (day.offset) {
+      0 => 'Programar para las $clock',
+      1 => 'Programar para mañana, $clock',
+      _ => 'Programar para el ${day.label.toLowerCase()}, $clock',
     };
   }
+}
+
+DateTime _dateOnly(DateTime at) => DateTime(at.year, at.month, at.day);
+
+/// Día de la grilla: cuántos faltan desde hoy y su etiqueta ("Hoy" · "Mañana" · "Jue 25").
+({int offset, String label}) _scheduleDay(DateTime at, DateTime now) {
+  const weekdays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+  final offset = _dateOnly(at).difference(_dateOnly(now)).inDays;
+  final label = switch (offset) {
+    0 => 'Hoy',
+    1 => 'Mañana',
+    _ => '${weekdays[at.weekday - 1]} ${at.day}',
+  };
+  return (offset: offset, label: label);
 }
 
 class _SlotCell extends StatelessWidget {
@@ -224,12 +230,12 @@ class _SlotCell extends StatelessWidget {
         : available
         ? scheme.onSurface
         : scheme.onSurface.withValues(alpha: 0.32);
-    final label = CheckoutFormat.hour12(slot.at);
+    final label = Formatters.hour12(slot.at);
     return Semantics(
       button: available,
       selected: selected,
       enabled: available,
-      label: available ? CheckoutFormat.clock(slot.at) : '${CheckoutFormat.clock(slot.at)}, no disponible',
+      label: available ? Formatters.clock(slot.at) : '${Formatters.clock(slot.at)}, no disponible',
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -249,8 +255,8 @@ class _SlotCell extends StatelessWidget {
               children: [
                 TextSpan(text: label),
                 TextSpan(
-                  text: ' ${CheckoutFormat.meridiem(slot.at)}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                  text: ' ${Formatters.meridiem(slot.at)}',
+                  style: TextStyle(fontSize: Theme.of(context).textTheme.labelSmall?.fontSize, fontWeight: FontWeight.w600),
                 ),
               ],
             ),

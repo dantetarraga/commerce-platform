@@ -55,7 +55,7 @@ final class LocalProductsRepositoryProvider
 }
 
 String _$localProductsRepositoryHash() =>
-    r'74f6d2891075b470439f5340a3890317384b4ba6';
+    r'58bc4e018be332ff7c6cb3a7350e14f633e80f05';
 
 /// "Hecho en Espinar": productos de la ciudad.
 
@@ -101,18 +101,15 @@ final class LocalProductsProvider
 
 String _$localProductsHash() => r'5fa03e979adfa596f6ab17ceb708d6a7c2b597ef';
 
-/// Momento actual; se recalcula cada 10 minutos (el saludo y las colecciones
-/// cambian solos al pasar del desayuno al almuerzo).
+/// Momento actual; se recalcula cada 10 minutos.
 
 @ProviderFor(CurrentMoment)
 final currentMomentProvider = CurrentMomentProvider._();
 
-/// Momento actual; se recalcula cada 10 minutos (el saludo y las colecciones
-/// cambian solos al pasar del desayuno al almuerzo).
+/// Momento actual; se recalcula cada 10 minutos.
 final class CurrentMomentProvider
     extends $NotifierProvider<CurrentMoment, Moment> {
-  /// Momento actual; se recalcula cada 10 minutos (el saludo y las colecciones
-  /// cambian solos al pasar del desayuno al almuerzo).
+  /// Momento actual; se recalcula cada 10 minutos.
   CurrentMomentProvider._()
     : super(
         from: null,
@@ -142,8 +139,7 @@ final class CurrentMomentProvider
 
 String _$currentMomentHash() => r'8e640a3bf4ddd0c7ee769ce1a9ef0a3fcca17205';
 
-/// Momento actual; se recalcula cada 10 minutos (el saludo y las colecciones
-/// cambian solos al pasar del desayuno al almuerzo).
+/// Momento actual; se recalcula cada 10 minutos.
 
 abstract class _$CurrentMoment extends $Notifier<Moment> {
   Moment build();

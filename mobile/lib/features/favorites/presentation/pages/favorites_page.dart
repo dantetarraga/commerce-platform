@@ -1,3 +1,4 @@
+import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/favorites/domain/favorites.dart';
 import 'package:chaski/features/favorites/presentation/providers/favorites_providers.dart';
 import 'package:chaski/features/products/products.dart';
@@ -22,14 +23,19 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
 
   Future<void> _remove(FavoriteKind kind, String id, String name) async {
     final notifier = ref.read(favoritesProvider.notifier);
-    await notifier.toggle(kind, id);
+    final result = await notifier.toggle(kind, id);
     if (!mounted) return;
-    AppToast.show(
-      context,
-      'Quitamos $name de tus favoritos',
-      actionLabel: 'Deshacer',
-      onAction: () => notifier.toggle(kind, id).ignore(),
-    );
+    switch (result) {
+      case Ok():
+        AppToast.show(
+          context,
+          'Quitamos $name de tus favoritos',
+          actionLabel: 'Deshacer',
+          onAction: () => notifier.toggle(kind, id).ignore(),
+        );
+      case Err(:final failure):
+        AppToast.show(context, failure.message, kind: AppToastKind.error);
+    }
   }
 
   @override

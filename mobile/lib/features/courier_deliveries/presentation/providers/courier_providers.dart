@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure.dart';
@@ -9,11 +7,12 @@ import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
 import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'courier_providers.g.dart';
 
-/// Cada cuánto se buscan pedidos listos mientras está conectado.
+/// Cada cuánto se buscan pedidos listos y se revisa la entrega en curso.
 const courierPollEvery = Duration(seconds: 10);
 
 @Riverpod(keepAlive: true)
@@ -36,7 +35,6 @@ class CourierMe extends _$CourierMe {
     switch (result) {
       case Ok(:final value):
         state = AsyncData(value);
-        ref.invalidate(courierAvailableOrdersProvider);
         return null;
       case Err(:final failure):
         return failure;
@@ -44,26 +42,32 @@ class CourierMe extends _$CourierMe {
   }
 }
 
-/// Pedidos listos para tomar. Se refresca solo cada [courierPollEvery].
+/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
+/// la app a la vista) si está conectado y libre.
 @riverpod
 Future<List<StaffOrder>> courierAvailableOrders(Ref ref) async {
-  final timer = Timer(courierPollEvery, ref.invalidateSelf);
-  ref.onDispose(timer.cancel);
+  final me = await ref.watch(courierMeProvider.future);
+  if (me.availability != CourierAvailability.available || !ref.mounted) return const [];
+  pollWhileForeground(ref, courierPollEvery);
   return (await ref.watch(courierRepositoryProvider).available()).getOrThrow();
 }
 
-/// El pedido que está llevando (o null).
+/// El pedido que está llevando (o null). Conectado, se revisa cada
+/// [courierPollEvery] por si lo cancelan o cambia.
 @riverpod
-Future<StaffOrder?> courierActiveDelivery(Ref ref) async =>
-    (await ref.watch(courierRepositoryProvider).activeDeliveries()).getOrThrow().firstOrNull;
+Future<StaffOrder?> courierActiveDelivery(Ref ref) async {
+  final me = await ref.watch(courierMeProvider.future);
+  if (!ref.mounted) return null;
+  if (me.isOnline) pollWhileForeground(ref, courierPollEvery);
+  return (await ref.watch(courierRepositoryProvider).activeDeliveries()).getOrThrow().firstOrNull;
+}
 
 @riverpod
 Future<CourierSummary> courierSummary(Ref ref) =>
     ref.watch(courierRepositoryProvider).summary().then((r) => r.getOrThrow());
 
 /// Tomar, recoger y entregar. Al terminar refresca todo lo del repartidor.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 @Riverpod(keepAlive: true)
 class CourierActions extends _$CourierActions {
   @override

@@ -1,6 +1,5 @@
 /// Momento del día: en Espinar se pide por momentos (el desayuno, el menú del
-/// mediodía, la noche fría), no solo por categorías. Ordena lo que Cerca
-/// muestra primero.
+/// mediodía, la noche fría), no solo por categorías.
 enum Moment {
   breakfast,
   lunch,
@@ -44,13 +43,16 @@ enum Moment {
     night => 'Noche fría: caldos y algo caliente',
   };
 
-  /// Ejemplos que rotan en el buscador.
-  List<String> get searchHints => switch (this) {
-    breakfast => const ['Busca pan chuta', 'Busca queso fresco', 'Busca café de altura', 'Busca leche'],
-    lunch => const ['Busca menú del día', 'Busca caldo de cordero', 'Busca pollo a la brasa', 'Busca trucha'],
-    afternoon => const ['Busca torta de chocolate', 'Busca bizcocho', 'Busca yogurt', 'Busca café'],
-    night => const ['Busca caldo', 'Busca pizza', 'Busca paracetamol', 'Busca hamburguesa'],
+  /// Términos de ejemplo del momento ("pan chuta", "caldo").
+  List<String> get searchTerms => switch (this) {
+    breakfast => const ['pan chuta', 'queso fresco', 'café de altura', 'leche'],
+    lunch => const ['menú del día', 'caldo de cordero', 'pollo a la brasa', 'trucha'],
+    afternoon => const ['torta de chocolate', 'bizcocho', 'yogurt', 'café'],
+    night => const ['caldo', 'pizza', 'paracetamol', 'hamburguesa'],
   };
+
+  /// Ejemplos que rotan en el buscador: "Busca pan chuta".
+  List<String> get searchHints => [for (final term in searchTerms) 'Busca $term'];
 
   /// Categorías que crecen en el estante en este momento (por `slug`).
   List<String> get featuredCategories => switch (this) {

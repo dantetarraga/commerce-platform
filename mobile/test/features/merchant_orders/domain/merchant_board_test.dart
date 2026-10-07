@@ -74,4 +74,8 @@ void main() {
     const summary = MerchantSummary(deliveredCount: 5, cancelledCount: 2, activeCount: 3, sales: Money(10000));
     expect(summary.totalCount, 8);
   });
+
+  test('un pedido chico va en una bolsa', () {
+    expect(staff('1', OrderStatus.ready).bagCount, 1);
+  });
 }

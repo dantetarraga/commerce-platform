@@ -1,24 +1,22 @@
 import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/features/auth/infrastructure/datasources/remote/fake_auth_remote_data_source.dart';
 import 'package:chaski/features/auth/presentation/pages/otp_page.dart';
+import 'package:chaski/features/auth/presentation/providers/auth_demo.dart';
 import 'package:chaski/features/auth/presentation/providers/phone_auth_flow.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
+import 'package:chaski/features/auth/presentation/widgets/auth_fields.dart';
+import 'package:chaski/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Cuenta de prueba que se ofrece en modo demo.
-typedef DemoAccount = ({String label, String phone});
-
 /// Paso 1 de la entrada: el celular. Sin contraseñas.
 class PhoneEntryPage extends ConsumerStatefulWidget {
   const PhoneEntryPage({
     this.title = '¿Cuál es tu celular?',
     this.subtitle = 'Te mandamos un código por SMS. Sin contraseñas.',
-    this.demoAccounts = const [(label: 'Cliente', phone: FakeAuthRemoteDataSource.demoPhone)],
+    this.demoAccounts = const [AuthDemo.customer],
     super.key,
   });
 
@@ -124,7 +122,7 @@ class _DemoHint extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              '${showLabel ? '${account.label}: ' : 'Modo demo: '}usa ${formatPhone(account.phone)} y el código ${FakeAuthRemoteDataSource.demoCode}.',
+              '${showLabel ? '${account.label}: ' : 'Modo demo: '}usa ${PhoneNumber.displayOf(account.phone)} y el código ${AuthDemo.code}.',
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface),
             ),
           ),

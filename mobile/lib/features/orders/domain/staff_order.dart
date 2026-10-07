@@ -38,19 +38,6 @@ final class StaffOrder extends Equatable {
   ];
 }
 
-/// Nombre corto del estado para los socios.
-extension StaffStatusLabel on OrderStatus {
-  String get staffLabel => switch (this) {
-    OrderStatus.received => 'Nuevo',
-    OrderStatus.confirmed => 'Aceptado',
-    OrderStatus.preparing => 'Preparando',
-    OrderStatus.ready => 'Listo para recoger',
-    OrderStatus.courierAssigned => 'Repartidor en camino al local',
-    OrderStatus.onTheWay => 'En camino al cliente',
-    OrderStatus.delivered => 'Entregado',
-    OrderStatus.cancelled => 'Cancelado',
-  };
-}
 
 /// Dónde recoger el pedido: los datos actuales del negocio.
 final class Pickup extends Equatable {

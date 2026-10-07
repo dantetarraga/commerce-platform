@@ -19,7 +19,7 @@ OrdersRemoteDataSource ordersRemoteDataSource(Ref ref) {
   return fake;
 }
 
-/// Pedidos fake de Chaski Socios, compartidos por los modos Negocio y
+/// Pedidos fake de Apamuy Socios, compartidos por los modos Negocio y
 /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
 @Riverpod(keepAlive: true)
 FakeStaffOrders fakeStaffOrders(Ref ref) {

@@ -1,6 +1,6 @@
 import 'package:chaski/app_partner/router/partner_routes.dart';
 import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
+import 'package:chaski/features/auth/presentation/widgets/auth_fields.dart';
 import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
 import 'package:chaski/features/merchant_orders/merchant_orders.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
@@ -16,7 +16,7 @@ void main() {
     await settle(tester);
     await tester.enterText(
       find.descendant(of: find.byType(AuthOtpField), matching: find.byType(TextField)),
-      FakeAuthRemoteDataSource.demoCode,
+      AuthDemo.code,
     );
     await settle(tester);
   }
@@ -67,7 +67,7 @@ void main() {
 
   testWidgets('el negocio del seed entra con su celular y el código', (tester) async {
     final container = await pumpPartner(tester);
-    await logIn(tester, FakeAuthRemoteDataSource.demoMerchantPhone);
+    await logIn(tester, AuthDemo.merchant.phone);
     expect(currentPartnerPath(container), PartnerRoutePaths.merchantHome);
     await unmountChaski(tester, container);
   });

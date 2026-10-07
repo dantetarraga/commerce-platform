@@ -5,13 +5,14 @@ import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/features/discovery/domain/moment.dart';
 import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/discovery/infrastructure/local_products_infrastructure.dart';
+import 'package:chaski/features/discovery/infrastructure/datasources/local_products_remote_data_source.dart';
+import 'package:chaski/features/discovery/infrastructure/repositories/discovery_repositories.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'discovery_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-LocalProductsRepository localProductsRepository(Ref ref) => LocalProductsRepository(
+LocalProductsRepository localProductsRepository(Ref ref) => LocalProductsRepositoryImpl(
   ref.watch(appEnvProvider).useFakeData
       ? FakeLocalProductsRemoteDataSource(ref.watch(fakeBackendProvider))
       : ApiLocalProductsRemoteDataSource(ref.watch(apiClientProvider)),
@@ -22,8 +23,7 @@ LocalProductsRepository localProductsRepository(Ref ref) => LocalProductsReposit
 Future<List<ProductHit>> localProducts(Ref ref) =>
     ref.watch(localProductsRepositoryProvider).localProducts().then((r) => r.getOrThrow());
 
-/// Momento actual; se recalcula cada 10 minutos (el saludo y las colecciones
-/// cambian solos al pasar del desayuno al almuerzo).
+/// Momento actual; se recalcula cada 10 minutos.
 @Riverpod(keepAlive: true)
 class CurrentMoment extends _$CurrentMoment {
   @override

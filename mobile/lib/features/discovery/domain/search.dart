@@ -93,6 +93,11 @@ final class PopularSearch extends Equatable {
   List<Object?> get props => [term, storeCount];
 }
 
+/// "Hecho en Espinar": productos de la ciudad.
+abstract interface class LocalProductsRepository {
+  Future<Result<List<ProductHit>>> localProducts();
+}
+
 abstract interface class PopularSearchesRepository {
   Future<Result<List<PopularSearch>>> popular();
 }

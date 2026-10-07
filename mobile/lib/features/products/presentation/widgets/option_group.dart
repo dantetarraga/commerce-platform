@@ -43,26 +43,15 @@ class _GroupHeader extends StatelessWidget {
     } else {
       label = Text(tag, style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700));
     }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.lg, AppSpacing.gutter, AppSpacing.sm),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Semantics(header: true, child: Text(title, style: theme.textTheme.titleMedium)),
-                if (subtitle != null) Text(subtitle!, style: theme.textTheme.bodySmall),
-              ],
-            ),
-          ),
-          AnimatedSwitcher(
-            duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
-            transitionBuilder: (child, animation) =>
-                ScaleTransition(scale: CurvedAnimation(parent: animation, curve: AppMotion.knot), child: child),
-            child: label,
-          ),
-        ],
+    return AppSectionHeader(
+      title,
+      subtitle: subtitle,
+      style: AppSectionHeaderStyle.group,
+      action: AnimatedSwitcher(
+        duration: reduceMotionOf(context) ? Duration.zero : AppMotion.base,
+        transitionBuilder: (child, animation) =>
+            ScaleTransition(scale: CurvedAnimation(parent: animation, curve: AppMotion.knot), child: child),
+        child: label,
       ),
     );
   }
@@ -151,7 +140,7 @@ class OptionGroup extends StatelessWidget {
 String _deltaLabel(Money delta, {required bool single}) =>
     delta.isZero ? (single ? 'incluido' : '') : '+ ${Formatters.money(delta)}';
 
-/// Fila con borde. Elegida: borde cobalto y fondo cobalto suave.
+/// Fila con borde. Elegida: borde y fondo suave del color primario.
 class _ChoiceRow extends StatelessWidget {
   const _ChoiceRow({
     required this.label,
@@ -239,7 +228,7 @@ class _ChoiceRow extends StatelessWidget {
   }
 }
 
-/// Radio (una) o check (varias), en cobalto al elegir.
+/// Radio (una) o check (varias).
 class _Mark extends StatelessWidget {
   const _Mark({required this.selected, required this.single, required this.muted, required this.duration});
 

@@ -1,5 +1,4 @@
-import 'package:chaski/features/auth/presentation/pages/phone_entry_page.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
+import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/onboarding/presentation/providers/onboarding_status.dart';
 import 'package:chaski/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
 import 'package:chaski/features/onboarding/presentation/widgets/onboarding_content.dart';
@@ -9,9 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Onboarding como una sola historia: la cámara recorre una calle dibujada con
-/// hilo mientras el texto cuenta descubre → pide → recibe. La calle vive en un
-/// bloque cobalto suave; debajo, el progreso (barra cobalto = paso actual).
+/// Onboarding como una sola historia (descubre → pide → recibe) sobre fotos de
+/// la ciudad; debajo, el progreso.
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
@@ -200,8 +198,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     );
   }
 
-  /// Progreso: el paso actual es una barra cobalto ancha; los demás, puntos
-  /// grises. Cada punto lleva al paso (área táctil de 48).
+  /// Progreso: el paso actual es una barra ancha; los demás, puntos. Cada punto
+  /// lleva a su paso (área táctil de 48).
   Widget _progress(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final reduced = reduceMotionOf(context);

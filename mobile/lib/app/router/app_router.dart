@@ -138,7 +138,7 @@ GoRouter appRouter(Ref ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.checkout,
         name: CheckoutPage.name,
-        builder: (_, _) => const CheckoutPage(),
+        builder: (context, _) => CheckoutPage(onHome: () => context.goNamed(HomePage.name)),
       ),
       materialRoute(
         parentNavigatorKey: rootNavigatorKey,

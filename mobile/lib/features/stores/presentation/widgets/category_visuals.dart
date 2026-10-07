@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Objeto del sticker de cada categoría y su inclinación (varía para que el
-/// estante se sienta pegado a mano, no una grilla de íconos). Sin colores por
-/// categoría: el estante es tonal y el añil lo pone el objeto.
-///
-/// Cuando existan fotos recortadas de objetos reales, `AppCategory.image` las
-/// usa en lugar del ícono.
+/// Ícono de cada categoría y su inclinación (varía para que el estante se
+/// sienta pegado a mano, no una grilla de íconos).
 ({IconData icon, double tilt}) categoryVisuals(String slug) => switch (slug) {
   'restaurantes' => (icon: Icons.soup_kitchen_rounded, tilt: -0.08),
   'mercado' => (icon: Icons.bakery_dining_rounded, tilt: 0.06),

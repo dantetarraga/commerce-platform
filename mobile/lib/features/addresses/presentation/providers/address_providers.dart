@@ -1,4 +1,5 @@
 import 'package:chaski/core/config/app_config_provider.dart';
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/core/storage/storage_providers.dart';
@@ -25,9 +26,8 @@ AddressRepository addressRepository(Ref ref) {
   );
 }
 
-/// Libreta de direcciones. La seleccionada define dónde se entregan los
-/// pedidos: al cambiar, actualiza la ubicación de entrega de toda la app
-/// (negocios cercanos, tiempos y envío se recalculan).
+/// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
+/// la app (negocios cercanos, tiempos y envío).
 @Riverpod(keepAlive: true)
 class AddressBookController extends _$AddressBookController {
   @override
@@ -54,6 +54,33 @@ class AddressBookController extends _$AddressBookController {
   }
 
   Future<void> save(Address address) => _commit(_book.save(address));
+
+  /// Grados por px del plano esquemático (~1 m por px en Espinar).
+  static const degreesPerPx = 0.00001;
+
+  /// Guarda una dirección nueva marcada en el plano. Sin geocodificación: parte
+  /// del punto de entrega actual y se corre lo que se movió el plano
+  /// ([movedX]/[movedY] en px; arrastrar a la derecha = ir al oeste).
+  Future<Address> addFromPlan({
+    required AddressKind kind,
+    required StreetLine street,
+    String reference = '',
+    String? label,
+    double movedX = 0,
+    double movedY = 0,
+  }) async {
+    final center = ref.read(currentDeliveryLocationProvider).coordinates;
+    final address = Address(
+      id: 'adr_${DateTime.now().microsecondsSinceEpoch}',
+      kind: kind,
+      label: kind == AddressKind.other ? label?.trim() : null,
+      street: street.value,
+      reference: reference.trim(),
+      coordinates: GeoCoordinates.trusted(center.latitude + movedY * degreesPerPx, center.longitude - movedX * degreesPerPx),
+    );
+    await save(address);
+    return address;
+  }
 
   Future<void> select(String id) => _commit(_book.select(id));
 

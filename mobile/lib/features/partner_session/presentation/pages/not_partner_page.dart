@@ -5,9 +5,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Se muestra cuando alguien entra a Chaski Socios sin ser socio: con sesión
-/// de cliente o con un celular que no tiene cuenta. Chaski Socios no crea
-/// cuentas: al socio lo da de alta el equipo (ver docs/OPERACION.md).
+/// Para quien entra sin ser socio (cliente o número sin cuenta). Aquí no se
+/// crean cuentas: al socio lo da de alta el equipo (docs/OPERACION.md).
 class NotPartnerPage extends ConsumerWidget {
   const NotPartnerPage({required this.onUseAnotherNumber, super.key});
 

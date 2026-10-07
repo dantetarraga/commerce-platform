@@ -1,5 +1,4 @@
 import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/checkout/presentation/widgets/checkout_format.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +7,8 @@ import 'package:flutter/services.dart';
 /// Qué hacer tras confirmar.
 enum OrderConfirmedAction { track, home }
 
-/// Confirmación de recepción con una ilustración Rive local y la mini boleta.
-/// Las acciones están disponibles desde el primer fotograma.
-/// Volver atrás equivale a "Seguir mi pedido".
+/// Confirmación del pedido con la ilustración y la mini boleta. Volver atrás
+/// equivale a "Seguir mi pedido".
 Future<OrderConfirmedAction> showOrderConfirmed(BuildContext context, {required Order order}) async {
   HapticFeedback.mediumImpact().ignore();
   final result = await Navigator.of(context, rootNavigator: true).push<OrderConfirmedAction>(
@@ -33,7 +31,7 @@ class _OrderConfirmedPage extends StatefulWidget {
 }
 
 class _OrderConfirmedPageState extends State<_OrderConfirmedPage> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+  late final AnimationController _controller = AnimationController(vsync: this, duration: AppMotion.breath);
   var _started = false;
 
   @override
@@ -67,7 +65,7 @@ class _OrderConfirmedPageState extends State<_OrderConfirmedPage> with SingleTic
     final scheduled = order.scheduledFor;
     final message = scheduled == null
         ? 'Enviamos tu pedido a $storeName. Sigue aquí su confirmación y preparación.'
-        : 'Enviamos tu pedido a $storeName para ${CheckoutFormat.whenPhrase(scheduled, DateTime.now())}. Podrás seguir su confirmación.';
+        : 'Enviamos tu pedido a $storeName para ${Formatters.whenPhrase(scheduled)}. Podrás seguir su confirmación.';
     final text = _interval(0.25, 0.7);
     final card = _interval(0.4, 0.85);
 

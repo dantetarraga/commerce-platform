@@ -29,9 +29,10 @@ class AddressPicker extends ConsumerWidget {
     final book = ref.watch(addressBookControllerProvider).value ?? AddressBook.empty;
     final selected = book.selected;
 
+    // Scrolleable: con varias direcciones y texto grande no entra en la hoja.
     return SafeArea(
       top: false,
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.md),
         child: Column(
           mainAxisSize: MainAxisSize.min,

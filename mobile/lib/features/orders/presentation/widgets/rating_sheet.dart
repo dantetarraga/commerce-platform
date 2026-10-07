@@ -50,7 +50,10 @@ class _RatingSheetState extends ConsumerState<_RatingSheet> {
     setState(() => _sending = false);
     result.fold(
       (_) {
-        ref.invalidate(ordersHistoryProvider);
+        // El seguimiento abierto debajo también debe ver la calificación.
+        ref
+          ..invalidate(ordersHistoryProvider)
+          ..invalidate(orderWatchProvider(widget.order.id));
         Navigator.of(context).pop();
         final who = widget.order.store.ownerName ?? widget.order.store.name;
         AppToast.show(context, 'Gracias. Se lo contamos a $who.', kind: AppToastKind.success);
@@ -78,7 +81,7 @@ class _RatingSheetState extends ConsumerState<_RatingSheet> {
             Center(
               child: AppAvatar(
                 imageUrl: courier?.avatarUrl ?? widget.order.store.logoUrl,
-                initials: courier?.name.split(' ').map((p) => p.isEmpty ? '' : p[0]).take(2).join(),
+                initials: courier?.initials,
                 seed: courier?.name,
                 variant: courier == null ? AppAvatarVariant.store : AppAvatarVariant.courier,
                 size: 56,
@@ -148,70 +151,28 @@ class _RatingSheetState extends ConsumerState<_RatingSheet> {
               runSpacing: AppSpacing.xs,
               children: [
                 for (final tag in _tagOptions)
-                  _TagChip(
+                  AppChip(
                     label: tag,
                     selected: _tags.contains(tag),
-                    onTap: () => setState(() => _tags.contains(tag) ? _tags.remove(tag) : _tags.add(tag)),
+                    onTap: () {
+                      HapticFeedback.selectionClick().ignore();
+                      setState(() => _tags.contains(tag) ? _tags.remove(tag) : _tags.add(tag));
+                    },
                   ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
-            TextField(
+            AppInput(
+              label: 'Para el negocio (opcional)',
               controller: _comment,
+              variant: AppInputVariant.note,
+              hint: 'Cuéntale algo al negocio',
               maxLength: 200,
-              minLines: 2,
-              maxLines: 3,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(hintText: 'Cuéntale algo al negocio (opcional)', counterText: ''),
             ),
             const SizedBox(height: AppSpacing.md),
             AppButton(label: 'Enviar', loading: _sending, onPressed: _rating == null ? null : _send),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Etiqueta con borde; seleccionada pasa a cobalto suave.
-class _TagChip extends StatelessWidget {
-  const _TagChip({required this.label, required this.selected, required this.onTap});
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.selectionClick().ignore();
-          onTap();
-        },
-        borderRadius: const BorderRadius.all(AppRadius.pill),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 40),
-          child: AnimatedContainer(
-            duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-            decoration: BoxDecoration(
-              color: selected ? scheme.primaryContainer : scheme.surface,
-              borderRadius: const BorderRadius.all(AppRadius.pill),
-              border: Border.all(color: selected ? scheme.primary : scheme.outlineVariant, width: 1.5),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (selected) ...[Icon(Icons.check_rounded, size: 16, color: scheme.primary), const SizedBox(width: 4)],
-                Text(label, style: theme.textTheme.labelMedium?.copyWith(color: selected ? scheme.primary : scheme.onSurface)),
-              ],
-            ),
-          ),
         ),
       ),
     );

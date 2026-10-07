@@ -83,7 +83,7 @@ void main() {
     expect(OrderStatus.onTheWay.tag, 'EN CAMINO');
     expect(OrderStatus.ready.label, 'Listo para salir');
     expect(OrderStatus.preparing.summaryLabel, 'En curso');
-    expect(OrderStatus.ready.partnerLabel, OrderStatus.ready.staffLabel);
+    expect(OrderStatus.ready.partnerLabel, 'Listo para recoger');
     const luis = Courier(name: 'Luis Quispe', vehicle: 'Moto');
     expect(order(OrderStatus.onTheWay, courier: luis).stepTitle(OrderStatus.onTheWay), 'Luis va en camino');
     expect(order(OrderStatus.ready).stepTitle(OrderStatus.preparing), 'Preparado por Rosa');

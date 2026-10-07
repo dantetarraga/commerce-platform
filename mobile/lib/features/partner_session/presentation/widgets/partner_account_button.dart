@@ -5,14 +5,14 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Botón de cuenta para la barra superior de Chaski Socios: muestra quién
-/// entró, permite cambiar de modo (si tiene los dos roles) y cerrar sesión.
+/// Cuenta del socio: quién entró, cambiar de modo (si tiene los dos roles) y
+/// cerrar sesión.
 class PartnerAccountButton extends ConsumerWidget {
   const PartnerAccountButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authSessionProvider).value;
+    final user = ref.watch(authSessionProvider.select((s) => s.value));
     if (user == null) return const SizedBox.shrink();
     return IconButton(
       tooltip: 'Tu cuenta',
@@ -54,7 +54,7 @@ class _AccountSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final user = ref.watch(authSessionProvider).value;
+    final user = ref.watch(authSessionProvider.select((s) => s.value));
     final modes = ref.watch(availablePartnerModesForProvider);
     final active = ref.watch(activePartnerModeProvider);
     return SafeArea(
@@ -96,7 +96,7 @@ class _AccountSheet extends ConsumerWidget {
                       ),
                       if (user != null)
                         Text(
-                          formatPhone(user.phone.value),
+                          user.phone.display,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),

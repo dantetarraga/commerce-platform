@@ -36,10 +36,7 @@ GoRouter partnerRouter(Ref ref) {
         builder: (_, _) => const PhoneEntryPage(
           title: 'Entra a $brandName Socios',
           subtitle: 'Usa el celular con el que te afiliamos. Te mandamos un código por SMS.',
-          demoAccounts: [
-            (label: 'Negocio', phone: FakeAuthRemoteDataSource.demoMerchantPhone),
-            (label: 'Repartidor', phone: FakeAuthRemoteDataSource.demoCourierPhone),
-          ],
+          demoAccounts: [AuthDemo.merchant, AuthDemo.courier],
         ),
         routes: [
           materialRoute(

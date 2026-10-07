@@ -1,4 +1,5 @@
 import 'package:chaski/features/discovery/discovery.dart';
+import 'package:chaski/features/stores/domain/entities/store_filter.dart';
 import 'package:chaski/features/stores/domain/entities/store_query.dart';
 import 'package:chaski/features/stores/domain/entities/store_summary.dart';
 import 'package:chaski/features/stores/presentation/pages/store_detail_page.dart';
@@ -23,44 +24,11 @@ class CategoryStoresPage extends ConsumerStatefulWidget {
   ConsumerState<CategoryStoresPage> createState() => _CategoryStoresPageState();
 }
 
-/// Filtros rápidos de la categoría.
-enum _Filter {
-  openNow('Abierto ahora'),
-  freeDelivery('Envío gratis'),
-  topRated('4.5+'),
-  noMinimum('Sin mínimo'),
-  offers('Con ofertas');
-
-  const _Filter(this.label);
-
-  final String label;
-
-  bool accepts(StoreSummary s) => switch (this) {
-    openNow => s.isOpenNow,
-    freeDelivery => s.deliveryFee.isZero,
-    topRated => s.rating.hasReviews && s.rating.average >= 4.5,
-    noMinimum => s.minOrderAmount.isZero,
-    offers => s.promoLabel != null,
-  };
-}
-
-String _sortLabel(StoreSort sort) => switch (sort) {
-  StoreSort.distance => 'cercanía',
-  StoreSort.popular => 'más pedidos',
-  StoreSort.rating => 'calificación',
-};
-
 class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
-  final _filters = <_Filter>{};
+  final _filters = <StoreFilter>{};
   StoreSort _sort = StoreSort.distance;
 
-  /// Filtra y deja los cerrados al final (sin perder el orden elegido).
-  List<StoreSummary> _apply(List<StoreSummary> stores) {
-    final filtered = [for (final s in stores) if (_filters.every((f) => f.accepts(s))) s];
-    return [...filtered.where((s) => s.isOpenNow), ...filtered.where((s) => !s.isOpenNow)];
-  }
-
-  void _toggle(_Filter f) => setState(() => _filters.contains(f) ? _filters.remove(f) : _filters.add(f));
+  void _toggle(StoreFilter f) => setState(() => _filters.contains(f) ? _filters.remove(f) : _filters.add(f));
 
   Future<void> _chooseSort() async {
     final picked = await showAppBottomSheet<StoreSort>(
@@ -79,11 +47,7 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     minTileHeight: AppSpacing.minTouch + 8,
-                    title: Text(switch (sort) {
-                      StoreSort.distance => 'Cercanía',
-                      StoreSort.popular => 'Más pedidos',
-                      StoreSort.rating => 'Mejor calificados',
-                    }, style: theme.textTheme.titleSmall),
+                    title: Text(sort.label, style: theme.textTheme.titleSmall),
                     trailing: sort == _sort ? Icon(Icons.check_rounded, color: theme.colorScheme.primary) : null,
                     onTap: () => Navigator.of(context).pop(sort),
                   ),
@@ -102,7 +66,7 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
     final category = ref.watch(categoriesProvider).value?.where((c) => c.id == widget.categoryId).firstOrNull;
     final provider = storesProvider(sort: _sort, categoryId: widget.categoryId);
     final stores = ref.watch(provider);
-    final items = stores.value == null ? null : _apply(stores.value!.items);
+    final items = stores.value?.items.matching(_filters).openFirst();
     final title = category == null ? 'Negocios' : categoryShelfLabel(category.slug, category.name);
 
     return Scaffold(
@@ -164,23 +128,16 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
 }
 
 /// Fila de negocio; si está cerrado se atenúa y dice cuándo abre.
-class _StoreRow extends ConsumerWidget {
+class _StoreRow extends StatelessWidget {
   const _StoreRow({required this.store});
 
   final StoreSummary store;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    String? closedLabel;
-    if (!store.isOpenNow) {
-      // El horario viene en el detalle (se pide solo para los cerrados).
-      final schedule = ref.watch(storeDetailProvider(store.id)).value?.schedule;
-      final next = schedule?.nextOpening(DateTime.now());
-      closedLabel = next == null ? 'Cerrado' : 'Cerrado · abre ${_opensLabel(next.inDays, next.opensAt)}';
-    }
+  Widget build(BuildContext context) {
     final card = AppStoreCard(
       variant: AppStoreCardVariant.row,
-      data: store.toCardData(withDistance: true, closedLabel: closedLabel),
+      data: store.toCardData(withDistance: true, closedLabel: store.isOpenNow ? null : store.closedLabel(DateTime.now())),
       onTap: () => context.pushNamed(
         StoreDetailPage.name,
         pathParameters: {'storeId': store.id},
@@ -189,20 +146,6 @@ class _StoreRow extends ConsumerWidget {
     );
     return store.isOpenNow ? card : Opacity(opacity: 0.75, child: card);
   }
-}
-
-const _weekdays = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-
-/// "6:00 pm" · "mañana 7:00 am" · "el lunes 8:00 am".
-String _opensLabel(int inDays, int minutes) {
-  final h24 = (minutes ~/ 60) % 24;
-  final h12 = h24 % 12 == 0 ? 12 : h24 % 12;
-  final time = '$h12:${(minutes % 60).toString().padLeft(2, '0')} ${h24 < 12 ? 'am' : 'pm'}';
-  return switch (inDays) {
-    0 => time,
-    1 => 'mañana $time',
-    _ => 'el ${_weekdays[(DateTime.now().weekday + inDays) % 7]} $time',
-  };
 }
 
 /// Cabecera fija: título + buscar, chips de filtro y "N negocios · Ordenar".
@@ -217,14 +160,14 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
   });
 
   static const _barHeight = 56.0;
-  static const _chipsHeight = 52.0;
+  static const _chipsHeight = 60.0;
   static const _sortHeight = 48.0;
 
   final String title;
   final int? count;
-  final Set<_Filter> filters;
+  final Set<StoreFilter> filters;
   final StoreSort sort;
-  final ValueChanged<_Filter> onToggle;
+  final ValueChanged<StoreFilter> onToggle;
   final VoidCallback onSort;
 
   @override
@@ -275,13 +218,12 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
-              itemCount: _Filter.values.length,
+              itemCount: StoreFilter.values.length,
               separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.xs),
               itemBuilder: (context, index) {
-                final f = _Filter.values[index];
+                final f = StoreFilter.values[index];
                 return AppChip(
                   label: f.label,
-                  icon: f == _Filter.topRated ? Icons.star_rounded : null,
                   selected: filters.contains(f),
                   onTap: () => onToggle(f),
                 );
@@ -319,7 +261,7 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Ordenar: ${_sortLabel(sort)}', style: theme.textTheme.labelLarge),
+                        Text('Ordenar: ${sort.inlineLabel}', style: theme.textTheme.labelLarge),
                         const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
                       ],
                     ),

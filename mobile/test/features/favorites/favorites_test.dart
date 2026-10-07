@@ -1,9 +1,15 @@
+import 'package:chaski/core/result/result.dart';
 import 'package:chaski/core/storage/local_json_store.dart';
 import 'package:chaski/core/storage/storage_providers.dart';
+import 'package:chaski/features/favorites/domain/favorites.dart';
 import 'package:chaski/features/favorites/favorites.dart';
 import 'package:chaski/features/favorites/infrastructure/local_favorites_repository.dart';
+import 'package:chaski/features/favorites/presentation/providers/favorites_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class _MockFavorites extends Mock implements FavoritesRepository {}
 
 void main() {
   group('Favorites', () {
@@ -46,11 +52,26 @@ void main() {
     expect(container.read(isFavoriteStoreProvider('st_1')), isFalse);
 
     final saved = await container.read(favoritesProvider.notifier).toggle(FavoriteKind.store, 'st_1');
-    expect(saved, isTrue);
+    expect(saved.getOrThrow(), isTrue);
     expect(container.read(isFavoriteStoreProvider('st_1')), isTrue);
     expect((await LocalFavoritesRepository(store).load()).storeIds, {'st_1'});
 
     await container.read(favoritesProvider.notifier).toggle(FavoriteKind.store, 'st_1');
+    expect(container.read(isFavoriteStoreProvider('st_1')), isFalse);
+  });
+
+  test('si no se puede guardar, vuelve atrás y devuelve el error', () async {
+    final repository = _MockFavorites();
+    registerFallbackValue(Favorites.empty);
+    when(repository.load).thenAnswer((_) async => Favorites.empty);
+    when(() => repository.save(any())).thenThrow(Exception('disco lleno'));
+    final container = ProviderContainer(overrides: [favoritesRepositoryProvider.overrideWithValue(repository)]);
+    addTearDown(container.dispose);
+    await container.read(favoritesProvider.future);
+
+    final result = await container.read(favoritesProvider.notifier).toggle(FavoriteKind.store, 'st_1');
+
+    expect(result, isA<Err<bool>>());
     expect(container.read(isFavoriteStoreProvider('st_1')), isFalse);
   });
 }

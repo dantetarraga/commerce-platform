@@ -1,16 +1,15 @@
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/cart/cart.dart';
 import 'package:chaski/features/checkout/checkout.dart';
 import 'package:chaski/features/favorites/favorites.dart';
 import 'package:chaski/features/products/domain/entities/product.dart';
 import 'package:chaski/features/products/domain/entities/product_selection.dart';
-import 'package:chaski/features/products/presentation/providers/cart_line_mapper.dart';
+import 'package:chaski/features/products/domain/mappers/selection_to_cart_line.dart';
 import 'package:chaski/features/products/presentation/providers/products_providers.dart';
 import 'package:chaski/features/products/presentation/widgets/option_group.dart';
+import 'package:chaski/features/products/presentation/widgets/product_add_bar.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/widgets/async_value_view.dart';
 import 'package:chaski/shared/widgets/image_sliver_app_bar.dart';
-import 'package:chaski/shared/widgets/quantity_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,18 +26,17 @@ class ProductDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final (key, child) = switch (ref.watch(productDetailProvider(productId))) {
-      AsyncData(:final value) => ('data', _ProductContent(product: value)),
-      AsyncError(:final error) => (
-        'error',
-        Scaffold(
-          appBar: AppBar(),
-          body: AppEmptyState.fromError(error, onRetry: () => ref.invalidate(productDetailProvider(productId))),
-        ),
+    final product = ref.watch(productDetailProvider(productId));
+    return Scaffold(
+      // Solo el error necesita su barra con "atrás": contenido y esqueleto traen la suya.
+      appBar: product.hasError && !product.hasValue ? AppBar() : null,
+      body: AsyncValueView(
+        value: product,
+        onRetry: () => ref.invalidate(productDetailProvider(productId)),
+        loading: const _ProductDetailSkeleton(),
+        data: (value) => _ProductContent(product: value),
       ),
-      _ => ('loading', const _ProductDetailSkeleton()),
-    };
-    return LoadCrossFade(stateKey: key, child: child);
+    );
   }
 }
 
@@ -120,7 +118,7 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
             trailing: FavoriteButton(
               onPhoto: true,
               isFavorite: ref.watch(isFavoriteProductProvider(product.id)),
-              onPressed: () => ref.read(favoritesProvider.notifier).toggle(FavoriteKind.product, product.id).ignore(),
+              onPressed: () => toggleFavorite(context, ref, FavoriteKind.product, product.id),
             ),
           ),
           SliverToBoxAdapter(
@@ -139,7 +137,6 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
                     Text(product.description!, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                   ],
                   const SizedBox(height: AppSpacing.sm),
-                  // El dominio aún no trae precio anterior: cuando llegue, AppPriceVariant.discount.
                   AppPrice(selection.unitPrice, size: 28),
                   if (!product.isAvailable) ...[
                     const SizedBox(height: AppSpacing.xs),
@@ -182,178 +179,12 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
           const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
         ],
       ),
-      bottomNavigationBar: _AddBar(
+      bottomNavigationBar: ProductAddBar(
         selection: selection,
         open: open,
         adding: _adding,
         onQuantityChanged: controller.setQuantity,
         onAdd: () => selection.isValid ? _add(selection) : _revealMissing(selection),
-      ),
-    );
-  }
-}
-
-class _AddBar extends StatelessWidget {
-  const _AddBar({
-    required this.selection,
-    required this.open,
-    required this.adding,
-    required this.onQuantityChanged,
-    required this.onAdd,
-  });
-
-  final ProductSelection selection;
-  final bool open;
-  final bool adding;
-  final ValueChanged<Quantity> onQuantityChanged;
-  final VoidCallback onAdd;
-
-  String? get _hint {
-    if (!open) return 'Está cerrado ahora. Programa tu pedido desde el negocio y lo agregas.';
-    if (!selection.product.isAvailable) return 'Este producto se agotó por hoy.';
-    if (selection.needsVariant) return 'Elige un tamaño.';
-    final missing = selection.missingRequiredOptions;
-    if (missing.isNotEmpty) return 'Falta elegir: ${missing.map((o) => o.name).join(', ')}.';
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final hint = _hint;
-    final canTry = open && selection.product.isAvailable;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        // La sombra suave, hacia arriba.
-        boxShadow: [
-          for (final s in AppShadows.soft(theme.brightness)) BoxShadow(color: s.color, blurRadius: s.blurRadius, offset: Offset(0, -s.offset.dy)),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.sm),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedSize(
-                duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
-                curve: AppMotion.arrive,
-                alignment: Alignment.bottomCenter,
-                child: hint == null
-                    ? const SizedBox(width: double.infinity)
-                    : Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: Text(hint, style: theme.textTheme.bodySmall),
-                        ),
-                      ),
-              ),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final quantity = QuantityStepper(quantity: selection.quantity, onChanged: onQuantityChanged, enabled: canTry);
-                  final add = _AddButton(total: Formatters.money(selection.total), enabled: canTry, valid: selection.isValid, loading: adding, onAdd: onAdd);
-                  if (constraints.maxWidth < 340 && MediaQuery.textScalerOf(context).scale(16) > 19) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(child: Text('Cantidad', style: theme.textTheme.labelLarge)),
-                            quantity,
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        add,
-                      ],
-                    );
-                  }
-                  return Row(
-                    children: [
-                      quantity,
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(child: add),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// "Agregar · total" en cobalto; el total cambia con una transición corta.
-class _AddButton extends StatelessWidget {
-  const _AddButton({
-    required this.total,
-    required this.enabled,
-    required this.valid,
-    required this.loading,
-    required this.onAdd,
-  });
-
-  final String total;
-  final bool enabled;
-  final bool valid;
-  final bool loading;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    // Incompleto: se ve más suave pero responde (lleva al grupo que falta).
-    final bg = enabled ? (valid ? scheme.primary : scheme.primary.withValues(alpha: 0.55)) : context.chaski.raised;
-    final fg = enabled ? scheme.onPrimary : scheme.onSurfaceVariant;
-    final reduce = reduceMotionOf(context);
-    final style = theme.textTheme.labelLarge?.copyWith(color: fg, fontSize: 16, fontWeight: FontWeight.w800);
-
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      label: 'Agregar a la bolsa, $total',
-      onTap: enabled && !loading ? onAdd : null,
-      excludeSemantics: true,
-      child: Material(
-        color: bg,
-        borderRadius: AppRadius.button,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: enabled && !loading ? onAdd : null,
-          child: SizedBox(
-            height: 56,
-            child: Center(
-              child: loading
-                  ? AppLoader(size: 22, color: fg, dot: fg)
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Agregar · ', style: style),
-                        AnimatedSwitcher(
-                          duration: reduce ? Duration.zero : AppMotion.quick,
-                          transitionBuilder: (child, animation) => FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween(begin: const Offset(0, 0.4), end: Offset.zero).animate(animation),
-                              child: child,
-                            ),
-                          ),
-                          child: Text(
-                            total,
-                            key: ValueKey(total),
-                            style: style?.copyWith(fontFeatures: AppTypography.tabularFigures),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ),
       ),
     );
   }

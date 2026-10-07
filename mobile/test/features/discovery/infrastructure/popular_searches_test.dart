@@ -1,5 +1,5 @@
 import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/features/discovery/infrastructure/popular_searches_infrastructure.dart';
+import 'package:chaski/features/discovery/infrastructure/repositories/popular_searches_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

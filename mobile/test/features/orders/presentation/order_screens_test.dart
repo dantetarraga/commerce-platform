@@ -1,11 +1,11 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/result/result.dart';
+import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/presentation/pages/order_help_page.dart';
 import 'package:chaski/features/orders/presentation/pages/order_tracking_page.dart';
 import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/order_bits.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,12 +57,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
   }
 
-  test('clock12 da la hora como se dice', () {
-    expect(clock12(DateTime(2026, 1, 1, 13, 12)), '1:12 pm');
-    expect(clock12(DateTime(2026, 1, 1, 0, 5)), '12:05 am');
-    expect(clock12(DateTime(2026, 1, 1, 12)), '12:00 pm');
-  });
-
   testWidgets('el seguimiento muestra la ETA, cada paso con su hora y la ayuda', (tester) async {
     final eta = DateTime.now().add(const Duration(minutes: 9));
     final confirmedAt = DateTime(2026, 9, 23, 13, 12);
@@ -81,12 +75,59 @@ void main() {
     expect(find.text('Llega en'), findsOneWidget);
     expect(find.text('EN CAMINO'), findsOneWidget);
     expect(find.text('1:12 pm'), findsOneWidget);
-    expect(find.text('~${clock12(eta)}'), findsOneWidget);
+    expect(find.text('~${Formatters.clock(eta)}'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Luis Quispe'), 100, scrollable: find.byType(Scrollable).last);
     expect(find.text('Luis Quispe'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('¿Algún problema con tu pedido?'), 120, scrollable: find.byType(Scrollable).last);
     expect(find.text('¿Algún problema con tu pedido?'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('tras calificar, el seguimiento abierto deja de ofrecer calificar', (tester) async {
+    final repository = _MockOrdersRepository();
+    var rated = false;
+    final delivered = order(OrderStatus.delivered, events: [OrderEvent(OrderStatus.received, placed), OrderEvent(OrderStatus.delivered, placed)]);
+    when(() => repository.watch('o1')).thenAnswer((_) => Stream.value(rated ? delivered.copyWith(rating: 5) : delivered));
+    when(repository.history).thenAnswer((_) async => const Result.ok(<Order>[]));
+    when(() => repository.rate('o1', rating: 5, comment: any(named: 'comment'))).thenAnswer((_) async {
+      rated = true;
+      return Result.ok(delivered.copyWith(rating: 5));
+    });
+
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [ordersRepositoryProvider.overrideWithValue(repository)],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const MediaQuery(data: MediaQueryData(disableAnimations: true), child: OrderTrackingPage(orderId: 'o1')),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    await tester.scrollUntilVisible(find.text('Calificar pedido'), 100, scrollable: find.byType(Scrollable).last);
+    await tester.tap(find.text('Calificar pedido'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.tap(find.bySemanticsLabel(RegExp('^5 de 5 estrellas')));
+    await tester.pump();
+    await tester.tap(find.text('Enviar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pump();
+
+    verify(() => repository.rate('o1', rating: 5, comment: any(named: 'comment'))).called(1);
+    expect(find.text('Calificar pedido'), findsNothing);
+    expect(find.text('Gracias por calificar'), findsOneWidget);
+
+    AppToast.dismiss();
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 5));
   });
 
   testWidgets('la ayuda lista los motivos y envía la descripción', (tester) async {

@@ -1,6 +1,6 @@
 import 'package:chaski/app/router/routes.dart';
 import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
+import 'package:chaski/features/auth/presentation/widgets/auth_fields.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

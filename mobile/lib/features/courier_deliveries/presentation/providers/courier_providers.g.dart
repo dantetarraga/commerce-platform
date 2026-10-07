@@ -132,7 +132,7 @@ final class CourierMeProvider
   CourierMe create() => CourierMe();
 }
 
-String _$courierMeHash() => r'4805b42965cf09cd525f7f524854c4e29557e3e7';
+String _$courierMeHash() => r'34cb52c3bd6be03e465e8451352b4e2c401cad6e';
 
 /// El repartidor y su disponibilidad.
 
@@ -154,12 +154,14 @@ abstract class _$CourierMe extends $AsyncNotifier<CourierProfile> {
   }
 }
 
-/// Pedidos listos para tomar. Se refresca solo cada [courierPollEvery].
+/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
+/// la app a la vista) si está conectado y libre.
 
 @ProviderFor(courierAvailableOrders)
 final courierAvailableOrdersProvider = CourierAvailableOrdersProvider._();
 
-/// Pedidos listos para tomar. Se refresca solo cada [courierPollEvery].
+/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
+/// la app a la vista) si está conectado y libre.
 
 final class CourierAvailableOrdersProvider
     extends
@@ -169,7 +171,8 @@ final class CourierAvailableOrdersProvider
           FutureOr<List<StaffOrder>>
         >
     with $FutureModifier<List<StaffOrder>>, $FutureProvider<List<StaffOrder>> {
-  /// Pedidos listos para tomar. Se refresca solo cada [courierPollEvery].
+  /// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
+  /// la app a la vista) si está conectado y libre.
   CourierAvailableOrdersProvider._()
     : super(
         from: null,
@@ -197,14 +200,16 @@ final class CourierAvailableOrdersProvider
 }
 
 String _$courierAvailableOrdersHash() =>
-    r'3486be992baeffbefffbc01fb96da3895b3ec726';
+    r'615b3895ce209a8c147ccccb1273b2ebc1199535';
 
-/// El pedido que está llevando (o null).
+/// El pedido que está llevando (o null). Conectado, se revisa cada
+/// [courierPollEvery] por si lo cancelan o cambia.
 
 @ProviderFor(courierActiveDelivery)
 final courierActiveDeliveryProvider = CourierActiveDeliveryProvider._();
 
-/// El pedido que está llevando (o null).
+/// El pedido que está llevando (o null). Conectado, se revisa cada
+/// [courierPollEvery] por si lo cancelan o cambia.
 
 final class CourierActiveDeliveryProvider
     extends
@@ -214,7 +219,8 @@ final class CourierActiveDeliveryProvider
           FutureOr<StaffOrder?>
         >
     with $FutureModifier<StaffOrder?>, $FutureProvider<StaffOrder?> {
-  /// El pedido que está llevando (o null).
+  /// El pedido que está llevando (o null). Conectado, se revisa cada
+  /// [courierPollEvery] por si lo cancelan o cambia.
   CourierActiveDeliveryProvider._()
     : super(
         from: null,
@@ -242,7 +248,7 @@ final class CourierActiveDeliveryProvider
 }
 
 String _$courierActiveDeliveryHash() =>
-    r'5314ad6254fd719f3a01d4f4110106b9702c93a3';
+    r'1cd9aedab7d395bfa1b7db0803a7983eed3b07ef';
 
 @ProviderFor(courierSummary)
 final courierSummaryProvider = CourierSummaryProvider._();
@@ -284,20 +290,17 @@ final class CourierSummaryProvider
 String _$courierSummaryHash() => r'59f76cb9bf3c519d630724e521618f6d5615e9ac';
 
 /// Tomar, recoger y entregar. Al terminar refresca todo lo del repartidor.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 
 @ProviderFor(CourierActions)
 final courierActionsProvider = CourierActionsProvider._();
 
 /// Tomar, recoger y entregar. Al terminar refresca todo lo del repartidor.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 final class CourierActionsProvider
     extends $NotifierProvider<CourierActions, void> {
   /// Tomar, recoger y entregar. Al terminar refresca todo lo del repartidor.
-  // keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-  // mitad de una acción (se perdería el refresco de las listas).
+  // keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
   CourierActionsProvider._()
     : super(
         from: null,
@@ -328,8 +331,7 @@ final class CourierActionsProvider
 String _$courierActionsHash() => r'28d25c65aff85f1b8493026b1dac610cce01f7b5';
 
 /// Tomar, recoger y entregar. Al terminar refresca todo lo del repartidor.
-// keepAlive: se usa con `ref.read(...notifier)` y no debe liberarse a
-// mitad de una acción (se perdería el refresco de las listas).
+// keepAlive: si se liberara a mitad de una acción, se perdería el refresco.
 
 abstract class _$CourierActions extends $Notifier<void> {
   void build();

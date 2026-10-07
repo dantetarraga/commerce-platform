@@ -10,9 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Inicio: portada con dirección y buscador, categorías, promos, volver a pedir,
-/// recomendados y negocios cerca. Con un pedido en curso, la portada es su
-/// seguimiento y debajo aparece "Mientras esperas".
+/// Inicio: portada, categorías, promos, volver a pedir, recomendados y negocios
+/// cerca. Con un pedido en curso, la portada es su seguimiento.
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
@@ -33,13 +32,14 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final order = ref.watch(activeOrderProvider).value;
     final live = order != null && order.isActive;
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 680),
           child: RefreshIndicator(
-            color: AppColors.terracota,
-            backgroundColor: AppColors.blanco,
+            color: scheme.primary,
+            backgroundColor: scheme.surface,
             edgeOffset: MediaQuery.paddingOf(context).top + 60,
             onRefresh: () => _refresh(ref),
             child: CustomScrollView(

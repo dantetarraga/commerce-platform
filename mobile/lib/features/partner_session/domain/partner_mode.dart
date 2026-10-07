@@ -1,5 +1,5 @@
-/// Modo en el que se usa Chaski Socios. Un socio puede tener los dos roles
-/// (por ejemplo, el dueño de una bodega que también reparte).
+/// Modo de Apamuy Socios. Un socio puede tener los dos roles (p. ej. el dueño
+/// de una bodega que también reparte).
 enum PartnerMode { merchant, courier }
 
 /// Modos disponibles según los roles del usuario, en orden de preferencia.

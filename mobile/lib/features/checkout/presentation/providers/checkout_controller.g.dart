@@ -57,18 +57,25 @@ final class CheckoutPreferencesProvider
 String _$checkoutPreferencesHash() =>
     r'3726cd798dcf717be6a4d20909b16fcfb036dbc2';
 
+/// Vive toda la sesión: la hora programada a veces se elige en el negocio
+/// (cerrado) antes de llegar al checkout.
+
 @ProviderFor(CheckoutController)
 final checkoutControllerProvider = CheckoutControllerProvider._();
 
+/// Vive toda la sesión: la hora programada a veces se elige en el negocio
+/// (cerrado) antes de llegar al checkout.
 final class CheckoutControllerProvider
     extends $NotifierProvider<CheckoutController, CheckoutState> {
+  /// Vive toda la sesión: la hora programada a veces se elige en el negocio
+  /// (cerrado) antes de llegar al checkout.
   CheckoutControllerProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'checkoutControllerProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -90,7 +97,10 @@ final class CheckoutControllerProvider
 }
 
 String _$checkoutControllerHash() =>
-    r'9fcfa8d51c27c629f5e1aac8cb55ce068edc9c4d';
+    r'5c02072822b84cf97543ece2e13dac544f73cdfb';
+
+/// Vive toda la sesión: la hora programada a veces se elige en el negocio
+/// (cerrado) antes de llegar al checkout.
 
 abstract class _$CheckoutController extends $Notifier<CheckoutState> {
   CheckoutState build();

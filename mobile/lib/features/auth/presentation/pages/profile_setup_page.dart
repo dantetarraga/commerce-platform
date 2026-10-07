@@ -1,6 +1,6 @@
 import 'package:chaski/features/auth/domain/value_objects/person_name.dart';
 import 'package:chaski/features/auth/presentation/providers/phone_auth_flow.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_widgets.dart';
+import 'package:chaski/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';

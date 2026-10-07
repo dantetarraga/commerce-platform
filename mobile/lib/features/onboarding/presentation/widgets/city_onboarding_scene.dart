@@ -47,13 +47,13 @@ class CityOnboardingScene extends StatelessWidget {
                               alignment: Alignment(((p - i) * 0.8).clamp(-1.0, 1.0), 0),
                             ),
                             // Oscurece abajo para que la etiqueta se lea sobre cualquier foto.
-                            const DecoratedBox(
+                            DecoratedBox(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  stops: [0, 0.35, 1],
-                                  colors: [Color(0x552A1A14), Color(0x002A1A14), Color(0xB32A1A14)],
+                                  stops: const [0, 0.35, 1],
+                                  colors: [AppColors.inkOverlay(0.33), AppColors.inkOverlay(0), AppColors.inkOverlay(0.7)],
                                 ),
                               ),
                             ),

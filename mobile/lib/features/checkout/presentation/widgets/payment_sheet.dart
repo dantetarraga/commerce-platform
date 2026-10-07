@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Hoja "¿Cómo pagas?": Yape, Plin, efectivo (con vuelto) o tarjeta al recibir.
-/// Guarda la elección en el checkout al tocar "Usar …".
+/// Hoja "¿Cómo pagas?". Guarda la elección en el checkout al tocar "Usar …".
 Future<void> showPaymentSheet(BuildContext context, {required Money total}) => showAppBottomSheet<void>(
   context,
   builder: (_) => _PaymentSheet(total: total),
@@ -36,12 +35,6 @@ class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
     _changeFor = draft.cashChangeFor;
   }
 
-  /// Billetes con los que se suele pagar, por encima del total.
-  List<Money> get _bills {
-    const bills = [2000, 5000, 10000, 20000];
-    return [for (final b in bills) if (b > widget.total.cents) Money(b)].take(3).toList();
-  }
-
   void _select(PaymentKind kind) {
     if (kind == _kind) return;
     HapticFeedback.selectionClick().ignore();
@@ -56,19 +49,16 @@ class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.md + MediaQuery.paddingOf(context).bottom),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Semantics(header: true, child: Text('¿Cómo pagas?', style: theme.textTheme.headlineSmall)),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            'Pagas cuando te llega: ${Formatters.money(widget.total)}',
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontFeatures: AppTypography.tabularFigures),
+          AppSheetHeader(
+            title: '¿Cómo pagas?',
+            subtitle: 'Pagas cuando te llega: ${Formatters.money(widget.total)}',
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
           ),
-          const SizedBox(height: AppSpacing.md),
           for (final kind in PaymentKind.offered) ...[
             _PaymentOption(kind: kind, selected: _kind == kind, onTap: () => _select(kind)),
             if (kind == PaymentKind.cash)
@@ -79,7 +69,7 @@ class _PaymentSheetState extends ConsumerState<_PaymentSheet> {
                 child: _kind == PaymentKind.cash
                     ? _CashChange(
                         total: widget.total,
-                        bills: _bills,
+                        bills: suggestedBills(widget.total),
                         value: _changeFor,
                         onChanged: (v) {
                           HapticFeedback.selectionClick().ignore();
@@ -188,7 +178,7 @@ class _CashChange extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final paysWith = value;
-    final change = paysWith == null || paysWith < total ? null : Money(paysWith.cents - total.cents);
+    final change = cashChange(paysWith, total);
     return Padding(
       padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xs),
       child: Column(

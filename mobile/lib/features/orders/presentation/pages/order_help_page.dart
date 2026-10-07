@@ -1,8 +1,9 @@
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/orders/domain/order.dart';
+import 'package:chaski/features/orders/presentation/order_status_labels.dart';
 import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/order_bits.dart';
+import 'package:chaski/features/orders/presentation/widgets/store_thumb.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,12 +42,7 @@ class OrderHelpPage extends ConsumerWidget {
             },
             child: switch (order) {
               AsyncValue(:final value?) => _OrderSummaryCard(order: value),
-              AsyncError(:final error) => orderLoadError(
-                error,
-                what: 'el pedido',
-                compact: true,
-                onRetry: () => ref.invalidate(orderWatchProvider(orderId)),
-              ),
+              AsyncError(:final error) => AppInlineNotice.fromError(error, onRetry: () => ref.invalidate(orderWatchProvider(orderId))),
               _ => const Skeleton(child: SkeletonBox(height: 72, borderRadius: AppRadius.card)),
             },
           ),
@@ -59,10 +55,10 @@ class OrderHelpPage extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppSpacing.xs),
             child: Semantics(header: true, child: Text('¿QUÉ PASÓ?', style: AppTypography.eyebrow(context))),
           ),
-          GroupedCard(
+          AppGroupedCard(
             children: [
               for (final (icon, reason) in _reasons)
-                GroupedRow(icon: icon, title: reason, onTap: () => _describe(context, reason, order.value)),
+                AppGroupedRow(icon: icon, title: reason, onTap: () => _describe(context, reason, order.value)),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -126,7 +122,6 @@ class _CancelOrderButtonState extends ConsumerState<_CancelOrderButton> {
         }
         AppToast.show(context, 'Cancelamos tu pedido. No se te cobró nada.', kind: AppToastKind.success);
       case Err(:final failure):
-        // P. ej. el negocio lo empezó a preparar hace un momento.
         ref.invalidate(orderWatchProvider(widget.order.id));
         AppToast.show(context, failure.message, kind: AppToastKind.error);
     }
@@ -149,17 +144,12 @@ class _OrderSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final status = switch (order.status) {
-      OrderStatus.delivered => 'Entregado',
-      OrderStatus.cancelled => 'Cancelado',
-      _ => 'En curso',
-    };
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
       child: Row(
         children: [
-          AppAvatar(imageUrl: order.store.logoUrl, variant: AppAvatarVariant.store, size: 48, fallbackIcon: Icons.storefront_rounded),
+          StoreThumb(url: order.store.logoUrl, background: theme.colorScheme.surface),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
@@ -173,7 +163,7 @@ class _OrderSummaryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${Formatters.relativeDay(order.placedAt)} · ${Formatters.money(order.total)} · $status',
+                  '${Formatters.relativeDay(order.placedAt)} · ${Formatters.money(order.total)} · ${order.status.summaryLabel}',
                   style: theme.textTheme.bodySmall?.copyWith(fontFeatures: AppTypography.tabularFigures),
                 ),
               ],
@@ -198,12 +188,6 @@ class _DescribeSheet extends StatefulWidget {
 class _DescribeSheetState extends State<_DescribeSheet> {
   final _text = TextEditingController();
   var _sending = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _text.addListener(() => setState(() {}));
-  }
 
   @override
   void dispose() {
@@ -236,17 +220,20 @@ class _DescribeSheetState extends State<_DescribeSheet> {
               style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: AppSpacing.md),
-            TextField(
+            AppInput(
+              label: 'Qué pasó',
               controller: _text,
+              variant: AppInputVariant.note,
+              hint: 'Ej.: faltó la gaseosa del combo',
               autofocus: true,
-              minLines: 3,
-              maxLines: 5,
               maxLength: 400,
               textCapitalization: TextCapitalization.sentences,
-              decoration: const InputDecoration(hintText: 'Ej.: faltó la gaseosa del combo'),
             ),
             const SizedBox(height: AppSpacing.sm),
-            AppButton(label: 'Enviar', loading: _sending, onPressed: _text.text.trim().isEmpty ? null : _send),
+            ListenableBuilder(
+              listenable: _text,
+              builder: (context, _) => AppButton(label: 'Enviar', loading: _sending, onPressed: _text.text.trim().isEmpty ? null : _send),
+            ),
           ],
         ),
       ),
