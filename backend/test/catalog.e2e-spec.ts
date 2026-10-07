@@ -39,6 +39,9 @@ describe('Catálogo (e2e)', () => {
       expect(res.body.items).toHaveLength(3);
       const [first] = res.body.items;
       expect(first.promoLabel === null || typeof first.promoLabel === 'string').toBe(true);
+      // Abierto → null; cerrado → próxima apertura en ISO 8601.
+      if (first.isOpenNow) expect(first.nextOpeningAt).toBeNull();
+      else expect(new Date(first.nextOpeningAt).toISOString()).toBe(first.nextOpeningAt);
       expect(first).toEqual({
         id: expect.any(String),
         name: expect.any(String),
@@ -55,6 +58,7 @@ describe('Catálogo (e2e)', () => {
         deliversToYou: true,
         tags: expect.any(Array),
         promoLabel: first.promoLabel,
+        nextOpeningAt: first.nextOpeningAt,
       });
     });
 

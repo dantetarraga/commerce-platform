@@ -1,4 +1,4 @@
-import { limaDate, limaDayRange } from '../../common/utils/lima-day';
+import { DEFAULT_TIMEZONE, zonedTime } from '../../common/time';
 import { Prisma } from '../../generated/prisma/client';
 import { OrderStatus } from '../../generated/prisma/enums';
 
@@ -10,14 +10,14 @@ export const FINAL_STATUSES = [OrderStatus.DELIVERED, OrderStatus.CANCELLED];
 
 /**
  * `active`: pedidos no finales (RECEIVED … ON_THE_WAY). `today`: los creados
- * hoy en hora de Lima. Sin scope, todos.
+ * hoy en hora local. Sin scope, todos.
  */
 export function listScopeWhere(scope: OrderListScope | undefined, now = new Date()): Prisma.OrderWhereInput {
   switch (scope) {
     case 'active':
       return { status: { notIn: FINAL_STATUSES } };
     case 'today': {
-      const { start, end } = limaDayRange(limaDate(now));
+      const { start, end } = zonedTime.dayRange(zonedTime.localDate(now, DEFAULT_TIMEZONE), DEFAULT_TIMEZONE);
       return { createdAt: { gte: start, lt: end } };
     }
     default:

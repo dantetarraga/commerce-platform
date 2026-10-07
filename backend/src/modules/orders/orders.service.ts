@@ -1,7 +1,8 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import type { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
-import { isOpenAt, localTime } from '../../common/utils/schedule';
+import { zonedTime } from '../../common/time';
+import { isOpenAt } from '../../common/utils/schedule';
 import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { OrderStatus, PaymentMethodType, Role } from '../../generated/prisma/enums';
@@ -267,7 +268,7 @@ export class OrdersService {
     if (at.getTime() - now.getTime() > MAX_SCHEDULE_DAYS * DAY_MS) {
       throw invalid('Puedes programar hasta 7 días antes.');
     }
-    if (!isOpenAt(store.schedules, localTime(at, city.timezone))) {
+    if (!isOpenAt(store.schedules, zonedTime.localTime(at, city.timezone))) {
       throw invalid(`${store.name} no atiende a esa hora.`);
     }
     return at;

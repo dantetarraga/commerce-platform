@@ -10,6 +10,7 @@ Los endpoints y el JSON salen de `mobile/lib/features/*/infrastructure` (datasou
 - **Prisma 7**: cliente generado en `src/generated/prisma` (CommonJS), `PrismaService` con `@prisma/adapter-pg`, URL en `prisma.config.ts`. Nunca TypeORM.
 - **Auth propia**: `JwtAuthGuard` global + `@Public()` y `RolesGuard` + `@Roles()`. Sin Passport. Login por celular + OTP.
 - **Errores**: `throw new AppException(ErrorCode.X, HttpStatus.Y, 'Mensaje en español.', details?)`. El código nuevo va a `ErrorCode`. El filtro global da `{ statusCode, code, message, details?, requestId }`; la validación sale como `VALIDATION_ERROR` con `details.fields`.
+- **Fechas por zona horaria** con `zonedTime` de `common/time` (interfaz `ZonedTime`). Luxon solo se importa en su adaptador (`luxon-zoned-time.ts`); para cambiar de librería se escribe otro adaptador que pase `zoned-time.spec.ts`.
 - **Dinero en céntimos (Int)**; en la API `{ amount, currency }` con `money()`.
 - **Proyecciones puras** de BD → JSON (p. ej. `stores/store-presenter.ts`); la lógica de cálculo (delivery, horarios) en funciones puras con unit tests.
 - **Config** solo vía `ConfigService<Env, true>`; variables nuevas en `src/config/env.ts` (zod) y `.env.example`.

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AppException } from '../../common/exceptions/app.exception';
-import { limaDate, limaDayRange } from '../../common/utils/lima-day';
+import { DEFAULT_TIMEZONE, zonedTime } from '../../common/time';
 import { money } from '../../common/utils/money';
-import { isOpenAt, localTime } from '../../common/utils/schedule';
+import { isOpenAt } from '../../common/utils/schedule';
 import { PrismaService } from '../../database/prisma.service';
 import type { Prisma } from '../../generated/prisma/client';
 import { fromPrice, productCardInclude } from '../stores/store-presenter';
@@ -42,7 +42,7 @@ export class MerchantService {
       name: store.name,
       logoUrl: store.logoUrl,
       isAcceptingOrders: store.isAcceptingOrders,
-      isOpenNow: isOpenAt(store.schedules, localTime(now, store.city.timezone)),
+      isOpenNow: isOpenAt(store.schedules, zonedTime.localTime(now, store.city.timezone)),
     }));
   }
 
@@ -79,10 +79,10 @@ export class MerchantService {
     return { id: productId, isAvailable };
   }
 
-  /** Pedidos creados ese día (hora de Lima) en sus negocios. */
+  /** Pedidos creados ese día (hora local) en sus negocios. */
   async summary(date: string | undefined, ownerId?: string, now = new Date()) {
-    const day = date ?? limaDate(now);
-    const { start, end } = limaDayRange(day);
+    const day = date ?? zonedTime.localDate(now, DEFAULT_TIMEZONE);
+    const { start, end } = zonedTime.dayRange(day, DEFAULT_TIMEZONE);
     const orders = await this.prisma.order.findMany({
       where: { createdAt: { gte: start, lt: end }, ...(ownerId && { store: { ownerId } }) },
       select: { status: true, subtotal: true },

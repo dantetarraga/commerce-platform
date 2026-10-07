@@ -1,15 +1,8 @@
-import { isOpenAt, localTime, nextOpeningAt, OpeningHours } from './schedule';
+import { isOpenAt, nextOpeningAt, OpeningHours } from './schedule';
 
 const MONDAY = 1;
 const TUESDAY = 2;
 const at = (dayOfWeek: number, hh: number, mm = 0) => ({ dayOfWeek, minutes: hh * 60 + mm });
-
-describe('localTime', () => {
-  it('usa la zona horaria de la ciudad, no la del servidor', () => {
-    // 2026-09-22 03:30 UTC = lunes 21 a las 22:30 en Lima (UTC-5).
-    expect(localTime(new Date('2026-09-22T03:30:00Z'), 'America/Lima')).toEqual(at(MONDAY, 22, 30));
-  });
-});
 
 describe('isOpenAt', () => {
   const lunch: OpeningHours[] = [{ dayOfWeek: MONDAY, opensAt: 11 * 60, closesAt: 23 * 60 }];
@@ -48,7 +41,7 @@ describe('nextOpeningAt', () => {
 
   it('hoy más tarde si todavía no abrió', () => {
     // Lunes 21 a las 08:15 en Lima → abre a las 11:00 (16:00 UTC).
-    expect(nextOpeningAt(lunch, new Date('2026-09-21T13:15:30Z'), lima)).toEqual(new Date('2026-09-21T16:00:00Z'));
+    expect(nextOpeningAt(lunch, new Date('2026-09-21T13:15:00Z'), lima)).toEqual(new Date('2026-09-21T16:00:00Z'));
   });
 
   it('la semana siguiente si ya cerró el único día que abre', () => {

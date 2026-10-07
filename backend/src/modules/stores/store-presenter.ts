@@ -1,6 +1,7 @@
 import { GeoPoint } from '../../common/utils/geo';
 import { Money, money } from '../../common/utils/money';
-import { isOpenAt, localTime, nextOpeningAt, OpeningHours } from '../../common/utils/schedule';
+import { zonedTime } from '../../common/time';
+import { isOpenAt, nextOpeningAt, OpeningHours } from '../../common/utils/schedule';
 import { Prisma } from '../../generated/prisma/client';
 import type { CityContext } from '../cities/cities.service';
 import { DeliveryEstimate, estimateDelivery } from '../delivery/delivery';
@@ -50,7 +51,7 @@ export function storeDelivery(store: StoreForSummary, city: CityContext, point: 
 
 /** Abierto = activo, aceptando pedidos y dentro de su horario (hora local de la ciudad). */
 export function isStoreOpen(store: StoreForSummary, city: CityContext, now: Date): boolean {
-  return store.isAcceptingOrders && isOpenAt(store.schedules, localTime(now, city.timezone));
+  return store.isAcceptingOrders && isOpenAt(store.schedules, zonedTime.localTime(now, city.timezone));
 }
 
 export function toStoreSummary(store: StoreForSummary, city: CityContext, point: GeoPoint, now: Date): StoreSummary {

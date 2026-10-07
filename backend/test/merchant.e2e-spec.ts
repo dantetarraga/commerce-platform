@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types';
-import { limaDate } from '../src/common/utils/lima-day';
+import { DEFAULT_TIMEZONE, zonedTime } from '../src/common/time';
 import { PrismaService } from '../src/database/prisma.service';
 import { API, logIn, signUp, TestSession } from './helpers';
 import { createTestApp } from './test-app';
@@ -220,7 +220,7 @@ describe('Chaski Socios: negocio (e2e)', () => {
 
   it('resumen del día: cuenta los pedidos de hoy y suma lo vendido de los entregados', async () => {
     const before = await summary();
-    expect(before.date).toBe(limaDate(new Date()));
+    expect(before.date).toBe(zonedTime.localDate(new Date(), DEFAULT_TIMEZONE));
     const otherSummary = async () =>
       (await http().get(`${API}/merchant/summary`).set(otherMerchant.auth).expect(200)).body as Summary;
     const otherBefore = await otherSummary();

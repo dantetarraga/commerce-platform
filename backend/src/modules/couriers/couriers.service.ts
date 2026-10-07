@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
-import { limaDate, limaDayRange } from '../../common/utils/lima-day';
+import { DEFAULT_TIMEZONE, zonedTime } from '../../common/time';
 import { money } from '../../common/utils/money';
 import { PrismaService } from '../../database/prisma.service';
 import { CourierStatus, OrderStatus } from '../../generated/prisma/enums';
@@ -67,11 +67,11 @@ export class CouriersService {
     return this.me(userId);
   }
 
-  /** Entregas de ese día (hora de Lima) y lo cobrado, por método. */
+  /** Entregas de ese día (hora local) y lo cobrado, por método. */
   async summary(userId: string, date: string | undefined, now = new Date()) {
     const courier = await this.status.courierFor(userId);
-    const day = date ?? limaDate(now);
-    const { start, end } = limaDayRange(day);
+    const day = date ?? zonedTime.localDate(now, DEFAULT_TIMEZONE);
+    const { start, end } = zonedTime.dayRange(day, DEFAULT_TIMEZONE);
     const orders = await this.prisma.order.findMany({
       where: { courierId: courier.id, status: OrderStatus.DELIVERED, deliveredAt: { gte: start, lt: end } },
       select: { payment: { select: { collectedMethod: true, collectedAmount: true } } },
