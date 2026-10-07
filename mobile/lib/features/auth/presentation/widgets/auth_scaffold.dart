@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/legal/legal_page.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 /// Pantallas de entrada: barra mínima (atrás o la marca), contenido
@@ -170,8 +172,23 @@ class _Shake extends StatelessWidget {
 }
 
 /// "Al continuar aceptas los términos y la privacidad." con los enlaces resaltados.
-class AuthLegalNote extends StatelessWidget {
+class AuthLegalNote extends StatefulWidget {
   const AuthLegalNote({super.key});
+
+  @override
+  State<AuthLegalNote> createState() => _AuthLegalNoteState();
+}
+
+class _AuthLegalNoteState extends State<AuthLegalNote> {
+  late final _terms = TapGestureRecognizer()..onTap = () => LegalPage.open(context, LegalDocument.terms);
+  late final _privacy = TapGestureRecognizer()..onTap = () => LegalPage.open(context, LegalDocument.privacy);
+
+  @override
+  void dispose() {
+    _terms.dispose();
+    _privacy.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -181,9 +198,9 @@ class AuthLegalNote extends StatelessWidget {
       TextSpan(
         children: [
           const TextSpan(text: 'Al continuar aceptas los '),
-          TextSpan(text: 'términos', style: link),
+          TextSpan(text: 'términos', style: link, recognizer: _terms, semanticsLabel: 'Términos y condiciones'),
           const TextSpan(text: ' y la '),
-          TextSpan(text: 'privacidad', style: link),
+          TextSpan(text: 'privacidad', style: link, recognizer: _privacy, semanticsLabel: 'Política de privacidad'),
           const TextSpan(text: ' de $brandName.'),
         ],
       ),

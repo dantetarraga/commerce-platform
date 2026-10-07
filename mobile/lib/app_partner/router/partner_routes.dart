@@ -12,6 +12,10 @@ abstract final class PartnerRoutePaths {
   static const courierHome = '/reparto';
   static const activeDelivery = 'pedido/:orderId'; // hija de /reparto
 
+  /// Términos y privacidad: se leen con o sin sesión.
+  static const legal = '/legal/:doc';
+  static bool isLegal(String location) => location.startsWith('/legal/');
+
   /// Rutas accesibles sin sesión (se comparan con el inicio del path).
   static const Set<String> public = {splash, login, notPartner};
 

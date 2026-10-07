@@ -5,6 +5,7 @@ import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
 import 'package:chaski/features/merchant_orders/merchant_orders.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/brand/brand_logo.dart';
+import 'package:chaski/shared/legal/legal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -48,6 +49,13 @@ GoRouter partnerRouter(Ref ref) {
         ],
       ),
       materialRoute(
+        path: PartnerRoutePaths.legal,
+        name: LegalPage.name,
+        builder: (_, state) => LegalPage(
+          document: LegalDocument.fromSlug(state.pathParameters[LegalPage.param]) ?? LegalDocument.terms,
+        ),
+      ),
+      materialRoute(
         path: PartnerRoutePaths.notPartner,
         name: NotPartnerPage.name,
         builder: (context, _) => NotPartnerPage(onUseAnotherNumber: () => context.goNamed(PhoneEntryPage.name)),
@@ -87,6 +95,8 @@ String? _redirect(Ref ref, String location) {
   if (!session.hasValue || !ref.read(splashGateProvider)) {
     return location == PartnerRoutePaths.splash ? null : PartnerRoutePaths.splash;
   }
+
+  if (PartnerRoutePaths.isLegal(location)) return null;
 
   if (session.value == null) {
     final allowed =

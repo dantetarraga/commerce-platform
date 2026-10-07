@@ -15,6 +15,7 @@ import 'package:chaski/features/products/products.dart';
 import 'package:chaski/features/profile/profile.dart';
 import 'package:chaski/features/stores/stores.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/legal/legal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -122,6 +123,14 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
+      materialRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: RoutePaths.legal,
+        name: LegalPage.name,
+        builder: (_, state) => LegalPage(
+          document: LegalDocument.fromSlug(state.pathParameters[LegalPage.param]) ?? LegalDocument.terms,
+        ),
+      ),
       // Pantallas de detalle: a pantalla completa, sobre la barra de navegación.
       materialRoute(
         parentNavigatorKey: rootNavigatorKey,
@@ -186,6 +195,8 @@ String? _redirect(Ref ref, String location) {
   if (!session.hasValue || !onboarding.hasValue || !ref.read(splashGateProvider)) {
     return location == RoutePaths.splash ? null : RoutePaths.splash;
   }
+
+  if (RoutePaths.isLegal(location)) return null;
 
   final isLoggedIn = session.value != null;
 

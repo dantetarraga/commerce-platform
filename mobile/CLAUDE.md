@@ -11,6 +11,7 @@
 - **Riverpod** (`riverpod_generator`) y **go_router** con `static const name` por página.
 - **Tests con `mocktail`**, no mockito (`dart-generate-test-mocks` no aplica). Helpers en `test/helpers/`.
 - Textos de UI en español.
+- Términos y privacidad en `assets/legal/*.md` (Markdown); los muestra `shared/legal/legal_page.dart` en las dos apps, y un enlace `apamuy:<slug>` abre el otro texto.
 
 ## Dos apps, un proyecto
 

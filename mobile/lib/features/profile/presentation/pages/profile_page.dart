@@ -10,6 +10,7 @@ import 'package:chaski/features/profile/presentation/pages/edit_profile_page.dar
 import 'package:chaski/features/profile/presentation/providers/profile_summary.dart';
 import 'package:chaski/features/profile/presentation/widgets/theme_mode_sheet.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/legal/legal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -143,6 +144,11 @@ class ProfilePage extends ConsumerWidget {
                   title: 'Tema',
                   subtitle: themeModeLabel(themeMode),
                   onTap: () => _pickTheme(context, ref, themeMode),
+                ),
+                AppGroupedRow(
+                  icon: Icons.description_outlined,
+                  title: 'Términos y privacidad',
+                  onTap: () => LegalPage.open(context, LegalDocument.terms),
                 ),
                 AppGroupedRow(
                   icon: Icons.help_outline_rounded,

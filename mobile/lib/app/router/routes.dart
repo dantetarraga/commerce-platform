@@ -27,6 +27,10 @@ abstract final class RoutePaths {
   static const notifications = '/avisos';
   static const addressForm = '/direccion/nueva';
 
+  /// Términos y privacidad: se leen con o sin sesión.
+  static const legal = '/legal/:doc';
+  static bool isLegal(String location) => location.startsWith('/legal/');
+
   /// Rutas accesibles sin sesión (se comparan con el inicio del path).
   static const Set<String> public = {splash, onboarding, login};
 
