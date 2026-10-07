@@ -55,48 +55,17 @@ extension StoreDetailLabels on StoreDetail {
   };
 }
 
-const _weekdays = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-
-String? nextOpeningLabelFor(WeeklySchedule schedule, DateTime now) {
-  final next = schedule.nextOpening(now);
-  if (next == null) return null;
-  final time = Formatters.timeOfDay(next.opensAt);
-  return switch (next.inDays) {
-    0 => 'Abre hoy a las $time',
-    1 => 'Abre mañana a las $time',
-    _ => 'Abre el ${_weekdays[(now.weekday + next.inDays) % 7]} a las $time',
-  };
-}
+/// "Abre hoy a las 6:00 pm" · "Abre mañana a las 7:00 am". Delegado a
+/// [WeeklyScheduleLabels.nextOpeningLabel].
+String? nextOpeningLabelFor(WeeklySchedule schedule, DateTime now) => schedule.nextOpeningLabel(now);
 
 /// Fecha y hora de la próxima apertura (para programar un pedido), o null.
-DateTime? nextOpeningAt(WeeklySchedule schedule, DateTime now) {
-  final next = schedule.nextOpening(now);
-  if (next == null) return null;
-  return DateTime(now.year, now.month, now.day + next.inDays, next.opensAt ~/ 60, next.opensAt % 60);
-}
+/// Delegado a [WeeklySchedule.nextOpeningAt].
+DateTime? nextOpeningAt(WeeklySchedule schedule, DateTime now) => schedule.nextOpeningAt(now);
 
-/// "Cierra 16:00" si ahora está dentro de un turno; null si no.
-String? closingLabelFor(WeeklySchedule schedule, DateTime now) {
-  final minutes = now.hour * 60 + now.minute;
-  final today = now.weekday % 7;
-  final yesterday = (today + 6) % 7;
-  for (final h in schedule.hours) {
-    final inToday = h.dayOfWeek == today &&
-        (h.crossesMidnight ? minutes >= h.opensAt : minutes >= h.opensAt && minutes < h.closesAt);
-    // Turno de ayer que cruzó la medianoche y sigue abierto.
-    final fromYesterday = h.dayOfWeek == yesterday && h.crossesMidnight && minutes < h.closesAt;
-    if (inToday || fromYesterday) return 'Cierra ${Formatters.timeOfDay(h.closesAt)}';
-  }
-  return null;
-}
+/// "Cierra 10:00 pm" si ahora está dentro de un turno; null si no. Delegado a
+/// [WeeklyScheduleLabels.closingLabel].
+String? closingLabelFor(WeeklySchedule schedule, DateTime now) => schedule.closingLabel(now);
 
-/// "hoy a las 18:30" · "mañana a las 07:00" · "el sábado a las 09:00".
-String scheduledAtLabel(DateTime at, DateTime now) {
-  final days = DateTime(at.year, at.month, at.day).difference(DateTime(now.year, now.month, now.day)).inDays;
-  final time = Formatters.clock(at);
-  return switch (days) {
-    <= 0 => 'hoy a las $time',
-    1 => 'mañana a las $time',
-    _ => 'el ${_weekdays[at.weekday % 7]} a las $time',
-  };
-}
+/// "hoy a las 6:30 pm" · "mañana a las 7:00 am" · "el sábado a las 9:00 am".
+String scheduledAtLabel(DateTime at, DateTime now) => Formatters.whenPhrase(at, now: now);

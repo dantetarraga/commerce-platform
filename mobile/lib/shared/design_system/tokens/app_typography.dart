@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Tipografía Chaski: títulos amables y redondos, interfaz silenciosa.
+/// Tipografía de Apamuy: títulos amables y redondos, interfaz silenciosa.
 ///
 /// - **Outfit** (display): títulos, nombres de negocio y precios. Geométrica y
 ///   abierta; se usa en 700 con espaciado casi normal para que respire.
@@ -65,6 +65,33 @@ abstract final class AppTypography {
       fontFeatures: _tabular,
     );
   }
+
+  /// Estilo display (Outfit) a medida: títulos de cabecera, cifras grandes,
+  /// nombres de lugar. Reemplaza los `TextStyle(fontFamily: AppTypography.display, …)`
+  /// escritos a mano.
+  ///
+  /// Por defecto: peso 700, alto de línea 1.2, sin espaciado extra y color
+  /// `onSurface`. Con [tabular] usa cifras tabulares (contadores, montos).
+  ///
+  /// Se llama `displayStyle` (y no `display`) porque [display] ya es el nombre
+  /// de la familia y se usa como `fontFamily` en muchos sitios.
+  static TextStyle displayStyle(
+    BuildContext context, {
+    required double size,
+    FontWeight? weight,
+    Color? color,
+    double? height,
+    double? letterSpacing,
+    bool tabular = false,
+  }) => TextStyle(
+    fontFamily: display,
+    fontSize: size,
+    fontWeight: weight ?? FontWeight.w700,
+    height: height ?? 1.2,
+    letterSpacing: letterSpacing ?? 0,
+    color: color ?? Theme.of(context).colorScheme.onSurface,
+    fontFeatures: tabular ? _tabular : null,
+  );
 
   /// Etiquetas en mayúsculas tipo "eyebrow" (secciones, pasos).
   static TextStyle eyebrow(BuildContext context) => TextStyle(

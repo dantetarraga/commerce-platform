@@ -45,6 +45,21 @@ const List<Money> tipPresets = [Money(100), Money(200), Money(300)];
 /// Tope de la propina "Otro" (S/ 50): evita errores de tipeo.
 const Money maxTip = Money(5000);
 
+/// Billetes con los que se suele pagar en efectivo (S/ 20 · 50 · 100 · 200).
+const List<Money> cashBills = [Money(2000), Money(5000), Money(10000), Money(20000)];
+
+/// Sugerencias de "¿Con cuánto pagas?": hasta [max] billetes mayores que
+/// [total], de menor a mayor.
+List<Money> suggestedBills(Money total, {int max = 3}) => [
+  for (final bill in cashBills)
+    if (total < bill) bill,
+].take(max).toList();
+
+/// Vuelto al pagar [total] con [paysWith]: `null` si paga exacto (sin monto)
+/// o si no alcanza.
+Money? cashChange(Money? paysWith, Money total) =>
+    paysWith == null || paysWith < total ? null : paysWith - total;
+
 /// Decisiones del checkout (lo demás sale de la bolsa).
 ///
 /// La propina empieza en cero a propósito: es un regalo del cliente, no un
@@ -78,12 +93,10 @@ final class CheckoutDraft extends Equatable {
   Money total(Cart cart) => cart.isEmpty ? const Money.zero() : cart.total + tip;
 
   /// Vuelto que lleva el repartidor (null si paga exacto o no alcanza).
-  Money? change(Cart cart) {
-    final paysWith = cashChangeFor;
-    if (paymentKind != PaymentKind.cash || paysWith == null) return null;
-    final diff = paysWith.cents - total(cart).cents;
-    return diff >= 0 ? Money(diff) : null;
-  }
+  Money? change(Cart cart) => paymentKind == PaymentKind.cash ? cashChange(cashChangeFor, total(cart)) : null;
+
+  /// Billetes que se sugieren para pagar el total en efectivo.
+  List<Money> bills(Cart cart) => suggestedBills(total(cart));
 
   CheckoutDraft copyWith({
     DeliveryTime? deliveryTime,

@@ -129,7 +129,7 @@ class _Medallion extends StatelessWidget {
       order = order
           .animate(delay: AppMotion.base)
           .scaleXY(begin: 0, end: 1, duration: AppMotion.move, curve: AppMotion.knot)
-          .then(delay: const Duration(milliseconds: 1400))
+          .then(delay: AppMotion.pulse)
           .moveY(begin: 0, end: -dot * 0.5, duration: AppMotion.quick, curve: Curves.easeOut)
           .then()
           .moveY(begin: 0, end: dot * 0.5, duration: AppMotion.base, curve: Curves.bounceOut);

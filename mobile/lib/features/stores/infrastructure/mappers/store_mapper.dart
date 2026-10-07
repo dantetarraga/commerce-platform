@@ -26,6 +26,7 @@ extension StoreSummaryDtoMapper on StoreSummaryDto {
     deliversToYou: deliversToYou,
     tags: tags,
     promoLabel: promoLabel,
+    nextOpeningAt: nextOpeningAt?.toLocal(),
   );
 }
 

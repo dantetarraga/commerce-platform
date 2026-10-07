@@ -34,6 +34,7 @@ class StoreSummaryDto {
     this.coverUrl,
     this.tags = const [],
     this.promoLabel,
+    this.nextOpeningAt,
   });
 
   factory StoreSummaryDto.fromJson(Map<String, dynamic> json) => _$StoreSummaryDtoFromJson(json);
@@ -56,6 +57,10 @@ class StoreSummaryDto {
   @JsonKey(defaultValue: <String>[])
   final List<String> tags;
   final String? promoLabel;
+
+  /// Si está cerrado, la próxima apertura según su horario (ISO 8601). El
+  /// backend aún no lo envía: hasta entonces llega `null`.
+  final DateTime? nextOpeningAt;
 }
 
 /// Respuesta paginada de `GET /stores`.

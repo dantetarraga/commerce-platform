@@ -36,6 +36,13 @@ abstract final class AppColors {
   static const peligro = Color(0xFFB3261E); // error · eliminar · cerrado
   static const peligro300 = Color(0xFFFF8A7A);
   static const rating = Color(0xFFB84A2B);
+
+  /// Texto secundario claro sobre fotografía oscurecida o sobre hierba.
+  static const onPhotoMuted = Color(0xFFF1E6DE);
+
+  /// Velo de tinta con la opacidad [alpha] (0–1): degradados sobre fotos,
+  /// negocios cerrados, sombras. Reemplaza los `Color(0x..2A1A14)` a mano.
+  static Color inkOverlay(double alpha) => tinta.withValues(alpha: alpha);
 }
 
 /// Colores semánticos que `ColorScheme` no cubre, resueltos por tema.
@@ -54,6 +61,8 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     required this.onPhoto,
     required this.scrim,
     required this.rating,
+    required this.card,
+    required this.onPhotoMuted,
   });
 
   static const light = ChaskiColors(
@@ -69,6 +78,8 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     onPhoto: AppColors.blanco,
     scrim: Color(0x732A1A14),
     rating: AppColors.rating,
+    card: AppColors.blanco,
+    onPhotoMuted: AppColors.onPhotoMuted,
   );
 
   static const dark = ChaskiColors(
@@ -84,6 +95,8 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     onPhoto: AppColors.blanco,
     scrim: Color(0x99000000),
     rating: AppColors.terracota300,
+    card: AppColors.nocheRaised,
+    onPhotoMuted: AppColors.onPhotoMuted,
   );
 
   /// Hierba: cintas de oferta, envío gratis, lo que pasa ahora.
@@ -110,6 +123,13 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   /// Estrella de calificación.
   final Color rating;
 
+  /// Fondo de tarjeta que se despega del fondo: blanco en claro, [raised] en
+  /// oscuro (reemplaza el ternario `dark ? chaski.raised : AppColors.blanco`).
+  final Color card;
+
+  /// Texto secundario claro sobre fotografía (bajada de portadas).
+  final Color onPhotoMuted;
+
   @override
   ChaskiColors copyWith({
     Color? accent,
@@ -124,6 +144,8 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     Color? onPhoto,
     Color? scrim,
     Color? rating,
+    Color? card,
+    Color? onPhotoMuted,
   }) => ChaskiColors(
     accent: accent ?? this.accent,
     onAccent: onAccent ?? this.onAccent,
@@ -137,6 +159,8 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     onPhoto: onPhoto ?? this.onPhoto,
     scrim: scrim ?? this.scrim,
     rating: rating ?? this.rating,
+    card: card ?? this.card,
+    onPhotoMuted: onPhotoMuted ?? this.onPhotoMuted,
   );
 
   @override
@@ -155,11 +179,13 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
       onPhoto: Color.lerp(onPhoto, other.onPhoto, t)!,
       scrim: Color.lerp(scrim, other.scrim, t)!,
       rating: Color.lerp(rating, other.rating, t)!,
+      card: Color.lerp(card, other.card, t)!,
+      onPhotoMuted: Color.lerp(onPhotoMuted, other.onPhotoMuted, t)!,
     );
   }
 }
 
 extension ChaskiColorsContext on BuildContext {
-  /// Colores semánticos de Chaski para el tema actual.
+  /// Colores semánticos de Apamuy para el tema actual.
   ChaskiColors get chaski => Theme.of(this).extension<ChaskiColors>() ?? ChaskiColors.light;
 }

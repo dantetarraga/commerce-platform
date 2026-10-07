@@ -1,7 +1,7 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Ancho de lectura para las herramientas de trabajo de Chaski Socios.
+/// Ancho de lectura para las herramientas de trabajo de Apamuy Socios.
 class PartnerContent extends StatelessWidget {
   const PartnerContent({required this.child, this.maxWidth = 1040, super.key});
 

@@ -1,5 +1,5 @@
+import 'package:chaski/shared/design_system/components/app_empty_state.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
-import 'package:chaski/shared/widgets/state_views.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -32,7 +32,7 @@ class AsyncValueView<T> extends StatelessWidget {
       // Mientras recarga con datos previos, se siguen mostrando los datos.
       AsyncValue(:final value?, hasValue: true) =>
         (isEmpty?.call(value) ?? false) && empty != null ? ('empty', empty!) : ('data', data(value)),
-      AsyncError(:final error) => ('error', ErrorView(error: error, onRetry: onRetry, compact: compactError)),
+      AsyncError(:final error) => ('error', AppEmptyState.fromError(error, onRetry: onRetry, compact: compactError)),
       _ => ('loading', loading),
     };
     return LoadCrossFade(stateKey: key, child: child);

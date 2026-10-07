@@ -22,7 +22,7 @@ abstract final class AppSpacing {
 }
 
 /// Esquina de salida: una sola esquina corta, abajo a la izquierda, por donde sale el
-/// trazo de Chaski. Tres tamaños (L 28/8, M 22/6, S 16/5); personas y fotos de portada en círculo.
+/// trazo de Apamuy. Tres tamaños (L 28/8, M 22/6, S 16/5); personas y fotos de portada en círculo.
 abstract final class AppRadius {
   static const sm = Radius.circular(8);
   static const md = Radius.circular(12);
@@ -60,11 +60,28 @@ abstract final class AppRadius {
   /// Portadas: solo las esquinas inferiores, con la de salida corta.
   static const hero = BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(36));
 
+  /// Esquina de salida a medida: tres esquinas de radio [r] y la inferior
+  /// izquierda corta. Por defecto la corta mide ~30 % de [r] (10 → 3, 16 → 5,
+  /// 18 → 5); [cut] la fija a mano.
+  static BorderRadius exit(double r, {double? cut}) {
+    final big = Radius.circular(r);
+    return BorderRadius.only(
+      topLeft: big,
+      topRight: big,
+      bottomRight: big,
+      bottomLeft: Radius.circular(cut ?? (r * 0.3).roundToDouble()),
+    );
+  }
+
+  /// Cabeceras de pantalla de color (socios): solo las esquinas inferiores,
+  /// la de salida corta y la derecha amplia.
+  static const header = BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(28));
+
   /// Hojas inferiores.
   static const sheet = BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28));
 }
 
-/// Solo dos niveles de sombra; en oscuro la elevación se expresa con superficies.
+/// Pocos niveles de sombra; en oscuro la elevación se expresa con superficies.
 abstract final class AppShadows {
   static List<BoxShadow> soft(Brightness brightness) =>
       brightness == Brightness.dark ? const [] : const [BoxShadow(color: Color(0x0F2A1A14), blurRadius: 16, offset: Offset(0, 4))];
@@ -75,4 +92,10 @@ abstract final class AppShadows {
           BoxShadow(color: Color(0x082A1A14), blurRadius: 2, offset: Offset(0, 1)),
           BoxShadow(color: Color(0x122A1A14), blurRadius: 24, offset: Offset(0, 8)),
         ];
+
+  /// Tarjeta levantada sobre el fondo (comandas, tarjetas destacadas).
+  static const List<BoxShadow> lifted = [BoxShadow(color: Color(0x1F2A1A14), blurRadius: 18, offset: Offset(0, 8))];
+
+  /// Perilla o ficha pequeña que se arrastra o se apila (deslizar para confirmar, sellos).
+  static const List<BoxShadow> knob = [BoxShadow(color: Color(0x402A1A14), blurRadius: 6, offset: Offset(0, 3))];
 }

@@ -4,6 +4,7 @@ import 'package:chaski/shared/design_system/components/app_loader.dart';
 import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 enum AppSearchBarVariant {
@@ -58,13 +59,37 @@ class _AppSearchBarState extends State<AppSearchBar> {
   @override
   void initState() {
     super.initState();
+    _startHints();
+    widget.controller?.addListener(_refresh);
+    widget.focusNode?.addListener(_refresh);
+  }
+
+  @override
+  void didUpdateWidget(AppSearchBar old) {
+    super.didUpdateWidget(old);
+    if (old.controller != widget.controller) {
+      old.controller?.removeListener(_refresh);
+      widget.controller?.addListener(_refresh);
+    }
+    if (old.focusNode != widget.focusNode) {
+      old.focusNode?.removeListener(_refresh);
+      widget.focusNode?.addListener(_refresh);
+    }
+    if (!listEquals(old.hints, widget.hints)) {
+      _hintIndex = 0;
+      _startHints();
+    }
+  }
+
+  /// Rota los ejemplos cada 3 s (solo si hay más de uno).
+  void _startHints() {
+    _timer?.cancel();
+    _timer = null;
     if (widget.hints.length > 1) {
       _timer = Timer.periodic(const Duration(seconds: 3), (_) {
         if (mounted) setState(() => _hintIndex = (_hintIndex + 1) % widget.hints.length);
       });
     }
-    widget.controller?.addListener(_refresh);
-    widget.focusNode?.addListener(_refresh);
   }
 
   @override

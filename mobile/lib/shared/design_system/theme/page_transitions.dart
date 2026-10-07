@@ -13,10 +13,10 @@ class RisingCardPageTransitionsBuilder extends PageTransitionsBuilder {
   const RisingCardPageTransitionsBuilder();
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 380);
+  Duration get transitionDuration => AppMotion.page;
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 280);
+  Duration get reverseTransitionDuration => AppMotion.pageReverse;
 
   @override
   Widget buildTransitions<T>(

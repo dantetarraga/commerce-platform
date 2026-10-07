@@ -47,6 +47,10 @@ StoreSummaryDto _$StoreSummaryDtoFromJson(Map<String, dynamic> json) =>
           (v) => (v as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
         ),
         promoLabel: $checkedConvert('promoLabel', (v) => v as String?),
+        nextOpeningAt: $checkedConvert(
+          'nextOpeningAt',
+          (v) => v == null ? null : DateTime.parse(v as String),
+        ),
       );
       return val;
     });

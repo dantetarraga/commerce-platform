@@ -98,7 +98,7 @@ class ImageSliverAppBar extends StatelessWidget {
           leading: Padding(
             padding: const EdgeInsets.only(left: AppSpacing.xs),
             child: Center(
-              child: PhotoCircleButton(
+              child: _PhotoCircleButton(
                 action: PhotoAction(
                   icon: leadingIcon,
                   tooltip: leadingIcon == Icons.close_rounded
@@ -116,7 +116,7 @@ class ImageSliverAppBar extends StatelessWidget {
             child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
           actions: [
-            for (final action in actions) PhotoCircleButton(action: action, onPhoto: !collapsed),
+            for (final action in actions) _PhotoCircleButton(action: action, onPhoto: !collapsed),
             ?trailing,
             const SizedBox(width: AppSpacing.xs),
           ],
@@ -182,8 +182,8 @@ class PhotoAction {
 }
 
 /// Botón circular blanco sobre la foto; sin círculo cuando la barra colapsa.
-class PhotoCircleButton extends StatelessWidget {
-  const PhotoCircleButton({required this.action, this.onPhoto = true, super.key});
+class _PhotoCircleButton extends StatelessWidget {
+  const _PhotoCircleButton({required this.action, this.onPhoto = true});
 
   final PhotoAction action;
   final bool onPhoto;

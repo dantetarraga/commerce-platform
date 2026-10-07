@@ -11,7 +11,7 @@ sk.PaintingEffect appSkeletonEffect(BuildContext context) {
   return sk.ShimmerEffect(
     baseColor: colors.shimmerBase,
     highlightColor: colors.shimmerHighlight,
-    duration: const Duration(milliseconds: 1400),
+    duration: AppMotion.pulse,
   );
 }
 

@@ -79,6 +79,9 @@ final class MerchantSummary extends Equatable {
   /// Suma de lo vendido en pedidos entregados (sin el envío).
   final Money sales;
 
+  /// Comandas del día: entregadas más en curso (las canceladas no cuentan).
+  int get totalCount => deliveredCount + activeCount;
+
   @override
   List<Object?> get props => [deliveredCount, cancelledCount, activeCount, sales];
 }

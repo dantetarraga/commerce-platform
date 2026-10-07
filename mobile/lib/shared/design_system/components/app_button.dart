@@ -16,13 +16,18 @@ enum AppButtonVariant {
 
   /// Eliminar, cancelar un pedido.
   danger,
+
+  /// Acción firme en tinta (en oscuro, texto claro invertido): avanzar una
+  /// comanda o una entrega en Apamuy Socios sin competir con el terracota.
+  ink,
 }
 
 enum AppButtonSize { lg, md, sm }
 
-/// Botón de Chaski: radio 14 en todas las variantes (no son píldoras).
-/// `primary` es cobalto; `secondary` es gris neutro con texto tinta, para no
-/// competir con la acción principal.
+/// Botón de Apamuy: esquina de salida ([AppRadius.button]) en todas las
+/// variantes (no son píldoras). `primary` es terracota; `secondary` es gris
+/// neutro con texto tinta, para no competir con la acción principal; `ink` es
+/// un bloque de tinta para las acciones de trabajo de los socios.
 ///
 /// [trailing] se muestra a la derecha, separado del texto (p. ej. el total en
 /// "Agregar · S/ 15.50"). Con [loading] el contenido cruza a un indicador sin
@@ -77,6 +82,19 @@ class AppButton extends StatelessWidget {
     super.key,
   }) : variant = AppButtonVariant.danger;
 
+  /// Bloque de tinta (en oscuro se invierte a `onSurface`).
+  const AppButton.ink({
+    required this.label,
+    required this.onPressed,
+    this.size = AppButtonSize.lg,
+    this.icon,
+    this.trailing,
+    this.loading = false,
+    this.expand = true,
+    this.semanticLabel,
+    super.key,
+  }) : variant = AppButtonVariant.ink;
+
   final String label;
   final VoidCallback? onPressed;
   final AppButtonVariant variant;
@@ -104,15 +122,18 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.secondary => (chaski.raised, scheme.onSurface, BorderSide.none),
       AppButtonVariant.ghost => (Colors.transparent, scheme.primary, BorderSide.none),
       AppButtonVariant.danger => (Colors.transparent, chaski.danger, BorderSide(color: chaski.danger, width: 1.5)),
+      AppButtonVariant.ink => Theme.of(context).brightness == Brightness.dark
+          ? (scheme.onSurface, scheme.surface, BorderSide.none)
+          : (AppColors.tinta, AppColors.blanco, BorderSide.none),
     };
-    final disabledBg = variant == AppButtonVariant.primary || variant == AppButtonVariant.secondary
+    final disabledBg = variant == AppButtonVariant.primary || variant == AppButtonVariant.secondary || variant == AppButtonVariant.ink
         ? scheme.onSurface.withValues(alpha: 0.08)
         : Colors.transparent;
     final disabledFg = scheme.onSurface.withValues(alpha: 0.38);
 
     final shape = RoundedRectangleBorder(
       borderRadius: AppRadius.button,
-      side: enabled ? side : side.copyWith(color: disabledFg),
+      side: enabled || loading ? side : side.copyWith(color: disabledFg),
     );
     final textStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
       fontSize: size == AppButtonSize.sm ? 14 : 16,
@@ -148,7 +169,7 @@ class AppButton extends StatelessWidget {
     );
 
     final button = Material(
-      color: enabled ? bg : disabledBg,
+      color: enabled || loading ? bg : disabledBg,
       shape: shape,
       clipBehavior: Clip.antiAlias,
       child: InkWell(

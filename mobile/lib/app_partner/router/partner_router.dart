@@ -1,4 +1,5 @@
 import 'package:chaski/app_partner/router/partner_routes.dart';
+import 'package:chaski/core/router/route_helpers.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
 import 'package:chaski/features/merchant_orders/merchant_orders.dart';
@@ -12,16 +13,11 @@ part 'partner_router.g.dart';
 
 final partnerNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Router de Chaski Socios. Entra quien tiene rol de negocio o repartidor;
+/// Router de Apamuy Socios. Entra quien tiene rol de negocio o repartidor;
 /// el resto ve [NotPartnerPage].
 @Riverpod(keepAlive: true)
 GoRouter partnerRouter(Ref ref) {
-  final refresh = ValueNotifier<int>(0);
-  ref
-    ..listen(authSessionProvider, (_, _) => refresh.value++)
-    ..listen(partnerModePreferenceProvider, (_, _) => refresh.value++)
-    ..listen(splashGateProvider, (_, _) => refresh.value++)
-    ..onDispose(refresh.dispose);
+  final refresh = routerRefresh(ref, [authSessionProvider, partnerModePreferenceProvider, splashGateProvider]);
 
   final router = GoRouter(
     navigatorKey: partnerNavigatorKey,
@@ -29,12 +25,12 @@ GoRouter partnerRouter(Ref ref) {
     refreshListenable: refresh,
     redirect: (context, state) => _redirect(ref, state.matchedLocation),
     routes: [
-      _route(
+      materialRoute(
         path: PartnerRoutePaths.splash,
         name: SplashPage.name,
         builder: (_, _) => const SplashPage(),
       ),
-      _route(
+      materialRoute(
         path: PartnerRoutePaths.login,
         name: PhoneEntryPage.name,
         builder: (_, _) => const PhoneEntryPage(
@@ -46,7 +42,7 @@ GoRouter partnerRouter(Ref ref) {
           ],
         ),
         routes: [
-          _route(
+          materialRoute(
             path: PartnerRoutePaths.otp,
             name: OtpPage.name,
             // Un número sin cuenta no es socio: aquí no se crean cuentas.
@@ -54,29 +50,29 @@ GoRouter partnerRouter(Ref ref) {
           ),
         ],
       ),
-      _route(
+      materialRoute(
         path: PartnerRoutePaths.notPartner,
         name: NotPartnerPage.name,
         builder: (context, _) => NotPartnerPage(onUseAnotherNumber: () => context.goNamed(PhoneEntryPage.name)),
       ),
-      _route(
+      materialRoute(
         path: PartnerRoutePaths.merchantHome,
         name: MerchantHomePage.name,
         builder: (_, _) => const MerchantHomePage(),
         routes: [
-          _route(
+          materialRoute(
             path: PartnerRoutePaths.merchantProducts,
             name: MerchantProductsPage.name,
             builder: (_, state) => MerchantProductsPage(storeId: state.pathParameters['storeId']!),
           ),
         ],
       ),
-      _route(
+      materialRoute(
         path: PartnerRoutePaths.courierHome,
         name: CourierHomePage.name,
         builder: (_, _) => const CourierHomePage(),
         routes: [
-          _route(
+          materialRoute(
             path: PartnerRoutePaths.activeDelivery,
             name: ActiveDeliveryPage.name,
             builder: (_, state) => ActiveDeliveryPage(orderId: state.pathParameters['orderId']!),
@@ -121,19 +117,3 @@ String? _redirect(Ref ref, String location) {
   if (PartnerRoutePaths.isPublic(location) || PartnerRoutePaths.isUnder(location, other)) return home;
   return null;
 }
-
-/// Pantalla normal: `MaterialPage` explícita para que use la transición del tema
-/// (go_router, por su cuenta, puede armarla sin transición).
-GoRoute _route({
-  required String path,
-  required String name,
-  required Widget Function(BuildContext context, GoRouterState state) builder,
-  GlobalKey<NavigatorState>? parentNavigatorKey,
-  List<RouteBase> routes = const [],
-}) => GoRoute(
-  path: path,
-  name: name,
-  parentNavigatorKey: parentNavigatorKey,
-  routes: routes,
-  pageBuilder: (context, state) => MaterialPage<void>(key: state.pageKey, name: state.name, child: builder(context, state)),
-);

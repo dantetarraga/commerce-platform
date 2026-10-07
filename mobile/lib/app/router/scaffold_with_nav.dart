@@ -1,8 +1,7 @@
+import 'package:chaski/app/purchase_bar/open_bag.dart';
 import 'package:chaski/app/purchase_bar/purchase_bar_controller.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/checkout/checkout.dart';
-import 'package:chaski/features/home/home.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -21,21 +20,19 @@ class ScaffoldWithNav extends ConsumerWidget {
     shell.goBranch(branch, initialLocation: branch == shell.currentIndex);
   }
 
-  void _openBag(BuildContext context) {
-    final router = GoRouter.of(context);
-    showCartSheet(
-      context,
-      onCheckout: () => router.pushNamed(CheckoutPage.name).ignore(),
-      onExplore: () => router.goNamed(HomePage.name),
-    ).ignore();
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final count = ref.watch(cartControllerProvider).value?.itemCount ?? 0;
-    final order = ref.watch(activeOrderProvider).value;
-    final pulse = ref.watch(purchaseBarControllerProvider.select((view) => view.pulse));
-    final user = ref.watch(authSessionProvider).value;
+    // Solo lo que la barra muestra: un cambio de precio en la bolsa o de estado
+    // dentro de un pedido en curso no reconstruye el shell.
+    final count = ref.watch(cartControllerProvider.select((cart) => cart.value?.itemCount ?? 0));
+    final liveOrder = ref.watch(activeOrderProvider.select((order) => order.value?.isActive ?? false));
+    final pulse = ref.watch(purchaseBarProvider.select((view) => view.pulse));
+    final user = ref.watch(
+      authSessionProvider.select((session) {
+        final u = session.value;
+        return (avatarUrl: u?.avatarUrl, initials: u?.initials, id: u?.id);
+      }),
+    );
     return Scaffold(
       body: shell,
       bottomNavigationBar: AppNavigationDock(
@@ -43,9 +40,9 @@ class ScaffoldWithNav extends ConsumerWidget {
         onSelected: _select,
         bagCount: count,
         bagPulse: pulse,
-        onBag: () => _openBag(context),
-        liveOrder: order != null && order.isActive,
-        avatar: AppAvatar(imageUrl: user?.avatarUrl, initials: user?.initials, seed: user?.id, size: 28),
+        onBag: () => openBag(context),
+        liveOrder: liveOrder,
+        avatar: AppAvatar(imageUrl: user.avatarUrl, initials: user.initials, seed: user.id, size: 28),
       ),
     );
   }

@@ -8,19 +8,19 @@ part of 'partner_router.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Router de Chaski Socios. Entra quien tiene rol de negocio o repartidor;
+/// Router de Apamuy Socios. Entra quien tiene rol de negocio o repartidor;
 /// el resto ve [NotPartnerPage].
 
 @ProviderFor(partnerRouter)
 final partnerRouterProvider = PartnerRouterProvider._();
 
-/// Router de Chaski Socios. Entra quien tiene rol de negocio o repartidor;
+/// Router de Apamuy Socios. Entra quien tiene rol de negocio o repartidor;
 /// el resto ve [NotPartnerPage].
 
 final class PartnerRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// Router de Chaski Socios. Entra quien tiene rol de negocio o repartidor;
+  /// Router de Apamuy Socios. Entra quien tiene rol de negocio o repartidor;
   /// el resto ve [NotPartnerPage].
   PartnerRouterProvider._()
     : super(
@@ -55,4 +55,4 @@ final class PartnerRouterProvider
   }
 }
 
-String _$partnerRouterHash() => r'bf47d6ad5256852bc00e686d126ad6caaeadfe86';
+String _$partnerRouterHash() => r'198c8080dc6b732d1ae68e941c996464d95b894f';

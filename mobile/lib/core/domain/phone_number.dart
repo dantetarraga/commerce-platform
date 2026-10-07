@@ -23,6 +23,14 @@ final class PhoneNumber extends Equatable {
     return Valid(PhoneNumber._(digits));
   }
 
+  /// "984 123 456": como se muestra a la persona.
+  String get display => displayOf(value);
+
+  /// Agrupa de a tres unos dígitos ya conocidos ("984123456" → "984 123 456").
+  /// Si no son 9 dígitos, los deja como vienen.
+  static String displayOf(String digits) =>
+      digits.length == 9 ? '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6)}' : digits;
+
   @override
   List<Object?> get props => [value];
 

@@ -1,6 +1,7 @@
 import 'package:chaski/app/purchase_bar/with_purchase_bar.dart';
 import 'package:chaski/app/router/routes.dart';
 import 'package:chaski/app/router/scaffold_with_nav.dart';
+import 'package:chaski/core/router/route_helpers.dart';
 import 'package:chaski/features/addresses/addresses.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/checkout/checkout.dart';
@@ -26,12 +27,7 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 GoRouter appRouter(Ref ref) {
   // El router se crea una sola vez; los cambios de sesión solo disparan un
   // nuevo `redirect` a través de este listenable.
-  final refresh = ValueNotifier<int>(0);
-  ref
-    ..listen(authSessionProvider, (_, _) => refresh.value++)
-    ..listen(onboardingStatusProvider, (_, _) => refresh.value++)
-    ..listen(splashGateProvider, (_, _) => refresh.value++)
-    ..onDispose(refresh.dispose);
+  final refresh = routerRefresh(ref, [authSessionProvider, onboardingStatusProvider, splashGateProvider]);
 
   final router = GoRouter(
     navigatorKey: rootNavigatorKey,
@@ -54,12 +50,12 @@ GoRouter appRouter(Ref ref) {
         name: PhoneEntryPage.name,
         pageBuilder: (_, state) => _fadeThroughPage(state, const PhoneEntryPage()),
         routes: [
-          _route(
+          materialRoute(
             path: RoutePaths.otp,
             name: OtpPage.name,
             builder: (_, _) => const OtpPage(),
             routes: [
-              _route(
+              materialRoute(
                 path: RoutePaths.profileSetup,
                 name: ProfileSetupPage.name,
                 builder: (_, _) => const ProfileSetupPage(),
@@ -75,12 +71,12 @@ GoRouter appRouter(Ref ref) {
         branches: [
           StatefulShellBranch(
             routes: [
-              _route(
+              materialRoute(
                 path: RoutePaths.home,
                 name: HomePage.name,
                 builder: (_, _) => const HomePage(),
                 routes: [
-                  _route(
+                  materialRoute(
                     path: RoutePaths.categoryStores,
                     name: CategoryStoresPage.name,
                     builder: (_, state) => CategoryStoresPage(categoryId: state.pathParameters['categoryId']!),
@@ -91,12 +87,12 @@ GoRouter appRouter(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              _route(path: RoutePaths.explore, name: ExplorePage.name, builder: (_, _) => const ExplorePage()),
+              materialRoute(path: RoutePaths.explore, name: ExplorePage.name, builder: (_, _) => const ExplorePage()),
             ],
           ),
           StatefulShellBranch(
             routes: [
-              _route(
+              materialRoute(
                 path: RoutePaths.orders,
                 name: OrdersPage.name,
                 builder: (context, _) => OrdersPage(
@@ -108,12 +104,12 @@ GoRouter appRouter(Ref ref) {
           ),
           StatefulShellBranch(
             routes: [
-              _route(
+              materialRoute(
                 path: RoutePaths.profile,
                 name: ProfilePage.name,
                 builder: (_, _) => const ProfilePage(),
                 routes: [
-                  _route(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
+                  materialRoute(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
                 ],
               ),
             ],
@@ -121,7 +117,7 @@ GoRouter appRouter(Ref ref) {
         ],
       ),
       // Pantallas de detalle: a pantalla completa, sobre la barra de navegación.
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.storeDetail,
         name: StoreDetailPage.name,
@@ -132,25 +128,25 @@ GoRouter appRouter(Ref ref) {
           ),
         ),
       ),
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.productDetail,
         name: ProductDetailPage.name,
         builder: (_, state) => ProductDetailPage(productId: state.pathParameters['productId']!),
       ),
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.checkout,
         name: CheckoutPage.name,
         builder: (_, _) => const CheckoutPage(),
       ),
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.orderTracking,
         name: OrderTrackingPage.name,
         builder: (_, state) => OrderTrackingPage(orderId: state.pathParameters['orderId']!),
         routes: [
-          _route(
+          materialRoute(
             parentNavigatorKey: rootNavigatorKey,
             path: RoutePaths.orderHelp,
             name: OrderHelpPage.name,
@@ -158,13 +154,13 @@ GoRouter appRouter(Ref ref) {
           ),
         ],
       ),
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.notifications,
         name: NotificationsPage.name,
         builder: (_, _) => const NotificationsPage(),
       ),
-      _route(
+      materialRoute(
         parentNavigatorKey: rootNavigatorKey,
         path: RoutePaths.addressForm,
         name: AddressFormPage.name,
@@ -204,8 +200,8 @@ CustomTransitionPage<void> _fadeThroughPage(GoRouterState state, Widget child) {
   return CustomTransitionPage<void>(
     key: state.pageKey,
     child: child,
-    transitionDuration: const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 260),
+    transitionDuration: AppMotion.page,
+    reverseTransitionDuration: AppMotion.fadeThroughReverse,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       if (MediaQuery.disableAnimationsOf(context)) return child;
       final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
@@ -216,19 +212,3 @@ CustomTransitionPage<void> _fadeThroughPage(GoRouterState state, Widget child) {
     },
   );
 }
-
-/// Pantalla normal: `MaterialPage` explícita para que use la transición del tema
-/// (go_router, por su cuenta, puede armarla sin transición).
-GoRoute _route({
-  required String path,
-  required String name,
-  required Widget Function(BuildContext context, GoRouterState state) builder,
-  GlobalKey<NavigatorState>? parentNavigatorKey,
-  List<RouteBase> routes = const [],
-}) => GoRoute(
-  path: path,
-  name: name,
-  parentNavigatorKey: parentNavigatorKey,
-  routes: routes,
-  pageBuilder: (context, state) => MaterialPage<void>(key: state.pageKey, name: state.name, child: builder(context, state)),
-);

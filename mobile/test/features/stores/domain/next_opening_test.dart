@@ -1,5 +1,4 @@
 import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
-import 'package:chaski/features/stores/presentation/widgets/store_mappers.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -12,33 +11,35 @@ void main() {
   ]);
 
   test('abre más tarde hoy', () {
-    expect(nextOpeningLabelFor(schedule, tuesday.add(const Duration(hours: 10))), 'Abre hoy a las 18:00');
+    expect(schedule.nextOpeningLabel(tuesday.add(const Duration(hours: 10))), 'Abre hoy a las 6:00 pm');
   });
 
   test('abre mañana si hoy ya cerró', () {
-    expect(nextOpeningLabelFor(schedule, tuesday.add(const Duration(hours: 23))), 'Abre mañana a las 07:00');
+    expect(schedule.nextOpeningLabel(tuesday.add(const Duration(hours: 23))), 'Abre mañana a las 7:00 am');
   });
 
   test('nombra el día si falta más', () {
-    expect(nextOpeningLabelFor(schedule, DateTime(2026, 9, 24, 13)), 'Abre el sábado a las 09:00');
+    expect(schedule.nextOpeningLabel(DateTime(2026, 9, 24, 13)), 'Abre el sábado a las 9:00 am');
+    expect(schedule.opensPhrase(DateTime(2026, 9, 24, 13)), 'el sábado a las 9:00 am');
   });
 
   test('sin horarios no hay próxima apertura', () {
-    expect(nextOpeningLabelFor(const WeeklySchedule([]), tuesday), isNull);
+    expect(const WeeklySchedule([]).nextOpeningLabel(tuesday), isNull);
   });
 
   test('la próxima apertura como fecha para programar', () {
-    expect(nextOpeningAt(schedule, tuesday.add(const Duration(hours: 23))), DateTime(2026, 9, 23, 7));
-    expect(nextOpeningAt(const WeeklySchedule([]), tuesday), isNull);
+    expect(schedule.nextOpeningAt(tuesday.add(const Duration(hours: 23))), DateTime(2026, 9, 23, 7));
+    expect(const WeeklySchedule([]).nextOpeningAt(tuesday), isNull);
   });
 
   test('dice a qué hora cierra si está abierto', () {
-    expect(closingLabelFor(schedule, tuesday.add(const Duration(hours: 19))), 'Cierra 22:00');
-    expect(closingLabelFor(schedule, tuesday.add(const Duration(hours: 10))), isNull);
+    expect(schedule.closingLabel(tuesday.add(const Duration(hours: 19))), 'Cierra 10:00 pm');
+    expect(schedule.closingLabel(tuesday.add(const Duration(hours: 10))), isNull);
+    expect(schedule.isOpenAt(tuesday.add(const Duration(hours: 19))), isTrue);
   });
 
   test('un turno que cruza la medianoche sigue abierto de madrugada', () {
     const night = WeeklySchedule([OpeningHours(dayOfWeek: 2, opensAt: 20 * 60, closesAt: 2 * 60)]);
-    expect(closingLabelFor(night, DateTime(2026, 9, 23, 1)), 'Cierra 02:00');
+    expect(night.closingLabel(DateTime(2026, 9, 23, 1)), 'Cierra 2:00 am');
   });
 }

@@ -184,7 +184,7 @@ class _KnotDot extends StatefulWidget {
 }
 
 class _KnotDotState extends State<_KnotDot> with TickerProviderStateMixin {
-  late final _breath = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
+  late final _breath = AnimationController(vsync: this, duration: AppMotion.breath);
   late final _tie = AnimationController(vsync: this, duration: AppMotion.story, value: 1);
 
   @override

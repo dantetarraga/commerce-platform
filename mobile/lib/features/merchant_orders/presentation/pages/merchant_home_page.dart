@@ -1,4 +1,3 @@
-import 'package:chaski/core/alarm/order_alarm.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
@@ -8,9 +7,8 @@ import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_or
 import 'package:chaski/features/orders/orders_staff.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/partner/partner.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
-import 'package:chaski/shared/widgets/partner_brand.dart';
-import 'package:chaski/shared/widgets/partner_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

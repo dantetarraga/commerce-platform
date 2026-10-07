@@ -14,7 +14,7 @@ enum AppChipVariant {
   suggestion,
 }
 
-/// Chip de Chaski: píldora gris; seleccionada pasa a tinta (contraste máximo)
+/// Chip de Apamuy: píldora gris; seleccionada pasa a tinta (contraste máximo)
 /// y, si es filtro, muestra un check.
 class AppChip extends StatelessWidget {
   const AppChip({

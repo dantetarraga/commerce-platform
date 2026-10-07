@@ -1,3 +1,4 @@
+import 'package:chaski/app/purchase_bar/open_bag.dart';
 import 'package:chaski/app/purchase_bar/purchase_bar_controller.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,13 @@ class PurchaseBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final purchaseBar = ref.watch(purchaseBarControllerProvider);
+    final purchaseBar = ref.watch(purchaseBarProvider);
     return Padding(
       padding: padding,
       child: AppPurchaseBar(
         state: purchaseBar.state,
         pulse: purchaseBar.pulse,
-        onTap: () => ref.read(purchaseBarControllerProvider.notifier).open(context),
+        onTap: () => openPurchaseBar(context, ref),
       ),
     );
   }

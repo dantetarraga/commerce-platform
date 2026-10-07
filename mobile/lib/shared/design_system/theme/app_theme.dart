@@ -5,7 +5,7 @@ import 'package:chaski/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// Tema Chaski claro/oscuro. En oscuro no se invierte: la terracota se aclara y la
+/// Tema de Apamuy claro/oscuro. En oscuro no se invierte: la terracota se aclara y la
 /// elevación se expresa con superficies más claras, no con sombras.
 abstract final class AppTheme {
   static ThemeData light() => _build(

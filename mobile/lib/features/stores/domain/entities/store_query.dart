@@ -3,6 +3,22 @@ import 'package:equatable/equatable.dart';
 
 enum StoreSort { distance, popular, rating }
 
+extension StoreSortLabel on StoreSort {
+  /// Opción en la hoja "Ordenar por": "Cercanía", "Más pedidos"…
+  String get label => switch (this) {
+    StoreSort.distance => 'Cercanía',
+    StoreSort.popular => 'Más pedidos',
+    StoreSort.rating => 'Mejor calificados',
+  };
+
+  /// Dentro de una frase ("Ordenado por cercanía").
+  String get inlineLabel => switch (this) {
+    StoreSort.distance => 'cercanía',
+    StoreSort.popular => 'más pedidos',
+    StoreSort.rating => 'calificación',
+  };
+}
+
 /// Criterios para listar negocios. Es inmutable y comparable por valor, así
 /// sirve directo como parámetro de un provider family.
 final class StoreQuery extends Equatable {

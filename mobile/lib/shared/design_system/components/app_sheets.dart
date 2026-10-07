@@ -13,14 +13,15 @@ enum AppSheetSize {
   full,
 }
 
-/// Abre una hoja inferior de Chaski (radio 24 arriba, asa visible).
+/// Abre una hoja inferior de Apamuy (radio 24 arriba, asa visible).
 /// Carrito, selector de dirección y filtros son hojas: no sacan al usuario de
-/// contexto.
+/// contexto. Con [title] (y opcionalmente [subtitle]) arma un [AppSheetHeader].
 Future<T?> showAppBottomSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
   AppSheetSize size = AppSheetSize.fit,
   String? title,
+  String? subtitle,
   bool useRootNavigator = true,
 }) {
   return showModalBottomSheet<T>(
@@ -33,11 +34,7 @@ Future<T?> showAppBottomSheet<T>(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm),
-              child: Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.headlineSmall)),
-            ),
+          if (title != null) AppSheetHeader(title: title, subtitle: subtitle),
           Flexible(child: builder(context)),
         ],
       );
@@ -54,6 +51,38 @@ Future<T?> showAppBottomSheet<T>(
       };
     },
   );
+}
+
+/// Cabecera de una hoja inferior: título (encabezado) y una bajada opcional
+/// en `bodyMedium` atenuado. Úsala en hojas que arman su propio contenido;
+/// `showAppBottomSheet(title:, subtitle:)` ya la incluye.
+class AppSheetHeader extends StatelessWidget {
+  const AppSheetHeader({required this.title, this.subtitle, this.padding = defaultPadding, super.key});
+
+  static const defaultPadding = EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm);
+
+  final String title;
+  final String? subtitle;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Semantics(header: true, child: Text(title, style: theme.textTheme.headlineSmall)),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppSpacing.xxs),
+            Text(subtitle!, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
 /// Diálogo de confirmación. Solo para decisiones con consecuencias (vaciar la

@@ -168,7 +168,7 @@ class _ToastViewState extends State<_ToastView> with SingleTickerProviderStateMi
           width: 36,
           height: 36,
           decoration: BoxDecoration(color: tone, borderRadius: AppRadius.button),
-          child: Icon(icon, size: 20, color: light ? Colors.white : AppColors.noche),
+          child: Icon(icon, size: 20, color: light ? AppColors.blanco : AppColors.noche),
         );
     if (!reduced && _fresh) {
       // El ícono salta al llegar; si es un error, además se sacude.

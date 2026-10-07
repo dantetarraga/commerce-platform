@@ -1,4 +1,5 @@
 import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/utils/text_utils.dart';
 import 'package:equatable/equatable.dart';
 
 /// Producto tal como aparece en el menú de un negocio. El detalle completo
@@ -62,6 +63,19 @@ final class StoreMenu extends Equatable {
       for (final section in visibleSections)
         for (final item in section.items)
           if (item.isFeatured && item.isAvailable && seen.add(item.id)) item,
+    ];
+  }
+
+  /// Productos cuyo nombre o descripción contienen [query], sin importar
+  /// mayúsculas ni tildes ("aji" encuentra "Ají de gallina"), en el orden de la
+  /// carta y sin repetir. Con [query] vacío, todos.
+  List<MenuItem> search(String query) {
+    final needle = normalizeForSearch(query);
+    final seen = <String>{};
+    return [
+      for (final section in visibleSections)
+        for (final item in section.items)
+          if ((needle.isEmpty || foldAccents('${item.name} ${item.description ?? ''}').contains(needle)) && seen.add(item.id)) item,
     ];
   }
 

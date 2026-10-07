@@ -1,6 +1,10 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/result/result.dart';
+import 'package:chaski/features/orders/domain/payment_method.dart';
 import 'package:equatable/equatable.dart';
+
+export 'order_insights.dart';
+export 'payment_method.dart';
 
 /// Estados del pedido en orden. `cancelled` puede ocurrir antes de `onTheWay`.
 enum OrderStatus {
@@ -17,49 +21,20 @@ enum OrderStatus {
 
   /// Pasos visibles en el seguimiento (sin `cancelled`).
   static const List<OrderStatus> timeline = [received, confirmed, preparing, ready, courierAssigned, onTheWay, delivered];
-}
 
-sealed class PaymentMethod extends Equatable {
-  const PaymentMethod();
+  /// Etapa para la barra de avance de la lista de pedidos (0 a [stageCount] − 1):
+  /// recibido · confirmado · en cocina (preparando o listo) · en camino
+  /// (recogiendo o yendo) · terminado.
+  int get stage => switch (this) {
+    received => 0,
+    confirmed => 1,
+    preparing || ready => 2,
+    courierAssigned || onTheWay => 3,
+    delivered || cancelled => 4,
+  };
 
-  String get label;
-
-  @override
-  List<Object?> get props => [label];
-}
-
-final class YapePayment extends PaymentMethod {
-  const YapePayment();
-
-  @override
-  String get label => 'Yape';
-}
-
-final class PlinPayment extends PaymentMethod {
-  const PlinPayment();
-
-  @override
-  String get label => 'Plin';
-}
-
-/// Efectivo; [changeFor] = con cuánto paga (para llevar el vuelto).
-final class CashPayment extends PaymentMethod {
-  const CashPayment({this.changeFor});
-
-  final Money? changeFor;
-
-  @override
-  String get label => 'Efectivo';
-
-  @override
-  List<Object?> get props => [label, changeFor];
-}
-
-final class CardPayment extends PaymentMethod {
-  const CardPayment();
-
-  @override
-  String get label => 'Tarjeta al recibir';
+  /// Cantidad de etapas de [stage].
+  static const stageCount = 5;
 }
 
 final class OrderLine extends Equatable {
@@ -110,6 +85,9 @@ final class Courier extends Equatable {
   final String? avatarUrl;
 
   String get firstName => name.split(' ').first;
+
+  /// "LQ" para el avatar: iniciales de las dos primeras palabras del nombre.
+  String get initials => name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).take(2).map((p) => p[0].toUpperCase()).join();
 
   @override
   List<Object?> get props => [name, vehicle, since, avatarUrl];

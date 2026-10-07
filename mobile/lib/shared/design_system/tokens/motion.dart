@@ -18,6 +18,27 @@ abstract final class AppMotion {
   /// Onboarding, nudo de confirmación.
   static const story = Duration(milliseconds: 520);
 
+  /// Entrada de una pantalla (transición de página y fundido entre contextos).
+  static const page = Duration(milliseconds: 380);
+
+  /// Regreso de una pantalla con la transición de tarjeta que sube.
+  static const pageReverse = Duration(milliseconds: 280);
+
+  /// Salida del fundido entre contextos (splash → entrada → app).
+  static const fadeThroughReverse = Duration(milliseconds: 260);
+
+  /// Vaivén de error en un campo o formulario.
+  static const shake = Duration(milliseconds: 420);
+
+  /// Ciclo de los bucles cortos: pulso "en vivo", brillo del skeleton, cargador.
+  static const pulse = Duration(milliseconds: 1400);
+
+  /// Respiración de los nudos y celebración de pedido confirmado.
+  static const breath = Duration(milliseconds: 1600);
+
+  /// Bucles lentos de ambiente (punto en vivo de la portada).
+  static const ambient = Duration(milliseconds: 2400);
+
   /// Lo que llega o se asienta.
   static const Curve arrive = Cubic(0.16, 1, 0.3, 1);
 

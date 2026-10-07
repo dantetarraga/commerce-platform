@@ -1,3 +1,4 @@
+import 'package:chaski/core/utils/formatters.dart';
 import 'package:equatable/equatable.dart';
 
 /// Horario de un día. Minutos desde medianoche en hora local de la ciudad;
@@ -42,6 +43,57 @@ final class WeeklySchedule extends Equatable {
     return null;
   }
 
+  /// Fecha y hora de la próxima apertura (para programar un pedido), o `null`
+  /// si no abre en la próxima semana.
+  DateTime? nextOpeningAt(DateTime now) {
+    final next = nextOpening(now);
+    if (next == null) return null;
+    return DateTime(now.year, now.month, now.day + next.inDays, next.opensAt ~/ 60, next.opensAt % 60);
+  }
+
+  /// Minuto del día en que cierra el turno en curso, o `null` si ahora está
+  /// cerrado. Cuenta el turno de ayer que cruzó la medianoche.
+  int? closesAt(DateTime now) {
+    final minutes = now.hour * 60 + now.minute;
+    final today = now.weekday % 7;
+    final yesterday = (today + 6) % 7;
+    for (final h in hours) {
+      final inToday = h.dayOfWeek == today &&
+          (h.crossesMidnight ? minutes >= h.opensAt : minutes >= h.opensAt && minutes < h.closesAt);
+      final fromYesterday = h.dayOfWeek == yesterday && h.crossesMidnight && minutes < h.closesAt;
+      if (inToday || fromYesterday) return h.closesAt;
+    }
+    return null;
+  }
+
+  /// Si según el horario está atendiendo en [now].
+  bool isOpenAt(DateTime now) => closesAt(now) != null;
+
   @override
   List<Object?> get props => [hours];
 }
+
+/// Textos del horario. Una sola forma de decir cuándo abre o cierra un
+/// negocio, en 12 h: "hoy a las 6:00 pm".
+extension WeeklyScheduleLabels on WeeklySchedule {
+  /// Cuándo abre, para ir dentro de una frase: "hoy a las 6:00 pm" ·
+  /// "mañana a las 7:00 am" · "el sábado a las 9:00 am". `null` si no abre
+  /// en la semana.
+  String? opensPhrase(DateTime now) => opensPhraseFor(nextOpeningAt(now), now: now);
+
+  /// "Abre hoy a las 6:00 pm" · "Abre mañana a las 7:00 am".
+  String? nextOpeningLabel(DateTime now) => switch (opensPhrase(now)) {
+    final phrase? => 'Abre $phrase',
+    null => null,
+  };
+
+  /// "Cierra 10:00 pm" si ahora está dentro de un turno; `null` si no.
+  String? closingLabel(DateTime now) => switch (closesAt(now)) {
+    final minutes? => 'Cierra ${Formatters.timeOfDay(minutes)}',
+    null => null,
+  };
+}
+
+/// La frase de apertura a partir de la fecha ya calculada (p. ej.
+/// `StoreSummary.nextOpeningAt`): "hoy a las 6:00 pm". `null` si [at] es `null`.
+String? opensPhraseFor(DateTime? at, {DateTime? now}) => at == null ? null : Formatters.whenPhrase(at, now: now);

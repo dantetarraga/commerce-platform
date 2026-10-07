@@ -7,7 +7,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 part 'order_alarm.g.dart';
 
-/// Alarma de pedidos de Chaski Socios mientras la app está abierta: un tono
+/// Alarma de pedidos de Apamuy Socios mientras la app está abierta: un tono
 /// corto que se repite cada pocos segundos hasta que alguien atiende, y la
 /// pantalla encendida en los modos de trabajo. Con la app cerrada avisa el
 /// push (fase 4).

@@ -21,7 +21,7 @@ class AppLoader extends StatelessWidget {
   final Color dot;
   final String? semanticsLabel;
 
-  static const period = Duration(milliseconds: 1400);
+  static const Duration period = AppMotion.pulse;
 
   @override
   Widget build(BuildContext context) {
