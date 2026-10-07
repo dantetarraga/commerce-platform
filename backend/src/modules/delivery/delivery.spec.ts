@@ -1,5 +1,5 @@
 import { haversineKm } from '../../common/utils/geo';
-import { DeliveryTariff, estimateAfterAccept, estimateDelivery } from './delivery';
+import { DeliveryTariff, estimateAfterAccept, estimateDelivery, estimateOnTheWay } from './delivery';
 
 const tariff: DeliveryTariff = {
   baseDeliveryFee: 250,
@@ -66,5 +66,20 @@ describe('estimateAfterAccept', () => {
     const scheduledFor = new Date('2026-09-25T19:00:00Z');
     const at = estimateAfterAccept({ now, prepMinutes: 10, distanceMeters: 1000, avgSpeedKmh: 20, scheduledFor });
     expect(at).toEqual(scheduledFor);
+  });
+});
+
+describe('estimateOnTheWay', () => {
+  const now = new Date('2026-09-25T17:00:00Z');
+
+  it('ahora + viaje, redondeado a múltiplos de 5', () => {
+    // 4 km a 20 km/h = 12 min → 15.
+    const at = estimateOnTheWay({ now, distanceMeters: 4000, avgSpeedKmh: 20 });
+    expect(at.toISOString()).toBe('2026-09-25T17:15:00.000Z');
+  });
+
+  it('un viaje corto se estima en al menos 5 minutos', () => {
+    const at = estimateOnTheWay({ now, distanceMeters: 300, avgSpeedKmh: 20 });
+    expect(at.toISOString()).toBe('2026-09-25T17:05:00.000Z');
   });
 });

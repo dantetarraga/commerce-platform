@@ -3,7 +3,7 @@ import { AppException, ErrorCode } from '../../../common/exceptions/app.exceptio
 import { PrismaService } from '../../../database/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
 import { CourierStatus, OrderStatus, PaymentMethodType, PaymentStatus, Role } from '../../../generated/prisma/enums';
-import { estimateAfterAccept } from '../../delivery/delivery';
+import { estimateAfterAccept, estimateOnTheWay } from '../../delivery/delivery';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { orderNotice } from '../../notifications/order-notices';
 import { orderInclude, OrderWithDetails } from '../order-presenter';
@@ -85,9 +85,25 @@ export class OrderStatusService {
         'Indica cómo pagó el cliente y cuánto cobraste.',
       );
     }
+    // La hora estimada de creación incluía la preparación; al salir solo queda el viaje.
+    const city =
+      to === OrderStatus.ON_THE_WAY
+        ? await this.prisma.city.findUniqueOrThrow({ where: { id: order.cityId }, select: { avgSpeedKmh: true } })
+        : null;
     await this.prisma.$transaction(async (tx) => {
       const now = new Date();
-      const data = to === OrderStatus.DELIVERED ? { deliveredAt: now } : {};
+      const data =
+        to === OrderStatus.DELIVERED
+          ? { deliveredAt: now }
+          : city
+            ? {
+                estimatedAt: estimateOnTheWay({
+                  now,
+                  distanceMeters: order.distanceMeters,
+                  avgSpeedKmh: city.avgSpeedKmh,
+                }),
+              }
+            : {};
       await this.move(tx, actor, order.id, order.status, to, note, data);
       if (to === OrderStatus.DELIVERED) {
         await tx.payment.updateMany({

@@ -59,8 +59,19 @@ export function estimateAfterAccept(input: {
   avgSpeedKmh: number;
   scheduledFor?: Date | null;
 }): Date {
-  const travelMinutes = (input.distanceMeters / 1000 / input.avgSpeedKmh) * 60;
-  const minutes = Math.ceil((input.prepMinutes + travelMinutes) / 5) * 5;
-  const estimated = new Date(input.now.getTime() + minutes * 60_000);
+  const estimated = after(input.now, input.prepMinutes + travelMinutes(input.distanceMeters, input.avgSpeedKmh));
   return input.scheduledFor && input.scheduledFor > estimated ? input.scheduledFor : estimated;
+}
+
+/** Al salir el repartidor del local solo falta el viaje: ahora + viaje, en múltiplos de 5. */
+export function estimateOnTheWay(input: { now: Date; distanceMeters: number; avgSpeedKmh: number }): Date {
+  return after(input.now, travelMinutes(input.distanceMeters, input.avgSpeedKmh));
+}
+
+const travelMinutes = (distanceMeters: number, avgSpeedKmh: number) => (distanceMeters / 1000 / avgSpeedKmh) * 60;
+
+/** `now` + `minutes` redondeado hacia arriba a múltiplos de 5 (al menos 5). */
+function after(now: Date, minutes: number): Date {
+  const rounded = Math.max(5, Math.ceil(minutes / 5) * 5);
+  return new Date(now.getTime() + rounded * 60_000);
 }

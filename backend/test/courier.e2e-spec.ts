@@ -163,7 +163,16 @@ describe('Chaski Socios: repartidor (e2e)', () => {
 
     const before = await summary(winner);
 
+    // Al salir, la hora estimada pasa a ser solo el viaje desde el local.
+    const leftAt = Date.now();
     await courierStatus(winner, order.id, { status: 'ON_THE_WAY' }).expect(200);
+    const onTheWay = await prisma.order.findUniqueOrThrow({
+      where: { id: order.id },
+      select: { estimatedAt: true, distanceMeters: true, city: { select: { avgSpeedKmh: true } } },
+    });
+    const travel = Math.max(5, Math.ceil(((onTheWay.distanceMeters / 1000 / onTheWay.city.avgSpeedKmh) * 60) / 5) * 5);
+    expect(onTheWay.estimatedAt!.getTime() - leftAt).toBeGreaterThanOrEqual(travel * 60_000 - 1000);
+    expect(onTheWay.estimatedAt!.getTime() - Date.now()).toBeLessThanOrEqual(travel * 60_000);
 
     // Entregar exige decir cómo pagó el cliente y cuánto se cobró.
     const missing = await courierStatus(winner, order.id, { status: 'DELIVERED' }).expect(422);
