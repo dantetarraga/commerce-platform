@@ -1,9 +1,9 @@
 // Local visual review: flutter run -d chrome -t tool/onboarding_preview.dart
 // Add ?theme=dark before #/onboarding to preview the dark palette.
 // Reloading resets only these in-memory preview preferences.
-import 'package:chaski/app/config/app_config_provider.dart';
-import 'package:chaski/app/config/env.dart';
 import 'package:chaski/app/router/app_router.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
+import 'package:chaski/core/config/env.dart';
 import 'package:chaski/core/storage/preferences_storage.dart';
 import 'package:chaski/core/storage/storage_providers.dart';
 import 'package:chaski/shared/design_system/theme/app_theme.dart';

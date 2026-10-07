@@ -4,6 +4,7 @@ import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
 import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_infrastructure.dart';
 
 class MerchantRepositoryImpl implements MerchantRepository {
   const MerchantRepositoryImpl(this._remote);

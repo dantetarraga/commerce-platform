@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/quantity.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/fake/fake_providers.dart';

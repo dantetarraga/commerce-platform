@@ -121,8 +121,9 @@ class CategoryShelf extends ConsumerWidget {
         .map((slug) => all.where((c) => c.slug == slug).firstOrNull)
         .nonNulls
         .firstOrNull;
-    if (featured != null && !main.contains(featured) && main.length == 4)
+    if (featured != null && !main.contains(featured) && main.length == 4) {
       main[3] = featured;
+    }
     return (
       main: main,
       rest: [
@@ -188,8 +189,9 @@ class RepeatRow extends ConsumerWidget {
     final history = ref.watch(ordersHistoryProvider).value ?? const [];
     final times = <String, int>{};
     for (final o in history) {
-      if (o.status == OrderStatus.delivered)
+      if (o.status == OrderStatus.delivered) {
         times[o.store.id] = (times[o.store.id] ?? 0) + 1;
+      }
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,8 +281,9 @@ class PromoCarouselSection extends ConsumerWidget {
     final items = promotions.value;
     final products = ref.watch(localProductsProvider).value ?? const [];
     final lead = products.where((p) => !p.hasChoices).firstOrNull;
-    if (promotions.hasError || (items != null && items.isEmpty && lead == null))
+    if (promotions.hasError || (items != null && items.isEmpty && lead == null)) {
       return const SizedBox.shrink();
+    }
 
     void onTap(Promotion promo) {
       if (promo.storeId != null) {
@@ -757,12 +760,13 @@ Future<void> _repeatOrder(
       storeDetailProvider(order.store.id).future,
     )).summary;
   } on Object {
-    if (context.mounted)
+    if (context.mounted) {
       AppToast.show(
         context,
         'No pudimos cargar ${order.store.name}. Intenta de nuevo.',
         kind: AppToastKind.error,
       );
+    }
     return;
   }
   if (!context.mounted) return;

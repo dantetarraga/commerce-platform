@@ -1,8 +1,8 @@
-import 'package:chaski/app/config/app_config_provider.dart';
-import 'package:chaski/app/config/env.dart';
 import 'package:chaski/app/router/app_router.dart';
 import 'package:chaski/app_partner/router/partner_router.dart';
 import 'package:chaski/core/alarm/order_alarm.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
+import 'package:chaski/core/config/env.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/storage/local_json_store.dart';

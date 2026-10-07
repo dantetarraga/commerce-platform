@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/utils/external_links.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/shared/design_system/design_system.dart';

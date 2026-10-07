@@ -1,7 +1,7 @@
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/notifications/domain/notice.dart';
 import 'package:chaski/features/notifications/presentation/providers/notifications_providers.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/features/stores/stores.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';

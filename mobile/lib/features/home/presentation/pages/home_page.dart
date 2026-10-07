@@ -3,7 +3,7 @@ import 'package:chaski/features/home/presentation/widgets/home_editorial.dart';
 import 'package:chaski/features/home/presentation/widgets/home_header.dart';
 import 'package:chaski/features/home/presentation/widgets/home_sections.dart';
 import 'package:chaski/features/notifications/notifications.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/features/stores/stores.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';

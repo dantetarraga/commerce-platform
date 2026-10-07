@@ -1,5 +1,5 @@
-import 'package:chaski/app/config/theme_mode_provider.dart';
 import 'package:chaski/app/router/app_router.dart';
+import 'package:chaski/core/config/theme_mode_provider.dart';
 import 'package:chaski/shared/design_system/brand/brand_logo.dart';
 import 'package:chaski/shared/design_system/theme/app_theme.dart';
 import 'package:flutter/gestures.dart';

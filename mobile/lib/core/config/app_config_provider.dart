@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/env.dart';
+import 'package:chaski/core/config/env.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_config_provider.g.dart';

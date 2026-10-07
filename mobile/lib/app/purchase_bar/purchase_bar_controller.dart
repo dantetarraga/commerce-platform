@@ -1,7 +1,7 @@
 import 'package:chaski/features/cart/cart.dart';
 import 'package:chaski/features/checkout/checkout.dart';
 import 'package:chaski/features/home/home.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/shared/design_system/components/app_purchase_bar.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';

@@ -5,7 +5,7 @@ import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/presentation/pages/merchant_products_page.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_staff.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';

@@ -1,10 +1,10 @@
-import 'package:chaski/app/config/theme_mode_provider.dart';
+import 'package:chaski/core/config/theme_mode_provider.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/addresses/addresses.dart';
 import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

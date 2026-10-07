@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/phone_number.dart';
 import 'package:chaski/features/auth/infrastructure/datasources/remote/fake_auth_remote_data_source.dart';
 import 'package:chaski/features/auth/presentation/pages/otp_page.dart';

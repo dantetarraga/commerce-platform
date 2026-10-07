@@ -306,13 +306,14 @@ class _StoreLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (url != null)
+    if (url != null) {
       return AppAvatar(
         imageUrl: url,
         variant: AppAvatarVariant.store,
         size: size,
         fallbackIcon: Icons.storefront_rounded,
       );
+    }
     return ExcludeSemantics(
       child: Container(
         width: size,

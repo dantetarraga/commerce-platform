@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/network/network_providers.dart';

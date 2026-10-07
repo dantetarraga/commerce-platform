@@ -11,7 +11,7 @@ import 'package:chaski/features/checkout/presentation/widgets/payment_sheet.dart
 import 'package:chaski/features/checkout/presentation/widgets/schedule_sheet.dart';
 import 'package:chaski/features/checkout/presentation/widgets/tip_selector.dart';
 import 'package:chaski/features/home/home.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

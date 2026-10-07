@@ -1,5 +1,5 @@
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_infrastructure.dart';
 
 /// Mapeo JSON → entidades de `merchant/*`.
 abstract final class MerchantJson {

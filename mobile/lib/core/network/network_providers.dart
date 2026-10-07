@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/core/network/interceptors/auth_interceptor.dart';
 import 'package:chaski/core/network/interceptors/request_id_interceptor.dart';

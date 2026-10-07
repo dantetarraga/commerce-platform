@@ -9,7 +9,7 @@ import 'package:chaski/features/favorites/favorites.dart';
 import 'package:chaski/features/home/home.dart';
 import 'package:chaski/features/notifications/notifications.dart';
 import 'package:chaski/features/onboarding/onboarding.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_customer.dart';
 import 'package:chaski/features/products/products.dart';
 import 'package:chaski/features/profile/profile.dart';
 import 'package:chaski/features/stores/stores.dart';

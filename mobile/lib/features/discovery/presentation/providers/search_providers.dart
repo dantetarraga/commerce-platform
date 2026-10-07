@@ -1,4 +1,4 @@
-import 'package:chaski/app/config/app_config_provider.dart';
+import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/core/network/network_providers.dart';

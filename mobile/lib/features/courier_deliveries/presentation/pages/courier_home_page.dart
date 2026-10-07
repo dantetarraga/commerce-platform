@@ -4,7 +4,7 @@ import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/presentation/pages/active_delivery_page.dart';
 import 'package:chaski/features/courier_deliveries/presentation/providers/courier_providers.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/orders/orders_staff.dart';
 import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
