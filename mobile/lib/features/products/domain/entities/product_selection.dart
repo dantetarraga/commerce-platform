@@ -3,10 +3,8 @@ import 'package:chaski/core/domain/quantity.dart';
 import 'package:chaski/features/products/domain/entities/product.dart';
 import 'package:equatable/equatable.dart';
 
-/// Lo que el usuario está armando en el detalle de producto: variante,
-/// opciones, cantidad y notas. Es inmutable: cada cambio devuelve una copia.
-///
-/// El precio que calcula es orientativo; el backend recalcula siempre.
+/// Lo que se arma en el detalle de producto; inmutable. El precio que calcula
+/// es orientativo: el backend recalcula siempre.
 final class ProductSelection extends Equatable {
   const ProductSelection._({
     required this.product,
@@ -78,7 +76,6 @@ final class ProductSelection extends Equatable {
     return _copyWith(notes: trimmed);
   }
 
-  /// Grupos obligatorios que todavía no alcanzan su mínimo.
   List<ProductOption> get missingRequiredOptions =>
       product.options.where((o) => selectedIn(o.id).length < o.minSelect).toList();
 

@@ -66,7 +66,6 @@ final class WeeklySchedule extends Equatable {
     return null;
   }
 
-  /// Si según el horario está atendiendo en [now].
   bool isOpenAt(DateTime now) => closesAt(now) != null;
 
   @override
@@ -76,9 +75,8 @@ final class WeeklySchedule extends Equatable {
 /// Textos del horario. Una sola forma de decir cuándo abre o cierra un
 /// negocio, en 12 h: "hoy a las 6:00 pm".
 extension WeeklyScheduleLabels on WeeklySchedule {
-  /// Cuándo abre, para ir dentro de una frase: "hoy a las 6:00 pm" ·
-  /// "mañana a las 7:00 am" · "el sábado a las 9:00 am". `null` si no abre
-  /// en la semana.
+  /// Cuándo abre, dentro de una frase: "hoy a las 6:00 pm" · "el sábado a las
+  /// 9:00 am". `null` si no abre en la semana.
   String? opensPhrase(DateTime now) => opensPhraseFor(nextOpeningAt(now), now: now);
 
   /// "Abre hoy a las 6:00 pm" · "Abre mañana a las 7:00 am".

@@ -36,10 +36,8 @@ class AppSkeletonizer extends StatelessWidget {
   }
 }
 
-/// Envuelve un árbol de [SkeletonBox] con el barrido de la marca. Solo se
-/// sombrean los bloques; el resto (tarjetas, separadores) queda igual.
-/// Regla: el skeleton reproduce la geometría exacta de la pantalla real, así
-/// el crossfade a los datos no produce saltos.
+/// Envuelve un árbol de [SkeletonBox] con el barrido de la marca. Debe reproducir
+/// la geometría exacta de la pantalla real, así el crossfade no salta.
 class Skeleton extends StatelessWidget {
   const Skeleton({required this.child, super.key});
 

@@ -21,8 +21,7 @@ CartRepository cartRepository(Ref ref) => CartRepositoryImpl(
       : ApiCouponRemoteDataSource(ref.watch(apiClientProvider)),
 );
 
-/// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
-/// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)
+/// La bolsa del usuario; cada cambio se guarda en el dispositivo. La lógica
 /// vive en [Cart]; aquí solo se orquesta y persiste.
 @Riverpod(keepAlive: true)
 class CartController extends _$CartController {
@@ -84,7 +83,6 @@ class CartController extends _$CartController {
 
   Future<void> removeCoupon() => _commit(_cart.removeCoupon());
 
-  /// Nota general para el negocio.
   Future<void> setNote(String note) => _commit(_cart.setNote(note));
 
   Future<void> clear() => _commit(Cart.empty);

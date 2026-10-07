@@ -36,7 +36,6 @@ final class TooLong extends ValueFailure {
   List<Object?> get props => [max];
 }
 
-/// Código de verificación con formato inválido.
 final class InvalidOtp extends ValueFailure {
   const InvalidOtp();
 }

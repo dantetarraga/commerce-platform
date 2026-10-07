@@ -2,7 +2,6 @@ import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/result/result.dart';
 
-/// Convierte excepciones de infraestructura en `Failure`.
 Failure mapExceptionToFailure(Object error) {
   return switch (error) {
     NetworkException() => const NetworkFailure(),

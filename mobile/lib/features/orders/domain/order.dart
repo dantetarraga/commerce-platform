@@ -22,9 +22,7 @@ enum OrderStatus {
   /// Pasos visibles en el seguimiento (sin `cancelled`).
   static const List<OrderStatus> timeline = [received, confirmed, preparing, ready, courierAssigned, onTheWay, delivered];
 
-  /// Etapa para la barra de avance de la lista de pedidos (0 a [stageCount] − 1):
-  /// recibido · confirmado · en cocina (preparando o listo) · en camino
-  /// (recogiendo o yendo) · terminado.
+  /// Etapa para la barra de avance de la lista de pedidos (0 a [stageCount] − 1).
   int get stage => switch (this) {
     received => 0,
     confirmed => 1,

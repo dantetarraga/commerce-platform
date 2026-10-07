@@ -14,7 +14,7 @@ La **app Apamuy Socios** (negocio y repartidor) ya opera pedidos contra la API. 
 
 | Parte | Listo | Falta |
 |---|---|---|
-| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). **Apamuy Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 158 tests | Ubicación real (GPS/mapa), editar perfil, push |
+| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). **Apamuy Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 277 tests | Ubicación real (GPS/mapa), editar perfil, push |
 | Backend (`backend/`) | Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; 76 unit + 73 e2e | Alta de socios por admin, CRUD de catálogo, push, imágenes |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker + APK de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
 | Repo | `feat/backend-fase-1` ya se integró a `main` y se borró. Todo commiteado | Push de `main` (los commits de Apamuy Socios están solo en local) |
@@ -36,6 +36,7 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 
 | Pendiente | Detalle |
 |---|---|
+| `nextOpeningAt` | La app ya lo lee en el resumen y el detalle del negocio (`GET /stores`, `/stores/:id`, ISO 8601) para decir cuándo abre un negocio cerrado; sin él no lo muestra |
 | CRUD de catálogo | Para sumar negocios, productos, horarios y promociones sin tocar el seed |
 | Push (FCM) | Los avisos in-app ya se crean en cada cambio de estado; falta enviarlos como push (tabla `Device` lista) |
 | Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |

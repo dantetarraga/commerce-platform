@@ -1,16 +1,8 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// App bar con foto de portada. El título aparece solo al colapsar; los
-/// botones van en círculos blancos para leerse sobre cualquier foto.
-///
-/// Abajo, la hoja blanca (radio 24) sube sobre la foto; [edge] se monta sobre
-/// ese borde (p. ej. el logo del negocio). Ambos se desvanecen al colapsar.
-///
-/// La portada hace parallax al hacer scroll y se agranda al estirar (iOS).
-/// Con [ImageSliverAppBar.loading] dibuja la misma geometría: si ya se conoce
-/// la portada (viene de la card) la muestra al instante; si no, shimmer.
-/// Con [heroTag], la foto vuela desde la card de origen.
+/// App bar con foto de portada: el título aparece al colapsar y [edge] se monta
+/// sobre el borde de la hoja. [ImageSliverAppBar.loading] dibuja la misma geometría.
 class ImageSliverAppBar extends StatelessWidget {
   const ImageSliverAppBar({
     required this.title,

@@ -1,4 +1,4 @@
-/// Paths de Chaski Socios. Para navegar se usa `context.goNamed(Page.name)`.
+/// Paths de Apamuy Socios. Para navegar se usa `context.goNamed(Page.name)`.
 abstract final class PartnerRoutePaths {
   static const splash = '/splash';
 

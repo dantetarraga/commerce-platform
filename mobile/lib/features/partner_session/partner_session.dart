@@ -1,5 +1,4 @@
-/// API pública del feature `partner_session`: quién es socio y en qué modo
-/// usa Apamuy Socios.
+/// API pública del feature `partner_session`: quién es socio y en qué modo entra.
 library;
 
 export 'domain/partner_mode.dart' show PartnerMode, availablePartnerModes, resolvePartnerMode;

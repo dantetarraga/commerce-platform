@@ -37,10 +37,8 @@ final class OrderAlarmRule<T> {
   }
 }
 
-/// Maneja la [OrderAlarm] de una pantalla de trabajo: aplica la regla a cada
-/// lista nueva, enciende o apaga la pantalla sin repetir llamadas y, al salir,
-/// calla el tono y deja que la pantalla se apague. Lo normal es usarlo a través
-/// de [OrderAlarmScope].
+/// Maneja la [OrderAlarm] de una pantalla de trabajo; lo normal es usarlo a
+/// través de [OrderAlarmScope].
 class OrderAlarmController {
   OrderAlarmController(this._alarm);
 
@@ -49,7 +47,6 @@ class OrderAlarmController {
   bool? _awake;
   var _ringing = false;
 
-  /// Si el tono está sonando.
   bool get isRinging => _ringing;
 
   /// Aplica [rule] a la lista actual de pedidos.
@@ -66,8 +63,7 @@ class OrderAlarmController {
     }
   }
 
-  /// Pantalla siempre encendida mientras se trabaja. Solo llama a la alarma
-  /// si el valor cambia.
+  /// Pantalla siempre encendida mientras se trabaja; solo llama a la alarma si cambia.
   void keepAwake({required bool on}) {
     if (_awake == on) return;
     _awake = on;
@@ -92,18 +88,8 @@ OrderAlarmController orderAlarmController(Ref ref) {
   return controller;
 }
 
-/// Pone la alarma de pedidos alrededor de una pantalla de trabajo, en una línea:
-///
-/// ```dart
-/// OrderAlarmScope(
-///   orders: merchantActiveOrdersProvider,
-///   rule: OrderAlarmRule.whilePending((o) => o.status == OrderStatus.received),
-///   child: ...,
-/// )
-/// ```
-///
-/// Escucha [orders] desde que se monta (sin efectos dentro de `build`), mantiene
-/// la pantalla encendida según [keepAwake] y al desmontarse calla todo.
+/// Pone la alarma de pedidos alrededor de una pantalla de trabajo: escucha [orders]
+/// desde que se monta (sin efectos en `build`) y al desmontarse calla todo.
 class OrderAlarmScope<T> extends ConsumerStatefulWidget {
   const OrderAlarmScope({required this.orders, required this.rule, required this.child, this.keepAwake = true, super.key});
 

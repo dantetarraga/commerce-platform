@@ -3,14 +3,8 @@ import 'dart:async';
 import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 
-/// Backend fake de Chaski Socios: los pedidos que ven el negocio y el
-/// repartidor, en memoria y compartidos entre ambos modos (lo que el negocio
-/// marca listo aparece como disponible para el repartidor).
-///
-/// Devuelve el mismo JSON que `merchant/*` y `courier/*` (ver
-/// `docs/OPERACION.md` §7) y lanza las mismas `ApiException`. Cada
-/// [newOrderEvery] entra un pedido nuevo al negocio demo, para que suene la
-/// alarma.
+/// Backend fake de Apamuy Socios: pedidos de negocio y repartidor compartidos en
+/// memoria, con el JSON de `merchant/*` y `courier/*`. Cada [newOrderEvery] entra uno.
 class FakeStaffOrders {
   FakeStaffOrders(this._backend, {this.newOrderEvery = const Duration(seconds: 45)});
 
@@ -169,8 +163,6 @@ class FakeStaffOrders {
     details: {'from': order['status'], 'to': to},
   );
 
-  // ─────────────── Negocio ───────────────
-
   Future<List<Map<String, dynamic>>> merchantStores() async {
     await _backend.delay();
     await _ready();
@@ -263,8 +255,6 @@ class FakeStaffOrders {
       'sales': _backend.money(delivered.fold<int>(0, (sum, o) => sum + ((o['subtotal'] as Map)['amount'] as int))),
     };
   }
-
-  // ─────────────── Repartidor ───────────────
 
   Map<String, dynamic>? get _activeDelivery => _orders.values
       .where((o) => o['_courierId'] == _courierId && (o['status'] == 'COURIER_ASSIGNED' || o['status'] == 'ON_THE_WAY'))

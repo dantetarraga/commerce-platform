@@ -39,12 +39,7 @@ class AppGroupedCard extends StatelessWidget {
 }
 
 /// Fila de lista agrupada: ícono, título, subtítulo opcional, [trailing] y
-/// chevron. Mide al menos 56 (48 en [AppGroupedRow.link]).
-///
-/// - Por defecto el ícono va en un círculo gris (`chaski.raised`) y el título
-///   en `titleSmall`, como las filas del perfil.
-/// - [AppGroupedRow.link] es la versión suelta: ícono sin círculo, título en
-///   `labelLarge` ("¿Problema con un pedido anterior?").
+/// chevron. Mide al menos 56 (48 en [AppGroupedRow.link], la versión suelta).
 class AppGroupedRow extends StatelessWidget {
   const AppGroupedRow({
     required this.icon,

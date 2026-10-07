@@ -7,9 +7,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Arranque mientras se restaura la sesión: entrada (la "a" atrapa el pedido),
-/// relevo si la sesión tarda y salida (el pedido cubre la pantalla). La "a"
-/// queda donde la deja el arranque nativo. Al terminar abre [splashGateProvider].
+/// Arranque mientras se restaura la sesión: entrada, relevo si tarda y salida.
+/// Al terminar abre [splashGateProvider].
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 

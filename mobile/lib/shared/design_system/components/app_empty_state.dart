@@ -11,13 +11,10 @@ enum AppEmptyKind {
   /// Búsqueda sin coincidencias.
   noResults,
 
-  /// Sin conexión.
   offline,
 
-  /// Algo falló.
   error,
 
-  /// Listo / confirmado.
   success,
 }
 

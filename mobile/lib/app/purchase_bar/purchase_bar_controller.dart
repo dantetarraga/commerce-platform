@@ -9,9 +9,8 @@ part 'purchase_bar_controller.g.dart';
 /// Lo que la barra de compra muestra + un contador para hacer "saltar" el nudo.
 typedef PurchaseBarView = ({PurchaseBarState state, int pulse});
 
-/// Traduce la bolsa y el pedido en curso a la forma de la barra de compra. El pedido
-/// activo tiene prioridad sobre la bolsa; uno entregado y ya calificado deja
-/// de mostrarse. Abrirla es cosa de la UI: ver `openPurchaseBar`.
+/// Traduce la bolsa y el pedido en curso a la barra de compra. El pedido activo
+/// tiene prioridad; uno entregado y ya calificado deja de mostrarse.
 @Riverpod(keepAlive: true)
 PurchaseBarView purchaseBar(Ref ref) {
   final cart = ref.watch(cartControllerProvider).value ?? Cart.empty;
@@ -19,9 +18,8 @@ PurchaseBarView purchaseBar(Ref ref) {
   return (state: purchaseBarStateFor(cart, order, DateTime.now()), pulse: ref.watch(purchaseBarPulseProvider));
 }
 
-/// Cuenta las veces que la bolsa recibió algo nuevo: el nudo de la barra salta
-/// cada vez que cambia. Escucha la bolsa en vez de compararla dentro de un
-/// `build`, así recalcular la barra no tiene efectos secundarios.
+/// Cuenta las veces que la bolsa recibió algo nuevo (el nudo salta). Escucha la
+/// bolsa en vez de compararla en un `build`, así recalcular la barra no tiene efectos.
 @Riverpod(keepAlive: true)
 class PurchaseBarPulse extends _$PurchaseBarPulse {
   @override
@@ -33,7 +31,6 @@ class PurchaseBarPulse extends _$PurchaseBarPulse {
   }
 }
 
-/// Estado de la barra para [cart] y el pedido en curso [order].
 PurchaseBarState purchaseBarStateFor(Cart cart, Order? order, DateTime now) {
   if (order != null && order.status != OrderStatus.cancelled && !(order.status == OrderStatus.delivered && order.rating != null)) {
     final minutes = order.minutesLeft(now);

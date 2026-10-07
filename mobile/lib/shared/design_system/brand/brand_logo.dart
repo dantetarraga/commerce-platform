@@ -2,7 +2,6 @@ import 'package:chaski/shared/design_system/tokens/app_colors.dart';
 import 'package:chaski/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
-/// Nombre de la marca tal como lo ve el usuario.
 const brandName = 'Apamuy';
 
 /// Logo de Apamuy: la "a" de una sola panza con el pedido (punto verde) adentro,
@@ -67,9 +66,8 @@ class BrandMark extends StatelessWidget {
   );
 }
 
-/// Dibuja la "a" sobre una grilla de 100 × 100: panza de radio 26 con hueco de 13,
-/// palito redondeado a la derecha y el pedido (radio 7) en el centro del hueco.
-/// [dotOffset] y [dotScale] mueven el pedido (lo usa la animación de arranque).
+/// Dibuja la "a" sobre una grilla de 100 × 100. [dotOffset] y [dotScale] mueven
+/// el pedido (lo usa la animación de arranque).
 class BrandMarkPainter extends CustomPainter {
   const BrandMarkPainter({
     required this.body,

@@ -11,9 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Portada del inicio: dirección y avisos, saludo, titular, la comida en
-/// círculo y el buscador montado sobre el borde. Al hacer scroll se compacta en
-/// una barra. Con un pedido en curso ([compactOnly]) solo muestra la barra.
+/// Portada del inicio; al hacer scroll se compacta en una barra. Con un pedido
+/// en curso ([compactOnly]) solo muestra la barra.
 class HomeHeader extends StatelessWidget {
   const HomeHeader({this.compactOnly = false, this.onHelp, super.key});
 

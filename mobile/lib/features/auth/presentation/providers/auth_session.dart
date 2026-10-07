@@ -5,11 +5,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_session.g.dart';
 
-/// Sesión actual de la app.
-///
-/// - `AsyncLoading`: restaurando la sesión al arrancar (se muestra el splash).
-/// - `AsyncData(null)`: sin sesión.
-/// - `AsyncData(user)`: autenticado.
+/// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
+/// `AsyncData(user)` autenticado.
 @Riverpod(keepAlive: true)
 class AuthSession extends _$AuthSession {
   @override

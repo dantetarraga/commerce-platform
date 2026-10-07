@@ -3,9 +3,8 @@ import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Renderiza los cuatro estados de una carga de forma uniforme:
-/// loading (skeleton), error (con reintentar), empty y data. El cambio entre
-/// estados es un crossfade, no un corte seco.
+/// Los cuatro estados de una carga (skeleton, error con reintentar, vacío y datos),
+/// con crossfade entre ellos.
 class AsyncValueView<T> extends StatelessWidget {
   const AsyncValueView({
     required this.value,

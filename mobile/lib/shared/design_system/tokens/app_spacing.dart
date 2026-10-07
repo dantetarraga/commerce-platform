@@ -60,9 +60,8 @@ abstract final class AppRadius {
   /// Portadas: solo las esquinas inferiores, con la de salida corta.
   static const hero = BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(36));
 
-  /// Esquina de salida a medida: tres esquinas de radio [r] y la inferior
-  /// izquierda corta. Por defecto la corta mide ~30 % de [r] (10 → 3, 16 → 5,
-  /// 18 → 5); [cut] la fija a mano.
+  /// Esquina de salida a medida: tres esquinas de radio [r] y la inferior izquierda
+  /// corta (~30 % de [r] por defecto; [cut] la fija a mano).
   static BorderRadius exit(double r, {double? cut}) {
     final big = Radius.circular(r);
     return BorderRadius.only(

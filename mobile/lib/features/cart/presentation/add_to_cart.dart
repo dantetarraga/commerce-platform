@@ -8,11 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Flujo único para agregar a la bolsa desde cualquier pantalla: resuelve el
-/// conflicto de negocio (preguntando), vibra y confirma con un aviso. La barra de compra
-/// hace saltar su nudo sola al ver crecer la bolsa.
-///
-/// Devuelve `true` si el producto quedó en la bolsa.
+/// Agrega a la bolsa desde cualquier pantalla: resuelve el conflicto de negocio
+/// preguntando, vibra y avisa. `true` si el producto quedó en la bolsa.
 Future<bool> addToCart(BuildContext context, WidgetRef ref, {required CartLine line, required CartStore store}) async {
   final controller = ref.read(cartControllerProvider.notifier);
   final result = await controller.add(line, store);

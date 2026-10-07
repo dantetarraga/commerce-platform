@@ -17,14 +17,8 @@ enum AmountRowKind {
   total,
 }
 
-/// Fila de monto: etiqueta a la izquierda y monto a la derecha con
-/// [Formatters.money] y cifras tabulares (las columnas se alinean).
-///
-/// Con [leader] la separación es la línea punteada de la boleta
-/// ([LeaderRow]); úsalo solo dentro de un ticket. Con [freeLabel], un monto
-/// cero se muestra como ese texto en verde ("Gratis").
-///
-/// Se lee como una sola frase: "Envío, 3 soles".
+/// Fila de monto con cifras tabulares. Con [leader] usa la línea punteada de la
+/// boleta (solo dentro de un ticket); con [freeLabel], el cero se muestra como ese texto.
 class AmountRow extends StatelessWidget {
   const AmountRow({
     required this.label,
@@ -37,7 +31,6 @@ class AmountRow extends StatelessWidget {
     super.key,
   });
 
-  /// Atajo para [AmountRowKind.discount].
   const AmountRow.discount({
     required this.label,
     required this.amount,
@@ -48,7 +41,6 @@ class AmountRow extends StatelessWidget {
   }) : kind = AmountRowKind.discount,
        freeLabel = null;
 
-  /// Atajo para [AmountRowKind.total].
   const AmountRow.total({
     required this.label,
     required this.amount,

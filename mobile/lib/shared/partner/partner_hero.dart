@@ -4,8 +4,7 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Portada a todo el ancho de Apamuy Socios: etiqueta, saludo, titular con su
-/// remate en terracota y la foto o el avatar en círculo. [pill] monta el borde
-/// inferior.
+/// remate en terracota y la foto. [pill] monta el borde inferior.
 class PartnerHero extends StatelessWidget {
   /// [subtitle] se prepara una sola vez aquí (el "S/" no se separa del monto
   /// al partir la línea), no en cada `build`.

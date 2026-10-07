@@ -3,11 +3,8 @@ import 'dart:math' as math;
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Plano del barrio que se arrastra bajo un pin fijo al centro ("mueve el
-/// mapa hasta tu puerta"). Al cambiar [seed] (la calle escrita) el plano se
-/// desplaza a un punto estable para esa calle y el pin vuelve a caer.
-///
-/// Da respuesta visual inmediata mientras no haya un mapa real integrado.
+/// Plano del barrio que se arrastra bajo un pin fijo, mientras no haya mapa real.
+/// Al cambiar [seed] (la calle) salta a un punto estable y el pin vuelve a caer.
 class NeighborhoodPlan extends StatefulWidget {
   const NeighborhoodPlan({required this.seed, this.height = 170, this.onMoved, this.hint, super.key});
 

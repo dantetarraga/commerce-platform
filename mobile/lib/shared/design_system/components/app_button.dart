@@ -24,14 +24,8 @@ enum AppButtonVariant {
 
 enum AppButtonSize { lg, md, sm }
 
-/// Botón de Apamuy: esquina de salida ([AppRadius.button]) en todas las
-/// variantes (no son píldoras). `primary` es terracota; `secondary` es gris
-/// neutro con texto tinta, para no competir con la acción principal; `ink` es
-/// un bloque de tinta para las acciones de trabajo de los socios.
-///
-/// [trailing] se muestra a la derecha, separado del texto (p. ej. el total en
-/// "Agregar · S/ 15.50"). Con [loading] el contenido cruza a un indicador sin
-/// cambiar el tamaño del botón.
+/// Botón de Apamuy con esquina de salida ([AppRadius.button]), no píldora. Con
+/// [loading] el contenido cruza a un indicador sin cambiar el tamaño del botón.
 class AppButton extends StatelessWidget {
   const AppButton({
     required this.label,
@@ -82,7 +76,6 @@ class AppButton extends StatelessWidget {
     super.key,
   }) : variant = AppButtonVariant.danger;
 
-  /// Bloque de tinta (en oscuro se invierte a `onSurface`).
   const AppButton.ink({
     required this.label,
     required this.onPressed,

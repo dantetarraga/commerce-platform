@@ -41,7 +41,6 @@ class CheckoutController extends _$CheckoutController {
 
   @override
   CheckoutState build() {
-    // Precarga el último método de pago usado.
     ref.read(checkoutPreferencesProvider).lastPayment().then((kind) {
       if (kind != null && ref.mounted && state.draft.paymentKind == null) {
         state = state.copyWith(draft: state.draft.copyWith(paymentKind: kind));

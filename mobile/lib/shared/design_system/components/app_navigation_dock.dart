@@ -2,11 +2,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Barra inferior clásica: Inicio · Buscar · Pedidos · Bolsa · Tú, con ícono y etiqueta
-/// siempre visibles. La pestaña activa lleva detrás del ícono un indicador con la esquina
-/// de salida de Apamuy. "Bolsa" no es una rama: abre la bolsa y muestra su contador.
-///
-/// [index] y [onSelected] usan el índice de rama (0 inicio, 1 buscar, 2 pedidos, 3 tú).
+/// Barra inferior clásica, con ícono y etiqueta siempre visibles. "Bolsa" no es
+/// una rama: abre la bolsa. [index] es de rama (0 inicio, 1 buscar, 2 pedidos, 3 tú).
 class AppNavigationDock extends StatelessWidget {
   const AppNavigationDock({
     required this.index,

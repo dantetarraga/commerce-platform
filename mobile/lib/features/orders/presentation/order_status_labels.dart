@@ -1,8 +1,6 @@
 import 'package:chaski/features/orders/domain/order.dart';
 
-/// Etiquetas de estado de un pedido para la UI, en un solo lugar. Las usan el
-/// seguimiento, la lista de pedidos, la ayuda, la portada del inicio y las
-/// pantallas de los socios.
+/// Etiquetas de estado de un pedido para la UI, en un solo lugar.
 extension OrderStatusLabels on OrderStatus {
   /// Etiqueta viva en mayúsculas: "EN CAMINO".
   String get tag => switch (this) {

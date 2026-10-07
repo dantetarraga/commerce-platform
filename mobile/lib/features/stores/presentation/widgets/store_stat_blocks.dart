@@ -91,7 +91,6 @@ class _StatBlock extends StatelessWidget {
   );
 }
 
-/// Los tres bloques con su fondo, mientras carga.
 class StoreStatBlocksSkeleton extends StatelessWidget {
   const StoreStatBlocksSkeleton({super.key});
 

@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Negocios y productos guardados como favoritos.
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
 

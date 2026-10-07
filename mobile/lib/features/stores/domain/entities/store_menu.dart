@@ -25,7 +25,6 @@ final class MenuItem extends Equatable {
   final Money price;
   final bool isAvailable;
 
-  /// Tiene variantes u opciones para elegir.
   final bool hasChoices;
 
   /// "Lo más pedido" del negocio.
@@ -51,7 +50,6 @@ final class StoreMenu extends Equatable {
 
   final List<MenuSection> sections;
 
-  /// Secciones con al menos un producto.
   List<MenuSection> get visibleSections => sections.where((s) => s.items.isNotEmpty).toList();
 
   bool get isEmpty => visibleSections.isEmpty;
@@ -66,9 +64,8 @@ final class StoreMenu extends Equatable {
     ];
   }
 
-  /// Productos cuyo nombre o descripción contienen [query], sin importar
-  /// mayúsculas ni tildes ("aji" encuentra "Ají de gallina"), en el orden de la
-  /// carta y sin repetir. Con [query] vacío, todos.
+  /// Busca en nombre y descripción sin importar mayúsculas ni tildes ("aji" →
+  /// "Ají de gallina"), en el orden de la carta y sin repetir. Vacío: todos.
   List<MenuItem> search(String query) {
     final needle = normalizeForSearch(query);
     final seen = <String>{};

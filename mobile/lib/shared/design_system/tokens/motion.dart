@@ -58,9 +58,8 @@ bool reduceMotionOf(BuildContext context) =>
 
 final _firstSeen = Expando<DateTime>();
 
-/// Ventana corta tras la primera vez que se pinta [data]. Sirve para animar la
-/// entrada escalonada de una lista solo cuando llegan los datos, y no cada vez
-/// que un ítem vuelve a construirse al hacer scroll.
+/// Ventana corta tras la primera vez que se pinta [data]: anima la entrada de una
+/// lista solo al llegar los datos, no en cada rebuild por scroll.
 bool entranceWindowOpen(Object data, {Duration window = const Duration(milliseconds: 700)}) {
   final seen = _firstSeen[data] ??= DateTime.now();
   return DateTime.now().difference(seen) < window;

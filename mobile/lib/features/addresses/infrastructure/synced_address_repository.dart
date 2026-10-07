@@ -3,14 +3,9 @@ import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/core/storage/local_json_store.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 
-/// Direcciones local primero, sincronizadas con `/users/me/addresses`.
-///
-/// - Se guarda siempre en el dispositivo y después se sube la libreta
-///   entera; sin red, la app sigue funcionando con lo local.
-/// - Al cargar: si el servidor tiene direcciones, mandan esas; si está vacío,
-///   se suben las locales (p. ej. la primera vez tras actualizar la app).
-/// - La caché recuerda de quién es: en un teléfono compartido, las
-///   direcciones de una persona nunca se suben a la cuenta de otra.
+/// Local primero, sincronizado con `/users/me/addresses`: se guarda en el dispositivo
+/// y se sube la libreta entera. Al cargar manda el servidor, salvo que esté vacío.
+/// La caché recuerda de quién es, para no subirla a otra cuenta en un teléfono compartido.
 class SyncedAddressRepository implements AddressRepository {
   SyncedAddressRepository({
     required AddressRepository local,

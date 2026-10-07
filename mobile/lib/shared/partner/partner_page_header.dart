@@ -1,22 +1,8 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Cabecera de color de las pantallas de trabajo de Apamuy Socios: volver
-/// (48 px), etiqueta en mayúsculas, titular display con su remate en terracota
-/// y, a la derecha, una métrica ("Entrega a · 850 m") o lo que se pase en
-/// [trailing].
-///
-/// ```dart
-/// PartnerPageHeader(
-///   eyebrow: 'RECORRIDO 3104 · PASO 1 DE 2',
-///   title: 'Recógelo, ',
-///   accent: 'al toque.',
-///   metricLabel: 'Entrega a',
-///   metric: '850 m',
-/// )
-/// ```
-///
-/// Con [skeleton] dibuja el mismo alto con cajas de carga.
+/// Cabecera de color de las pantallas de trabajo de Apamuy Socios: volver, etiqueta,
+/// titular con su remate en terracota y una métrica o [trailing] a la derecha.
 class PartnerPageHeader extends StatelessWidget {
   const PartnerPageHeader({
     required this.eyebrow,

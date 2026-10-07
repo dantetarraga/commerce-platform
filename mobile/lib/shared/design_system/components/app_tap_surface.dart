@@ -2,22 +2,8 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// Superficie tocable: el patrón de los mosaicos y tarjetas de portada en una
-/// pieza. Semántica de botón, escala leve al presionar ([PressableScale]),
-/// fondo [color] con radio [borderRadius] y onda recortada a esa forma.
-///
-/// Con [semanticLabel] el lector de pantalla lee solo esa frase (el contenido
-/// se excluye); sin él, lee los textos del hijo como un único botón.
-///
-/// ```dart
-/// AppTapSurface(
-///   semanticLabel: 'Explorar Farmacias',
-///   color: context.chaski.card,
-///   borderRadius: AppRadius.tileExit,
-///   onTap: open,
-///   child: SizedBox(height: 120, child: tile),
-/// )
-/// ```
+/// Superficie tocable de mosaicos y tarjetas: semántica de botón, escala al
+/// presionar y onda recortada a [borderRadius]. Con [semanticLabel] solo se lee esa frase.
 class AppTapSurface extends StatelessWidget {
   const AppTapSurface({
     required this.child,

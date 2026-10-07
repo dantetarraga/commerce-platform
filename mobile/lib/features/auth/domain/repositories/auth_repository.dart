@@ -6,7 +6,6 @@ import 'package:chaski/features/auth/domain/value_objects/otp_code.dart';
 import 'package:chaski/features/auth/domain/value_objects/person_name.dart';
 
 abstract interface class AuthRepository {
-  /// Envía un código de verificación al celular.
   Future<Result<OtpChallenge>> requestCode(PhoneNumber phone);
 
   /// Verifica el código: inicia sesión o pide completar el perfil.

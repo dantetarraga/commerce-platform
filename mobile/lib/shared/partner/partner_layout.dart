@@ -12,9 +12,8 @@ abstract final class PartnerLayout {
   /// Ancho mínimo para poner dos botones lado a lado.
   static const sideBySide = 280.0;
 
-  /// `true` si hay ancho para [minWidth] y la letra del sistema no es grande
-  /// (con letra grande todo va en una columna). Por defecto mide la pantalla;
-  /// con [width] mide el espacio dado (p. ej. de un `LayoutBuilder`).
+  /// `true` si hay ancho para [minWidth] y la letra del sistema no es grande. Mide
+  /// la pantalla o, con [width], el espacio dado.
   static bool isWide(BuildContext context, {double minWidth = wideBoard, double? width}) =>
       (width ?? MediaQuery.sizeOf(context).width) >= minWidth && !isLargeText(context, base: 14);
 

@@ -3,13 +3,8 @@ import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Lo que cobra el repartidor al entregar.
-///
-/// - Por defecto, la sección de cobro del ticket: medio de pago, pedido,
-///   envío, total grande y el vuelto que debe llevar. Va dentro de un
-///   [TicketSection] (usa [LeaderRow]).
-/// - [StaffCollectSummary.compact]: una sola fila sobre fondo de campo,
-///   "Cobras · Yape ······ S/ 28.50", para las tarjetas de recorrido.
+/// Lo que cobra el repartidor al entregar: la sección de cobro del ticket (usa
+/// [LeaderRow]) o, con [StaffCollectSummary.compact], una sola fila.
 class StaffCollectSummary extends StatelessWidget {
   const StaffCollectSummary({required this.order, this.title = 'COBRA AL ENTREGAR', super.key}) : _compact = false;
 

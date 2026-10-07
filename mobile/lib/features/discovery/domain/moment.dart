@@ -35,7 +35,6 @@ enum Moment {
     night => '¿Algo calientito?',
   };
 
-  /// Título de la colección del momento.
   String get collectionTitle => switch (this) {
     breakfast => 'Para empezar el día',
     lunch => 'Menú del día cerca de ti',

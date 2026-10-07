@@ -9,15 +9,8 @@ import 'package:toastification/toastification.dart';
 
 enum AppToastKind { info, success, undo, error }
 
-/// Aviso breve que baja desde arriba (lejos de la barra de compra y la
-/// navegación) y se va solo. Se desliza para cerrarlo y, mientras se mantiene
-/// presionado, no se va.
-///
-/// `AppToast.show(context, 'Eliminado', kind: AppToastKind.undo, onAction: …)`.
-///
-/// Es el adaptador del paquete de toasts: **nada fuera de este archivo importa
-/// `toastification`**. Para cambiar de paquete basta con reescribir [show] y
-/// [dismiss]; las llamadas de la app no cambian.
+/// Aviso breve que baja desde arriba y se va solo. Es el adaptador del paquete:
+/// **nada fuera de este archivo importa `toastification`**.
 abstract final class AppToast {
   /// Como mucho dos a la vez: el más viejo se va cuando llega un tercero.
   static const _maxVisible = 2;

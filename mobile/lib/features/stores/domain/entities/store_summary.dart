@@ -55,12 +55,10 @@ final class StoreSummary extends Equatable {
   /// Oferta vigente del negocio ("−15 % en caldos hoy"), si hay.
   final String? promoLabel;
 
-  /// Si está cerrado, cuándo vuelve a abrir (hora local); `null` si está
-  /// abierto o no abre en la próxima semana. Evita pedir el detalle de cada
-  /// negocio cerrado solo para decir "abre mañana a las 7:00 am".
+  /// Si está cerrado, cuándo vuelve a abrir (hora local); `null` si no aplica.
+  /// Evita pedir el detalle de cada cerrado solo para decir "abre mañana".
   final DateTime? nextOpeningAt;
 
-  /// Se puede pedir ahora mismo.
   bool get canOrder => isOpenNow && deliversToYou;
 
   /// Cuándo abre, para ir dentro de una frase ("mañana a las 7:00 am"), o

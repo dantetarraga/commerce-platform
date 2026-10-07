@@ -35,12 +35,10 @@ Map<String, int> deliveredCountByStore(Ref ref) {
   return count;
 }
 
-/// Cómo terminó un "Repetir".
 sealed class RepeatOutcome {
   const RepeatOutcome();
 }
 
-/// No se pudo cargar el negocio.
 final class RepeatFailed extends RepeatOutcome {
   const RepeatFailed(this.storeName, this.failure);
   final String storeName;
@@ -53,7 +51,6 @@ final class RepeatUnavailable extends RepeatOutcome {
   final StoreSummary store;
 }
 
-/// Nada de ese pedido sigue disponible.
 final class RepeatNothingLeft extends RepeatOutcome {
   const RepeatNothingLeft(this.store);
   final StoreSummary store;

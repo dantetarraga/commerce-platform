@@ -6,11 +6,8 @@ import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-/// Indicador de carga de la marca: el relevo del arranque en miniatura. El
-/// pedido sale de la "a" por la derecha, otro entra por la izquierda y la "a"
-/// se mece al recibirlo. Reemplaza a los spinners circulares y barras finas.
-///
-/// Con movimiento reducido queda quieto (la "a" con su pedido).
+/// Indicador de carga de la marca: el relevo del arranque en miniatura.
+/// Con movimiento reducido queda quieto.
 class AppLoader extends StatelessWidget {
   const AppLoader({this.size = 24, this.color, this.dot = AppColors.hierba, this.semanticsLabel = 'Cargando', super.key});
 
@@ -63,7 +60,6 @@ class AppLoader extends StatelessWidget {
     );
   }
 
-  /// La "a" se mece al recibir el pedido.
   static double _wobble(double t) {
     const keys = [(0.58, 0.0), (0.66, -8.0), (0.78, 3.0), (0.9, 0.0)];
     if (t <= keys.first.$1 || t >= keys.last.$1) return 0;

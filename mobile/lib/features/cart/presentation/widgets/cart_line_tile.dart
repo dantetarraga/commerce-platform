@@ -4,10 +4,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Fila de la bolsa: deslizar o "−" en 1 quita; tocar edita la nota.
-///
-/// Quitar y deshacer los resuelve quien la contiene ([onRemove]): la fila se
-/// desmonta al salir y no puede mostrar el aviso de "Deshacer".
+/// Fila de la bolsa: deslizar o "−" en 1 quita; tocar edita la nota. "Deshacer"
+/// lo muestra quien la contiene ([onRemove]): la fila se desmonta al salir.
 class CartLineTile extends StatelessWidget {
   const CartLineTile({required this.line, this.onRemove, this.onDismissed, this.onQuantityChanged, this.onEditNotes, super.key});
 

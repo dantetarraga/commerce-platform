@@ -15,15 +15,7 @@ enum AppSectionHeaderStyle {
 }
 
 /// Encabezado de sección: título (o eyebrow), bajada opcional y una acción a la
-/// derecha ("Ver todo" con [onSeeAll], o cualquier widget en [action]).
-///
-/// El título se anuncia como encabezado. Con acción, el margen derecho se
-/// achica para que el botón (48 de alto) quede alineado al borde.
-///
-/// ```dart
-/// AppSectionHeader('Cerca de ti', subtitle: 'Abiertos ahora', onSeeAll: openAll)
-/// AppSectionHeader.eyebrow('RECIENTES', action: AppButton.ghost(...))
-/// ```
+/// derecha ([onSeeAll] o [action]). Con acción, el margen derecho se achica.
 class AppSectionHeader extends StatelessWidget {
   const AppSectionHeader(
     this.title, {

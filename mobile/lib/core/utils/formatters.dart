@@ -1,13 +1,8 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:intl/intl.dart';
 
-/// Único lugar para los formatos que ve la persona: montos, distancias,
-/// horas y fechas relativas.
-///
-/// En Perú el uso común es "S/ 1,250.50": símbolo adelante, coma de miles y
-/// punto decimal. La locale es_PE de CLDR usa coma decimal y pone el símbolo
-/// al final, así que el patrón se fija explícitamente. Las horas van en 12 h
-/// ("6:30 pm"), que es como se dicen en la ciudad.
+/// Único lugar para los formatos que ve la persona. En Perú se usa "S/ 1,250.50"
+/// (la locale es_PE de CLDR no), así que el patrón se fija a mano; horas en 12 h.
 abstract final class Formatters {
   static final _amount = NumberFormat('#,##0.00', 'en_US');
   static final _oneDecimal = NumberFormat('0.0', 'en_US');
@@ -67,7 +62,6 @@ abstract final class Formatters {
     return '$h:${local.minute.toString().padLeft(2, '0')}';
   }
 
-  /// "am" · "pm".
   static String meridiem(DateTime at) => at.toLocal().hour < 12 ? 'am' : 'pm';
 
   static String _twelveHour(int hour, int minute) {

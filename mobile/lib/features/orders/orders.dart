@@ -1,6 +1,4 @@
-/// API pública del feature `orders`, compartida por las dos apps: dominio,
-/// etiquetas de estado y providers. La UI de cada app va en `orders_customer.dart` y
-/// `orders_staff.dart`; los modelos JSON en `orders_infrastructure.dart`.
+/// API pública de `orders` para las dos apps (UI en `orders_customer`/`orders_staff`).
 library;
 
 export 'domain/order.dart';

@@ -86,10 +86,8 @@ Map<NoticeDay, List<Notice>> groupNotices(List<Notice> notices, DateTime now) {
   return {for (final day in NoticeDay.values) day: ?groups[day]};
 }
 
-/// Avisos del pedido que sigue en camino, del más antiguo al más reciente, para
-/// mostrarlos juntos como un solo hilo. Vacío si no hay pedido en curso o si
-/// tiene un único aviso (entonces se muestra como uno más). Los avisos sin
-/// [Notice.orderId] (los de prueba) cuentan como el mismo pedido.
+/// Avisos del pedido en camino (antiguo → reciente) para mostrarlos como un hilo;
+/// vacío si hay menos de dos. Los sin [Notice.orderId] (de prueba) cuentan como uno.
 List<Notice> activeOrderThread(List<Notice> notices) {
   final byOrder = <String?, List<Notice>>{};
   for (final n in notices.where((n) => n.kind.isOrder)) {

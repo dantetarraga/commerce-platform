@@ -2,16 +2,8 @@ import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Acciones de los socios con un solo patrón: marca [busy], espera, revisa que
-/// la pantalla siga montada y avisa con un toast (el error, o el texto de
-/// éxito si se pasa).
-///
-/// ```dart
-/// class _CardState extends ConsumerState<Card> with PartnerActionRunner {
-///   Future<void> _ready() => run(() => ref.read(actionsProvider.notifier).markReady(id), success: 'Lista para recoger');
-///   // en build: AppButton(onPressed: busy ? null : _ready, loading: busy, …)
-/// }
-/// ```
+/// Acciones de los socios con un solo patrón: marca [busy], espera, revisa que la
+/// pantalla siga montada y avisa con un toast (el error, o el texto de éxito).
 mixin PartnerActionRunner<W extends ConsumerStatefulWidget> on ConsumerState<W> {
   var _busy = false;
 

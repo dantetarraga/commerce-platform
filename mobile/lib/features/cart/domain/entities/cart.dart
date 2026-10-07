@@ -129,10 +129,8 @@ final class StoreConflict extends AddToCartResult {
   final CartStore incoming;
 }
 
-/// La bolsa: un negocio, sus líneas y, opcionalmente, un cupón.
-///
-/// Inmutable: cada operación devuelve una bolsa nueva. Los montos son
-/// orientativos; el backend recalcula siempre al confirmar.
+/// La bolsa: un negocio, sus líneas y un cupón opcional. Inmutable; los montos
+/// son orientativos y el backend recalcula al confirmar.
 final class Cart extends Equatable {
   const Cart({this.store, this.lines = const [], this.coupon, this.note = ''});
 

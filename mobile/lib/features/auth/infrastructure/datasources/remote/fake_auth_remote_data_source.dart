@@ -4,12 +4,8 @@ import 'package:chaski/core/storage/token_storage.dart';
 import 'package:chaski/features/auth/infrastructure/datasources/remote/auth_remote_data_source.dart';
 import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
 
-/// Simula `/auth/otp/*`, `/auth/register` y `/users/me` en memoria.
-///
-/// - Cualquier celular válido recibe el código [demoCode].
-/// - [demoPhone] ya tiene cuenta (entra directo); otros números piden nombre.
-/// - [demoMerchantPhone] y [demoCourierPhone] son los socios del seed del
-///   backend: el dueño de Pollería El Chaski Dorado y un repartidor.
+/// Simula `/auth/otp/*`, `/auth/register` y `/users/me` en memoria: todo celular
+/// recibe [demoCode]; [demoPhone] y los socios del seed ya tienen cuenta.
 class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
   FakeAuthRemoteDataSource(this._backend, this._tokenStorage);
 

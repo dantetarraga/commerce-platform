@@ -62,7 +62,6 @@ abstract interface class CourierRepository {
   /// Pedidos listos para recoger en su ciudad (vacío si está desconectado).
   Future<Result<List<StaffOrder>>> available();
 
-  /// Sus pedidos en curso.
   Future<Result<List<StaffOrder>>> activeDeliveries();
 
   Future<Result<StaffOrder>> accept(String orderId);

@@ -15,11 +15,8 @@ enum AppSearchBarVariant {
   compact,
 }
 
-/// Buscador. Si [onTap] no es nulo, se comporta como botón (abre Explorar);
-/// si hay [controller], es editable.
-///
-/// [hints] rota ejemplos reales según el momento ("caldo", "pan",
-/// "paracetamol"…) cada 3 s, con un fundido corto.
+/// Buscador: con [onTap] se comporta como botón (abre Explorar); con
+/// [controller] es editable. [hints] rota ejemplos cada 3 s.
 class AppSearchBar extends StatefulWidget {
   const AppSearchBar({
     this.hints = const ['Busca negocios o productos'],
@@ -81,7 +78,6 @@ class _AppSearchBarState extends State<AppSearchBar> {
     }
   }
 
-  /// Rota los ejemplos cada 3 s (solo si hay más de uno).
   void _startHints() {
     _timer?.cancel();
     _timer = null;

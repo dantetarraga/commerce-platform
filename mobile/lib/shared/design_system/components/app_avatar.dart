@@ -16,10 +16,8 @@ enum AppAvatarVariant {
   store,
 }
 
-/// Avatar con fallback en cadena:
-/// foto real → ilustración local DiceBear (si hay [seed]) → iniciales → ícono.
-///
-/// Los negocios no usan DiceBear: sin logo muestran el ícono.
+/// Avatar con fallback: foto → ilustración DiceBear local (si hay [seed]) →
+/// iniciales → ícono. Los negocios no usan DiceBear.
 class AppAvatar extends StatelessWidget {
   const AppAvatar({
     this.imageUrl,

@@ -37,10 +37,8 @@ final class PurchaseBarOrder extends PurchaseBarState {
   final bool delivered;
 }
 
-/// Bolsa flotante en terracota con acción blanca. Cambia de tamaño según su
-/// contenido y aparece cuando hay productos o un pedido activo.
-///
-/// Incrementar [pulse] hace "saltar" el contador (al recibir un producto).
+/// Bolsa flotante en terracota: aparece cuando hay productos o un pedido activo.
+/// Incrementar [pulse] hace saltar el contador.
 class AppPurchaseBar extends StatefulWidget {
   const AppPurchaseBar({required this.state, required this.onTap, this.pulse = 0, super.key});
 
@@ -188,7 +186,6 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
   }
 }
 
-/// Contador de productos: salta al agregar uno.
 class _Count extends StatelessWidget {
   const _Count({required this.pulse, required this.count, required this.bg, required this.fg});
 

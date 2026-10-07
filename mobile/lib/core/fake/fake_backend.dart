@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
-/// Utilidades compartidas por los datasources fake mientras no existe el backend.
-///
-/// Los datasources fake devuelven el mismo JSON que devolverá la API y lanzan
-/// las mismas `ApiException`, así el resto de la app no nota la diferencia.
+/// Utilidades de los datasources fake: devuelven el mismo JSON y lanzan las
+/// mismas `ApiException` que la API, así el resto de la app no nota la diferencia.
 class FakeBackend {
   FakeBackend({
     AssetBundle? bundle,
@@ -22,7 +20,6 @@ class FakeBackend {
   final Duration orderStep;
   Map<String, dynamic>? _catalog;
 
-  /// Catálogo de prueba (ciudad, categorías, negocios, productos, promociones).
   Future<Map<String, dynamic>> catalog() async {
     // Sin el caché del bundle: este objeto ya guarda el catálogo, y el caché
     // global comparte un Future entre tests que en el segundo nunca completa.

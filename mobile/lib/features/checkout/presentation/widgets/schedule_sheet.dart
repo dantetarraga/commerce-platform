@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Hoja "¿Para cuándo?": día y hora (cada 15 min) para programar el pedido.
-/// [notBefore] es la primera hora posible (p. ej. cuando abre un negocio
-/// cerrado). La elección queda en el checkout (`scheduledDeliveryProvider`).
+/// Hoja "¿Para cuándo?": día y hora cada 15 min. [notBefore] es la primera hora
+/// posible (p. ej. cuando abre el negocio); la elección queda en el checkout.
 Future<DateTime?> showScheduleSheet(BuildContext context, {String? storeName, DateTime? notBefore}) {
   return showAppBottomSheet<DateTime>(
     context,

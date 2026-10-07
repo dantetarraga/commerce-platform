@@ -26,7 +26,6 @@ final class StreetLine extends Equatable {
   List<Object?> get props => [value];
 }
 
-/// Dirección de entrega guardada.
 final class Address extends Equatable {
   const Address({
     required this.id,

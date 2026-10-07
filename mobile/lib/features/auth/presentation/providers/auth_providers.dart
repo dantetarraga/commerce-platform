@@ -13,8 +13,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_providers.g.dart';
 
-// Inyección de dependencias del feature: datasource → repository → use cases.
-
 @Riverpod(keepAlive: true)
 AuthRemoteDataSource authRemoteDataSource(Ref ref) => ref.watch(appEnvProvider).useFakeData
     ? FakeAuthRemoteDataSource(ref.watch(fakeBackendProvider), ref.watch(tokenStorageProvider))

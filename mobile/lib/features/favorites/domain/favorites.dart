@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-/// Qué se guarda como favorito.
 enum FavoriteKind { store, product }
 
 /// Negocios y productos guardados. Solo ids: los datos frescos (precio, si

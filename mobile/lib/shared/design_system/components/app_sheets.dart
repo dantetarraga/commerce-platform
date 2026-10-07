@@ -13,9 +13,7 @@ enum AppSheetSize {
   full,
 }
 
-/// Abre una hoja inferior de Apamuy (radio 24 arriba, asa visible).
-/// Carrito, selector de dirección y filtros son hojas: no sacan al usuario de
-/// contexto. Con [title] (y opcionalmente [subtitle]) arma un [AppSheetHeader].
+/// Abre una hoja inferior de Apamuy. Con [title] (y [subtitle]) arma un [AppSheetHeader].
 Future<T?> showAppBottomSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
@@ -53,9 +51,7 @@ Future<T?> showAppBottomSheet<T>(
   );
 }
 
-/// Cabecera de una hoja inferior: título (encabezado) y una bajada opcional
-/// en `bodyMedium` atenuado. Úsala en hojas que arman su propio contenido;
-/// `showAppBottomSheet(title:, subtitle:)` ya la incluye.
+/// Cabecera de hoja inferior; `showAppBottomSheet(title:, subtitle:)` ya la incluye.
 class AppSheetHeader extends StatelessWidget {
   const AppSheetHeader({required this.title, this.subtitle, this.padding = defaultPadding, super.key});
 

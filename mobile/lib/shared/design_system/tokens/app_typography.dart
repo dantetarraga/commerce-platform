@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Tipografía de Apamuy: títulos amables y redondos, interfaz silenciosa.
-///
-/// - **Outfit** (display): títulos, nombres de negocio y precios. Geométrica y
-///   abierta; se usa en 700 con espaciado casi normal para que respire.
-/// - **Plus Jakarta Sans** (UI): todo lo demás.
-///
-/// Ambas van empaquetadas en `assets/fonts` (sin descarga en tiempo de
-/// ejecución: la app debe verse bien con red irregular).
+/// Tipografía de Apamuy: Outfit (display) para títulos, nombres y precios; Plus
+/// Jakarta Sans para la UI. Empaquetadas en `assets/fonts`: sin descarga en ejecución.
 abstract final class AppTypography {
   static const display = 'Outfit';
   static const ui = 'Jakarta';
@@ -66,15 +60,8 @@ abstract final class AppTypography {
     );
   }
 
-  /// Estilo display (Outfit) a medida: títulos de cabecera, cifras grandes,
-  /// nombres de lugar. Reemplaza los `TextStyle(fontFamily: AppTypography.display, …)`
-  /// escritos a mano.
-  ///
-  /// Por defecto: peso 700, alto de línea 1.2, sin espaciado extra y color
-  /// `onSurface`. Con [tabular] usa cifras tabulares (contadores, montos).
-  ///
-  /// Se llama `displayStyle` (y no `display`) porque [display] ya es el nombre
-  /// de la familia y se usa como `fontFamily` en muchos sitios.
+  /// Estilo display (Outfit) a medida: peso 700, alto 1.2 y `onSurface` por defecto.
+  /// Se llama `displayStyle` porque [display] ya es el nombre de la familia.
   static TextStyle displayStyle(
     BuildContext context, {
     required double size,

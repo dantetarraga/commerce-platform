@@ -15,13 +15,8 @@ enum AppNoticeKind {
   error,
 }
 
-/// Aviso dentro del flujo (no a pantalla completa): ícono, mensaje y una
-/// acción opcional. Para un error que ocupa la pantalla usa
-/// `AppEmptyState.fromError`; para algo pasajero, un toast.
-///
-/// Por defecto va en una caja suave del color del tipo; con [boxed] en `false`
-/// es solo la línea (ícono + texto), como los avisos sobre el botón de pagar.
-/// Se anuncia como región viva.
+/// Aviso dentro del flujo: ícono, mensaje y una acción opcional. Para errores a
+/// pantalla completa usa `AppEmptyState.fromError`; para algo pasajero, un toast.
 class AppInlineNotice extends StatelessWidget {
   const AppInlineNotice({
     required this.message,
@@ -32,9 +27,7 @@ class AppInlineNotice extends StatelessWidget {
     super.key,
   });
 
-  /// Aviso de error a partir de un [Failure] (o cualquier error): sin conexión
-  /// da un mensaje humano; si no, el mensaje del fallo. Con [onRetry] agrega
-  /// "Reintentar".
+  /// Aviso de error a partir de un [Failure]: sin conexión da un mensaje humano.
   factory AppInlineNotice.fromError(Object error, {VoidCallback? onRetry, bool boxed = true, Key? key}) => AppInlineNotice(
     key: key,
     kind: AppNoticeKind.error,

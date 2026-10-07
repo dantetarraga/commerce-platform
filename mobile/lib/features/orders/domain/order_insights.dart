@@ -1,7 +1,7 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 
-/// Datos derivados de un pedido que antes se calculaban en cada pantalla.
+/// Datos derivados de un pedido.
 extension OrderInsights on Order {
   /// "2481": el código sin el "#", para leerlo en voz alta o compararlo.
   String get shortCode => code.startsWith('#') ? code.substring(1) : code;
@@ -23,9 +23,8 @@ extension OrderInsights on Order {
   /// Cuándo el repartidor salió con el pedido (lo recogió en el negocio).
   DateTime? get pickedUpAt => timeOf(OrderStatus.onTheWay);
 
-  /// Avance estimado del repartidor sobre la ruta (0 a 1) entre la salida del
-  /// negocio y la llegada estimada. No es GPS: antes de salir es 0, entregado
-  /// es 1 y en camino se mueve entre 0.05 y 0.95 para que siempre se vea.
+  /// Avance estimado del repartidor (0 a 1) entre la salida y la llegada estimada.
+  /// No es GPS: en camino se mueve entre 0.05 y 0.95 para que siempre se vea.
   double routeProgress(DateTime now) {
     if (status == OrderStatus.delivered) return 1;
     if (!reached(OrderStatus.onTheWay)) return 0;

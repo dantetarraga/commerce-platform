@@ -60,9 +60,8 @@ class AuthPhoneField extends StatelessWidget {
   }
 }
 
-/// Código de [length] dígitos en casillas; la que toca escribir va resaltada.
-/// Un único campo invisible recibe el teclado (admite pegar el código y el
-/// autocompletado por SMS).
+/// Código de [length] dígitos en casillas. Un único campo invisible recibe el
+/// teclado (admite pegar el código y el autocompletado por SMS).
 class AuthOtpField extends StatefulWidget {
   const AuthOtpField({
     required this.onCompleted,

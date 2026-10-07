@@ -2,8 +2,7 @@ import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/storage/local_json_store.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 
-/// Direcciones guardadas en el dispositivo. Cuando exista `/users/me/addresses`
-/// este repositorio sincroniza con el backend sin que cambie la UI.
+/// Direcciones guardadas solo en el dispositivo (la base de `SyncedAddressRepository`).
 class AddressRepositoryImpl implements AddressRepository {
   const AddressRepositoryImpl(this._store);
 

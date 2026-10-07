@@ -18,9 +18,8 @@ GoRoute materialRoute({
   pageBuilder: (context, state) => MaterialPage<void>(key: state.pageKey, name: state.name, child: builder(context, state)),
 );
 
-/// `refreshListenable` para un router que se crea una sola vez: avisa cada vez
-/// que cambia alguno de [providers] (sesión, onboarding…), así go_router
-/// vuelve a correr su `redirect`. Se libera junto con el provider del router.
+/// `refreshListenable` que avisa cuando cambia alguno de [providers], para que
+/// go_router vuelva a correr su `redirect`.
 Listenable routerRefresh(Ref ref, List<ProviderListenable<Object?>> providers) {
   final refresh = ValueNotifier<int>(0);
   for (final provider in providers) {

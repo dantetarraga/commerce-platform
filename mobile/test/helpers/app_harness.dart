@@ -63,9 +63,8 @@ class MemoryTokens implements TokenStorage {
   Future<void> clear() async => _tokens = null;
 }
 
-/// Monta la app completa con el backend fake (latencias cortas) y todo el
-/// almacenamiento en memoria. Desmonta y libera el contenedor al terminar,
-/// así no quedan temporizadores vivos.
+/// Monta la app completa con el backend fake y almacenamiento en memoria; la
+/// desmonta al terminar para no dejar temporizadores vivos.
 Future<ProviderContainer> pumpChaski(
   WidgetTester tester, {
   bool onboardingSeen = true,

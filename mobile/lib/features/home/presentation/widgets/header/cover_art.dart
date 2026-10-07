@@ -3,9 +3,7 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Composición de la portada, medida sobre 390 px y anclada al borde derecho:
-/// un halo de 210, la comida en un círculo de 164 que se sale de la pantalla,
-/// el pan en uno de 48 y la etiqueta del negocio popular abierto.
+/// Composición de la portada, medida sobre 390 px y anclada al borde derecho.
 class HomeCoverArt extends ConsumerWidget {
   const HomeCoverArt({required this.width, super.key});
 

@@ -27,9 +27,8 @@ enum AppStoreCardVariant {
   repeat,
 }
 
-/// Card de negocio. Cada variante vive en su archivo de `store_card/`; esta
-/// clase pone la semántica (un solo botón con todo el resumen), la escala al
-/// presionar y la onda.
+/// Card de negocio; cada variante vive en `store_card/`. Esta clase pone la
+/// semántica (un solo botón con todo el resumen), la escala y la onda.
 class AppStoreCard extends StatelessWidget {
   const AppStoreCard({
     required this.data,

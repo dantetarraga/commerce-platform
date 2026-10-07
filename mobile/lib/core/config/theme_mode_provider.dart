@@ -4,8 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'theme_mode_provider.g.dart';
 
-/// Tema elegido por el usuario (sistema, claro u oscuro), guardado en el
-/// dispositivo.
+/// Tema elegido por el usuario, guardado en el dispositivo.
 @Riverpod(keepAlive: true)
 class AppThemeMode extends _$AppThemeMode {
   static const _key = 'chaski.themeMode';

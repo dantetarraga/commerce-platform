@@ -1,15 +1,9 @@
 import 'package:chaski/core/storage/token_storage.dart';
 import 'package:dio/dio.dart';
 
-/// Agrega el Bearer token y, ante un 401, refresca el token una sola vez y
-/// reintenta la request original.
-///
-/// Evita loops porque:
-/// - es un `QueuedInterceptor`: los errores se procesan de a uno, así que
-///   nunca hay dos refresh en paralelo;
-/// - el refresh usa `_refreshDio`, una instancia sin este interceptor;
-/// - cada request se reintenta como máximo una vez (`extra['retried']`);
-/// - las rutas `/auth/*` nunca disparan refresh.
+/// Agrega el Bearer token y, ante un 401, refresca una sola vez y reintenta.
+/// Sin loops: es `QueuedInterceptor`, el refresh usa `_refreshDio`, cada request
+/// se reintenta una vez (`extra['retried']`) y `/auth/*` nunca refresca.
 class AuthInterceptor extends QueuedInterceptor {
   AuthInterceptor({
     required Dio dio,

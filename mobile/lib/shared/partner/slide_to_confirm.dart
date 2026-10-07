@@ -4,10 +4,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Confirmación deslizando la ficha hasta el final del carril, para no marcar una
-/// entrega con un toque sin querer. Arriba va la instrucción (y el dato que importa,
-/// como el monto a cobrar); dentro del carril, solo la acción. Con lector de
-/// pantalla se activa con un toque normal.
+/// Confirmación deslizando la ficha hasta el final, para no marcar una entrega con
+/// un toque sin querer. Con lector de pantalla se activa con un toque normal.
 class SlideToConfirm extends StatefulWidget {
   const SlideToConfirm({
     required this.label,

@@ -8,11 +8,8 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// "+" rápido de un producto sin opciones fuera de su negocio (inicio,
-/// Explorar). Si no se conoce el negocio ([known]) lo carga para saber si se
-/// puede pedir; cualquier problema termina en un aviso, nunca en una excepción.
-///
-/// Devuelve `true` si el producto quedó en la bolsa.
+/// "+" rápido fuera del negocio (inicio, Explorar). Sin [known] carga el negocio
+/// para saber si se puede pedir; todo error es un aviso. `true` si quedó en la bolsa.
 Future<bool> quickAddProduct(BuildContext context, WidgetRef ref, ProductHit product, {StoreSummary? known}) async {
   var store = known;
   if (store == null) {

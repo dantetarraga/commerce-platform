@@ -4,7 +4,6 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Qué hacer tras confirmar.
 enum OrderConfirmedAction { track, home }
 
 /// Confirmación del pedido con la ilustración y la mini boleta. Volver atrás

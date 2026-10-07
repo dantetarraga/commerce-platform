@@ -1,10 +1,8 @@
 import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
-/// Botón circular con ícono (llamar, mensaje, volver sobre el mapa). El
-/// círculo mide [diameter] pero el área táctil siempre es de 48.
-///
-/// [tooltip] es obligatorio: es lo que dice el lector de pantalla.
+/// Botón circular con ícono: el círculo mide [diameter] pero el área táctil es
+/// de 48. [tooltip] es obligatorio: es lo que dice el lector de pantalla.
 class AppCircleButton extends StatelessWidget {
   const AppCircleButton({
     required this.icon,

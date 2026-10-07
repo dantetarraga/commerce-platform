@@ -1,7 +1,6 @@
 import 'package:chaski/features/cart/domain/entities/cart.dart';
 import 'package:chaski/features/products/domain/entities/product_selection.dart';
 
-/// Traduce lo armado en el detalle de producto a una línea de bolsa.
 extension ProductSelectionToCart on ProductSelection {
   CartLine toCartLine() {
     final choices = <CartChoice>[

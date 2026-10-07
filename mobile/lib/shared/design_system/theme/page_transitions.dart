@@ -3,12 +3,8 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// Al abrir una pantalla, sube desde abajo como una tarjeta con la esquina de
-/// salida y se vuelve pantalla completa al llegar; la de atrás retrocede un poco
-/// y se oscurece. Al volver, el movimiento se invierte.
-///
-/// Solo en Android: en iOS se mantiene el deslizamiento nativo con su gesto de
-/// regreso. Con "reducir movimiento" el cambio es inmediato.
+/// Al abrir, la pantalla sube como tarjeta con la esquina de salida y la de atrás
+/// retrocede. Solo en Android; con "reducir movimiento" el cambio es inmediato.
 class RisingCardPageTransitionsBuilder extends PageTransitionsBuilder {
   const RisingCardPageTransitionsBuilder();
 
@@ -112,9 +108,8 @@ class _RisingCard extends StatelessWidget {
   }
 }
 
-/// Contenedor de las pestañas: la pestaña nueva aparece con un fundido y una
-/// subida leve. Las demás quedan montadas (conservan su estado y scroll) pero
-/// ocultas y sin animaciones.
+/// Contenedor de las pestañas: la nueva entra con fundido y subida leve; las demás
+/// quedan montadas (conservan estado y scroll) pero ocultas y sin animaciones.
 class AnimatedBranchContainer extends StatefulWidget {
   const AnimatedBranchContainer({
     required this.currentIndex,

@@ -4,11 +4,8 @@ import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
-/// El traspaso: la foto del producto viaja desde [from] hasta la bolsa (la pestaña o la
-/// barra de compra) encogiéndose, como el chaski que entrega el mensaje.
-///
-/// [from] es el rectángulo global de origen (p. ej. la foto del detalle).
-/// Con movimiento reducido no hace nada.
+/// La foto del producto viaja desde [from] (rectángulo global) hasta la bolsa,
+/// encogiéndose. Con movimiento reducido no hace nada.
 Future<void> flyToPurchaseBar(BuildContext context, {required Rect from, String? imageUrl}) async {
   if (reduceMotionOf(context)) return;
   final overlay = Overlay.of(context, rootOverlay: true);
@@ -66,7 +63,6 @@ Rect? _visibleBagRect() {
   return globalRectOf(AppNavigationDock.bagKey);
 }
 
-/// Rectángulo global de un widget (por su [GlobalKey]).
 Rect? globalRectOf(GlobalKey key) {
   final box = key.currentContext?.findRenderObject();
   if (box is! RenderBox || !box.hasSize) return null;

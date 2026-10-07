@@ -1,6 +1,4 @@
-/// Design system de Apamuy · Ciudad en movimiento.
-///
-/// Un solo import para tokens, tema, componentes, marca e ilustraciones.
+/// Design system de Apamuy: un solo import para tokens, tema, componentes y marca.
 library;
 
 export 'brand/brand_logo.dart';

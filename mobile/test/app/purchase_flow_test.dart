@@ -27,7 +27,6 @@ void main() {
       final container = await pumpChaski(tester, signedIn: true, size: size, textScale: scale, brightness: brightness);
       final router = container.read(appRouterProvider);
 
-      // ── Cerca ──
       expect(currentPath(container), RoutePaths.home);
       await tester.scrollUntilVisible(find.text('Volver a pedir'), 250, scrollable: find.byType(Scrollable).first);
       expect(find.text('Volver a pedir'), findsOneWidget); // historial de demo
@@ -41,7 +40,7 @@ void main() {
         await captureCity(tester, 'inicio_barrio');
       }
 
-      // ── Negocio: "+" rápido de un producto sin opciones ──
+      // Negocio: "+" rápido de un producto sin opciones.
       router.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': 'st_dona_rosa'}).ignore();
       await settle(tester, frames: 30);
       expect(find.text('Picantería Doña Rosa'), findsWidgets);
@@ -60,7 +59,7 @@ void main() {
       expect(container.read(cartControllerProvider).value?.itemCount, 1);
       expect(find.bySemanticsLabel(RegExp('^1 producto')), findsOneWidget); // la barra de compra
 
-      // ── Producto con variante: se elige "Grande" y se agrega ──
+      // Producto con variante: se elige "Grande" y se agrega.
       router.pushNamed(ProductDetailPage.name, pathParameters: {'productId': 'pr_caldo_cordero'}).ignore();
       await settle(tester, frames: 30);
       if (name == 'movil') await captureCity(tester, 'producto');
@@ -75,7 +74,6 @@ void main() {
       expect(cart.itemCount, 2);
       expect(cart.lines.any((l) => l.variantName == 'Grande'), isTrue);
 
-      // ── Bolsa → checkout ──
       expect(find.bySemanticsLabel(RegExp('^2 productos')), findsOneWidget);
       await tester.tap(find.text('Ver bolsa'));
       await settle(tester);
@@ -129,7 +127,7 @@ void main() {
       expect(find.textContaining(RegExp('Recibimos tu pedido|confirmó tu pedido')), findsWidgets);
       expect(container.read(cartControllerProvider).value?.isEmpty, isTrue);
 
-      // ── Seguimiento: el pedido avanza solo (paso de 2 s en el fake) ──
+      // Seguimiento: el pedido avanza solo (paso de 2 s en el fake).
       await settle(tester, frames: 50, step: const Duration(milliseconds: 100)); // ~5 s
       expect(find.text('Rosa está preparando tu pedido'), findsOneWidget);
 

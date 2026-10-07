@@ -1,9 +1,7 @@
 import 'package:chaski/core/utils/random_id.dart';
 
-/// Clave de idempotencia para una operación que el usuario puede repetir
-/// (confirmar un pedido): la misma request reusa la clave, así un doble tap o
-/// un reintento tras un corte de red no la duplican; una request distinta
-/// recibe una clave nueva. [reset] al terminar con éxito.
+/// Clave de idempotencia: la misma request reusa la clave (doble tap, reintento
+/// tras un corte de red) y una distinta recibe otra. [reset] al terminar con éxito.
 final class IdempotencyKeys<T extends Object> {
   IdempotencyKeys({String Function()? generate})
     : _generate = generate ?? randomHexId;

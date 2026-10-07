@@ -3,10 +3,7 @@ import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Lo que se pidió, como en una comanda: "2×" en primario, nombre, detalle,
-/// la nota de cada producto en un chip y la nota del pedido al final.
-///
-/// Va dentro de un ticket ([TicketSection]): con [prices] usa [LeaderRow].
+/// Lo que se pidió, como en una comanda. Va dentro de un ticket ([TicketSection]);
 /// [dense] es la versión del repartidor (texto mediano, sin descripciones).
 class StaffOrderLines extends StatelessWidget {
   const StaffOrderLines({

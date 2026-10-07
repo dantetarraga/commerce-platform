@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Terracota: crema cálida, terracota de marca y verde hierba de acento.
 abstract final class AppColors {
-  // Marca
   static const terracota = Color(0xFFB84A2B);
   static const terracota700 = Color(0xFF8F3920);
   static const terracota50 = Color(0xFFF7E6DC); // portadas y fondos de marca suaves
@@ -12,7 +11,6 @@ abstract final class AppColors {
   static const hierbaSoft = Color(0xFFE6EFE0);
   static const hierba300 = Color(0xFF8CC07A); // hierba sobre fondos oscuros
 
-  // Neutros claros
   static const papel = Color(0xFFFBF7F2); // fondo crema
   static const blanco = Color(0xFFFFFFFF);
   static const gris = Color(0xFFF3ECE3); // bloques agrupados, campos
@@ -21,7 +19,6 @@ abstract final class AppColors {
   static const piedra = Color(0xFF6E5F56);
   static const linea = Color(0xFFEDE3D8);
 
-  // Neutros oscuros (modo oscuro del sistema, en cafés cálidos)
   static const noche = Color(0xFF140F0D);
   static const nocheSurface = Color(0xFF1C1613);
   static const nocheRaised = Color(0xFF261E1A);
@@ -30,7 +27,6 @@ abstract final class AppColors {
   static const nocheTexto = Color(0xFFF6EFEA);
   static const nochePiedra = Color(0xFFB3A59C);
 
-  // Estados
   static const exito = Color(0xFF3F7A3A); // abierto · envío gratis · descuento
   static const exito300 = Color(0xFF8CC07A);
   static const peligro = Color(0xFFB3261E); // error · eliminar · cerrado
@@ -40,8 +36,7 @@ abstract final class AppColors {
   /// Texto secundario claro sobre fotografía oscurecida o sobre hierba.
   static const onPhotoMuted = Color(0xFFF1E6DE);
 
-  /// Velo de tinta con la opacidad [alpha] (0–1): degradados sobre fotos,
-  /// negocios cerrados, sombras. Reemplaza los `Color(0x..2A1A14)` a mano.
+  /// Velo de tinta con la opacidad [alpha] (0–1): degradados sobre fotos, sombras.
   static Color inkOverlay(double alpha) => tinta.withValues(alpha: alpha);
 }
 
@@ -123,8 +118,7 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   /// Estrella de calificación.
   final Color rating;
 
-  /// Fondo de tarjeta que se despega del fondo: blanco en claro, [raised] en
-  /// oscuro (reemplaza el ternario `dark ? chaski.raised : AppColors.blanco`).
+  /// Fondo de tarjeta que se despega del fondo: blanco en claro, [raised] en oscuro.
   final Color card;
 
   /// Texto secundario claro sobre fotografía (bajada de portadas).
@@ -186,6 +180,5 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
 }
 
 extension ChaskiColorsContext on BuildContext {
-  /// Colores semánticos de Apamuy para el tema actual.
   ChaskiColors get chaski => Theme.of(this).extension<ChaskiColors>() ?? ChaskiColors.light;
 }

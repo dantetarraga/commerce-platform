@@ -3,24 +3,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-/// Lo común del `MaterialApp.router` de las dos apps (cliente y Apamuy
-/// Socios): temas claro/oscuro, idioma es-PE con sus traducciones de Material
-/// y el scroll que acepta mouse y trackpad.
-///
-/// ```dart
-/// return AppMaterialDefaults.router(
-///   title: brandName,
-///   themeMode: ref.watch(appThemeModeProvider),
-///   routerConfig: ref.watch(appRouterProvider),
-/// );
-/// ```
+/// Lo común del `MaterialApp.router` de las dos apps: temas, idioma es-PE con sus
+/// traducciones de Material y el scroll que acepta mouse y trackpad.
 abstract final class AppMaterialDefaults {
   static const locale = Locale('es', 'PE');
   static const supportedLocales = [Locale('es', 'PE'), Locale('es')];
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = GlobalMaterialLocalizations.delegates;
   static const scrollBehavior = AppScrollBehavior();
 
-  /// `MaterialApp.router` con los valores por defecto de Apamuy.
   static MaterialApp router({
     required String title,
     required RouterConfig<Object> routerConfig,

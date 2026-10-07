@@ -1,7 +1,4 @@
-/// Piezas compartidas de Apamuy Socios (negocio y repartidor): portada,
-/// píldora de estado, pestañas, temporizador, sello, estaciones, riel,
-/// deslizar para confirmar, cabecera de pantalla, alarma de pedidos y ayudas
-/// de layout y acciones. La app del cliente no las usa.
+/// Piezas compartidas de Apamuy Socios (negocio y repartidor). La app del cliente no las usa.
 library;
 
 export 'alarm/order_alarm.dart';

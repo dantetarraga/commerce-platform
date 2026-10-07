@@ -100,7 +100,6 @@ abstract interface class MerchantRepository {
   /// Pedidos en curso (de nuevo a en camino), del más reciente al más antiguo.
   Future<Result<List<StaffOrder>>> activeOrders();
 
-  /// Todos los pedidos de hoy.
   Future<Result<List<StaffOrder>>> todayOrders();
 
   /// Acepta y empieza a preparar; [prepMinutes] ajusta la hora estimada.

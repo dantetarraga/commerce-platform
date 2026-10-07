@@ -1,7 +1,6 @@
 import 'package:chaski/core/fake/fake_backend.dart';
 
 /// Proyecciones del catálogo de prueba al JSON que devolverá la API.
-/// Compartidas por los datasources fake de stores, products, search y promotions.
 extension FakeCatalogJson on FakeBackend {
   Map<String, Object?> storeSummaryJson(Map<String, dynamic> store) => {
     'id': store['id'],

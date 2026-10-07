@@ -4,7 +4,6 @@ import 'package:chaski/features/cart/domain/entities/cart.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:equatable/equatable.dart';
 
-/// Cuándo entregar.
 sealed class DeliveryTime extends Equatable {
   const DeliveryTime();
 
@@ -60,10 +59,8 @@ List<Money> suggestedBills(Money total, {int max = 3}) => [
 Money? cashChange(Money? paysWith, Money total) =>
     paysWith == null || paysWith < total ? null : paysWith - total;
 
-/// Decisiones del checkout (lo demás sale de la bolsa).
-///
-/// La propina empieza en cero a propósito: es un regalo del cliente, no un
-/// cargo preseleccionado (nada se suma al total sin que lo elijas).
+/// Decisiones del checkout (lo demás sale de la bolsa). La propina empieza en
+/// cero a propósito: nada se suma al total sin que lo elijas.
 final class CheckoutDraft extends Equatable {
   const CheckoutDraft({
     this.deliveryTime = const DeliverAsap(),
@@ -95,7 +92,6 @@ final class CheckoutDraft extends Equatable {
   /// Vuelto que lleva el repartidor (null si paga exacto o no alcanza).
   Money? change(Cart cart) => paymentKind == PaymentKind.cash ? cashChange(cashChangeFor, total(cart)) : null;
 
-  /// Billetes que se sugieren para pagar el total en efectivo.
   List<Money> bills(Cart cart) => suggestedBills(total(cart));
 
   CheckoutDraft copyWith({
@@ -111,7 +107,6 @@ final class CheckoutDraft extends Equatable {
     tip: tip == null ? this.tip : (maxTip < tip ? maxTip : tip),
   );
 
-  /// Validación completa antes de confirmar.
   List<CheckoutIssue> issues(Cart cart, Address? address) => [
     if (cart.isEmpty) CheckoutIssue.emptyCart,
     if (!cart.isEmpty && !cart.reachesMinimum) CheckoutIssue.belowMinimum,
@@ -187,17 +182,15 @@ DateTime _ceilTo15(DateTime t) {
   return base.add(Duration(minutes: ((minutes + 14) ~/ 15) * 15));
 }
 
-/// Primera hora programable: [scheduleLeadMinutes] desde ahora o [notBefore]
-/// (p. ej. cuando abre un negocio cerrado), lo que sea después, redondeado a
-/// los siguientes 15 min.
+/// Primera hora programable: [scheduleLeadMinutes] desde ahora o [notBefore],
+/// lo que sea después, redondeado a los siguientes 15 min.
 DateTime firstSchedulable(DateTime now, {DateTime? notBefore}) {
   final lead = now.add(const Duration(minutes: scheduleLeadMinutes));
   return _ceilTo15(notBefore != null && notBefore.isAfter(lead) ? notBefore : lead);
 }
 
-/// Grilla de horas de [day], cada 15 min: [past] horas previas tachadas como
-/// contexto y luego hasta [count] en total, sin pasar de la medianoche. Los
-/// días futuros empiezan a las [dayStartHour].
+/// Horas de [day] cada 15 min: [past] previas tachadas como contexto y hasta
+/// [count] en total, sin pasar la medianoche. Días futuros desde [dayStartHour].
 List<ScheduleSlot> scheduleSlots(
   DateTime now, {
   DateTime? day,

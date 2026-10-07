@@ -228,7 +228,6 @@ class _KnotDotState extends State<_KnotDot> with TickerProviderStateMixin {
       animation: Listenable.merge([_breath, _tie]),
       builder: (context, _) {
         final tie = AppMotion.knot.transform(_tie.value);
-        // Cumplido: punto cobalto. En curso: punto cobalto con halo. Pendiente: gris.
         final (Color fill, double size) = switch (widget.knot) {
           QuipuKnot.done => (chaski.thread, 12.0 * tie.clamp(0.0, 1.3)),
           QuipuKnot.current => (chaski.thread, 12.0),

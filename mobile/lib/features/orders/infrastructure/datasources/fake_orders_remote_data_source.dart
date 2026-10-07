@@ -4,11 +4,8 @@ import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
 
-/// Simula `/orders` en memoria. Un pedido nuevo avanza solo por los estados
-/// (cada [FakeBackend.orderStep]) para que el seguimiento se vea vivo en demo.
-///
-/// Arranca con dos pedidos entregados para que "Volver a pedir" y el historial
-/// tengan contenido.
+/// Simula `/orders` en memoria: un pedido nuevo avanza solo por los estados (cada
+/// [FakeBackend.orderStep]). Arranca con dos entregados para "Volver a pedir".
 class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
   FakeOrdersRemoteDataSource(this._backend);
 

@@ -30,9 +30,8 @@ class AppRatingPill extends StatelessWidget {
   }
 }
 
-/// Ficha blanca "Cerrado por ahora" con la próxima apertura ([closedLabel],
-/// p. ej. "Abre mañana 7:00"). Va sobre la foto del negocio: sus colores no
-/// cambian con el tema.
+/// Ficha "Cerrado por ahora" con la próxima apertura. Va sobre la foto: sus
+/// colores no cambian con el tema.
 class StoreClosedBadge extends StatelessWidget {
   const StoreClosedBadge({this.closedLabel, super.key});
 
