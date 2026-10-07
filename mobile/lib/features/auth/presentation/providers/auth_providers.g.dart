@@ -222,6 +222,47 @@ final class CompleteProfileProvider
 
 String _$completeProfileHash() => r'a1e029849d9490c0224982b751bfa7be58fbc01e';
 
+@ProviderFor(updateProfile)
+final updateProfileProvider = UpdateProfileProvider._();
+
+final class UpdateProfileProvider
+    extends $FunctionalProvider<UpdateProfile, UpdateProfile, UpdateProfile>
+    with $Provider<UpdateProfile> {
+  UpdateProfileProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'updateProfileProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateProfileHash();
+
+  @$internal
+  @override
+  $ProviderElement<UpdateProfile> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  UpdateProfile create(Ref ref) {
+    return updateProfile(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UpdateProfile value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UpdateProfile>(value),
+    );
+  }
+}
+
+String _$updateProfileHash() => r'fc7538454c02fd96de51b04da76bb41758f361e1';
+
 @ProviderFor(restoreSession)
 final restoreSessionProvider = RestoreSessionProvider._();
 

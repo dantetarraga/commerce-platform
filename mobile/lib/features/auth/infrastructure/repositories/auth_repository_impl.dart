@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/email_address.dart';
 import 'package:chaski/core/domain/phone_number.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/errors/failure_mapper.dart';
@@ -51,6 +52,16 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     await _tokenStorage.save((accessToken: response.accessToken, refreshToken: response.refreshToken));
     return response.user.toDomain();
+  });
+
+  @override
+  Future<Result<AuthUser>> updateProfile({
+    required PersonName firstName,
+    required PersonName lastName,
+    EmailAddress? email,
+  }) => guard(() async {
+    final user = await _remote.updateMe(firstName: firstName.value, lastName: lastName.value, email: email?.value);
+    return user.toDomain();
   });
 
   @override

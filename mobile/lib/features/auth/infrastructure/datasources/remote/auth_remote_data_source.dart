@@ -17,6 +17,9 @@ abstract interface class AuthRemoteDataSource {
 
   Future<UserDto> me();
 
+  /// `PATCH /users/me`; `email: null` lo borra.
+  Future<UserDto> updateMe({required String firstName, required String lastName, String? email});
+
   Future<void> logout(String refreshToken);
 }
 
@@ -63,6 +66,12 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<UserDto> me() async {
     final data = await _api.get('/users/me');
+    return UserDto.fromJson(data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<UserDto> updateMe({required String firstName, required String lastName, String? email}) async {
+    final data = await _api.patch('/users/me', body: {'firstName': firstName, 'lastName': lastName, 'email': email});
     return UserDto.fromJson(data as Map<String, dynamic>);
   }
 

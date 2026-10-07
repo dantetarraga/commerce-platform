@@ -8,24 +8,21 @@ part of 'purchase_bar_controller.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Traduce la bolsa y el pedido en curso a la forma de la barra de compra. El pedido
-/// activo tiene prioridad sobre la bolsa; uno entregado y ya calificado deja
-/// de mostrarse. Abrirla es cosa de la UI: ver `openPurchaseBar`.
+/// Traduce la bolsa y el pedido en curso a la barra de compra. El pedido activo
+/// tiene prioridad; uno entregado y ya calificado deja de mostrarse.
 
 @ProviderFor(purchaseBar)
 final purchaseBarProvider = PurchaseBarProvider._();
 
-/// Traduce la bolsa y el pedido en curso a la forma de la barra de compra. El pedido
-/// activo tiene prioridad sobre la bolsa; uno entregado y ya calificado deja
-/// de mostrarse. Abrirla es cosa de la UI: ver `openPurchaseBar`.
+/// Traduce la bolsa y el pedido en curso a la barra de compra. El pedido activo
+/// tiene prioridad; uno entregado y ya calificado deja de mostrarse.
 
 final class PurchaseBarProvider
     extends
         $FunctionalProvider<PurchaseBarView, PurchaseBarView, PurchaseBarView>
     with $Provider<PurchaseBarView> {
-  /// Traduce la bolsa y el pedido en curso a la forma de la barra de compra. El pedido
-  /// activo tiene prioridad sobre la bolsa; uno entregado y ya calificado deja
-  /// de mostrarse. Abrirla es cosa de la UI: ver `openPurchaseBar`.
+  /// Traduce la bolsa y el pedido en curso a la barra de compra. El pedido activo
+  /// tiene prioridad; uno entregado y ya calificado deja de mostrarse.
   PurchaseBarProvider._()
     : super(
         from: null,
@@ -61,21 +58,18 @@ final class PurchaseBarProvider
 
 String _$purchaseBarHash() => r'62186758725ae2f7149cc1bec9af37f364895b1e';
 
-/// Cuenta las veces que la bolsa recibió algo nuevo: el nudo de la barra salta
-/// cada vez que cambia. Escucha la bolsa en vez de compararla dentro de un
-/// `build`, así recalcular la barra no tiene efectos secundarios.
+/// Cuenta las veces que la bolsa recibió algo nuevo (el nudo salta). Escucha la
+/// bolsa en vez de compararla en un `build`, así recalcular la barra no tiene efectos.
 
 @ProviderFor(PurchaseBarPulse)
 final purchaseBarPulseProvider = PurchaseBarPulseProvider._();
 
-/// Cuenta las veces que la bolsa recibió algo nuevo: el nudo de la barra salta
-/// cada vez que cambia. Escucha la bolsa en vez de compararla dentro de un
-/// `build`, así recalcular la barra no tiene efectos secundarios.
+/// Cuenta las veces que la bolsa recibió algo nuevo (el nudo salta). Escucha la
+/// bolsa en vez de compararla en un `build`, así recalcular la barra no tiene efectos.
 final class PurchaseBarPulseProvider
     extends $NotifierProvider<PurchaseBarPulse, int> {
-  /// Cuenta las veces que la bolsa recibió algo nuevo: el nudo de la barra salta
-  /// cada vez que cambia. Escucha la bolsa en vez de compararla dentro de un
-  /// `build`, así recalcular la barra no tiene efectos secundarios.
+  /// Cuenta las veces que la bolsa recibió algo nuevo (el nudo salta). Escucha la
+  /// bolsa en vez de compararla en un `build`, así recalcular la barra no tiene efectos.
   PurchaseBarPulseProvider._()
     : super(
         from: null,
@@ -105,9 +99,8 @@ final class PurchaseBarPulseProvider
 
 String _$purchaseBarPulseHash() => r'3a275a7c6fdfdd8e0a66bc9fefe239c7df2fc6f8';
 
-/// Cuenta las veces que la bolsa recibió algo nuevo: el nudo de la barra salta
-/// cada vez que cambia. Escucha la bolsa en vez de compararla dentro de un
-/// `build`, así recalcular la barra no tiene efectos secundarios.
+/// Cuenta las veces que la bolsa recibió algo nuevo (el nudo salta). Escucha la
+/// bolsa en vez de compararla en un `build`, así recalcular la barra no tiene efectos.
 
 abstract class _$PurchaseBarPulse extends $Notifier<int> {
   int build();

@@ -50,20 +50,17 @@ final class CartRepositoryProvider
 
 String _$cartRepositoryHash() => r'42f6d6a70aeac6f99b0336f9c0aee94bf26d6124';
 
-/// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
-/// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)
+/// La bolsa del usuario; cada cambio se guarda en el dispositivo. La lógica
 /// vive en [Cart]; aquí solo se orquesta y persiste.
 
 @ProviderFor(CartController)
 final cartControllerProvider = CartControllerProvider._();
 
-/// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
-/// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)
+/// La bolsa del usuario; cada cambio se guarda en el dispositivo. La lógica
 /// vive en [Cart]; aquí solo se orquesta y persiste.
 final class CartControllerProvider
     extends $AsyncNotifierProvider<CartController, Cart> {
-  /// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
-  /// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)
+  /// La bolsa del usuario; cada cambio se guarda en el dispositivo. La lógica
   /// vive en [Cart]; aquí solo se orquesta y persiste.
   CartControllerProvider._()
     : super(
@@ -86,8 +83,7 @@ final class CartControllerProvider
 
 String _$cartControllerHash() => r'20a5c49370a0643e7d2918fb9f7f3eac674a7b29';
 
-/// La bolsa del usuario. Fuente única de verdad: cada cambio se guarda en el
-/// dispositivo. La lógica (un negocio por bolsa, fusionar líneas, mínimos)
+/// La bolsa del usuario; cada cambio se guarda en el dispositivo. La lógica
 /// vive en [Cart]; aquí solo se orquesta y persiste.
 
 abstract class _$CartController extends $AsyncNotifier<Cart> {

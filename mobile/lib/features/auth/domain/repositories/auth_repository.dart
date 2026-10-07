@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/email_address.dart';
 import 'package:chaski/core/domain/phone_number.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/auth/domain/entities/auth_user.dart';
@@ -16,6 +17,13 @@ abstract interface class AuthRepository {
     required String registrationToken,
     required PersonName firstName,
     required PersonName lastName,
+  });
+
+  /// Cambia nombre y correo de la cuenta; `email: null` lo borra.
+  Future<Result<AuthUser>> updateProfile({
+    required PersonName firstName,
+    required PersonName lastName,
+    EmailAddress? email,
   });
 
   /// Devuelve el usuario si hay una sesión guardada y válida, o `null`.

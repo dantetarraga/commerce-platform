@@ -8,27 +8,18 @@ part of 'auth_session.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Sesión actual de la app.
-///
-/// - `AsyncLoading`: restaurando la sesión al arrancar (se muestra el splash).
-/// - `AsyncData(null)`: sin sesión.
-/// - `AsyncData(user)`: autenticado.
+/// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
+/// `AsyncData(user)` autenticado.
 
 @ProviderFor(AuthSession)
 final authSessionProvider = AuthSessionProvider._();
 
-/// Sesión actual de la app.
-///
-/// - `AsyncLoading`: restaurando la sesión al arrancar (se muestra el splash).
-/// - `AsyncData(null)`: sin sesión.
-/// - `AsyncData(user)`: autenticado.
+/// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
+/// `AsyncData(user)` autenticado.
 final class AuthSessionProvider
     extends $AsyncNotifierProvider<AuthSession, AuthUser?> {
-  /// Sesión actual de la app.
-  ///
-  /// - `AsyncLoading`: restaurando la sesión al arrancar (se muestra el splash).
-  /// - `AsyncData(null)`: sin sesión.
-  /// - `AsyncData(user)`: autenticado.
+  /// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
+  /// `AsyncData(user)` autenticado.
   AuthSessionProvider._()
     : super(
         from: null,
@@ -48,13 +39,10 @@ final class AuthSessionProvider
   AuthSession create() => AuthSession();
 }
 
-String _$authSessionHash() => r'd5a1527db02f665c138816fb25c33476dc585e4b';
+String _$authSessionHash() => r'e8fe00f40c0ee8352a44a346ce97ec2877c4a1ca';
 
-/// Sesión actual de la app.
-///
-/// - `AsyncLoading`: restaurando la sesión al arrancar (se muestra el splash).
-/// - `AsyncData(null)`: sin sesión.
-/// - `AsyncData(user)`: autenticado.
+/// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
+/// `AsyncData(user)` autenticado.
 
 abstract class _$AuthSession extends $AsyncNotifier<AuthUser?> {
   FutureOr<AuthUser?> build();

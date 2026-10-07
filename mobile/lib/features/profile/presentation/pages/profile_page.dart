@@ -6,6 +6,7 @@ import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/favorites/favorites.dart';
 import 'package:chaski/features/notifications/notifications.dart';
 import 'package:chaski/features/orders/orders_customer.dart';
+import 'package:chaski/features/profile/presentation/pages/edit_profile_page.dart';
 import 'package:chaski/features/profile/presentation/providers/profile_summary.dart';
 import 'package:chaski/features/profile/presentation/widgets/theme_mode_sheet.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
@@ -74,10 +75,10 @@ class ProfilePage extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Ajustes de tu cuenta',
+                    tooltip: 'Editar tus datos',
                     style: IconButton.styleFrom(backgroundColor: context.chaski.raised),
-                    icon: const Icon(Icons.settings_outlined),
-                    onPressed: () => AppToast.show(context, 'Muy pronto: editar tu nombre y foto.'),
+                    icon: const Icon(Icons.edit_outlined),
+                    onPressed: () => context.pushNamed(EditProfilePage.name),
                   ),
                 ],
               ),

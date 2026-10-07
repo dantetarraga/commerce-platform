@@ -24,6 +24,9 @@ class AuthSession extends _$AuthSession {
 
   void signedIn(AuthUser user) => state = AsyncData(user);
 
+  /// Datos de la cuenta editados en el perfil.
+  void userUpdated(AuthUser user) => state = AsyncData(user);
+
   Future<void> logout() async {
     await ref.read(logoutProvider).call();
     state = const AsyncData(null);

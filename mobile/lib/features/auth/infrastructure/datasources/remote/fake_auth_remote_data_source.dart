@@ -104,14 +104,36 @@ class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<UserDto> me() async {
     await _backend.delay();
-    // Simula el header Authorization que agregaría AuthInterceptor.
+    return UserDto.fromJson(await _currentUser());
+  }
+
+  @override
+  Future<UserDto> updateMe({required String firstName, required String lastName, String? email}) async {
+    await _backend.delay();
+    final user = await _currentUser();
+    if (email != null && _usersByPhone.values.any((u) => u['email'] == email && u['id'] != user['id'])) {
+      throw const ApiException(
+        statusCode: 409,
+        code: 'EMAIL_ALREADY_EXISTS',
+        message: 'Ese correo ya está en uso por otra cuenta.',
+      );
+    }
+    user
+      ..['firstName'] = firstName
+      ..['lastName'] = lastName
+      ..['email'] = email;
+    return UserDto.fromJson(user);
+  }
+
+  /// Simula el header Authorization que agregaría AuthInterceptor.
+  Future<Map<String, dynamic>> _currentUser() async {
     final tokens = await _tokenStorage.read();
     final userId = tokens?.accessToken.replaceFirst(_tokenPrefix, '');
     final user = _usersByPhone.values.where((u) => u['id'] == userId).firstOrNull;
     if (user == null) {
       throw const ApiException(statusCode: 401, code: 'TOKEN_EXPIRED', message: 'Sesión expirada.');
     }
-    return UserDto.fromJson(user);
+    return user;
   }
 
   @override

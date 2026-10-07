@@ -2,11 +2,13 @@
 library;
 
 export 'domain/entities/auth_user.dart';
+export 'domain/value_objects/person_name.dart';
 export 'presentation/pages/otp_page.dart';
 export 'presentation/pages/phone_entry_page.dart';
 export 'presentation/pages/profile_setup_page.dart';
 export 'presentation/pages/splash_page.dart';
 export 'presentation/providers/auth_demo.dart';
+export 'presentation/providers/auth_providers.dart' show updateProfileProvider;
 export 'presentation/providers/auth_session.dart';
 export 'presentation/providers/phone_auth_flow.dart' show phoneAuthFlowProvider;
 export 'presentation/providers/splash_gate.dart';

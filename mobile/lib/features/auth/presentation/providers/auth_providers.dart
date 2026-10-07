@@ -6,6 +6,7 @@ import 'package:chaski/features/auth/domain/repositories/auth_repository.dart';
 import 'package:chaski/features/auth/domain/usecases/logout.dart';
 import 'package:chaski/features/auth/domain/usecases/phone_auth.dart';
 import 'package:chaski/features/auth/domain/usecases/restore_session.dart';
+import 'package:chaski/features/auth/domain/usecases/update_profile.dart';
 import 'package:chaski/features/auth/infrastructure/datasources/remote/auth_remote_data_source.dart';
 import 'package:chaski/features/auth/infrastructure/datasources/remote/fake_auth_remote_data_source.dart';
 import 'package:chaski/features/auth/infrastructure/repositories/auth_repository_impl.dart';
@@ -30,6 +31,9 @@ VerifyCode verifyCode(Ref ref) => VerifyCode(ref.watch(authRepositoryProvider));
 
 @riverpod
 CompleteProfile completeProfile(Ref ref) => CompleteProfile(ref.watch(authRepositoryProvider));
+
+@riverpod
+UpdateProfile updateProfile(Ref ref) => UpdateProfile(ref.watch(authRepositoryProvider));
 
 @riverpod
 RestoreSession restoreSession(Ref ref) => RestoreSession(ref.watch(authRepositoryProvider));

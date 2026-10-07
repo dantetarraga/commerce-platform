@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/email_address.dart';
 import 'package:chaski/core/domain/phone_number.dart';
 import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/errors/failure.dart';
@@ -143,5 +144,32 @@ void main() {
     await repository.logout();
 
     verify(() => storage.clear()).called(1);
+  });
+
+  test('updateProfile manda los datos normalizados y devuelve el usuario', () async {
+    when(() => remote.updateMe(firstName: 'Alexandra', lastName: 'Quispe', email: 'alex@correo.pe')).thenAnswer(
+      (_) async => const UserDto(id: 'u1', phone: '984123456', firstName: 'Alexandra', lastName: 'Quispe', roles: ['CUSTOMER']),
+    );
+
+    final user = (await repository.updateProfile(
+      firstName: PersonName.create(' Alexandra ').valueOrNull!,
+      lastName: PersonName.create('Quispe').valueOrNull!,
+      email: EmailAddress.create('Alex@Correo.pe').valueOrNull,
+    )).getOrThrow();
+
+    expect(user.firstName, 'Alexandra');
+  });
+
+  test('updateProfile con un correo ya usado llega como BusinessFailure', () async {
+    when(() => remote.updateMe(firstName: any(named: 'firstName'), lastName: any(named: 'lastName'), email: any(named: 'email')))
+        .thenThrow(const ApiException(statusCode: 409, code: 'EMAIL_ALREADY_EXISTS', message: 'Ese correo ya está en uso por otra cuenta.'));
+
+    final result = await repository.updateProfile(
+      firstName: PersonName.create('Alex').valueOrNull!,
+      lastName: PersonName.create('Quispe').valueOrNull!,
+      email: EmailAddress.create('otro@correo.pe').valueOrNull,
+    );
+
+    expect(failureOf(result), const BusinessFailure('EMAIL_ALREADY_EXISTS', 'Ese correo ya está en uso por otra cuenta.'));
   });
 }

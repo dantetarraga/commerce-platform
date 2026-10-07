@@ -8,18 +8,15 @@ part of 'theme_mode_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Tema elegido por el usuario (sistema, claro u oscuro), guardado en el
-/// dispositivo.
+/// Tema elegido por el usuario, guardado en el dispositivo.
 
 @ProviderFor(AppThemeMode)
 final appThemeModeProvider = AppThemeModeProvider._();
 
-/// Tema elegido por el usuario (sistema, claro u oscuro), guardado en el
-/// dispositivo.
+/// Tema elegido por el usuario, guardado en el dispositivo.
 final class AppThemeModeProvider
     extends $NotifierProvider<AppThemeMode, ThemeMode> {
-  /// Tema elegido por el usuario (sistema, claro u oscuro), guardado en el
-  /// dispositivo.
+  /// Tema elegido por el usuario, guardado en el dispositivo.
   AppThemeModeProvider._()
     : super(
         from: null,
@@ -49,8 +46,7 @@ final class AppThemeModeProvider
 
 String _$appThemeModeHash() => r'48db0f9c0d554160b095c4c27ee12af82da1670e';
 
-/// Tema elegido por el usuario (sistema, claro u oscuro), guardado en el
-/// dispositivo.
+/// Tema elegido por el usuario, guardado en el dispositivo.
 
 abstract class _$AppThemeMode extends $Notifier<ThemeMode> {
   ThemeMode build();

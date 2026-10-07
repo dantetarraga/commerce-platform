@@ -16,6 +16,7 @@ abstract final class RoutePaths {
   static const profile = '/tu';
   static const orders = '/pedidos';
   static const favorites = 'favoritos'; // hija de /tu
+  static const editProfile = 'datos'; // hija de /tu
 
   // Detalle a pantalla completa (sobre la barra).
   static const storeDetail = '/negocio/:storeId';

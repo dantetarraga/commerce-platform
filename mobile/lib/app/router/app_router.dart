@@ -110,6 +110,12 @@ GoRouter appRouter(Ref ref) {
                 builder: (_, _) => const ProfilePage(),
                 routes: [
                   materialRoute(path: RoutePaths.favorites, name: FavoritesPage.name, builder: (_, _) => const FavoritesPage()),
+                  materialRoute(
+                    parentNavigatorKey: rootNavigatorKey,
+                    path: RoutePaths.editProfile,
+                    name: EditProfilePage.name,
+                    builder: (_, _) => const EditProfilePage(),
+                  ),
                 ],
               ),
             ],
