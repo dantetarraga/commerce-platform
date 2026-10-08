@@ -10,8 +10,9 @@ abstract final class ExternalLinks {
     Uri.https('wa.me', '/51$phone', {'text': ?text}),
   );
 
-  static Future<bool> map(double lat, double lng) => _open(
-    Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': '$lat,$lng'}),
+  /// Ruta hasta ese punto en Google Maps (navegación lista para empezar).
+  static Future<bool> directions(double lat, double lng) => _open(
+    Uri.https('www.google.com', '/maps/dir/', {'api': '1', 'destination': '$lat,$lng', 'travelmode': 'driving'}),
   );
 
   static Future<bool> _open(Uri uri) async {

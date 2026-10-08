@@ -18,7 +18,7 @@ class DeliveryRoute extends StatelessWidget {
     if (!opened && context.mounted) AppToast.show(context, 'No pudimos abrir esa app en este celular.');
   }
 
-  static Future<bool> _map(GeoCoordinates at) => ExternalLinks.map(at.latitude, at.longitude);
+  static Future<bool> _map(GeoCoordinates at) => ExternalLinks.directions(at.latitude, at.longitude);
 
   @override
   Widget build(BuildContext context) {

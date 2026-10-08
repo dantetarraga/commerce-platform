@@ -53,6 +53,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> with Pa
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(courierLocationSharingProvider);
     final delivery = ref.watch(courierActiveDeliveryProvider);
     final delivering = _delivering;
     return Scaffold(

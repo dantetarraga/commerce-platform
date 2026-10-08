@@ -17,8 +17,9 @@ String? sessionUserId(Ref ref) => ref.watch(authSessionProvider).value?.id;
 @Riverpod(keepAlive: true)
 RealtimeClient realtimeClient(Ref ref) {
   final env = ref.watch(appEnvProvider);
+  if (env.useFakeData) return const NoRealtimeClient();
   final userId = ref.watch(sessionUserIdProvider);
-  if (env.useFakeData || userId == null) return const NoRealtimeClient();
+  if (userId == null) return const NoRealtimeClient();
   final client = SocketIoRealtimeClient(
     url: realtimeUrl(env.apiBaseUrl),
     accessToken: () async => (await ref.read(tokenStorageProvider).read())?.accessToken,

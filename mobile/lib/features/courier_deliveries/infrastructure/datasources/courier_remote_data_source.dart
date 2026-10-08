@@ -21,6 +21,9 @@ abstract interface class CourierRemoteDataSource {
   Future<Map<String, dynamic>> delivered(String orderId, {required String method, required Map<String, Object?> amount});
 
   Future<Map<String, dynamic>> summary();
+
+  /// Última posición del repartidor (`POST /courier/me/location`).
+  Future<void> reportLocation({required double lat, required double lng});
 }
 
 class ApiCourierRemoteDataSource implements CourierRemoteDataSource {
@@ -68,6 +71,10 @@ class ApiCourierRemoteDataSource implements CourierRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> summary() async => _map(await _api.get('/courier/me/summary'));
+
+  @override
+  Future<void> reportLocation({required double lat, required double lng}) =>
+      _api.post('/courier/me/location', body: {'lat': lat, 'lng': lng});
 }
 
 /// Modo demo: todo sale de [FakeStaffOrders], compartido con el negocio.
@@ -100,4 +107,8 @@ class FakeCourierRemoteDataSource implements CourierRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> summary() => _fake.courierSummary();
+
+  /// En la demo nadie sigue al repartidor.
+  @override
+  Future<void> reportLocation({required double lat, required double lng}) async {}
 }

@@ -1,3 +1,6 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/maps/location_service.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/presentation/providers/courier_providers.dart';
@@ -9,6 +12,34 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockRepository extends Mock implements CourierRepository {}
+
+class _MockLocation extends Mock implements LocationService {}
+
+final _here = GeoCoordinates.trusted(-14.79, -71.41);
+
+StaffOrder _delivery() => StaffOrder(
+  order: Order(
+    id: 'or_1',
+    code: '#1',
+    store: const OrderStore(id: 's1', name: 'Doña Rosa'),
+    lines: const [],
+    subtotal: const Money(2000),
+    deliveryFee: const Money(300),
+    discount: const Money.zero(),
+    total: const Money(2300),
+    addressTitle: 'Casa',
+    addressStreet: 'Jr. Lima 1',
+    payment: const YapePayment(),
+    status: OrderStatus.onTheWay,
+    events: const [],
+    placedAt: DateTime(2026, 10, 8, 12),
+  ),
+  customerName: 'Ana',
+  customerPhone: '984123456',
+  deliveryLocation: _here,
+  pickup: Pickup(address: 'Plaza', location: _here),
+  distanceMeters: 800,
+);
 
 class _Foreground extends AppForeground {
   @override
@@ -92,5 +123,54 @@ void main() {
     await tester.pump();
     verify(() => repo.activeDeliveries()).called(1);
     container.dispose();
+  });
+
+  group('ubicación del repartidor', () {
+    late _MockLocation location;
+
+    ProviderContainer sharing({StaffOrder? delivery}) {
+      location = _MockLocation();
+      when(() => location.current(ask: any(named: 'ask'))).thenAnswer((_) async => LocationFix(_here));
+      when(() => repo.me()).thenAnswer((_) async => Ok(_profile(CourierAvailability.busy)));
+      when(() => repo.activeDeliveries()).thenAnswer((_) async => Ok([?delivery]));
+      when(() => repo.reportLocation(any())).thenAnswer((_) async => const Ok(null));
+      return ProviderContainer(
+        overrides: [
+          courierRepositoryProvider.overrideWithValue(repo),
+          locationServiceProvider.overrideWithValue(location),
+          appForegroundProvider.overrideWith(_Foreground.new),
+        ],
+      )..listen(courierLocationSharingProvider, (_, _) {});
+    }
+
+    setUpAll(() => registerFallbackValue(_here));
+
+    testWidgets('con un pedido en curso la manda cada tanto; el permiso se pide una vez', (tester) async {
+      final container = sharing(delivery: _delivery());
+      for (var i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 10));
+      }
+      verify(() => repo.reportLocation(_here)).called(1);
+      verify(() => location.current()).called(1);
+
+      await tester.pump(courierLocationEvery);
+      await tester.pump();
+      verify(() => repo.reportLocation(_here)).called(1);
+      verify(() => location.current(ask: false)).called(1);
+
+      (container.read(appForegroundProvider.notifier) as _Foreground).show(visible: false);
+      await tester.pump(courierLocationEvery * 3);
+      verifyNever(() => repo.reportLocation(any()));
+      container.dispose();
+    });
+
+    testWidgets('sin pedido en curso no la manda', (tester) async {
+      final container = sharing();
+      await tester.pump();
+      await tester.pump(courierLocationEvery * 2);
+      verifyNever(() => repo.reportLocation(any()));
+      verifyNever(() => location.current(ask: any(named: 'ask')));
+      container.dispose();
+    });
   });
 }

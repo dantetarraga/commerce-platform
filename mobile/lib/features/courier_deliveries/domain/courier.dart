@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/orders/domain/staff_order.dart';
@@ -73,4 +74,7 @@ abstract interface class CourierRepository {
   Future<Result<StaffOrder>> delivered(String orderId, {required CollectionMethod method, required Money amount});
 
   Future<Result<CourierSummary>> summary();
+
+  /// Dónde va: el cliente lo ve en el mapa mientras le lleva el pedido.
+  Future<Result<void>> reportLocation(GeoCoordinates at);
 }

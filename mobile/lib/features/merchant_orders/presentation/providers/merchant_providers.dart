@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/network/network_providers.dart';
+import 'package:chaski/core/realtime/realtime_client.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/core/utils/text_utils.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
@@ -10,12 +11,12 @@ import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/merchant_repository_impl.dart';
 import 'package:chaski/features/orders/orders.dart';
+import 'package:chaski/features/partner_session/partner_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'merchant_providers.g.dart';
 
-/// Cada cuánto se refrescan los pedidos con la app abierta (hasta que llegue
-/// el push).
+/// Sin WebSocket, cada cuánto se refrescan los pedidos con la app abierta.
 const merchantPollEvery = Duration(seconds: 10);
 
 @Riverpod(keepAlive: true)
@@ -49,11 +50,11 @@ class MerchantStores extends _$MerchantStores {
   }
 }
 
-/// Pedidos en curso. Se refresca solo cada [merchantPollEvery].
+/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
+/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
 @riverpod
 Future<List<StaffOrder>> merchantActiveOrders(Ref ref) async {
-  final timer = Timer(merchantPollEvery, ref.invalidateSelf);
-  ref.onDispose(timer.cancel);
+  refreshLive(ref, events: {RealtimeEvents.storeOrdersChanged}, every: merchantPollEvery, foregroundOnly: false);
   return (await ref.watch(merchantRepositoryProvider).activeOrders()).getOrThrow();
 }
 

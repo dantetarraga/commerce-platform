@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure.dart';
+import 'package:chaski/core/maps/location_service.dart';
 import 'package:chaski/core/network/network_providers.dart';
+import 'package:chaski/core/realtime/realtime_client.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
@@ -12,8 +16,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'courier_providers.g.dart';
 
-/// Cada cuánto se buscan pedidos listos y se revisa la entrega en curso.
+/// Sin WebSocket, cada cuánto se buscan pedidos listos y se revisa la entrega
+/// en curso. Con él, los cambios llegan al instante.
 const courierPollEvery = Duration(seconds: 10);
+
+/// Cada cuánto manda su ubicación mientras lleva un pedido.
+const courierLocationEvery = Duration(seconds: 10);
 
 @Riverpod(keepAlive: true)
 CourierRemoteDataSource courierRemoteDataSource(Ref ref) => ref.watch(appEnvProvider).useFakeData
@@ -42,24 +50,57 @@ class CourierMe extends _$CourierMe {
   }
 }
 
-/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
-/// la app a la vista) si está conectado y libre.
+/// Pedidos listos para tomar, si está conectado y libre. Se refrescan al
+/// llegar `courier.orders.changed` (o cada [courierPollEvery] sin WebSocket).
 @riverpod
 Future<List<StaffOrder>> courierAvailableOrders(Ref ref) async {
   final me = await ref.watch(courierMeProvider.future);
   if (me.availability != CourierAvailability.available || !ref.mounted) return const [];
-  pollWhileForeground(ref, courierPollEvery);
+  refreshLive(ref, events: {RealtimeEvents.courierOrdersChanged}, every: courierPollEvery);
   return (await ref.watch(courierRepositoryProvider).available()).getOrThrow();
 }
 
-/// El pedido que está llevando (o null). Conectado, se revisa cada
-/// [courierPollEvery] por si lo cancelan o cambia.
+/// El pedido que está llevando (o null). Conectado, se revisa por si lo
+/// cancelan o cambia.
 @riverpod
 Future<StaffOrder?> courierActiveDelivery(Ref ref) async {
   final me = await ref.watch(courierMeProvider.future);
   if (!ref.mounted) return null;
-  if (me.isOnline) pollWhileForeground(ref, courierPollEvery);
+  if (me.isOnline) refreshLive(ref, events: {RealtimeEvents.courierOrdersChanged}, every: courierPollEvery);
   return (await ref.watch(courierRepositoryProvider).activeDeliveries()).getOrThrow().firstOrNull;
+}
+
+/// Id del pedido en curso. Solo avisa cuando cambia de pedido, no en cada
+/// consulta.
+@riverpod
+String? courierActiveOrderId(Ref ref) => ref.watch(courierActiveDeliveryProvider).value?.id;
+
+/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
+/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
+/// una vez; sin permiso o sin señal, simplemente no manda nada.
+@riverpod
+void courierLocationSharing(Ref ref) {
+  final orderId = ref.watch(courierActiveOrderIdProvider);
+  if (orderId == null || !ref.watch(appForegroundProvider)) return;
+  final location = ref.read(locationServiceProvider);
+  final repository = ref.read(courierRepositoryProvider);
+  var ask = true;
+  var sending = false;
+  Future<void> send() async {
+    if (sending) return;
+    sending = true;
+    try {
+      final reading = await location.current(ask: ask);
+      ask = false;
+      if (reading case LocationFix(:final coordinates) when ref.mounted) await repository.reportLocation(coordinates);
+    } finally {
+      sending = false;
+    }
+  }
+
+  unawaited(send());
+  final timer = Timer.periodic(courierLocationEvery, (_) => unawaited(send()));
+  ref.onDispose(timer.cancel);
 }
 
 @riverpod

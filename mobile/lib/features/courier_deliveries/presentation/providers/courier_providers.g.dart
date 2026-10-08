@@ -154,14 +154,14 @@ abstract class _$CourierMe extends $AsyncNotifier<CourierProfile> {
   }
 }
 
-/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
-/// la app a la vista) si está conectado y libre.
+/// Pedidos listos para tomar, si está conectado y libre. Se refrescan al
+/// llegar `courier.orders.changed` (o cada [courierPollEvery] sin WebSocket).
 
 @ProviderFor(courierAvailableOrders)
 final courierAvailableOrdersProvider = CourierAvailableOrdersProvider._();
 
-/// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
-/// la app a la vista) si está conectado y libre.
+/// Pedidos listos para tomar, si está conectado y libre. Se refrescan al
+/// llegar `courier.orders.changed` (o cada [courierPollEvery] sin WebSocket).
 
 final class CourierAvailableOrdersProvider
     extends
@@ -171,8 +171,8 @@ final class CourierAvailableOrdersProvider
           FutureOr<List<StaffOrder>>
         >
     with $FutureModifier<List<StaffOrder>>, $FutureProvider<List<StaffOrder>> {
-  /// Pedidos listos para tomar. Solo se consultan (cada [courierPollEvery], con
-  /// la app a la vista) si está conectado y libre.
+  /// Pedidos listos para tomar, si está conectado y libre. Se refrescan al
+  /// llegar `courier.orders.changed` (o cada [courierPollEvery] sin WebSocket).
   CourierAvailableOrdersProvider._()
     : super(
         from: null,
@@ -200,16 +200,16 @@ final class CourierAvailableOrdersProvider
 }
 
 String _$courierAvailableOrdersHash() =>
-    r'615b3895ce209a8c147ccccb1273b2ebc1199535';
+    r'97fb25035709b1282941680e98e123790d094b47';
 
-/// El pedido que está llevando (o null). Conectado, se revisa cada
-/// [courierPollEvery] por si lo cancelan o cambia.
+/// El pedido que está llevando (o null). Conectado, se revisa por si lo
+/// cancelan o cambia.
 
 @ProviderFor(courierActiveDelivery)
 final courierActiveDeliveryProvider = CourierActiveDeliveryProvider._();
 
-/// El pedido que está llevando (o null). Conectado, se revisa cada
-/// [courierPollEvery] por si lo cancelan o cambia.
+/// El pedido que está llevando (o null). Conectado, se revisa por si lo
+/// cancelan o cambia.
 
 final class CourierActiveDeliveryProvider
     extends
@@ -219,8 +219,8 @@ final class CourierActiveDeliveryProvider
           FutureOr<StaffOrder?>
         >
     with $FutureModifier<StaffOrder?>, $FutureProvider<StaffOrder?> {
-  /// El pedido que está llevando (o null). Conectado, se revisa cada
-  /// [courierPollEvery] por si lo cancelan o cambia.
+  /// El pedido que está llevando (o null). Conectado, se revisa por si lo
+  /// cancelan o cambia.
   CourierActiveDeliveryProvider._()
     : super(
         from: null,
@@ -248,7 +248,110 @@ final class CourierActiveDeliveryProvider
 }
 
 String _$courierActiveDeliveryHash() =>
-    r'1cd9aedab7d395bfa1b7db0803a7983eed3b07ef';
+    r'b9926a79cab3c207860f5ea57d06c3db698f07d9';
+
+/// Id del pedido en curso. Solo avisa cuando cambia de pedido, no en cada
+/// consulta.
+
+@ProviderFor(courierActiveOrderId)
+final courierActiveOrderIdProvider = CourierActiveOrderIdProvider._();
+
+/// Id del pedido en curso. Solo avisa cuando cambia de pedido, no en cada
+/// consulta.
+
+final class CourierActiveOrderIdProvider
+    extends $FunctionalProvider<String?, String?, String?>
+    with $Provider<String?> {
+  /// Id del pedido en curso. Solo avisa cuando cambia de pedido, no en cada
+  /// consulta.
+  CourierActiveOrderIdProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'courierActiveOrderIdProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$courierActiveOrderIdHash();
+
+  @$internal
+  @override
+  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String? create(Ref ref) {
+    return courierActiveOrderId(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$courierActiveOrderIdHash() =>
+    r'a64e8342d1e270942ab2909de57db3608b59cd9a';
+
+/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
+/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
+/// una vez; sin permiso o sin señal, simplemente no manda nada.
+
+@ProviderFor(courierLocationSharing)
+final courierLocationSharingProvider = CourierLocationSharingProvider._();
+
+/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
+/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
+/// una vez; sin permiso o sin señal, simplemente no manda nada.
+
+final class CourierLocationSharingProvider
+    extends $FunctionalProvider<void, void, void>
+    with $Provider<void> {
+  /// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
+  /// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
+  /// una vez; sin permiso o sin señal, simplemente no manda nada.
+  CourierLocationSharingProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'courierLocationSharingProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$courierLocationSharingHash();
+
+  @$internal
+  @override
+  $ProviderElement<void> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  void create(Ref ref) {
+    return courierLocationSharing(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$courierLocationSharingHash() =>
+    r'bea5dceb27159fe40a4b571cc1196df956dace12';
 
 @ProviderFor(courierSummary)
 final courierSummaryProvider = CourierSummaryProvider._();

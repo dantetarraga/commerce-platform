@@ -156,12 +156,14 @@ abstract class _$MerchantStores extends $AsyncNotifier<List<MerchantStore>> {
   }
 }
 
-/// Pedidos en curso. Se refresca solo cada [merchantPollEvery].
+/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
+/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
 
 @ProviderFor(merchantActiveOrders)
 final merchantActiveOrdersProvider = MerchantActiveOrdersProvider._();
 
-/// Pedidos en curso. Se refresca solo cada [merchantPollEvery].
+/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
+/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
 
 final class MerchantActiveOrdersProvider
     extends
@@ -171,7 +173,8 @@ final class MerchantActiveOrdersProvider
           FutureOr<List<StaffOrder>>
         >
     with $FutureModifier<List<StaffOrder>>, $FutureProvider<List<StaffOrder>> {
-  /// Pedidos en curso. Se refresca solo cada [merchantPollEvery].
+  /// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
+  /// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
   MerchantActiveOrdersProvider._()
     : super(
         from: null,
@@ -199,7 +202,7 @@ final class MerchantActiveOrdersProvider
 }
 
 String _$merchantActiveOrdersHash() =>
-    r'2e8b0da3c95bf0079f5c95e3193e805cc3033ffa';
+    r'567f9d6632e88e23dc83da775e058174d16871c2';
 
 /// Los pedidos en curso repartidos en las tres columnas del riel.
 

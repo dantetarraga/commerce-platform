@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/errors/failure_mapper.dart';
 import 'package:chaski/core/result/result.dart';
@@ -68,4 +69,8 @@ class CourierRepositoryImpl implements CourierRepository {
 
   @override
   Future<Result<CourierSummary>> summary() => guard(() async => _summary(await _remote.summary()));
+
+  @override
+  Future<Result<void>> reportLocation(GeoCoordinates at) =>
+      guard(() => _remote.reportLocation(lat: at.latitude, lng: at.longitude));
 }

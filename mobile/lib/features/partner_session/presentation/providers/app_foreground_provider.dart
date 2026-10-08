@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chaski/features/auth/auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -31,4 +32,30 @@ void pollWhileForeground(Ref ref, Duration every) {
     ..listen(appForegroundProvider, (was, now) {
       if (now && was == false) ref.invalidateSelf();
     });
+}
+
+/// Refresca el provider de [ref] apenas llega por WebSocket alguno de
+/// [events]. La consulta queda de respaldo: cada [connectedEvery] con conexión
+/// y cada [every] sin ella. Con [foregroundOnly] (lo normal) se pausa en segundo
+/// plano; el negocio lo desactiva para que la alarma suene con la pantalla
+/// bloqueada.
+void refreshLive(
+  Ref ref, {
+  required Set<String> events,
+  required Duration every,
+  Duration connectedEvery = const Duration(seconds: 30),
+  bool foregroundOnly = true,
+}) {
+  final realtime = ref.watch(realtimeClientProvider);
+  final subscription = realtime.events.where((event) => events.contains(event.name)).listen((_) {
+    if (!foregroundOnly || ref.read(appForegroundProvider)) ref.invalidateSelf();
+  });
+  ref.onDispose(subscription.cancel);
+  final pollEvery = realtime.isConnected ? connectedEvery : every;
+  if (foregroundOnly) {
+    pollWhileForeground(ref, pollEvery);
+  } else {
+    final timer = Timer(pollEvery, ref.invalidateSelf);
+    ref.onDispose(timer.cancel);
+  }
 }

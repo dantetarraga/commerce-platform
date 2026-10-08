@@ -44,6 +44,8 @@ class _CourierHomePageState extends ConsumerState<CourierHomePage> with PartnerA
   @override
   Widget build(BuildContext context) {
     final me = ref.watch(courierMeProvider);
+    // Con un pedido en curso, el cliente lo ve llegar en el mapa.
+    ref.watch(courierLocationSharingProvider);
     final delivery = ref.watch(courierActiveDeliveryProvider);
 
     return OrderAlarmScope<StaffOrder>(
