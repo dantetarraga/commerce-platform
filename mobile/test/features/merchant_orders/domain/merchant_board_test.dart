@@ -2,6 +2,7 @@ import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
+import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -34,18 +35,20 @@ void main() {
     distanceMeters: 800,
   );
 
-  test('agrupa los pedidos en las tres columnas del riel', () {
-    final board = MerchantBoardColumn.group([
-      staff('1', OrderStatus.received),
-      staff('2', OrderStatus.preparing),
-      staff('3', OrderStatus.courierAssigned),
-      staff('4', OrderStatus.confirmed),
-      staff('5', OrderStatus.delivered),
-    ]);
-    expect(board[MerchantBoardColumn.fresh]!.map((o) => o.id), ['1']);
-    expect(board[MerchantBoardColumn.cooking]!.map((o) => o.id), ['2', '4']);
-    expect(board[MerchantBoardColumn.ready]!.map((o) => o.id), ['3']);
-    expect(MerchantBoardColumn.of(OrderStatus.cancelled), isNull);
+  test('el tablero respeta las columnas y los conteos del backend', () {
+    Map<String, Object?> column(String key, List<StaffOrder> orders) => {'key': key, 'count': orders.length, 'items': <Object?>[]};
+    final board = MerchantJson.board({
+      'columns': [
+        column('fresh', [staff('1', OrderStatus.received)]),
+        column('cooking', []),
+        {'key': 'otra', 'count': 9, 'items': <Object?>[]},
+      ],
+    });
+    expect(board[MerchantBoardColumn.fresh].count, 1);
+    expect(board[MerchantBoardColumn.cooking].count, 0);
+    // Una columna que no vino queda vacía; una desconocida se ignora.
+    expect(board[MerchantBoardColumn.ready], BoardColumn.empty);
+    expect(board.columns.keys, [MerchantBoardColumn.fresh, MerchantBoardColumn.cooking]);
   });
 
   test('avance en el fogón hacia la hora prometida', () {

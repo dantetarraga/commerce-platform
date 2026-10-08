@@ -187,6 +187,27 @@ class FakeStaffOrders {
     return _sorted(_orders.values.where((o) => (o['store'] as Map)['id'] == merchantStoreId && filter(o)));
   }
 
+  static const _boardColumns = {
+    'fresh': {'RECEIVED'},
+    'cooking': {'CONFIRMED', 'PREPARING'},
+    'ready': {'READY', 'COURIER_ASSIGNED', 'ON_THE_WAY'},
+  };
+
+  /// Como `GET /merchant/board`: los pedidos en curso en sus tres columnas.
+  Future<Map<String, dynamic>> merchantBoard() async {
+    final active = await merchantOrders(scope: 'active');
+    return {
+      'columns': [
+        for (final MapEntry(:key, value: statuses) in _boardColumns.entries)
+          {
+            'key': key,
+            'count': active.where((o) => statuses.contains(o['status'])).length,
+            'items': active.where((o) => statuses.contains(o['status'])).toList(),
+          },
+      ],
+    };
+  }
+
   Future<Map<String, dynamic>> accept(String id, {required int prepMinutes}) async {
     await _backend.delay();
     final order = _find(id);

@@ -5,7 +5,6 @@ import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_j
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_rail.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/today_charts.dart';
-import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,7 +92,7 @@ void main() {
   });
 
   testWidgets('cada columna vacía tiene su ícono y su dato del momento', (tester) async {
-    final board = {for (final c in MerchantBoardColumn.values) c: <StaffOrder>[]};
+    const board = MerchantBoard({});
     await _pump(
       tester,
       const Column(
@@ -103,7 +102,7 @@ void main() {
         ],
       ),
       overrides: [
-        merchantBoardProvider.overrideWithValue(AsyncData(board)),
+        merchantBoardProvider.overrideWith((ref) async => board),
         merchantSummaryProvider.overrideWith((ref) async => MerchantJson.summary(_json)),
         merchantStoresProvider.overrideWith(_Stores.new),
       ],

@@ -1,5 +1,6 @@
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/result/result.dart';
+import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/orders/domain/staff_order.dart';
 import 'package:equatable/equatable.dart';
 
@@ -217,7 +218,8 @@ abstract interface class MerchantRepository {
   Future<Result<MerchantStore>> setAcceptingOrders(MerchantStore store, {required bool accepting});
 
   /// Pedidos en curso (de nuevo a en camino), del más reciente al más antiguo.
-  Future<Result<List<StaffOrder>>> activeOrders();
+  /// Los pedidos en curso repartidos en las tres columnas, con sus conteos.
+  Future<Result<MerchantBoard>> board();
 
   Future<Result<List<StaffOrder>>> todayOrders();
 

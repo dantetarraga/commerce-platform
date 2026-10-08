@@ -1,4 +1,5 @@
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
+import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/orders/orders_infrastructure.dart';
 
 /// Mapeo JSON → entidades de `merchant/*`.
@@ -19,6 +20,14 @@ abstract final class MerchantJson {
     section: json['section'] as String?,
     isAvailable: json['isAvailable'] as bool,
   );
+
+  static MerchantBoard board(Map<String, dynamic> json) => MerchantBoard({
+    for (final c in _rows(json['columns']))
+      ?MerchantBoardColumn.values.asNameMap()[c['key']]: BoardColumn(
+          count: c['count'] as int,
+          items: [for (final o in _rows(c['items'])) StaffOrderJson.fromJson(o)],
+        ),
+  });
 
   static String filterToJson(ProductFilter filter) => switch (filter) {
     ProductFilter.all => 'all',

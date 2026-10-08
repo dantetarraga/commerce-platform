@@ -1,38 +1,43 @@
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/domain/staff_order.dart';
+import 'package:equatable/equatable.dart';
 
-/// Las tres columnas del riel de cocina del negocio.
+/// Las tres columnas del tablero del negocio. Qué pedido va en cuál lo
+/// decide el backend (`GET /merchant/board`).
 enum MerchantBoardColumn {
-  /// Comandas nuevas, esperando respuesta.
-  fresh({OrderStatus.received}),
+  /// Pedidos nuevos, esperando respuesta.
+  fresh,
 
-  /// En fogón: aceptadas y preparándose.
-  cooking({OrderStatus.confirmed, OrderStatus.preparing}),
+  /// Aceptados y en preparación.
+  cooking,
 
-  /// Listas: esperando al repartidor o ya en camino.
-  ready({OrderStatus.ready, OrderStatus.courierAssigned, OrderStatus.onTheWay});
+  /// Listos: esperando al repartidor o ya en camino.
+  ready,
+}
 
-  const MerchantBoardColumn(this.statuses);
+/// Una columna del tablero: cuántos pedidos tiene y cuáles.
+final class BoardColumn extends Equatable {
+  const BoardColumn({required this.count, required this.items});
 
-  final Set<OrderStatus> statuses;
+  static const empty = BoardColumn(count: 0, items: []);
 
-  /// Columna de un estado, o `null` si ya no está en el riel (entregado, cancelado).
-  static MerchantBoardColumn? of(OrderStatus status) {
-    for (final column in values) {
-      if (column.statuses.contains(status)) return column;
-    }
-    return null;
-  }
+  final int count;
+  final List<StaffOrder> items;
 
-  /// Reparte [orders] en las tres columnas conservando su orden. Todas las
-  /// columnas están en el mapa, aunque queden vacías.
-  static Map<MerchantBoardColumn, List<StaffOrder>> group(Iterable<StaffOrder> orders) {
-    final board = {for (final column in values) column: <StaffOrder>[]};
-    for (final order in orders) {
-      if (of(order.status) case final column?) board[column]!.add(order);
-    }
-    return board;
-  }
+  @override
+  List<Object?> get props => [count, items];
+}
+
+/// El tablero tal como lo arma el backend.
+final class MerchantBoard extends Equatable {
+  const MerchantBoard(this.columns);
+
+  final Map<MerchantBoardColumn, BoardColumn> columns;
+
+  BoardColumn operator [](MerchantBoardColumn column) => columns[column] ?? BoardColumn.empty;
+
+  @override
+  List<Object?> get props => [columns];
 }
 
 /// Lo que el backend suma a la preparación para estimar la llegada al cliente.

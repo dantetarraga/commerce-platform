@@ -3,7 +3,6 @@ import 'package:chaski/features/merchant_orders/presentation/providers/merchant_
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_rail.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
-import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/partner/partner.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
@@ -14,23 +13,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class MerchantOrdersTab extends ConsumerWidget {
   const MerchantOrdersTab({required this.board, required this.column, super.key});
 
-  final AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> board;
+  final AsyncValue<MerchantBoard> board;
   final MerchantBoardColumn column;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final key = 'orders-${column.name}';
     return RefreshIndicator(
-      onRefresh: () => ref.refresh(merchantActiveOrdersProvider.future),
+      onRefresh: () => ref.refresh(merchantBoardProvider.future),
       child: AsyncValueView(
         value: board,
-        onRetry: () => ref.invalidate(merchantActiveOrdersProvider),
+        onRetry: () => ref.invalidate(merchantBoardProvider),
         loading: MerchantListView(
           storageKey: '$key-loading',
           itemCount: 2,
           itemBuilder: (_, i) => OrderCardSkeleton(withActions: i == 0),
         ),
-        isEmpty: (board) => board[column]!.isEmpty,
+        isEmpty: (board) => board[column].items.isEmpty,
         empty: MerchantListView(
           storageKey: key,
           itemCount: 1,
@@ -40,7 +39,7 @@ class MerchantOrdersTab extends ConsumerWidget {
           ),
         ),
         data: (board) {
-          final orders = board[column]!;
+          final orders = board[column].items;
           return LayoutBuilder(
             builder: (context, constraints) {
               final columns = PartnerLayout.columnsFor(context, constraints.maxWidth);

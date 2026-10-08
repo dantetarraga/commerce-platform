@@ -18,6 +18,7 @@ import { StoresService } from '../stores/stores.service';
 import { MerchantProductsQueryDto } from './dto/merchant-products-query.dto';
 import { UpdateProductAvailabilityDto } from './dto/update-product-availability.dto';
 import { UpdateStoreStatusDto } from './dto/update-store-status.dto';
+import { BOARD_LIMIT, groupBoard } from './merchant-board';
 import { MerchantService } from './merchant.service';
 
 /** El admin opera cualquier negocio; el merchant, solo los suyos. */
@@ -49,6 +50,20 @@ export class MerchantController {
   @Get('stores')
   myStores(@CurrentUser() user: AuthUser) {
     return this.merchant.stores(ownerOf(user));
+  }
+
+  /**
+   * Tablero: los pedidos en curso ya repartidos en Nuevos, Preparando y
+   * Listos, con el conteo de cada columna.
+   */
+  @Get('board')
+  async board(@CurrentUser() user: AuthUser) {
+    const { orders } = await this.orders.page(
+      { AND: [scopeFor(actorOf(user)), listScopeWhere('active')] },
+      { limit: BOARD_LIMIT },
+    );
+    const columns = groupBoard(orders);
+    return { columns: columns.map((c) => ({ ...c, items: c.items.map(toStaffOrderResponse) })) };
   }
 
   /** `scope=active|today` y `status` se combinan. */

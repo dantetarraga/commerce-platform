@@ -5,7 +5,6 @@ import 'package:chaski/features/merchant_orders/presentation/providers/merchant_
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/store_switch.dart';
-import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/partner/partner.dart';
 import 'package:chaski/shared/widgets/async_value_view.dart';
@@ -110,14 +109,14 @@ class _TodayCount extends ConsumerWidget {
 class RailBoard extends ConsumerWidget {
   const RailBoard({required this.board, super.key});
 
-  final AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> board;
+  final AsyncValue<MerchantBoard> board;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => RefreshIndicator(
-    onRefresh: () => ref.refresh(merchantActiveOrdersProvider.future),
+    onRefresh: () => ref.refresh(merchantBoardProvider.future),
     child: AsyncValueView(
       value: board,
-      onRetry: () => ref.invalidate(merchantActiveOrdersProvider),
+      onRetry: () => ref.invalidate(merchantBoardProvider),
       loading: _RailRow(
         scrollable: false,
         builder: (column) => PartnerRail(
@@ -128,7 +127,7 @@ class RailBoard extends ConsumerWidget {
       ),
       data: (board) => _RailRow(
         builder: (column) {
-          final orders = board[column]!;
+          final orders = board[column].items;
           return PartnerRail(
             title: column.title,
             count: orders.length,
@@ -192,7 +191,7 @@ class MerchantColumnEmpty extends ConsumerWidget {
             : const AppEmptyChip(label: 'Pedidos en pausa'),
         _ => null,
       },
-      MerchantBoardColumn.cooking => switch (ref.watch(merchantBoardProvider).value?[MerchantBoardColumn.fresh]?.length) {
+      MerchantBoardColumn.cooking => switch (ref.watch(merchantBoardProvider).value?[MerchantBoardColumn.fresh].count) {
         final waiting? when waiting > 0 => AppEmptyChip(
           label: '$waiting ${waiting == 1 ? 'pedido espera' : 'pedidos esperan'} respuesta${compact ? '' : ' →'}',
           onTap: compact ? null : () => DefaultTabController.maybeOf(context)?.animateTo(MerchantBoardColumn.fresh.index),

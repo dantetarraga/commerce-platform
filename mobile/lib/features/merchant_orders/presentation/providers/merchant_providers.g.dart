@@ -156,70 +156,28 @@ abstract class _$MerchantStores extends $AsyncNotifier<List<MerchantStore>> {
   }
 }
 
-/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
-/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
-
-@ProviderFor(merchantActiveOrders)
-final merchantActiveOrdersProvider = MerchantActiveOrdersProvider._();
-
-/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
-/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
-
-final class MerchantActiveOrdersProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<StaffOrder>>,
-          List<StaffOrder>,
-          FutureOr<List<StaffOrder>>
-        >
-    with $FutureModifier<List<StaffOrder>>, $FutureProvider<List<StaffOrder>> {
-  /// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
-  /// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
-  MerchantActiveOrdersProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'merchantActiveOrdersProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$merchantActiveOrdersHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<List<StaffOrder>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<StaffOrder>> create(Ref ref) {
-    return merchantActiveOrders(ref);
-  }
-}
-
-String _$merchantActiveOrdersHash() =>
-    r'567f9d6632e88e23dc83da775e058174d16871c2';
-
-/// Los pedidos en curso repartidos en las tres columnas del riel.
+/// El tablero: pedidos en curso repartidos por el backend en tres columnas.
+/// Llega al instante con `store.orders.changed` (también el pedido nuevo); sin
+/// WebSocket, se consulta cada [merchantPollEvery].
 
 @ProviderFor(merchantBoard)
 final merchantBoardProvider = MerchantBoardProvider._();
 
-/// Los pedidos en curso repartidos en las tres columnas del riel.
+/// El tablero: pedidos en curso repartidos por el backend en tres columnas.
+/// Llega al instante con `store.orders.changed` (también el pedido nuevo); sin
+/// WebSocket, se consulta cada [merchantPollEvery].
 
 final class MerchantBoardProvider
     extends
         $FunctionalProvider<
-          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>,
-          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>,
-          AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>
+          AsyncValue<MerchantBoard>,
+          MerchantBoard,
+          FutureOr<MerchantBoard>
         >
-    with $Provider<AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>> {
-  /// Los pedidos en curso repartidos en las tres columnas del riel.
+    with $FutureModifier<MerchantBoard>, $FutureProvider<MerchantBoard> {
+  /// El tablero: pedidos en curso repartidos por el backend en tres columnas.
+  /// Llega al instante con `store.orders.changed` (también el pedido nuevo); sin
+  /// WebSocket, se consulta cada [merchantPollEvery].
   MerchantBoardProvider._()
     : super(
         from: null,
@@ -236,29 +194,70 @@ final class MerchantBoardProvider
 
   @$internal
   @override
-  $ProviderElement<AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>>
-  $createElement($ProviderPointer pointer) => $ProviderElement(pointer);
+  $FutureProviderElement<MerchantBoard> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> create(Ref ref) {
+  FutureOr<MerchantBoard> create(Ref ref) {
     return merchantBoard(ref);
+  }
+}
+
+String _$merchantBoardHash() => r'9144a6de99ef58d7928e013d1cfbc992e3b36522';
+
+/// Los pedidos nuevos (la columna que hace sonar la alarma).
+
+@ProviderFor(merchantFreshOrders)
+final merchantFreshOrdersProvider = MerchantFreshOrdersProvider._();
+
+/// Los pedidos nuevos (la columna que hace sonar la alarma).
+
+final class MerchantFreshOrdersProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<StaffOrder>>,
+          AsyncValue<List<StaffOrder>>,
+          AsyncValue<List<StaffOrder>>
+        >
+    with $Provider<AsyncValue<List<StaffOrder>>> {
+  /// Los pedidos nuevos (la columna que hace sonar la alarma).
+  MerchantFreshOrdersProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'merchantFreshOrdersProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$merchantFreshOrdersHash();
+
+  @$internal
+  @override
+  $ProviderElement<AsyncValue<List<StaffOrder>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AsyncValue<List<StaffOrder>> create(Ref ref) {
+    return merchantFreshOrders(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(
-    AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> value,
-  ) {
+  Override overrideWithValue(AsyncValue<List<StaffOrder>> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride:
-          $SyncValueProvider<
-            AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>>
-          >(value),
+      providerOverride: $SyncValueProvider<AsyncValue<List<StaffOrder>>>(value),
     );
   }
 }
 
-String _$merchantBoardHash() => r'0e47f4422eac4997f8f20a612ded8cce6e4291c0';
+String _$merchantFreshOrdersHash() =>
+    r'f9178e68d76fe898f7fc544b53429a624bdce7f9';
 
 @ProviderFor(merchantTodayOrders)
 final merchantTodayOrdersProvider = MerchantTodayOrdersProvider._();
@@ -379,7 +378,7 @@ final class MerchantOrderActionsProvider
 }
 
 String _$merchantOrderActionsHash() =>
-    r'ed9d7f58ed78a77b8a032b137e66284960ce20b3';
+    r'0ecb6c3b56ea47aacd298071598a2af6ae01dec3';
 
 /// Acciones sobre un pedido. Al terminar refresca las listas y el resumen.
 // keepAlive: si se liberara a mitad de una acción, se perdería el refresco.

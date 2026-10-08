@@ -10,6 +10,9 @@ abstract interface class MerchantRemoteDataSource {
   /// [scope]: `active` o `today`.
   Future<List<Map<String, dynamic>>> orders({required String scope});
 
+  /// `{ columns: [{ key, count, items }] }` (`GET /merchant/board`).
+  Future<Map<String, dynamic>> board();
+
   Future<Map<String, dynamic>> accept(String orderId, {required int prepMinutes});
 
   Future<Map<String, dynamic>> markReady(String orderId);
@@ -39,6 +42,9 @@ class ApiMerchantRemoteDataSource implements MerchantRemoteDataSource {
   @override
   Future<Map<String, dynamic>> setAcceptingOrders(String storeId, {required bool accepting}) async =>
       _map(await _api.patch('/merchant/stores/$storeId', body: {'isAcceptingOrders': accepting}));
+
+  @override
+  Future<Map<String, dynamic>> board() async => _map(await _api.get('/merchant/board'));
 
   @override
   Future<List<Map<String, dynamic>>> orders({required String scope}) async {
@@ -86,6 +92,9 @@ class FakeMerchantRemoteDataSource implements MerchantRemoteDataSource {
 
   @override
   Future<List<Map<String, dynamic>>> orders({required String scope}) => _fake.merchantOrders(scope: scope);
+
+  @override
+  Future<Map<String, dynamic>> board() => _fake.merchantBoard();
 
   @override
   Future<Map<String, dynamic>> accept(String orderId, {required int prepMinutes}) =>

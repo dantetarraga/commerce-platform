@@ -35,7 +35,7 @@ class MerchantHomePage extends ConsumerWidget {
     final stores = storesValue.value ?? const <MerchantStore>[];
     final store = stores.firstOrNull;
     final wide = PartnerLayout.isWide(context);
-    final fresh = board.value?[MerchantBoardColumn.fresh]?.length ?? 0;
+    final fresh = board.value?[MerchantBoardColumn.fresh].count ?? 0;
 
     final actions = [
       if (store != null)
@@ -51,7 +51,7 @@ class MerchantHomePage extends ConsumerWidget {
         ? const ['Pedidos', 'Hoy']
         : [
             for (final column in MerchantBoardColumn.values)
-              switch (board.value?[column]?.length ?? 0) {
+              switch (board.value?[column].count ?? 0) {
                 0 => column.title,
                 final n => '${column.title} ($n)',
               },
@@ -59,7 +59,7 @@ class MerchantHomePage extends ConsumerWidget {
           ];
 
     return OrderAlarmScope<StaffOrder>(
-      orders: merchantActiveOrdersProvider,
+      orders: merchantFreshOrdersProvider,
       rule: const OrderAlarmRule.whilePending(_waiting),
       child: DefaultTabController(
         length: tabs.length,

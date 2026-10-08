@@ -1,6 +1,7 @@
 import 'package:chaski/core/errors/failure_mapper.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
+import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
 import 'package:chaski/features/orders/orders.dart';
@@ -22,8 +23,7 @@ class MerchantRepositoryImpl implements MerchantRepository {
   });
 
   @override
-  Future<Result<List<StaffOrder>>> activeOrders() =>
-      guard(() async => (await _remote.orders(scope: 'active')).map(StaffOrderJson.fromJson).toList());
+  Future<Result<MerchantBoard>> board() => guard(() async => MerchantJson.board(await _remote.board()));
 
   @override
   Future<Result<List<StaffOrder>>> todayOrders() =>

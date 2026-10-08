@@ -261,6 +261,28 @@ describe('Chaski Socios: negocio (e2e)', () => {
       .expect(200);
   });
 
+  it('tablero: el backend reparte los pedidos en curso en tres columnas y las cuenta', async () => {
+    type Board = { columns: { key: string; count: number; items: { id: string; status: string }[] }[] };
+    const board = async (session = merchant) =>
+      (await http().get(`${API}/merchant/board`).set(session.auth).expect(200)).body as Board;
+    const column = (b: Board, key: string) => b.columns.find((c) => c.key === key)!;
+
+    const order = await place();
+    let now = await board();
+    expect(now.columns.map((c) => c.key)).toEqual(['fresh', 'cooking', 'ready']);
+    expect(column(now, 'fresh').items.map((o) => o.id)).toContain(order.id);
+    for (const c of now.columns) expect(c.count).toBe(c.items.length);
+
+    await accept(order.id, 20).expect(200);
+    now = await board();
+    expect(column(now, 'fresh').items.map((o) => o.id)).not.toContain(order.id);
+    expect(column(now, 'cooking').items.find((o) => o.id === order.id)?.status).toBe('PREPARING');
+
+    // Otro negocio no ve este pedido en su tablero.
+    const other = await board(otherMerchant);
+    expect(other.columns.flatMap((c) => c.items.map((o) => o.id))).not.toContain(order.id);
+  });
+
   it('resumen del día: cuenta los pedidos de hoy y suma lo vendido de los entregados', async () => {
     const before = await summary();
     expect(before.date).toBe(zonedTime.localDate(new Date(), DEFAULT_TIMEZONE));

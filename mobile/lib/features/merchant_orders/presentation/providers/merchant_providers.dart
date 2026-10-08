@@ -49,18 +49,19 @@ class MerchantStores extends _$MerchantStores {
   }
 }
 
-/// Pedidos en curso. Llegan al instante con `store.orders.changed` (también
-/// el pedido nuevo); sin WebSocket, se consultan cada [merchantPollEvery].
+/// El tablero: pedidos en curso repartidos por el backend en tres columnas.
+/// Llega al instante con `store.orders.changed` (también el pedido nuevo); sin
+/// WebSocket, se consulta cada [merchantPollEvery].
 @riverpod
-Future<List<StaffOrder>> merchantActiveOrders(Ref ref) async {
+Future<MerchantBoard> merchantBoard(Ref ref) async {
   refreshLive(ref, events: {RealtimeEvents.storeOrdersChanged}, every: merchantPollEvery, foregroundOnly: false);
-  return (await ref.watch(merchantRepositoryProvider).activeOrders()).getOrThrow();
+  return (await ref.watch(merchantRepositoryProvider).board()).getOrThrow();
 }
 
-/// Los pedidos en curso repartidos en las tres columnas del riel.
+/// Los pedidos nuevos (la columna que hace sonar la alarma).
 @riverpod
-AsyncValue<Map<MerchantBoardColumn, List<StaffOrder>>> merchantBoard(Ref ref) =>
-    ref.watch(merchantActiveOrdersProvider).whenData(MerchantBoardColumn.group);
+AsyncValue<List<StaffOrder>> merchantFreshOrders(Ref ref) =>
+    ref.watch(merchantBoardProvider).whenData((board) => board[MerchantBoardColumn.fresh].items);
 
 @riverpod
 Future<List<StaffOrder>> merchantTodayOrders(Ref ref) =>
@@ -90,7 +91,7 @@ class MerchantOrderActions extends _$MerchantOrderActions {
     final result = await action();
     if (!ref.mounted) return null;
     ref
-      ..invalidate(merchantActiveOrdersProvider)
+      ..invalidate(merchantBoardProvider)
       ..invalidate(merchantTodayOrdersProvider)
       ..invalidate(merchantSummaryProvider);
     return switch (result) {
