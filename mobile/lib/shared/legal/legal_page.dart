@@ -82,7 +82,7 @@ class _LegalPageState extends State<LegalPage> {
             title: 'No pudimos abrir este texto',
             message: 'Cierra y vuelve a intentarlo.',
           ),
-          _ => const Center(child: AppLoader()),
+          _ => const Center(child: AppWaitLoader()),
         },
       ),
     );

@@ -144,7 +144,7 @@ class _AddButton extends StatelessWidget {
             height: 56,
             child: Center(
               child: loading
-                  ? AppLoader(size: 22, color: fg, dot: fg)
+                  ? AppLoader(size: 22, color: fg)
                   : Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

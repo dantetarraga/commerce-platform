@@ -1,7 +1,8 @@
-"""Lleva las animaciones Lottie de los estados vacíos a la paleta de Apamuy.
+"""Lleva las animaciones Lottie de LottieFiles a la paleta de Apamuy.
 
-Uso (desde mobile/): python tool/brand/recolor_empty_lotties.py
-Lee los originales de tool/brand/lottie_src/ y escribe assets/animations/empty/.
+Uso (desde mobile/): python tool/brand/recolor_lotties.py
+Lee los originales de tool/brand/lottie_src/ y escribe assets/animations/empty/
+(estados vacíos) y assets/animations/ (la moto de las esperas largas).
 Cada archivo tiene su propio mapa para respetar el orden claro→oscuro del dibujo.
 """
 import json
@@ -36,6 +37,17 @@ MAPS = {
     },
     'receipt': {
         '05bba9': TERRACOTA, 'b0ebd7': TERRACOTA_50, 'ffde54': HIERBA, '2c4053': PAPEL, '37373c': TINTA,
+    },
+}
+
+
+# La moto de AppWaitLoader: piel y faro quedan; la caja es el pedido (hierba).
+LOADERS = {
+    'moto': {
+        'f25d27': TERRACOTA, 'ed121d': TERRACOTA_700, 'ca8108': TERRACOTA_300, 'ffffb5': TERRACOTA_50,
+        '000000': TINTA, '333333': TINTA, '062a46': TINTA, '4d4d4d': PIEDRA, '989898': PIEDRA,
+        'b2b2b2': ARENA, 'cbcbcb': ARENA, 'e5e5e5': GRIS_ALTO, 'f1f1f1': PAPEL,
+        '3e5778': HIERBA, 'ffd2aa': 'FFD2AA',
     },
 }
 
@@ -78,8 +90,9 @@ def recolor(node, mapping, missing):
 def main():
     root = pathlib.Path(__file__).resolve().parents[2]
     src = root / 'tool/brand/lottie_src'
-    out = root / 'assets/animations/empty'
-    for name, mapping in MAPS.items():
+    targets = [(name, mapping, root / 'assets/animations/empty') for name, mapping in MAPS.items()]
+    targets += [(name, mapping, root / 'assets/animations') for name, mapping in LOADERS.items()]
+    for name, mapping, out in targets:
         data = json.loads((src / f'{name}.json').read_text(encoding='utf-8'))
         missing = set()
         recolor(data, {k.lower(): v for k, v in mapping.items()}, missing)

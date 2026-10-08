@@ -21,8 +21,7 @@ class NeighborhoodPlan extends StatefulWidget {
   State<NeighborhoodPlan> createState() => _NeighborhoodPlanState();
 }
 
-class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProviderStateMixin {
-  late final _drop = AnimationController(vsync: this, duration: AppMotion.story, value: 1);
+class _NeighborhoodPlanState extends State<NeighborhoodPlan> with SingleTickerProviderStateMixin {
   late final _glide = AnimationController(vsync: this, duration: AppMotion.move);
   Offset _offset = Offset.zero;
   Animation<Offset>? _glideTween;
@@ -47,7 +46,6 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
     } else {
       _glideTween = Tween(begin: _offset, end: target).animate(CurvedAnimation(parent: _glide, curve: AppMotion.arrive));
       _glide.forward(from: 0);
-      _drop.forward(from: 0);
     }
     // Fuera del build: quien escucha puede llamar a setState.
     WidgetsBinding.instance.addPostFrameCallback((_) => widget.onMoved?.call(target));
@@ -55,7 +53,6 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
 
   @override
   void dispose() {
-    _drop.dispose();
     _glide.dispose();
     super.dispose();
   }
@@ -85,7 +82,6 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
           onPanUpdate: (d) => setState(() => _offset += d.delta),
           onPanEnd: (_) {
             setState(() => _dragging = false);
-            if (!reduceMotionOf(context)) _drop.forward(from: 0.4);
             widget.onMoved?.call(_offset);
           },
           child: Stack(
@@ -94,39 +90,8 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
               CustomPaint(
                 painter: _PlanPainter(offset: _offset, ground: chaski.raised, block: scheme.surfaceContainerHigh),
               ),
-              // Pin grande al centro: se levanta al arrastrar y cae al soltar.
-              Center(
-                child: AnimatedBuilder(
-                  animation: _drop,
-                  builder: (context, _) {
-                    final drop = AppMotion.knot.transform(_drop.value).clamp(0.0, 1.2);
-                    final lift = _dragging ? 14.0 : (1 - drop.clamp(0.0, 1.0)) * 28;
-                    return Transform.translate(
-                      offset: const Offset(0, -26),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          AnimatedContainer(
-                            duration: motion,
-                            transform: Matrix4.translationValues(0, -lift, 0),
-                            child: const DoorPin(),
-                          ),
-                          const SizedBox(height: 4),
-                          AnimatedContainer(
-                            duration: motion,
-                            width: _dragging ? 8 : 14,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: scheme.inverseSurface.withValues(alpha: 0.25),
-                              borderRadius: const BorderRadius.all(AppRadius.pill),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+              // Pin al centro: se levanta al arrastrar y cae al soltar.
+              Center(child: LiftingDoorPin(lifted: _dragging)),
               if (widget.hint case final hint?)
                 Align(
                   alignment: const Alignment(0, -0.62),

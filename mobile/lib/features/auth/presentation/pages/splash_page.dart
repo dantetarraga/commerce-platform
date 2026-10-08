@@ -6,9 +6,10 @@ import 'package:chaski/features/auth/presentation/widgets/splash_motion.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 
-/// Arranque mientras se restaura la sesión: entrada, relevo si tarda y salida.
-/// Al terminar abre [splashGateProvider].
+/// Arranque mientras se restaura la sesión: llega la moto, espera andando si
+/// tarda y sale acelerando. Al terminar abre [splashGateProvider].
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
 
@@ -20,13 +21,13 @@ class SplashPage extends ConsumerStatefulWidget {
 
 class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStateMixin {
   late final _intro = AnimationController(vsync: this, duration: SplashTiming.intro);
-  late final _loop = AnimationController(vsync: this, duration: SplashTiming.loop);
   late final _exit = AnimationController(vsync: this, duration: SplashTiming.exit);
   var _started = false;
   var _leaving = false;
 
+  /// Igual que la "a" del arranque nativo (assets/brand/splash_mark.png).
   static const _markSize = 112.0;
-  static const _word = 'apamuy';
+  static const _disc = 188.0;
 
   @override
   void didChangeDependencies() {
@@ -45,11 +46,6 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
 
   void _waitThenLeave() {
     if (!mounted) return;
-    if (ref.read(authSessionProvider).hasValue) {
-      _leave().ignore();
-      return;
-    }
-    if (!reduceMotionOf(context)) _loop.repeat().ignore();
     ref.listenManual(authSessionProvider, (_, next) {
       if (next.hasValue) _leave().ignore();
     }, fireImmediately: true);
@@ -58,7 +54,6 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
   Future<void> _leave() async {
     if (_leaving || !mounted) return;
     _leaving = true;
-    _loop.stop();
     if (!reduceMotionOf(context)) await _exit.forward();
     if (mounted) ref.read(splashGateProvider.notifier).open();
   }
@@ -66,7 +61,6 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
   @override
   void dispose() {
     _intro.dispose();
-    _loop.dispose();
     _exit.dispose();
     super.dispose();
   }
@@ -74,6 +68,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     final ground = Theme.of(context).scaffoldBackgroundColor;
+    final moto = Lottie.asset(AppWaitLoader.asset, animate: !reduceMotionOf(context), errorBuilder: (_, _, _) => const SizedBox());
     return Scaffold(
       backgroundColor: AppColors.terracota,
       body: Semantics(
@@ -85,80 +80,69 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
             builder: (context, constraints) {
               final center = constraints.biggest.center(Offset.zero);
               const k = _markSize / 100;
-              final dotOnScreen = center + (BrandMarkPainter.dotCenter - const Offset(50, 50)) * k;
+              // El disco nace de la panza de la "a".
+              final bowl = center + (BrandMarkPainter.dotCenter - const Offset(50, 50)) * k;
               return AnimatedBuilder(
-                animation: Listenable.merge([_intro, _loop, _exit]),
+                animation: Listenable.merge([_intro, _exit]),
                 builder: (context, _) {
-                  final f = SplashFrame.at(intro: _intro.value, loop: _loop.isAnimating ? _loop.value : null, exit: _exit.value);
+                  final f = SplashFrame.at(intro: _intro.value, exit: _exit.value);
+                  final discColor = Color.lerp(AppColors.papel, ground, f.reveal)!;
                   return Stack(
                     children: [
-                      Opacity(
-                        opacity: f.contentOpacity,
-                        child: Transform.scale(
-                          scale: f.contentScale,
-                          origin: dotOnScreen - center,
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: center.dx - _markSize / 2,
-                                top: center.dy - _markSize / 2,
-                                child: Transform.rotate(
-                                  angle: f.bodyAngle,
-                                  child: Transform.scale(
-                                    scale: f.bodyScale,
-                                    child: CustomPaint(
-                                      size: const Size.square(_markSize),
-                                      painter: BrandMarkPainter(
-                                        body: AppColors.papel,
-                                        dot: AppColors.hierba300,
-                                        dotOffset: f.dotOffset,
-                                        dotScale: f.dotScale,
-                                        dotOpacity: f.dotOpacity,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 0,
-                                right: 0,
-                                top: center.dy + _markSize / 2 + 14,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    for (var i = 0; i < _word.length; i++)
-                                      Opacity(
-                                        opacity: f.letterOpacity(i),
-                                        child: Transform.translate(
-                                          offset: Offset(0, f.letterY(i)),
-                                          child: Transform.scale(
-                                            scale: f.letterScale(i),
-                                            child: Text(
-                                              _word[i],
-                                              style: AppTypography.displayStyle(
-                                                context,
-                                                size: 44,
-                                                height: 1,
-                                                weight: FontWeight.w800,
-                                                color: AppColors.papel,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                      if (f.markOpacity > 0)
+                        Positioned(
+                          left: center.dx - _markSize / 2,
+                          top: center.dy - _markSize / 2,
+                          child: Opacity(
+                            opacity: f.markOpacity,
+                            child: const CustomPaint(
+                              size: Size.square(_markSize),
+                              painter: BrandMarkPainter(body: AppColors.papel, dot: AppColors.papel, drawDot: false),
+                            ),
+                          ),
+                        ),
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _DiscPainter(
+                            center: bowl,
+                            radius: _disc / 2 * f.discScale,
+                            reveal: f.reveal,
+                            color: discColor,
                           ),
                         ),
                       ),
-                      if (f.reveal > 0)
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: _RevealPainter(center: dotOnScreen, progress: f.reveal, color: ground),
+                      Positioned(
+                        left: bowl.dx - _disc / 2,
+                        top: bowl.dy - _disc / 2,
+                        child: ClipOval(
+                          child: SizedBox.square(
+                            dimension: _disc,
+                            child: Transform.translate(
+                              offset: Offset(f.riderX * _disc, 0),
+                              child: Transform.scale(scale: AppWaitLoader.zoom, alignment: AppWaitLoader.zoomAlignment, child: moto),
+                            ),
                           ),
                         ),
+                      ),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: bowl.dy + _disc / 2 + 22 + f.wordY,
+                        child: Opacity(
+                          opacity: f.wordOpacity,
+                          child: Text(
+                            'apamuy',
+                            textAlign: TextAlign.center,
+                            style: AppTypography.displayStyle(
+                              context,
+                              size: 44,
+                              height: 1,
+                              weight: FontWeight.w800,
+                              color: AppColors.papel,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -171,22 +155,25 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
   }
 }
 
-/// El pedido que se abre hasta cubrir toda la pantalla.
-class _RevealPainter extends CustomPainter {
-  const _RevealPainter({required this.center, required this.progress, required this.color});
+/// El disco crema de la moto; en la salida crece hasta cubrir la pantalla.
+class _DiscPainter extends CustomPainter {
+  const _DiscPainter({required this.center, required this.radius, required this.reveal, required this.color});
 
   final Offset center;
-  final double progress;
+  final double radius;
+  final double reveal;
   final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (radius <= 0) return;
     final far = [Offset.zero, size.topRight(Offset.zero), size.bottomLeft(Offset.zero), size.bottomRight(Offset.zero)]
         .map((c) => (c - center).distance)
         .reduce(math.max);
-    canvas.drawCircle(center, 7 + (far - 7) * progress, Paint()..color = color);
+    canvas.drawCircle(center, radius + (far - radius) * reveal, Paint()..color = color);
   }
 
   @override
-  bool shouldRepaint(_RevealPainter old) => old.progress != progress || old.center != center || old.color != color;
+  bool shouldRepaint(_DiscPainter old) =>
+      old.center != center || old.radius != radius || old.reveal != reveal || old.color != color;
 }

@@ -16,10 +16,10 @@ Todas son gratuitas en LottieFiles bajo la **Lottie Simple License** (uso comerc
 
 ## Colores
 
-Los originales sin tocar están en `tool/brand/lottie_src/`. `tool/brand/recolor_empty_lotties.py` los lleva a la paleta (terracota, hierba, papel, tinta) con un mapa por archivo y falla si aparece un color sin mapear:
+Los originales sin tocar están en `tool/brand/lottie_src/`. `tool/brand/recolor_lotties.py` los lleva a la paleta (terracota, hierba, papel, tinta) con un mapa por archivo y falla si aparece un color sin mapear:
 
 ```sh
-python tool/brand/recolor_empty_lotties.py
+python tool/brand/recolor_lotties.py
 ```
 
 Para cambiar una animación: reemplazar el original en `lottie_src/`, ajustar su mapa de colores, volver a correr el script y revisar el tamaño con `AppEmptyArt.lottieScale` (cada archivo trae su propio encuadre).

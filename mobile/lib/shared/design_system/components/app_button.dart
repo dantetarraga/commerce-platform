@@ -141,7 +141,7 @@ class AppButton extends StatelessWidget {
         child: ScaleTransition(scale: Tween<double>(begin: 0.85, end: 1).animate(animation), child: child),
       ),
       child: loading
-          ? AppLoader(key: const ValueKey('loading'), size: 22, color: fg, dot: fg, semanticsLabel: null)
+          ? AppLoader(key: const ValueKey('loading'), size: 22, color: fg, semanticsLabel: null)
           : Row(
               key: const ValueKey('content'),
               mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,

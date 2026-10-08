@@ -167,7 +167,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
             child: AnimatedSwitcher(
               duration: reduceMotionOf(context) ? Duration.zero : AppMotion.quick,
               child: widget.loading
-                  ? AppLoader(key: const ValueKey('loading'), color: fg, semanticsLabel: 'Buscando')
+                  ? AppLoader(key: const ValueKey('loading'), size: 15, color: fg, semanticsLabel: 'Buscando')
                   : Icon(Icons.search_rounded, key: const ValueKey('idle'), color: fg),
             ),
           ),

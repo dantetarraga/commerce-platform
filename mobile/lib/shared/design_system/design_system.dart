@@ -30,6 +30,7 @@ export 'components/app_toast.dart';
 export 'components/fly_to_purchase_bar.dart';
 export 'components/store_card/app_store_card.dart';
 export 'illustrations/app_rive_success.dart';
+export 'illustrations/app_wait_loader.dart';
 export 'illustrations/empty_art.dart';
 export 'theme/app_material_defaults.dart';
 export 'theme/app_theme.dart';

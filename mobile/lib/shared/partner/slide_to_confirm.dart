@@ -235,7 +235,7 @@ class _SlideToConfirmState extends State<SlideToConfirm> with SingleTickerProvid
                             boxShadow: AppShadows.knob,
                           ),
                           child: widget.busy
-                              ? Center(child: AppLoader(size: 22, color: widget.color, dot: widget.color))
+                              ? Center(child: AppLoader(size: 22, color: widget.color))
                               : Icon(_armed ? Icons.check_rounded : widget.icon, color: widget.color),
                         ),
                       ),
