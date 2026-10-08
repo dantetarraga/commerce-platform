@@ -1,6 +1,7 @@
 import { LogOut, Menu } from 'lucide-react'
 import { UserAvatar } from '@/components/shared/user-avatar'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from './theme-toggle'
 
 export interface HeaderUser {
   name: string
@@ -28,6 +29,7 @@ export function Header({ user, onOpenMenu, onSignOut }: HeaderProps) {
         <Menu className='size-5' />
       </Button>
       <div className='ml-auto flex items-center gap-3'>
+        <ThemeToggle />
         <div className='hidden text-right leading-tight sm:block'>
           <p className='text-sm font-semibold'>{user.name}</p>
           <p className='text-muted-foreground text-xs'>{user.roleLabel}</p>

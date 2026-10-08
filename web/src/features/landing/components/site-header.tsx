@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { BrandMark } from '@/components/layout/brand-mark'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { Button } from '@/components/ui/button'
 
 const sections = [
@@ -27,9 +28,12 @@ export function SiteHeader() {
             </a>
           ))}
         </nav>
-        <Button asChild size='sm' variant='outline'>
-          <Link to='/login'>Ingresar</Link>
-        </Button>
+        <div className='flex items-center gap-1.5'>
+          <ThemeToggle />
+          <Button asChild size='sm' variant='outline'>
+            <Link to='/login'>Ingresar</Link>
+          </Button>
+        </div>
       </div>
     </header>
   )

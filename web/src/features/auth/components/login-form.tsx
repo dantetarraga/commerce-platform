@@ -7,7 +7,8 @@ import { CodeStep } from './code-step'
 import { NotPartnerNotice } from './not-partner-notice'
 import { PhoneStep } from './phone-step'
 
-type Step = { name: 'phone' } | { name: 'code'; phone: string } | { name: 'not-partner' }
+type Step =
+  { name: 'phone' } | { name: 'code'; phone: string } | { name: 'not-partner'; isCourier: boolean }
 
 interface LoginFormProps {
   onAuthenticated: (user: SessionUser) => void
@@ -28,7 +29,8 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
   async function verifyCode(phone: string, code: string) {
     const result = await verifyOtp.mutateAsync({ phone, code })
     if (result.status === 'AUTHENTICATED' && signIn(result)) return onAuthenticated(result.user)
-    setStep({ name: 'not-partner' })
+    const isCourier = result.status === 'AUTHENTICATED' && result.user.roles.includes('COURIER')
+    setStep({ name: 'not-partner', isCourier })
   }
 
   function handleResend(phone: string) {
@@ -50,6 +52,8 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         />
       )
     case 'not-partner':
-      return <NotPartnerNotice onRetry={() => setStep({ name: 'phone' })} />
+      return (
+        <NotPartnerNotice isCourier={step.isCourier} onRetry={() => setStep({ name: 'phone' })} />
+      )
   }
 }

@@ -35,6 +35,7 @@ React 19 + Vite + TypeScript. Alcance y decisiones en [`docs/PANEL_WEB.md`](../d
 - El tema se define en CSS (`@theme`) y las utilidades propias con `@utility` (`corner-exit-l|m|s`). No hay `tailwind.config.js`.
 - Sintaxis de v4: opacidad con barra (`bg-foreground/40`), `!` al final (`text-primary!`) y variables con `bg-(--var)`.
 - Las variantes de un componente se definen con `cva` y las clases se combinan con `cn()`. `@apply` solo se usa en la capa base.
+- Tema claro por defecto, sin seguir al sistema. El usuario lo cambia con `ThemeToggle` (landing, login y header) y se guarda en `localStorage`. El script de `index.html` lo aplica antes del primer pintado. Sobre fotos se usan `ink`, `ink-foreground` e `ink-accent`, que no cambian con el tema.
 - Mobile first: los estilos base son para móvil y los breakpoints suben (`md:`, `lg:`). Para tamaños cuadrados se usa `size-*`.
 - Los valores arbitrarios (`[…]`) son la excepción. Si un valor se repite, se convierte en token.
 - El orden de las clases lo resuelve Prettier con `prettier-plugin-tailwindcss`.

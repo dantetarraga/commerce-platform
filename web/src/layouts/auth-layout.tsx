@@ -1,11 +1,16 @@
 import { Link, Outlet } from '@tanstack/react-router'
-import { ArrowLeft, BellRing, ChartColumn, UtensilsCrossed, type LucideIcon } from 'lucide-react'
+import { ArrowLeft, Bike, ShieldCheck, Store, type LucideIcon } from 'lucide-react'
 import { BrandMark } from '@/components/layout/brand-mark'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
 
-const highlights: { icon: LucideIcon; text: string }[] = [
-  { icon: BellRing, text: 'Pedidos en vivo, con alarma' },
-  { icon: UtensilsCrossed, text: 'Tu carta y tus horarios al día' },
-  { icon: ChartColumn, text: 'Las ventas de tu día, sin sacar cuentas' },
+const audiences: { icon: LucideIcon; title: string; text: string }[] = [
+  { icon: Store, title: 'Negocios', text: 'Pedidos en vivo, tu carta y las ventas del día.' },
+  { icon: Bike, title: 'Repartidores', text: 'Tus entregas y tu caja, en la app Apamuy Socios.' },
+  {
+    icon: ShieldCheck,
+    title: 'Equipo Apamuy',
+    text: 'Socios, pedidos de la ciudad y la caja de todos.',
+  },
 ]
 
 function Brand({ className }: { className?: string }) {
@@ -33,26 +38,26 @@ export function AuthLayout() {
           <div className='space-y-8'>
             <div className='space-y-4'>
               <p className='text-sm font-semibold tracking-wider uppercase opacity-80'>
-                Panel de Apamuy
+                Socios y equipo Apamuy
               </p>
               <p className='font-display text-5xl leading-[1.02] font-bold text-balance xl:text-6xl'>
-                Tu negocio, <span className='text-ink-accent'>al día.</span>
+                Para quienes <span className='text-ink-accent'>mueven Yauri.</span>
               </p>
             </div>
-            <ul className='space-y-3'>
-              {highlights.map(({ icon: Icon, text }) => (
-                <li key={text} className='flex items-center gap-3 text-lg'>
-                  <span className='bg-ink-foreground/15 corner-exit-s flex size-9 items-center justify-center'>
-                    <Icon className='size-4.5' aria-hidden />
+            <ul className='space-y-4'>
+              {audiences.map(({ icon: Icon, title, text }) => (
+                <li key={title} className='flex items-start gap-3'>
+                  <span className='bg-ink-foreground/15 corner-exit-s flex size-10 shrink-0 items-center justify-center'>
+                    <Icon className='size-5' aria-hidden />
                   </span>
-                  {text}
+                  <span>
+                    <span className='block text-lg font-semibold'>{title}</span>
+                    <span className='block opacity-80'>{text}</span>
+                  </span>
                 </li>
               ))}
             </ul>
           </div>
-          <p className='text-sm opacity-70'>
-            Para el equipo de Apamuy y los negocios socios de Yauri.
-          </p>
         </div>
       </aside>
 
@@ -65,7 +70,10 @@ export function AuthLayout() {
             <ArrowLeft className='size-4' aria-hidden />
             Volver a la portada
           </Link>
-          <Brand className='lg:hidden' />
+          <div className='flex items-center gap-2'>
+            <Brand className='lg:hidden' />
+            <ThemeToggle />
+          </div>
         </div>
         <div className='flex flex-1 items-start justify-center px-5 pt-10 pb-16 sm:px-8 lg:items-center lg:pt-6'>
           <div className='w-full max-w-sm'>

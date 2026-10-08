@@ -18,9 +18,10 @@ export function LoginPage() {
   return (
     <div className='space-y-8'>
       <div className='space-y-2'>
-        <h1 className='text-4xl font-bold'>Ingresa a tu panel</h1>
+        <h1 className='text-4xl font-bold'>Ingresa a Apamuy</h1>
         <p className='text-muted-foreground'>
-          Escribe el celular con el que te registraste. Te enviamos un código por SMS.
+          Negocios, repartidores y equipo Apamuy: escribe el celular con el que te registraste y te
+          enviamos un código por SMS.
         </p>
       </div>
       <LoginForm onAuthenticated={goHome} />

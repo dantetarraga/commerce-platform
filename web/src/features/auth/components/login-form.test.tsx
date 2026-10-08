@@ -102,6 +102,22 @@ describe('LoginForm', () => {
     expect(useSessionStore.getState().user).toBeNull()
   })
 
+  it('un repartidor ve que su trabajo está en la app Socios', async () => {
+    vi.mocked(authApi.verifyOtp).mockResolvedValue({
+      status: 'AUTHENTICATED',
+      accessToken: 'a',
+      refreshToken: 'r',
+      user: user(['COURIER']),
+    })
+    const view = renderWithProviders(<LoginForm onAuthenticated={vi.fn()} />)
+
+    await view.user.type(await goToCodeStep(view.user), '123456')
+    await view.user.click(screen.getByRole('button', { name: 'Ingresar' }))
+
+    expect(await screen.findByText('Tus entregas están en la app')).toBeInTheDocument()
+    expect(useSessionStore.getState().user).toBeNull()
+  })
+
   it('muestra el mensaje del backend cuando el código es incorrecto', async () => {
     vi.mocked(authApi.verifyOtp).mockRejectedValue(
       new ApiError(400, 'OTP_INVALID', 'El código no es correcto. Te quedan 2 intentos.'),
