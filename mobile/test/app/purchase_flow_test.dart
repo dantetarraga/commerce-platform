@@ -95,6 +95,10 @@ void main() {
         find.descendant(of: find.widgetWithText(AppInput, 'Calle y número'), matching: find.byType(TextFormField)),
         'Jr. Túpac Amaru 214',
       );
+      await tester.enterText(
+        find.descendant(of: find.widgetWithText(AppInput, 'Referencia para el repartidor'), matching: find.byType(TextFormField)),
+        'Puerta verde',
+      );
       await tester.tap(find.text('Guardar dirección'));
       await settle(tester, frames: 30);
       expect(find.byType(CheckoutPage), findsOneWidget);

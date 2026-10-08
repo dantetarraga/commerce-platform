@@ -55,4 +55,4 @@ final class PartnerRouterProvider
   }
 }
 
-String _$partnerRouterHash() => r'6ca6363de875a3ea5e6dfbc5901f4cc19d5eb6bc';
+String _$partnerRouterHash() => r'37bf29e3741ccfab5ad898b680015920c166f012';

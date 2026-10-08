@@ -8,18 +8,15 @@ part of 'delivery_location.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Fase 1: centro de Espinar. En la Fase 2 lo reemplaza la dirección
-/// seleccionada en el feature `addresses` (o la ubicación del GPS).
+/// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
 
 @ProviderFor(CurrentDeliveryLocation)
 final currentDeliveryLocationProvider = CurrentDeliveryLocationProvider._();
 
-/// Fase 1: centro de Espinar. En la Fase 2 lo reemplaza la dirección
-/// seleccionada en el feature `addresses` (o la ubicación del GPS).
+/// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
 final class CurrentDeliveryLocationProvider
     extends $NotifierProvider<CurrentDeliveryLocation, DeliveryLocation> {
-  /// Fase 1: centro de Espinar. En la Fase 2 lo reemplaza la dirección
-  /// seleccionada en el feature `addresses` (o la ubicación del GPS).
+  /// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
   CurrentDeliveryLocationProvider._()
     : super(
         from: null,
@@ -48,10 +45,9 @@ final class CurrentDeliveryLocationProvider
 }
 
 String _$currentDeliveryLocationHash() =>
-    r'43498d4c4ed73f37f24c59bdb8da3af366fd80f5';
+    r'373433f641b1724c7f5de03e8fc48b036cf7c4b2';
 
-/// Fase 1: centro de Espinar. En la Fase 2 lo reemplaza la dirección
-/// seleccionada en el feature `addresses` (o la ubicación del GPS).
+/// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
 
 abstract class _$CurrentDeliveryLocation extends $Notifier<DeliveryLocation> {
   DeliveryLocation build();

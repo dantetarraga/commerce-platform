@@ -31,6 +31,8 @@ dependencies:
   flutter_animate: ^4.5.2
   toastification: ^3.2.0
   flutter_markdown_plus: ^1.0.12
+  google_maps_flutter: ^2.18.2
+  geolocator: ^14.0.1
 
 # toastification 3.2.0 pide equatable ^2, pero solo usa `extends Equatable`,
 # que no cambió en la 3 (la 3 quitó EquatableMixin). Quitar cuando lo actualicen.

@@ -95,7 +95,7 @@ final class AddressBookControllerProvider
 }
 
 String _$addressBookControllerHash() =>
-    r'962a65fad88ad248ac0cecf41a59fb3a59df36fc';
+    r'6a89611eeb890fa313fc33856fd58a5d2b0fb2dc';
 
 /// Libreta de direcciones. La seleccionada es la ubicación de entrega de toda
 /// la app (negocios cercanos, tiempos y envío).

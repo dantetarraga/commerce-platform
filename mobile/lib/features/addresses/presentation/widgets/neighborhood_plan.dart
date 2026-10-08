@@ -1,5 +1,4 @@
-import 'dart:math' as math;
-
+import 'package:chaski/features/addresses/presentation/widgets/door_pin.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
@@ -50,7 +49,8 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
       _glide.forward(from: 0);
       _drop.forward(from: 0);
     }
-    widget.onMoved?.call(target);
+    // Fuera del build: quien escucha puede llamar a setState.
+    WidgetsBinding.instance.addPostFrameCallback((_) => widget.onMoved?.call(target));
   }
 
   @override
@@ -109,7 +109,7 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
                           AnimatedContainer(
                             duration: motion,
                             transform: Matrix4.translationValues(0, -lift, 0),
-                            child: _Pin(color: scheme.primary, dot: scheme.onPrimary, shadow: AppShadows.raised(theme.brightness)),
+                            child: const DoorPin(),
                           ),
                           const SizedBox(height: 4),
                           AnimatedContainer(
@@ -144,42 +144,6 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with TickerProvider
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Gota cobalto con un punto claro al centro.
-class _Pin extends StatelessWidget {
-  const _Pin({required this.color, required this.dot, required this.shadow});
-
-  final Color color;
-  final Color dot;
-  final List<BoxShadow> shadow;
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: -math.pi / 4,
-      child: Container(
-        width: 46,
-        height: 46,
-        decoration: BoxDecoration(
-          color: color,
-          boxShadow: shadow,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(23),
-            topRight: Radius.circular(23),
-            bottomRight: Radius.circular(23),
-            bottomLeft: Radius.circular(4),
-          ),
-        ),
-        alignment: Alignment.center,
-        child: Container(
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
         ),
       ),
     );

@@ -1,6 +1,12 @@
+import 'dart:async';
+
+import 'package:chaski/core/config/city.dart';
+import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:chaski/core/maps/delivery_location.dart';
+import 'package:chaski/core/maps/location_service.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
-import 'package:chaski/features/addresses/presentation/widgets/neighborhood_plan.dart';
+import 'package:chaski/features/addresses/presentation/widgets/door_map.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
@@ -26,8 +32,49 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
   var _saving = false;
   var _seed = '';
 
-  /// Cuánto se movió el plano (px lógicos) desde el punto de entrega actual.
-  Offset _moved = Offset.zero;
+  late final GeoCoordinates _origin = ref.read(currentDeliveryLocationProvider).coordinates;
+
+  /// El punto bajo el pin.
+  late GeoCoordinates _door = _origin;
+
+  /// Adónde debe volar el mapa ("Mi ubicación").
+  GeoCoordinates? _focus;
+  var _locating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (googleMapsSupported) WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_locate(quiet: true)));
+  }
+
+  /// Lleva el mapa a la ubicación del teléfono. Con [quiet] (al abrir) no avisa
+  /// si falta permiso o señal: el usuario igual puede mover el mapa.
+  Future<void> _locate({bool quiet = false}) async {
+    setState(() => _locating = true);
+    final service = ref.read(locationServiceProvider);
+    final reading = await service.current();
+    if (!mounted) return;
+    setState(() => _locating = false);
+    final (String? message, String? action) = switch (reading) {
+      LocationFix(:final coordinates) when isInCoverage(coordinates) => (null, null),
+      LocationFix() => ('Tu ubicación está fuera de $cityName. Mueve el mapa hasta tu puerta.', null),
+      LocationOff() => ('Activa la ubicación del teléfono para encontrarte.', 'Activar'),
+      LocationDenied(forever: true) => ('Da permiso de ubicación a Apamuy en Ajustes.', 'Ajustes'),
+      LocationDenied() => quiet ? (null, null) : ('Sin permiso de ubicación. Mueve el mapa hasta tu puerta.', null),
+      LocationUnavailable() => quiet ? (null, null) : ('No pudimos encontrarte. Mueve el mapa hasta tu puerta.', null),
+    };
+    if (reading case LocationFix(:final coordinates) when isInCoverage(coordinates)) {
+      setState(() => _focus = coordinates);
+    }
+    if (message != null) {
+      AppToast.show(
+        context,
+        message,
+        actionLabel: action,
+        onAction: action == null ? null : () => unawaited(service.openSettings(reading)),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -39,18 +86,21 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!isInCoverage(_door)) {
+      AppToast.show(context, 'Ese punto está fuera de la zona de reparto de $cityName.', kind: AppToastKind.error);
+      return;
+    }
     setState(() => _saving = true);
     final Address address;
     try {
       address = await ref
           .read(addressBookControllerProvider.notifier)
-          .addFromPlan(
+          .add(
             kind: _kind,
             street: StreetLine.create(_street.text).valueOrNull!,
+            coordinates: _door,
             reference: _reference.text,
             label: _label.text,
-            movedX: _moved.dx,
-            movedY: _moved.dy,
           );
     } on Object {
       if (mounted) AppToast.show(context, 'No pudimos guardar la dirección. Inténtalo otra vez.', kind: AppToastKind.error);
@@ -74,11 +124,13 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
         children: [
           Stack(
             children: [
-              NeighborhoodPlan(
+              DoorMap(
+                origin: _origin,
+                focus: _focus,
                 seed: _seed,
                 height: mapHeight,
-                hint: 'Mueve el mapa hasta tu puerta',
-                onMoved: (offset) => _moved = offset,
+                hint: isInCoverage(_door) ? 'Mueve el mapa hasta tu puerta' : 'Fuera de la zona de reparto',
+                onCenter: (door) => setState(() => _door = door),
               ),
               SafeArea(
                 bottom: false,
@@ -92,6 +144,17 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                   ),
                 ),
               ),
+              if (googleMapsSupported)
+                Positioned(
+                  right: AppSpacing.xs,
+                  bottom: AppSpacing.xs,
+                  child: AppCircleButton(
+                    icon: Icons.my_location_rounded,
+                    tooltip: 'Mi ubicación',
+                    elevated: true,
+                    onPressed: _locating ? null : () => unawaited(_locate()),
+                  ),
+                ),
             ],
           ),
           Expanded(
@@ -126,6 +189,8 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                             maxLength: 140,
                             hint: 'Puerta verde, 2.º piso',
                             helper: 'Aquí las referencias valen más que el número.',
+                            validator: (v) =>
+                                (v ?? '').trim().isEmpty ? 'Cuéntale al repartidor cómo reconocer tu puerta.' : null,
                           ),
                           const SizedBox(height: AppSpacing.md),
                           Wrap(

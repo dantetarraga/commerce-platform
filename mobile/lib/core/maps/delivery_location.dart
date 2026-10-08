@@ -1,4 +1,6 @@
+import 'package:chaski/core/config/city.dart';
 import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:chaski/core/maps/location_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -15,15 +17,20 @@ final class DeliveryLocation extends Equatable {
   List<Object?> get props => [label, coordinates];
 }
 
-/// Fase 1: centro de Espinar. En la Fase 2 lo reemplaza la dirección
-/// seleccionada en el feature `addresses` (o la ubicación del GPS).
+/// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
 @Riverpod(keepAlive: true)
 class CurrentDeliveryLocation extends _$CurrentDeliveryLocation {
   @override
-  DeliveryLocation build() => DeliveryLocation(
-    label: 'Espinar, Cusco',
-    coordinates: GeoCoordinates.trusted(-14.7936, -71.4128),
-  );
+  DeliveryLocation build() => DeliveryLocation(label: 'Espinar, Cusco', coordinates: cityCenter);
 
   void change(DeliveryLocation location) => state = location;
+
+  /// Usa el GPS solo si ya hay permiso (no muestra el diálogo) y cae en la zona.
+  Future<void> useGpsIfAllowed() async {
+    final reading = await ref.read(locationServiceProvider).current(ask: false);
+    if (state.coordinates != cityCenter) return;
+    if (reading case LocationFix(:final coordinates) when isInCoverage(coordinates)) {
+      state = DeliveryLocation(label: 'Tu ubicación', coordinates: coordinates);
+    }
+  }
 }

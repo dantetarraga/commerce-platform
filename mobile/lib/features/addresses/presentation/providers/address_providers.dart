@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
@@ -46,8 +48,12 @@ class AddressBookController extends _$AddressBookController {
   }
 
   void _syncLocation(AddressBook book) {
+    final location = ref.read(currentDeliveryLocationProvider.notifier);
     final selected = book.selected;
-    if (selected == null) return;
+    if (selected == null) {
+      unawaited(location.useGpsIfAllowed());
+      return;
+    }
     ref
         .read(currentDeliveryLocationProvider.notifier)
         .change(DeliveryLocation(label: selected.street, coordinates: selected.coordinates));
@@ -55,28 +61,21 @@ class AddressBookController extends _$AddressBookController {
 
   Future<void> save(Address address) => _commit(_book.save(address));
 
-  /// Grados por px del plano esquemático (~1 m por px en Espinar).
-  static const degreesPerPx = 0.00001;
-
-  /// Guarda una dirección nueva marcada en el plano. Sin geocodificación: parte
-  /// del punto de entrega actual y se corre lo que se movió el plano
-  /// ([movedX]/[movedY] en px; arrastrar a la derecha = ir al oeste).
-  Future<Address> addFromPlan({
+  /// Guarda una dirección nueva en el punto que quedó bajo el pin del mapa.
+  Future<Address> add({
     required AddressKind kind,
     required StreetLine street,
+    required GeoCoordinates coordinates,
     String reference = '',
     String? label,
-    double movedX = 0,
-    double movedY = 0,
   }) async {
-    final center = ref.read(currentDeliveryLocationProvider).coordinates;
     final address = Address(
       id: 'adr_${DateTime.now().microsecondsSinceEpoch}',
       kind: kind,
       label: kind == AddressKind.other ? label?.trim() : null,
       street: street.value,
       reference: reference.trim(),
-      coordinates: GeoCoordinates.trusted(center.latitude + movedY * degreesPerPx, center.longitude - movedX * degreesPerPx),
+      coordinates: coordinates,
     );
     await save(address);
     return address;
