@@ -7,6 +7,8 @@ import { PrismaService } from '../../database/prisma.service';
 import type { Prisma } from '../../generated/prisma/client';
 import { fromPrice, productCardInclude } from '../stores/store-presenter';
 import { visibleStore } from '../stores/stores.service';
+import type { MerchantProductsQueryDto } from './dto/merchant-products-query.dto';
+import { matchingProductIds } from './merchant.queries';
 import { summarizeMerchantDay } from './merchant-summary';
 
 /** `ownerId` limita a los negocios de ese dueño; sin él (admin), todos. */
@@ -46,27 +48,56 @@ export class MerchantService {
     }));
   }
 
-  /** Productos del negocio (sin los borrados), en el orden del menú. */
-  async products(storeId: string, ownerId?: string) {
+  /**
+   * La carta del negocio para Socios: los conteos de cada pestaña (de toda la
+   * carta) y los productos del filtro y la búsqueda, agrupados por sección en
+   * el orden del menú. Los que no tienen sección van al final, en "Otros".
+   */
+  async products(storeId: string, query: MerchantProductsQueryDto, ownerId?: string) {
     const store = await this.prisma.store.findFirst({
       where: { id: storeId, ...ownedStores(ownerId) },
       select: { city: { select: { currency: true } } },
     });
     if (!store) throw AppException.notFound('No encontramos ese negocio.');
 
+    const where = { storeId, deletedAt: null };
+    const [available, soldOut, matching] = await Promise.all([
+      this.prisma.product.count({ where: { ...where, isAvailable: true } }),
+      this.prisma.product.count({ where: { ...where, isAvailable: false } }),
+      query.q ? matchingProductIds(this.prisma, storeId, query.q) : null,
+    ]);
     const products = await this.prisma.product.findMany({
-      where: { storeId, deletedAt: null },
+      where: {
+        ...where,
+        ...(query.status !== 'all' && { isAvailable: query.status === 'available' }),
+        ...(matching && { id: { in: [...matching] } }),
+      },
       orderBy: [{ menuSection: { sortOrder: 'asc' } }, { sortOrder: 'asc' }, { name: 'asc' }],
       include: { ...productCardInclude, menuSection: { select: { name: true } } },
     });
-    return products.map((product) => ({
-      id: product.id,
-      name: product.name,
-      imageUrl: product.imageUrl,
-      price: money(fromPrice(product), store.city.currency),
-      section: product.menuSection?.name ?? null,
-      isAvailable: product.isAvailable,
-    }));
+
+    const sections: { name: string; items: unknown[] }[] = [];
+    const others: unknown[] = [];
+    for (const product of products) {
+      const item = {
+        id: product.id,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        price: money(fromPrice(product), store.city.currency),
+        section: product.menuSection?.name ?? null,
+        isAvailable: product.isAvailable,
+      };
+      if (!item.section) {
+        others.push(item);
+        continue;
+      }
+      const last = sections.at(-1);
+      if (last?.name === item.section) last.items.push(item);
+      else sections.push({ name: item.section, items: [item] });
+    }
+    if (others.length > 0) sections.push({ name: 'Otros', items: others });
+
+    return { counts: { all: available + soldOut, available, soldOut }, sections };
   }
 
   /** Marca un producto disponible o agotado. Uno de otro negocio responde 404. */

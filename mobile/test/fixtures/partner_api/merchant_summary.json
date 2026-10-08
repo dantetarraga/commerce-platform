@@ -1,10 +1,44 @@
 {
- "date": "2026-09-25",
- "deliveredCount": 0,
- "cancelledCount": 0,
- "activeCount": 1,
- "sales": {
-  "amount": 0,
-  "currency": "PEN"
- }
+  "date": "2026-10-08",
+  "deliveredCount": 0,
+  "cancelledCount": 0,
+  "activeCount": 0,
+  "sales": {
+    "amount": 0,
+    "currency": "PEN"
+  },
+  "averageTicket": null,
+  "averagePrepMinutes": null,
+  "peakHour": null,
+  "salesByHour": [],
+  "payments": [
+    {
+      "method": "CASH",
+      "sales": {
+        "amount": 0,
+        "currency": "PEN"
+      },
+      "orders": 0,
+      "share": 0
+    },
+    {
+      "method": "YAPE",
+      "sales": {
+        "amount": 0,
+        "currency": "PEN"
+      },
+      "orders": 0,
+      "share": 0
+    },
+    {
+      "method": "PLIN",
+      "sales": {
+        "amount": 0,
+        "currency": "PEN"
+      },
+      "orders": 0,
+      "share": 0
+    }
+  ],
+  "topProducts": []
 }

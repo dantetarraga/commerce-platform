@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chaski/core/errors/app_exception.dart';
 import 'package:chaski/core/fake/fake_backend.dart';
+import 'package:chaski/core/utils/text_utils.dart';
 
 /// Backend fake de Apamuy Socios: pedidos de negocio y repartidor compartidos en
 /// memoria, con el JSON de `merchant/*` y `courier/*`. Cada [newOrderEvery] entra uno.
@@ -213,27 +214,47 @@ class FakeStaffOrders {
     return _public(order);
   }
 
-  Future<List<Map<String, dynamic>>> products(String storeId) async {
+  /// Como `GET /merchant/stores/:id/products`: conteos de toda la carta y
+  /// los productos del filtro y la búsqueda, agrupados en el orden del menú.
+  Future<Map<String, dynamic>> products(String storeId, {String status = 'all', String query = ''}) async {
     await _backend.delay();
     final catalog = await _backend.catalog();
     final store = _backend.listOf(catalog, 'stores').firstWhere(
       (s) => s['id'] == storeId,
       orElse: () => throw const ApiException(statusCode: 404, code: 'NOT_FOUND', message: 'No encontramos ese negocio.'),
     );
-    final sections = (store['menuSections'] as List).cast<Map<String, dynamic>>();
-    String? section(String productId) =>
-        sections.where((s) => (s['productIds'] as List).contains(productId)).firstOrNull?['name'] as String?;
-    return [
+    final menu = (store['menuSections'] as List).cast<Map<String, dynamic>>();
+    final all = [
       for (final p in _backend.listOf(catalog, 'products').where((p) => p['storeId'] == storeId))
         {
           'id': p['id'],
           'name': p['name'],
           'imageUrl': p['imageUrl'],
           'price': _backend.money(p['basePrice'] as int),
-          'section': section(p['id'] as String),
+          'section': menu.where((s) => (s['productIds'] as List).contains(p['id'])).firstOrNull?['name'] as String?,
           'isAvailable': _productAvailable[p['id']] ?? (p['isAvailable'] as bool? ?? true),
         },
     ];
+    final needle = normalizeForSearch(query);
+    final shown = [
+      for (final p in all)
+        if (foldAccents(p['name']! as String).contains(needle) &&
+            switch (status) {
+              'available' => p['isAvailable']! as bool,
+              'sold_out' => !(p['isAvailable']! as bool),
+              _ => true,
+            })
+          p,
+    ];
+    final available = all.where((p) => p['isAvailable']! as bool).length;
+    return {
+      'counts': {'all': all.length, 'available': available, 'soldOut': all.length - available},
+      'sections': [
+        for (final section in [...menu.map((s) => s['name'] as String), null])
+          if (shown.where((p) => p['section'] == section).toList() case final items when items.isNotEmpty)
+            {'name': section ?? 'Otros', 'items': items},
+      ],
+    };
   }
 
   Future<Map<String, dynamic>> setProductAvailable(String productId, {required bool available}) async {

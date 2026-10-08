@@ -63,6 +63,43 @@ final class MerchantProduct extends Equatable {
   List<Object?> get props => [id, name, imageUrl, price, section, isAvailable];
 }
 
+/// Pestañas de la carta en Socios.
+enum ProductFilter { all, available, soldOut }
+
+/// Cuántos productos hay en cada pestaña (de toda la carta, no de la búsqueda).
+final class ProductCounts extends Equatable {
+  const ProductCounts({required this.all, required this.available, required this.soldOut});
+
+  final int all;
+  final int available;
+  final int soldOut;
+
+  @override
+  List<Object?> get props => [all, available, soldOut];
+}
+
+final class ProductSection extends Equatable {
+  const ProductSection({required this.name, required this.items});
+
+  final String name;
+  final List<MerchantProduct> items;
+
+  @override
+  List<Object?> get props => [name, items];
+}
+
+/// La carta tal como la arma el backend para un filtro y una búsqueda: los
+/// conteos de las pestañas y los productos agrupados en el orden del menú.
+final class MerchantCatalog extends Equatable {
+  const MerchantCatalog({required this.counts, required this.sections});
+
+  final ProductCounts counts;
+  final List<ProductSection> sections;
+
+  @override
+  List<Object?> get props => [counts, sections];
+}
+
 /// Cómo va el día del negocio. Todo lo calcula el backend (`GET /merchant/summary`).
 final class MerchantSummary extends Equatable {
   const MerchantSummary({
@@ -191,7 +228,8 @@ abstract interface class MerchantRepository {
 
   Future<Result<StaffOrder>> reject(String orderId, {required String reason});
 
-  Future<Result<List<MerchantProduct>>> products(String storeId);
+  /// La carta con el [filter] y la búsqueda [query] aplicados por el backend.
+  Future<Result<MerchantCatalog>> products(String storeId, {ProductFilter filter = ProductFilter.all, String query = ''});
 
   Future<Result<MerchantProduct>> setProductAvailable(MerchantProduct product, {required bool available});
 

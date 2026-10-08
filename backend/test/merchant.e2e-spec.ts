@@ -192,8 +192,21 @@ describe('Chaski Socios: negocio (e2e)', () => {
   });
 
   it('productos: lista con precio y sección, marcar agotado; los de otro negocio dan 404', async () => {
-    const list = await http().get(`${API}/merchant/stores/${STORE}/products`).set(merchant.auth).expect(200);
-    const medio = (list.body as { id: string }[]).find((p) => p.id === 'pr_pollo_medio');
+    type Catalog = {
+      counts: { all: number; available: number; soldOut: number };
+      sections: { name: string; items: { id: string; name: string; isAvailable: boolean }[] }[];
+    };
+    const catalog = async (query: object = {}) =>
+      (await http().get(`${API}/merchant/stores/${STORE}/products`).query(query).set(merchant.auth).expect(200))
+        .body as Catalog;
+    const ids = (c: Catalog) => c.sections.flatMap((s) => s.items.map((p) => p.id));
+
+    const all = await catalog();
+    expect(all.counts.all).toBe(all.counts.available + all.counts.soldOut);
+    expect(ids(all)).toHaveLength(all.counts.all);
+    // Agrupado por sección y en el orden del menú: cada sección aparece una vez.
+    expect(new Set(all.sections.map((s) => s.name)).size).toBe(all.sections.length);
+    const medio = all.sections.flatMap((s) => s.items).find((p) => p.id === 'pr_pollo_medio');
     expect(medio).toEqual({
       id: 'pr_pollo_medio',
       name: '1/2 pollo a la brasa',
@@ -211,6 +224,24 @@ describe('Chaski Socios: negocio (e2e)', () => {
       .send({ isAvailable: false })
       .expect(200);
     expect(off.body).toEqual({ id: 'pr_pollo_medio', isAvailable: false });
+
+    // Las pestañas y la búsqueda las resuelve el backend.
+    const soldOut = await catalog({ status: 'sold_out' });
+    expect(ids(soldOut)).toContain('pr_pollo_medio');
+    expect(soldOut.counts).toEqual({
+      all: all.counts.all,
+      available: all.counts.available - 1,
+      soldOut: all.counts.soldOut + 1,
+    });
+    expect(ids(await catalog({ status: 'available' }))).not.toContain('pr_pollo_medio');
+    // Sin tildes ni mayúsculas.
+    expect(ids(await catalog({ q: 'POLLO A LA BRASA' }))).toContain('pr_pollo_medio');
+    expect(ids(await catalog({ q: 'ninguno-asi' }))).toEqual([]);
+    await http()
+      .get(`${API}/merchant/stores/${STORE}/products`)
+      .query({ status: 'todos' })
+      .set(merchant.auth)
+      .expect(400);
     expect((await prisma.product.findUniqueOrThrow({ where: { id: 'pr_pollo_medio' } })).isAvailable).toBe(false);
 
     // Agotado: el cliente ya no puede pedirlo.

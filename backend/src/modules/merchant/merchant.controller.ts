@@ -15,6 +15,7 @@ import { toStaffOrderResponse } from '../orders/order-presenter';
 import { OrdersService } from '../orders/orders.service';
 import { OrderActor, OrderStatusService, scopeFor } from '../orders/status/order-status.service';
 import { StoresService } from '../stores/stores.service';
+import { MerchantProductsQueryDto } from './dto/merchant-products-query.dto';
 import { UpdateProductAvailabilityDto } from './dto/update-product-availability.dto';
 import { UpdateStoreStatusDto } from './dto/update-store-status.dto';
 import { MerchantService } from './merchant.service';
@@ -92,8 +93,8 @@ export class MerchantController {
   }
 
   @Get('stores/:id/products')
-  products(@CurrentUser() user: AuthUser, @Param('id') id: string) {
-    return this.merchant.products(id, ownerOf(user));
+  products(@CurrentUser() user: AuthUser, @Param('id') id: string, @Query() query: MerchantProductsQueryDto) {
+    return this.merchant.products(id, query, ownerOf(user));
   }
 
   /** Marca un producto disponible o agotado. */

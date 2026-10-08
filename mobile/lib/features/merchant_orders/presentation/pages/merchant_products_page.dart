@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/partner/partner.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,15 +23,101 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
   final _search = TextEditingController();
   ProductFilter _filter = ProductFilter.all;
 
+  /// Lo que se manda al backend: el texto, cuando se deja de escribir.
+  var _query = '';
+  Timer? _debounce;
+
+  /// La última carta recibida: mientras llega otra pestaña o búsqueda, los
+  /// conteos y el buscador siguen a la vista.
+  MerchantCatalog? _last;
+
+  static const _searchDelay = Duration(milliseconds: 300);
+
   @override
   void dispose() {
+    _debounce?.cancel();
     _search.dispose();
     super.dispose();
   }
 
+  void _onSearch(String text) {
+    setState(() {});
+    _debounce?.cancel();
+    _debounce = Timer(_searchDelay, () {
+      if (mounted && text.trim() != _query) setState(() => _query = text.trim());
+    });
+  }
+
+  void _clearSearch() {
+    _debounce?.cancel();
+    setState(() {
+      _search.clear();
+      _query = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final catalog = ref.watch(merchantProductsFilteredProvider(widget.storeId, query: _search.text, filter: _filter));
+    final provider = merchantCatalogProvider(widget.storeId, filter: _filter, query: _query);
+    final catalog = ref.watch(provider);
+    if (catalog.value case final value?) _last = value;
+    final last = _last;
+
+    final Widget body;
+    if (last == null) {
+      body = catalog.hasError
+          ? AppEmptyState.fromError(catalog.error!, onRetry: () => ref.invalidate(provider))
+          : const _ProductsSkeleton();
+    } else if (last.counts.all == 0) {
+      body = const AppEmptyState(scene: AppEmptyArt.menu, title: 'Sin productos', message: 'Todavía no cargamos tu menú.');
+    } else {
+      body = RefreshIndicator(
+        onRefresh: () => ref.refresh(provider.future),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.md),
+              sliver: SliverToBoxAdapter(child: _searchAndFilters(last.counts)),
+            ),
+            if (catalog.isLoading)
+              const SliverToBoxAdapter(child: _ProductRowsSkeleton())
+            else if (catalog.hasError)
+              SliverToBoxAdapter(
+                child: AppEmptyState.fromError(catalog.error!, compact: true, onRetry: () => ref.invalidate(provider)),
+              )
+            else if (last.sections.isEmpty)
+              const SliverToBoxAdapter(
+                child: AppEmptyState(
+                  kind: AppEmptyKind.noResults,
+                  title: 'Sin coincidencias',
+                  message: 'Prueba con otro nombre o cambia el filtro.',
+                ),
+              )
+            else
+              for (final section in last.sections)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter),
+                  sliver: SliverList.list(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
+                        child: Text(section.name, style: Theme.of(context).textTheme.titleMedium),
+                      ),
+                      for (final product in section.items)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                          child: _ProductRow(key: ValueKey(product.id), product: product),
+                        ),
+                    ],
+                  ),
+                ),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: partnerStatusBar(context),
       body: SafeArea(
@@ -43,89 +130,33 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
               accent: 'al día.',
               titleSize: 24,
             ),
-            Expanded(
-              child: PartnerContent(
-                maxWidth: 760,
-                child: AsyncValueView(
-                  value: catalog,
-                  onRetry: () => ref.invalidate(merchantProductsProvider(widget.storeId)),
-                  loading: const _ProductsSkeleton(),
-                  isEmpty: (c) => c.total == 0,
-                  empty: const AppEmptyState(scene: AppEmptyArt.menu, title: 'Sin productos', message: 'Todavía no cargamos tu menú.'),
-                  data: (c) => RefreshIndicator(
-                    onRefresh: () => ref.refresh(merchantProductsProvider(widget.storeId).future),
-                    child: CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.md),
-                          sliver: SliverToBoxAdapter(child: _searchAndFilters(c)),
-                        ),
-                        if (c.visible.isEmpty)
-                          const SliverToBoxAdapter(
-                            child: AppEmptyState(kind: AppEmptyKind.noResults, title: 'Sin coincidencias', message: 'Prueba con otro nombre o cambia el filtro.'),
-                          ),
-                        SliverPadding(
-                          padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.xl),
-                          sliver: SliverList.builder(
-                            itemCount: c.visible.length,
-                            itemBuilder: (context, index) {
-                              final product = c.visible[index];
-                              final section = productSection(product);
-                              final startsSection = index == 0 || productSection(c.visible[index - 1]) != section;
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  if (startsSection)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
-                                      child: Text(section, style: Theme.of(context).textTheme.titleMedium),
-                                    ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                                    child: _ProductRow(key: ValueKey(product.id), storeId: widget.storeId, product: product),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: PartnerContent(maxWidth: 760, child: body)),
           ],
         ),
       ),
     );
   }
 
-  Widget _searchAndFilters(MerchantCatalog c) {
+  Widget _searchAndFilters(ProductCounts counts) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: AppSpacing.sm),
         Text(
-          '${c.available} de ${c.total} productos disponibles para pedir.',
+          '${counts.available} de ${counts.all} productos disponibles para pedir.',
           style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
         const SizedBox(height: AppSpacing.md),
         TextField(
           controller: _search,
-          onChanged: (_) => setState(() {}),
+          onChanged: _onSearch,
           decoration: InputDecoration(
             hintText: 'Buscar producto',
             prefixIcon: const Icon(Icons.search_rounded),
             suffixIcon: _search.text.isEmpty
                 ? null
-                : IconButton(
-                    tooltip: 'Limpiar búsqueda',
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => setState(_search.clear),
-                  ),
+                : IconButton(tooltip: 'Limpiar búsqueda', icon: const Icon(Icons.close_rounded), onPressed: _clearSearch),
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -134,9 +165,9 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
           runSpacing: AppSpacing.xs,
           children: [
             for (final (filter, label) in [
-              (ProductFilter.all, 'Todos (${c.total})'),
-              (ProductFilter.available, 'Disponibles (${c.available})'),
-              (ProductFilter.soldOut, 'Agotados (${c.soldOut})'),
+              (ProductFilter.all, 'Todos (${counts.all})'),
+              (ProductFilter.available, 'Disponibles (${counts.available})'),
+              (ProductFilter.soldOut, 'Agotados (${counts.soldOut})'),
             ])
               AppChip(label: label, selected: _filter == filter, onTap: () => setState(() => _filter = filter)),
           ],
@@ -148,9 +179,8 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
 
 /// Un producto con su interruptor de disponible/agotado.
 class _ProductRow extends ConsumerStatefulWidget {
-  const _ProductRow({required this.storeId, required this.product, super.key});
+  const _ProductRow({required this.product, super.key});
 
-  final String storeId;
   final MerchantProduct product;
 
   @override
@@ -159,7 +189,7 @@ class _ProductRow extends ConsumerStatefulWidget {
 
 class _ProductRowState extends ConsumerState<_ProductRow> with PartnerActionRunner {
   Future<void> _toggle(bool available) =>
-      run(() => ref.read(merchantProductsProvider(widget.storeId).notifier).setAvailable(widget.product, available: available));
+      run(() => ref.read(merchantProductActionsProvider.notifier).setAvailable(widget.product, available: available));
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +239,6 @@ class _ProductsSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width >= 360;
     return ListView(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs + AppSpacing.sm, AppSpacing.gutter, 0),
@@ -230,43 +259,72 @@ class _ProductsSkeleton extends StatelessWidget {
                   ],
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-              const SkeletonBox(width: 110, height: 16),
-              const SizedBox(height: AppSpacing.sm),
             ],
           ),
         ),
-        for (var i = 0; i < 5; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-            child: PartnerSurface(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Skeleton(
-                child: Row(
-                  children: [
-                    if (wide) ...[
-                      const SkeletonBox(width: 56, height: 64, borderRadius: AppRadius.tile),
-                      const SizedBox(width: AppSpacing.sm),
-                    ],
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SkeletonBox(width: 150),
-                          SizedBox(height: AppSpacing.xs),
-                          SkeletonBox(width: 60, height: 12),
-                          SizedBox(height: 6),
-                          SkeletonBox(width: 70, height: 10),
-                        ],
-                      ),
-                    ),
-                    const SkeletonBox(width: 52, height: 32, borderRadius: BorderRadius.all(Radius.circular(16))),
-                  ],
-                ),
+        const _ProductRowsSkeleton(padded: false),
+      ],
+    );
+  }
+}
+
+
+/// Filas de la carta en blanco: al cambiar de pestaña o buscar, solo la lista
+/// espera; el buscador y los conteos quedan arriba.
+class _ProductRowsSkeleton extends StatelessWidget {
+  const _ProductRowsSkeleton({this.padded = true});
+
+  /// Con el margen lateral de la lista (dentro del scroll de la carta).
+  final bool padded;
+
+  @override
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width >= 360;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: padded ? AppSpacing.gutter : 0),
+      child: Column(
+        children: [
+          const Skeleton(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
+                child: SkeletonBox(width: 110, height: 16),
               ),
             ),
           ),
-      ],
+        for (var i = 0; i < 5; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: PartnerSurface(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Skeleton(
+                  child: Row(
+                    children: [
+                      if (wide) ...[
+                        const SkeletonBox(width: 56, height: 64, borderRadius: AppRadius.tile),
+                        const SizedBox(width: AppSpacing.sm),
+                      ],
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SkeletonBox(width: 150),
+                            SizedBox(height: AppSpacing.xs),
+                            SkeletonBox(width: 60, height: 12),
+                            SizedBox(height: 6),
+                            SkeletonBox(width: 70, height: 10),
+                          ],
+                        ),
+                      ),
+                      const SkeletonBox(width: 52, height: 32, borderRadius: BorderRadius.all(Radius.circular(16))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

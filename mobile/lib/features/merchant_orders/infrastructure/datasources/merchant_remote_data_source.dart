@@ -16,7 +16,8 @@ abstract interface class MerchantRemoteDataSource {
 
   Future<Map<String, dynamic>> reject(String orderId, {required String reason});
 
-  Future<List<Map<String, dynamic>>> products(String storeId);
+  /// `{ counts, sections }` con [status] (`all`, `available`, `sold_out`) y la búsqueda [query].
+  Future<Map<String, dynamic>> products(String storeId, {String status = 'all', String query = ''});
 
   Future<Map<String, dynamic>> setProductAvailable(String productId, {required bool available});
 
@@ -58,8 +59,9 @@ class ApiMerchantRemoteDataSource implements MerchantRemoteDataSource {
       _map(await _api.post('/merchant/orders/$orderId/cancel', body: {'reason': reason}));
 
   @override
-  Future<List<Map<String, dynamic>>> products(String storeId) async =>
-      _list(await _api.get('/merchant/stores/$storeId/products'));
+  Future<Map<String, dynamic>> products(String storeId, {String status = 'all', String query = ''}) async => _map(
+    await _api.get('/merchant/stores/$storeId/products', query: {'status': status, if (query.trim().isNotEmpty) 'q': query.trim()}),
+  );
 
   @override
   Future<Map<String, dynamic>> setProductAvailable(String productId, {required bool available}) async =>
@@ -96,7 +98,8 @@ class FakeMerchantRemoteDataSource implements MerchantRemoteDataSource {
   Future<Map<String, dynamic>> reject(String orderId, {required String reason}) => _fake.reject(orderId, reason: reason);
 
   @override
-  Future<List<Map<String, dynamic>>> products(String storeId) => _fake.products(storeId);
+  Future<Map<String, dynamic>> products(String storeId, {String status = 'all', String query = ''}) =>
+      _fake.products(storeId, status: status, query: query);
 
   @override
   Future<Map<String, dynamic>> setProductAvailable(String productId, {required bool available}) =>

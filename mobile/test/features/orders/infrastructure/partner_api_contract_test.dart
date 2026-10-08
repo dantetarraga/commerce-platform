@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/features/courier_deliveries/domain/courier.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
 import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
+import 'package:chaski/features/merchant_orders/domain/merchant.dart';
+import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/features/orders/orders_infrastructure.dart';
@@ -22,6 +25,8 @@ Map<String, dynamic> _map(String name) => _fixture(name)! as Map<String, dynamic
 List<Map<String, dynamic>> _list(String name) => (_fixture(name)! as List).cast<Map<String, dynamic>>();
 
 class _MockCourierRemote extends Mock implements CourierRemoteDataSource {}
+
+class _MockApiClient extends Mock implements ApiClient {}
 
 void main() {
   test('el pedido para socios trae notas, retiro, cliente y cobro', () {
@@ -47,10 +52,25 @@ void main() {
     final orders = (_map('merchant_orders_active')['items'] as List).cast<Map<String, dynamic>>();
     expect(orders.map(StaffOrderJson.fromJson), isNotEmpty);
     expect(_list('merchant_stores').map(MerchantJson.store).single.id, 'st_chaski_dorado');
-    final products = _list('merchant_products').map(MerchantJson.product).toList();
-    expect(products.where((p) => !p.isAvailable), isNotEmpty);
-    expect(products.first.section, isNotNull);
-    expect(MerchantJson.summary(_map('merchant_summary')).sales, isA<Money>());
+    final catalog = MerchantJson.catalog(_map('merchant_products'));
+    final products = catalog.sections.expand((s) => s.items).toList();
+    expect(products, hasLength(catalog.counts.all));
+    expect(products.where((p) => !p.isAvailable), hasLength(catalog.counts.soldOut));
+    expect(catalog.sections.first.name, isNotEmpty);
+    final summary = MerchantJson.summary(_map('merchant_summary'));
+    expect(summary.sales, isA<Money>());
+    expect(summary.payments.map((p) => p.kind), [PaymentKind.cash, PaymentKind.yape, PaymentKind.plin]);
+  });
+
+  test('la carta pide al backend la pestaña y la búsqueda', () async {
+    final api = _MockApiClient();
+    when(() => api.get(any(), query: any(named: 'query'))).thenAnswer((_) async => _map('merchant_products'));
+    final remote = ApiMerchantRemoteDataSource(api);
+
+    await remote.products('st_1', status: 'sold_out', query: '  pollo ');
+    verify(() => api.get('/merchant/stores/st_1/products', query: {'status': 'sold_out', 'q': 'pollo'})).called(1);
+    await remote.products('st_1');
+    verify(() => api.get('/merchant/stores/st_1/products', query: {'status': 'all'})).called(1);
   });
 
   test('repartidor: perfil, disponibles y resumen', () async {

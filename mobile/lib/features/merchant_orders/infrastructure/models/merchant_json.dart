@@ -20,6 +20,27 @@ abstract final class MerchantJson {
     isAvailable: json['isAvailable'] as bool,
   );
 
+  static String filterToJson(ProductFilter filter) => switch (filter) {
+    ProductFilter.all => 'all',
+    ProductFilter.available => 'available',
+    ProductFilter.soldOut => 'sold_out',
+  };
+
+  static MerchantCatalog catalog(Map<String, dynamic> json) {
+    final counts = json['counts'] as Map<String, dynamic>;
+    return MerchantCatalog(
+      counts: ProductCounts(
+        all: counts['all'] as int,
+        available: counts['available'] as int,
+        soldOut: counts['soldOut'] as int,
+      ),
+      sections: [
+        for (final s in _rows(json['sections']))
+          ProductSection(name: s['name'] as String, items: [for (final p in _rows(s['items'])) product(p)]),
+      ],
+    );
+  }
+
   static const Map<String, PaymentKind> _paymentKinds = {
     'CASH': PaymentKind.cash,
     'YAPE': PaymentKind.yape,

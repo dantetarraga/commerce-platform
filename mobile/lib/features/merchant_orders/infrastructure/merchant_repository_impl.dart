@@ -42,8 +42,8 @@ class MerchantRepositoryImpl implements MerchantRepository {
       guard(() async => StaffOrderJson.fromJson(await _remote.reject(orderId, reason: reason)));
 
   @override
-  Future<Result<List<MerchantProduct>>> products(String storeId) =>
-      guard(() async => (await _remote.products(storeId)).map(MerchantJson.product).toList());
+  Future<Result<MerchantCatalog>> products(String storeId, {ProductFilter filter = ProductFilter.all, String query = ''}) =>
+      guard(() async => MerchantJson.catalog(await _remote.products(storeId, status: MerchantJson.filterToJson(filter), query: query)));
 
   @override
   Future<Result<MerchantProduct>> setProductAvailable(MerchantProduct product, {required bool available}) =>

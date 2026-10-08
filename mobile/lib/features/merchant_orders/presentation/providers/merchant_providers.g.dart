@@ -402,178 +402,67 @@ abstract class _$MerchantOrderActions extends $Notifier<void> {
   }
 }
 
-/// Productos de un negocio con su interruptor de disponible/agotado.
+/// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+/// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
 
-@ProviderFor(MerchantProducts)
-final merchantProductsProvider = MerchantProductsFamily._();
+@ProviderFor(merchantCatalog)
+final merchantCatalogProvider = MerchantCatalogFamily._();
 
-/// Productos de un negocio con su interruptor de disponible/agotado.
-final class MerchantProductsProvider
-    extends $AsyncNotifierProvider<MerchantProducts, List<MerchantProduct>> {
-  /// Productos de un negocio con su interruptor de disponible/agotado.
-  MerchantProductsProvider._({
-    required MerchantProductsFamily super.from,
-    required String super.argument,
-  }) : super(
-         retry: null,
-         name: r'merchantProductsProvider',
-         isAutoDispose: true,
-         dependencies: null,
-         $allTransitiveDependencies: null,
-       );
+/// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+/// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
 
-  @override
-  String debugGetCreateSourceHash() => _$merchantProductsHash();
-
-  @override
-  String toString() {
-    return r'merchantProductsProvider'
-        ''
-        '($argument)';
-  }
-
-  @$internal
-  @override
-  MerchantProducts create() => MerchantProducts();
-
-  @override
-  bool operator ==(Object other) {
-    return other is MerchantProductsProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
-}
-
-String _$merchantProductsHash() => r'ddff497f3bd1c82606634de38565c025cc14bf8d';
-
-/// Productos de un negocio con su interruptor de disponible/agotado.
-
-final class MerchantProductsFamily extends $Family
-    with
-        $ClassFamilyOverride<
-          MerchantProducts,
-          AsyncValue<List<MerchantProduct>>,
-          List<MerchantProduct>,
-          FutureOr<List<MerchantProduct>>,
-          String
-        > {
-  MerchantProductsFamily._()
-    : super(
-        retry: null,
-        name: r'merchantProductsProvider',
-        dependencies: null,
-        $allTransitiveDependencies: null,
-        isAutoDispose: true,
-      );
-
-  /// Productos de un negocio con su interruptor de disponible/agotado.
-
-  MerchantProductsProvider call(String storeId) =>
-      MerchantProductsProvider._(argument: storeId, from: this);
-
-  @override
-  String toString() => r'merchantProductsProvider';
-}
-
-/// Productos de un negocio con su interruptor de disponible/agotado.
-
-abstract class _$MerchantProducts
-    extends $AsyncNotifier<List<MerchantProduct>> {
-  late final _$args = ref.$arg as String;
-  String get storeId => _$args;
-
-  FutureOr<List<MerchantProduct>> build(String storeId);
-  @$mustCallSuper
-  @override
-  WhenComplete runBuild() {
-    final ref =
-        this.ref
-            as $Ref<AsyncValue<List<MerchantProduct>>, List<MerchantProduct>>;
-    final element =
-        ref.element
-            as $ClassProviderElement<
-              AnyNotifier<
-                AsyncValue<List<MerchantProduct>>,
-                List<MerchantProduct>
-              >,
-              AsyncValue<List<MerchantProduct>>,
-              Object?,
-              Object?
-            >;
-    return element.handleCreate(ref, () => build(_$args));
-  }
-}
-
-/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
-
-@ProviderFor(merchantProductsFiltered)
-final merchantProductsFilteredProvider = MerchantProductsFilteredFamily._();
-
-/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
-
-final class MerchantProductsFilteredProvider
+final class MerchantCatalogProvider
     extends
         $FunctionalProvider<
           AsyncValue<MerchantCatalog>,
-          AsyncValue<MerchantCatalog>,
-          AsyncValue<MerchantCatalog>
+          MerchantCatalog,
+          FutureOr<MerchantCatalog>
         >
-    with $Provider<AsyncValue<MerchantCatalog>> {
-  /// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
-  MerchantProductsFilteredProvider._({
-    required MerchantProductsFilteredFamily super.from,
-    required (String, {String query, ProductFilter filter}) super.argument,
+    with $FutureModifier<MerchantCatalog>, $FutureProvider<MerchantCatalog> {
+  /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+  /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+  MerchantCatalogProvider._({
+    required MerchantCatalogFamily super.from,
+    required (String, {ProductFilter filter, String query}) super.argument,
   }) : super(
          retry: null,
-         name: r'merchantProductsFilteredProvider',
+         name: r'merchantCatalogProvider',
          isAutoDispose: true,
          dependencies: null,
          $allTransitiveDependencies: null,
        );
 
   @override
-  String debugGetCreateSourceHash() => _$merchantProductsFilteredHash();
+  String debugGetCreateSourceHash() => _$merchantCatalogHash();
 
   @override
   String toString() {
-    return r'merchantProductsFilteredProvider'
+    return r'merchantCatalogProvider'
         ''
         '$argument';
   }
 
   @$internal
   @override
-  $ProviderElement<AsyncValue<MerchantCatalog>> $createElement(
+  $FutureProviderElement<MerchantCatalog> $createElement(
     $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
+  ) => $FutureProviderElement(pointer);
 
   @override
-  AsyncValue<MerchantCatalog> create(Ref ref) {
+  FutureOr<MerchantCatalog> create(Ref ref) {
     final argument =
-        this.argument as (String, {String query, ProductFilter filter});
-    return merchantProductsFiltered(
+        this.argument as (String, {ProductFilter filter, String query});
+    return merchantCatalog(
       ref,
       argument.$1,
-      query: argument.query,
       filter: argument.filter,
-    );
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AsyncValue<MerchantCatalog> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<AsyncValue<MerchantCatalog>>(value),
+      query: argument.query,
     );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is MerchantProductsFilteredProvider &&
-        other.argument == argument;
+    return other is MerchantCatalogProvider && other.argument == argument;
   }
 
   @override
@@ -582,37 +471,105 @@ final class MerchantProductsFilteredProvider
   }
 }
 
-String _$merchantProductsFilteredHash() =>
-    r'23f4fbd4307306dc1eae4a54f7ad389806ca1bef';
+String _$merchantCatalogHash() => r'd0a0673ab04495cb8eb1fb287e51f835458b7e35';
 
-/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+/// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+/// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
 
-final class MerchantProductsFilteredFamily extends $Family
+final class MerchantCatalogFamily extends $Family
     with
         $FunctionalFamilyOverride<
-          AsyncValue<MerchantCatalog>,
-          (String, {String query, ProductFilter filter})
+          FutureOr<MerchantCatalog>,
+          (String, {ProductFilter filter, String query})
         > {
-  MerchantProductsFilteredFamily._()
+  MerchantCatalogFamily._()
     : super(
         retry: null,
-        name: r'merchantProductsFilteredProvider',
+        name: r'merchantCatalogProvider',
         dependencies: null,
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
 
-  /// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
+  /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+  /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
 
-  MerchantProductsFilteredProvider call(
+  MerchantCatalogProvider call(
     String storeId, {
-    String query = '',
     ProductFilter filter = ProductFilter.all,
-  }) => MerchantProductsFilteredProvider._(
-    argument: (storeId, query: query, filter: filter),
+    String query = '',
+  }) => MerchantCatalogProvider._(
+    argument: (storeId, filter: filter, query: query),
     from: this,
   );
 
   @override
-  String toString() => r'merchantProductsFilteredProvider';
+  String toString() => r'merchantCatalogProvider';
+}
+
+/// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
+/// carta (en "Disponibles" el producto agotado ya no viene).
+// keepAlive: si se liberara a mitad del cambio, se perdería el refresco.
+
+@ProviderFor(MerchantProductActions)
+final merchantProductActionsProvider = MerchantProductActionsProvider._();
+
+/// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
+/// carta (en "Disponibles" el producto agotado ya no viene).
+// keepAlive: si se liberara a mitad del cambio, se perdería el refresco.
+final class MerchantProductActionsProvider
+    extends $NotifierProvider<MerchantProductActions, void> {
+  /// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
+  /// carta (en "Disponibles" el producto agotado ya no viene).
+  // keepAlive: si se liberara a mitad del cambio, se perdería el refresco.
+  MerchantProductActionsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'merchantProductActionsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$merchantProductActionsHash();
+
+  @$internal
+  @override
+  MerchantProductActions create() => MerchantProductActions();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$merchantProductActionsHash() =>
+    r'5557ce8ea8dec43f2c1f71eef259669a086acb8b';
+
+/// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
+/// carta (en "Disponibles" el producto agotado ya no viene).
+// keepAlive: si se liberara a mitad del cambio, se perdería el refresco.
+
+abstract class _$MerchantProductActions extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
 }

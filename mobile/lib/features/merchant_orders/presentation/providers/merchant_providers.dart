@@ -5,7 +5,6 @@ import 'package:chaski/core/errors/failure.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/core/realtime/realtime_client.dart';
 import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/utils/text_utils.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
@@ -101,67 +100,31 @@ class MerchantOrderActions extends _$MerchantOrderActions {
   }
 }
 
-/// Productos de un negocio con su interruptor de disponible/agotado.
+/// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
+/// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
 @riverpod
-class MerchantProducts extends _$MerchantProducts {
+Future<MerchantCatalog> merchantCatalog(
+  Ref ref,
+  String storeId, {
+  ProductFilter filter = ProductFilter.all,
+  String query = '',
+}) => ref.watch(merchantRepositoryProvider).products(storeId, filter: filter, query: query).then((r) => r.getOrThrow());
+
+/// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
+/// carta (en "Disponibles" el producto agotado ya no viene).
+// keepAlive: si se liberara a mitad del cambio, se perdería el refresco.
+@Riverpod(keepAlive: true)
+class MerchantProductActions extends _$MerchantProductActions {
   @override
-  Future<List<MerchantProduct>> build(String storeId) =>
-      ref.watch(merchantRepositoryProvider).products(storeId).then((r) => r.getOrThrow());
+  void build() {}
 
   Future<Failure?> setAvailable(MerchantProduct product, {required bool available}) async {
-    final previous = state.value;
-    if (previous == null) return null;
-    state = AsyncData([for (final p in previous) if (p.id == product.id) p.copyWith(isAvailable: available) else p]);
     final result = await ref.read(merchantRepositoryProvider).setProductAvailable(product, available: available);
     if (!ref.mounted) return null;
+    ref.invalidate(merchantCatalogProvider);
     return switch (result) {
       Ok() => null,
-      Err(:final failure) => () {
-        state = AsyncData(previous);
-        return failure;
-      }(),
+      Err(:final failure) => failure,
     };
   }
 }
-
-enum ProductFilter { all, available, soldOut }
-
-/// La carta filtrada para la pantalla de productos.
-final class MerchantCatalog {
-  const MerchantCatalog({required this.total, required this.available, required this.visible});
-
-  final int total;
-  final int available;
-  int get soldOut => total - available;
-
-  /// Lo que coincide con la búsqueda y el filtro, agrupado por sección.
-  final List<MerchantProduct> visible;
-}
-
-/// Sección de un producto en la carta ("Otros" si no tiene).
-String productSection(MerchantProduct product) => product.section ?? 'Otros';
-
-/// [merchantProductsProvider] buscado (sin importar tildes) y filtrado.
-@riverpod
-AsyncValue<MerchantCatalog> merchantProductsFiltered(
-  Ref ref,
-  String storeId, {
-  String query = '',
-  ProductFilter filter = ProductFilter.all,
-}) => ref.watch(merchantProductsProvider(storeId)).whenData((list) {
-  final needle = normalizeForSearch(query);
-  final visible = [
-    for (final p in list)
-      if (foldAccents(p.name).contains(needle) &&
-          switch (filter) {
-            ProductFilter.all => true,
-            ProductFilter.available => p.isAvailable,
-            ProductFilter.soldOut => !p.isAvailable,
-          })
-        p,
-  ];
-  // Por sección y, dentro de cada una, en el orden de la carta.
-  final sections = visible.map(productSection).toSet().toList()..sort();
-  final grouped = [for (final s in sections) ...visible.where((p) => productSection(p) == s)];
-  return MerchantCatalog(total: list.length, available: list.where((p) => p.isAvailable).length, visible: grouped);
-});

@@ -104,4 +104,4 @@ final class RealtimeClientProvider
   }
 }
 
-String _$realtimeClientHash() => r'9d3e4fd4957e0a4841d85d4d8a3da395b5c39cfa';
+String _$realtimeClientHash() => r'ebd8b5ca44aa9118ee9e777c256d4bb988cd56de';
