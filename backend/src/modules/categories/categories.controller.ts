@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/auth.decorators';
+import { LocationQueryDto, pointOf } from '../../common/dto/location-query.dto';
 import { CategoriesService } from './categories.service';
 
 @ApiTags('catalog')
@@ -9,8 +10,9 @@ import { CategoriesService } from './categories.service';
 export class CategoriesController {
   constructor(private readonly categories: CategoriesService) {}
 
+  /** `openStoreCount`: abiertos ahora que llegan a `?lat=&lng=` (o al centro). */
   @Get()
-  list() {
-    return this.categories.list();
+  list(@Query() location: LocationQueryDto) {
+    return this.categories.list(pointOf(location));
   }
 }

@@ -21,11 +21,11 @@ class _BarrioStoresState extends ConsumerState<BarrioStores> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = storesProvider();
+    // Los filtros los aplica el backend; el conteo de abiertos es del barrio.
+    final provider = storesProvider(filters: StoreFilters({..._filters}));
     final stores = ref.watch(provider);
-    final all = stores.value?.items ?? const <StoreSummary>[];
-    final open = all.where((s) => s.isOpenNow).length;
-    final shown = all.matching(_filters);
+    final shown = stores.value?.items ?? const <StoreSummary>[];
+    final open = stores.value?.openCount ?? 0;
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(

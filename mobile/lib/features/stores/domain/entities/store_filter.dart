@@ -1,4 +1,5 @@
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
+import 'package:equatable/equatable.dart';
+
 
 /// Filtros rápidos de los listados de negocios ("Cerca de ti", categoría).
 enum StoreFilter {
@@ -15,25 +16,25 @@ enum StoreFilter {
   /// Los tres que caben en la portada del inicio.
   static const List<StoreFilter> quick = [openNow, freeDelivery, topRated];
 
-  /// Calificación mínima de [topRated].
-  static const topRatedMin = 4.5;
-
-  bool accepts(StoreSummary s) => switch (this) {
-    openNow => s.isOpenNow,
-    freeDelivery => s.deliveryFee.isZero,
-    topRated => s.rating.hasReviews && s.rating.average >= topRatedMin,
-    noMinimum => s.minOrderAmount.isZero,
-    offers => s.promoLabel != null,
+  /// Nombre en la API (`?filters=open_now,free_delivery`).
+  String get apiName => switch (this) {
+    openNow => 'open_now',
+    freeDelivery => 'free_delivery',
+    topRated => 'top_rated',
+    noMinimum => 'no_minimum',
+    offers => 'offers',
   };
 }
 
-extension StoreListFilters on Iterable<StoreSummary> {
-  /// Los que pasan todos los [filters] (sin filtros, todos).
-  List<StoreSummary> matching(Set<StoreFilter> filters) => [
-    for (final s in this)
-      if (filters.every((f) => f.accepts(s))) s,
-  ];
+/// Filtros elegidos, comparables por valor: así sirven como parámetro de un
+/// provider family aunque la pantalla arme un `Set` nuevo en cada build.
+final class StoreFilters extends Equatable {
+  const StoreFilters([this.values = const {}]);
 
-  /// Abiertos primero y cerrados al final, sin perder el orden elegido.
-  List<StoreSummary> openFirst() => [...where((s) => s.isOpenNow), ...where((s) => !s.isOpenNow)];
+  static const none = StoreFilters();
+
+  final Set<StoreFilter> values;
+
+  @override
+  List<Object?> get props => [values];
 }

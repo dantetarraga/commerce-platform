@@ -103,8 +103,12 @@ final class StoresRepositoryProvider
 
 String _$storesRepositoryHash() => r'8106553331541cf69cf0231c36ef3e7cd0728c63';
 
+/// Categorías con sus negocios abiertos en la ubicación de entrega actual.
+
 @ProviderFor(categories)
 final categoriesProvider = CategoriesProvider._();
+
+/// Categorías con sus negocios abiertos en la ubicación de entrega actual.
 
 final class CategoriesProvider
     extends
@@ -114,6 +118,7 @@ final class CategoriesProvider
           FutureOr<List<Category>>
         >
     with $FutureModifier<List<Category>>, $FutureProvider<List<Category>> {
+  /// Categorías con sus negocios abiertos en la ubicación de entrega actual.
   CategoriesProvider._()
     : super(
         from: null,
@@ -140,7 +145,7 @@ final class CategoriesProvider
   }
 }
 
-String _$categoriesHash() => r'e6be06b2915aed77c249458d9fa19dcc2272f866';
+String _$categoriesHash() => r'c2dda05ea9fd1ac3f26ea83f15da8f5b7d782074';
 
 /// Negocios para la ubicación de entrega actual.
 
@@ -152,17 +157,21 @@ final storesProvider = StoresFamily._();
 final class StoresProvider
     extends
         $FunctionalProvider<
-          AsyncValue<PageResult<StoreSummary>>,
-          PageResult<StoreSummary>,
-          FutureOr<PageResult<StoreSummary>>
+          AsyncValue<StorePage>,
+          StorePage,
+          FutureOr<StorePage>
         >
-    with
-        $FutureModifier<PageResult<StoreSummary>>,
-        $FutureProvider<PageResult<StoreSummary>> {
+    with $FutureModifier<StorePage>, $FutureProvider<StorePage> {
   /// Negocios para la ubicación de entrega actual.
   StoresProvider._({
     required StoresFamily super.from,
-    required ({StoreSort sort, String? categoryId}) super.argument,
+    required ({
+      StoreSort sort,
+      String? categoryId,
+      StoreFilters filters,
+      int limit,
+    })
+    super.argument,
   }) : super(
          retry: null,
          name: r'storesProvider',
@@ -183,14 +192,26 @@ final class StoresProvider
 
   @$internal
   @override
-  $FutureProviderElement<PageResult<StoreSummary>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  $FutureProviderElement<StorePage> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
-  FutureOr<PageResult<StoreSummary>> create(Ref ref) {
-    final argument = this.argument as ({StoreSort sort, String? categoryId});
-    return stores(ref, sort: argument.sort, categoryId: argument.categoryId);
+  FutureOr<StorePage> create(Ref ref) {
+    final argument =
+        this.argument
+            as ({
+              StoreSort sort,
+              String? categoryId,
+              StoreFilters filters,
+              int limit,
+            });
+    return stores(
+      ref,
+      sort: argument.sort,
+      categoryId: argument.categoryId,
+      filters: argument.filters,
+      limit: argument.limit,
+    );
   }
 
   @override
@@ -204,15 +225,20 @@ final class StoresProvider
   }
 }
 
-String _$storesHash() => r'9708c1e300ed1f0657105ed35a52273296206e09';
+String _$storesHash() => r'f924005495ded9e74a62ef0819901ff4ae14b4de';
 
 /// Negocios para la ubicación de entrega actual.
 
 final class StoresFamily extends $Family
     with
         $FunctionalFamilyOverride<
-          FutureOr<PageResult<StoreSummary>>,
-          ({StoreSort sort, String? categoryId})
+          FutureOr<StorePage>,
+          ({
+            StoreSort sort,
+            String? categoryId,
+            StoreFilters filters,
+            int limit,
+          })
         > {
   StoresFamily._()
     : super(
@@ -228,8 +254,15 @@ final class StoresFamily extends $Family
   StoresProvider call({
     StoreSort sort = StoreSort.distance,
     String? categoryId,
+    StoreFilters filters = StoreFilters.none,
+    int limit = 20,
   }) => StoresProvider._(
-    argument: (sort: sort, categoryId: categoryId),
+    argument: (
+      sort: sort,
+      categoryId: categoryId,
+      filters: filters,
+      limit: limit,
+    ),
     from: this,
   );
 
@@ -393,4 +426,88 @@ final class StoreMenuFamily extends $Family
 
   @override
   String toString() => r'storeMenuProvider';
+}
+
+/// Lo que coincide con [query] en la carta del negocio (busca el backend).
+
+@ProviderFor(menuSearch)
+final menuSearchProvider = MenuSearchFamily._();
+
+/// Lo que coincide con [query] en la carta del negocio (busca el backend).
+
+final class MenuSearchProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<MenuItem>>,
+          List<MenuItem>,
+          FutureOr<List<MenuItem>>
+        >
+    with $FutureModifier<List<MenuItem>>, $FutureProvider<List<MenuItem>> {
+  /// Lo que coincide con [query] en la carta del negocio (busca el backend).
+  MenuSearchProvider._({
+    required MenuSearchFamily super.from,
+    required (String, String) super.argument,
+  }) : super(
+         retry: null,
+         name: r'menuSearchProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$menuSearchHash();
+
+  @override
+  String toString() {
+    return r'menuSearchProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<MenuItem>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<MenuItem>> create(Ref ref) {
+    final argument = this.argument as (String, String);
+    return menuSearch(ref, argument.$1, argument.$2);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MenuSearchProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$menuSearchHash() => r'f7f42ad20174ffaaee32f80042df8acbb3fcab3f';
+
+/// Lo que coincide con [query] en la carta del negocio (busca el backend).
+
+final class MenuSearchFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<MenuItem>>, (String, String)> {
+  MenuSearchFamily._()
+    : super(
+        retry: null,
+        name: r'menuSearchProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Lo que coincide con [query] en la carta del negocio (busca el backend).
+
+  MenuSearchProvider call(String storeId, String query) =>
+      MenuSearchProvider._(argument: (storeId, query), from: this);
+
+  @override
+  String toString() => r'menuSearchProvider';
 }

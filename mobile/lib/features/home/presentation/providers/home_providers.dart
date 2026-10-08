@@ -11,19 +11,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_providers.g.dart';
 
-/// Negocios abiertos ahora por id de categoría.
-@riverpod
-Map<String, int> openStoresByCategory(Ref ref) {
-  final stores = ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[];
-  final count = <String, int>{};
-  for (final store in stores.where((s) => s.isOpenNow)) {
-    for (final id in store.categoryIds) {
-      count[id] = (count[id] ?? 0) + 1;
-    }
-  }
-  return count;
-}
-
 /// Pedidos entregados por id de negocio ("Lo pediste 4 veces").
 @riverpod
 Map<String, int> deliveredCountByStore(Ref ref) {

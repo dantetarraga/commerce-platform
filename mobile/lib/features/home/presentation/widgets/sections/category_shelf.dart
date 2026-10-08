@@ -1,5 +1,4 @@
 import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/features/home/presentation/providers/home_providers.dart';
 import 'package:chaski/features/home/presentation/widgets/city_categories.dart';
 import 'package:chaski/features/stores/stores.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
@@ -41,7 +40,6 @@ class CategoryShelf extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final moment = ref.watch(currentMomentProvider);
-    final openCount = ref.watch(openStoresByCategoryProvider);
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.lg),
       child: AsyncValueView(
@@ -54,7 +52,7 @@ class CategoryShelf extends ConsumerWidget {
           return CityCategories(
             categories: [...picked.main, ...picked.rest],
             highlighted: picked.highlighted,
-            openCount: openCount,
+            openCount: {for (final c in categories) c.id: c.openStoreCount},
           );
         },
       ),

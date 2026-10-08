@@ -11,7 +11,7 @@ class RecommendedStores extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stores = ref.watch(storesProvider(sort: StoreSort.popular)).value?.items.where((s) => s.isOpenNow).take(3).toList();
+    final stores = ref.watch(storesProvider(sort: StoreSort.popular, filters: const StoreFilters({StoreFilter.openNow}), limit: 3)).value?.items;
     if (stores == null || stores.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,7 +3,9 @@ import { AppException } from '../../common/exceptions/app.exception';
 import { GeoPoint } from '../../common/utils/geo';
 import { PrismaService } from '../../database/prisma.service';
 import type { Prisma } from '../../generated/prisma/client';
+import { storeProductIds } from '../search/search.queries';
 import { CitiesService, CityContext } from '../cities/cities.service';
+import { matchesFilters, openFirst } from './store-filters';
 import type { StoreSort, StoresQueryDto } from './dto/stores-query.dto';
 import {
   productCardInclude,
@@ -34,7 +36,7 @@ export class StoresService {
    */
   async list(query: StoresQueryDto, point?: GeoPoint, now = new Date()) {
     const city = await this.cities.resolve(point);
-    if (!city) return { items: [], page: query.page, limit: query.limit, total: 0 };
+    if (!city) return { items: [], page: query.page, limit: query.limit, total: 0, openCount: 0 };
 
     const stores = await this.prisma.store.findMany({
       where: {
@@ -46,10 +48,12 @@ export class StoresService {
     });
 
     const at = point ?? city.center;
-    const rows = stores
+    const reachable = stores
       .map((store) => ({ store, summary: toStoreSummary(store, city, at, now) }))
       .filter(({ summary }) => query.includeOutOfCoverage || summary.deliversToYou)
       .sort(comparator(query.sort));
+    const filtered = reachable.filter(({ summary }) => matchesFilters(summary, query.filters));
+    const rows = query.openFirst ? openFirst(filtered, ({ summary }) => summary.isOpenNow) : filtered;
 
     const start = (query.page - 1) * query.limit;
     return {
@@ -57,7 +61,26 @@ export class StoresService {
       page: query.page,
       limit: query.limit,
       total: rows.length,
+      /** Abiertos ahora entre los que llegan a la ubicación, sin contar los filtros. */
+      openCount: reachable.filter(({ summary }) => summary.isOpenNow).length,
     };
+  }
+
+  /** Negocios abiertos ahora que llegan a la ubicación, por id de categoría. */
+  async openCountByCategory(point?: GeoPoint, now = new Date()): Promise<Map<string, number>> {
+    const city = await this.cities.resolve(point);
+    const counts = new Map<string, number>();
+    if (!city) return counts;
+    const stores = await this.prisma.store.findMany({
+      where: { ...visibleStore, cityId: city.id },
+      include: storeSummaryInclude,
+    });
+    for (const store of stores) {
+      const summary = toStoreSummary(store, city, point ?? city.center, now);
+      if (!summary.deliversToYou || !summary.isOpenNow) continue;
+      for (const id of summary.categoryIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return counts;
   }
 
   async detail(storeId: string, point?: GeoPoint, now = new Date()) {
@@ -66,6 +89,21 @@ export class StoresService {
   }
 
   /** Menú agrupado por secciones; los productos sin sección van al final en "Otros". */
+  /**
+   * Busca en la carta del negocio (nombre y descripción, sin tildes), en el
+   * orden de la carta y sin repetir. Sin texto: toda la carta.
+   */
+  async searchMenu(storeId: string, query?: string) {
+    const { city } = await this.load(storeId);
+    const ids = query ? await storeProductIds(this.prisma, storeId, query) : null;
+    const products = await this.prisma.product.findMany({
+      where: { storeId, deletedAt: null, ...(ids && { id: { in: ids } }) },
+      orderBy: [{ menuSection: { sortOrder: 'asc' } }, { sortOrder: 'asc' }, { name: 'asc' }],
+      include: productCardInclude,
+    });
+    return { items: products.map((product) => toMenuItem(product, city.currency)) };
+  }
+
   async menu(storeId: string) {
     const { city } = await this.load(storeId);
     const [sections, unsectioned] = await Promise.all([

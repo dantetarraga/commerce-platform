@@ -150,7 +150,7 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
     size: AppSheetSize.full,
     title: 'Buscar en ${widget.store.name}',
     builder: (sheetContext) => MenuSearchSheet(
-      menu: menu,
+      storeId: widget.store.id,
       onOpen: (item) {
         Navigator.pop(sheetContext);
         _openProduct(item);

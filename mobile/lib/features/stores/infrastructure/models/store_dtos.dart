@@ -5,7 +5,7 @@ part 'store_dtos.g.dart';
 
 @JsonSerializable()
 class CategoryDto {
-  const CategoryDto({required this.id, required this.name, required this.slug, this.iconUrl});
+  const CategoryDto({required this.id, required this.name, required this.slug, this.iconUrl, this.openStoreCount = 0});
 
   factory CategoryDto.fromJson(Map<String, dynamic> json) => _$CategoryDtoFromJson(json);
 
@@ -13,6 +13,7 @@ class CategoryDto {
   final String name;
   final String slug;
   final String? iconUrl;
+  final int openStoreCount;
 }
 
 /// Item de `GET /stores`.
@@ -66,7 +67,7 @@ class StoreSummaryDto {
 /// Respuesta paginada de `GET /stores`.
 @JsonSerializable()
 class StorePageDto {
-  const StorePageDto({required this.items, required this.page, required this.limit, required this.total});
+  const StorePageDto({required this.items, required this.page, required this.limit, required this.total, this.openCount = 0});
 
   factory StorePageDto.fromJson(Map<String, dynamic> json) => _$StorePageDtoFromJson(json);
 
@@ -74,6 +75,7 @@ class StorePageDto {
   final int page;
   final int limit;
   final int total;
+  final int openCount;
 }
 
 @JsonSerializable()

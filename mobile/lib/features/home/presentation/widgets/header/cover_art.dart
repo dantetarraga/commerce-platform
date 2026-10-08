@@ -15,7 +15,10 @@ class HomeCoverArt extends ConsumerWidget {
     final scheme = theme.colorScheme;
     final x = width - 390;
     final nearest = ref.watch(
-      storesProvider(sort: StoreSort.popular).select((s) => s.value?.items.where((s) => s.isOpenNow && s.coverUrl != null).firstOrNull),
+      storesProvider(
+        sort: StoreSort.popular,
+        filters: const StoreFilters({StoreFilter.openNow}),
+      ).select((s) => s.value?.items.where((s) => s.coverUrl != null).firstOrNull),
     );
     return Positioned(
       left: 0,

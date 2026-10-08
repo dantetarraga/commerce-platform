@@ -25,8 +25,28 @@ describe('Catálogo (e2e)', () => {
 
   it('GET /categories en orden', async () => {
     const res = await http().get(`${API}/categories`).expect(200);
-    expect(res.body[0]).toEqual({ id: 'cat_restaurantes', name: 'Restaurantes', slug: 'restaurantes', iconUrl: null });
+    expect(res.body[0]).toEqual({
+      id: 'cat_restaurantes',
+      name: 'Restaurantes',
+      slug: 'restaurantes',
+      iconUrl: null,
+      openStoreCount: expect.any(Number),
+    });
     expect(res.body).toHaveLength(8);
+  });
+
+  it('GET /categories cuenta los abiertos que llegan, igual que /stores con open_now', async () => {
+    const categories = (await http().get(`${API}/categories`).query(PLAZA).expect(200)).body as {
+      id: string;
+      openStoreCount: number;
+    }[];
+    for (const category of categories) {
+      const open = await http()
+        .get(`${API}/stores`)
+        .query({ ...PLAZA, categoryId: category.id, filters: 'open_now' })
+        .expect(200);
+      expect(category.openStoreCount).toBe(open.body.total);
+    }
   });
 
   describe('GET /stores', () => {
@@ -105,6 +125,45 @@ describe('Catálogo (e2e)', () => {
       expect(all.body.items.every((s: { deliversToYou: boolean }) => !s.deliversToYou)).toBe(true);
     });
 
+    it('los filtros y "abiertos primero" los aplica el backend', async () => {
+      type Row = {
+        isOpenNow: boolean;
+        estimatedDeliveryFee: { amount: number };
+        ratingAvg: number;
+        ratingCount: number;
+      };
+      const list = async (query: object) =>
+        (
+          await http()
+            .get(`${API}/stores`)
+            .query({ ...PLAZA, limit: 50, ...query })
+            .expect(200)
+        ).body as {
+          items: Row[];
+          total: number;
+          openCount: number;
+        };
+      const all = await list({});
+      expect(all.openCount).toBe(all.items.filter((s) => s.isOpenNow).length);
+
+      const open = await list({ filters: 'open_now' });
+      expect(open.items.every((s) => s.isOpenNow)).toBe(true);
+      expect(open.total).toBe(all.openCount);
+      // El conteo de abiertos no cambia con los filtros: es el del barrio.
+      expect(open.openCount).toBe(all.openCount);
+
+      const rated = await list({ filters: 'top_rated,free_delivery' });
+      expect(
+        rated.items.every((s) => s.ratingCount > 0 && s.ratingAvg >= 4.5 && s.estimatedDeliveryFee.amount === 0),
+      ).toBe(true);
+
+      const sorted = await list({ openFirst: true });
+      const firstClosed = sorted.items.findIndex((s) => !s.isOpenNow);
+      if (firstClosed >= 0) expect(sorted.items.slice(firstClosed).every((s) => !s.isOpenNow)).toBe(true);
+
+      await http().get(`${API}/stores`).query({ filters: 'baratos' }).expect(400);
+    });
+
     it('valida el query', async () => {
       const res = await http().get(`${API}/stores`).query({ lat: 'abc', sort: 'cheap' }).expect(400);
       expect(Object.keys(res.body.details.fields).sort()).toEqual(['lat', 'lng', 'sort']);
@@ -146,6 +205,30 @@ describe('Catálogo (e2e)', () => {
       hasChoices: true,
       isFeatured: true,
     });
+  });
+
+  it('GET /stores/:id/products/search busca en la carta sin tildes, en su orden', async () => {
+    type Hit = { id: string; name: string; description: string | null };
+    const search = async (q?: string) =>
+      (
+        await http()
+          .get(`${API}/stores/st_chaski_dorado/products/search`)
+          .query(q === undefined ? {} : { q })
+          .expect(200)
+      ).body.items as Hit[];
+    const all = await search();
+    expect(all.length).toBeGreaterThan(0);
+    const pollos = await search('POLLO');
+    expect(pollos.length).toBeGreaterThan(0);
+    expect(
+      pollos.every((p) =>
+        `${p.name} ${p.description ?? ''}`.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes('pollo'),
+      ),
+    ).toBe(true);
+    // Mismo orden que la carta completa.
+    expect(pollos.map((p) => p.id)).toEqual(all.map((p) => p.id).filter((id) => pollos.some((p) => p.id === id)));
+    expect(await search('nada-que-ver')).toEqual([]);
+    await http().get(`${API}/stores/no-existe/products/search`).query({ q: 'pollo' }).expect(404);
   });
 
   it('GET /products/:id con variantes, opciones y resumen del negocio', async () => {
@@ -219,6 +302,14 @@ describe('Catálogo (e2e)', () => {
         .query({ q: 'polleria', ...PLAZA })
         .expect(200);
       expect(res.body.stores[0]).toMatchObject({ id: 'st_chaski_dorado', etaMinutes: expect.any(Number) });
+    });
+
+    it('"Abierto ahora" lo filtra el backend', async () => {
+      const res = await http()
+        .get(`${API}/search`)
+        .query({ q: 'po', ...PLAZA, openOnly: true })
+        .expect(200);
+      expect(res.body.stores.every((s: { isOpenNow: boolean }) => s.isOpenNow)).toBe(true);
     });
 
     it('los productos traen el negocio que los vende', async () => {

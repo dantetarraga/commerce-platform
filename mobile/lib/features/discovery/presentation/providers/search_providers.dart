@@ -25,9 +25,21 @@ class SearchQuery extends _$SearchQuery {
   void update(String query) => state = query;
 }
 
+/// Chip "Abierto ahora" de los resultados: se manda al backend.
+@riverpod
+class SearchOpenOnly extends _$SearchOpenOnly {
+  @override
+  bool build() => false;
+
+  void toggle() => state = !state;
+}
+
 @riverpod
 Future<SearchResults> searchResults(Ref ref) {
   final query = ref.watch(searchQueryProvider);
+  final openOnly = ref.watch(searchOpenOnlyProvider);
   final location = ref.watch(currentDeliveryLocationProvider).coordinates;
-  return SearchCatalog(ref.watch(searchRepositoryProvider)).call(query, location).then((r) => r.getOrThrow());
+  return SearchCatalog(
+    ref.watch(searchRepositoryProvider),
+  ).call(query, location, openOnly: openOnly).then((r) => r.getOrThrow());
 }

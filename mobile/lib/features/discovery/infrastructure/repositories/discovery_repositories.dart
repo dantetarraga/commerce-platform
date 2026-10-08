@@ -13,8 +13,8 @@ class SearchRepositoryImpl implements SearchRepository {
   final SearchRemoteDataSource _remote;
 
   @override
-  Future<Result<SearchResults>> search(String query, GeoCoordinates location) =>
-      guard(() async => (await _remote.search(query, location)).toDomain());
+  Future<Result<SearchResults>> search(String query, GeoCoordinates location, {bool openOnly = false}) =>
+      guard(() async => (await _remote.search(query, location, openOnly: openOnly)).toDomain());
 }
 
 class PromotionsRepositoryImpl implements PromotionsRepository {

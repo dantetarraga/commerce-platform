@@ -14,7 +14,7 @@ export class SearchController {
   /** Negocios + productos en una llamada, para la pantalla Buscar. */
   @Get('search')
   find(@Query() query: SearchQueryDto) {
-    return this.search.search(query.q, pointOf(query));
+    return this.search.search(query.q, pointOf(query), query.openOnly);
   }
 
   @Get('discovery/local-products')

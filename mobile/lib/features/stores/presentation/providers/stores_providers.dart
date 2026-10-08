@@ -1,13 +1,13 @@
 import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/page_result.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/features/stores/domain/entities/category.dart';
 import 'package:chaski/features/stores/domain/entities/store_detail.dart';
+import 'package:chaski/features/stores/domain/entities/store_filter.dart';
 import 'package:chaski/features/stores/domain/entities/store_menu.dart';
+import 'package:chaski/features/stores/domain/entities/store_page.dart';
 import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
 import 'package:chaski/features/stores/domain/repositories/stores_repository.dart';
 import 'package:chaski/features/stores/domain/usecases/store_usecases.dart';
 import 'package:chaski/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
@@ -25,15 +25,30 @@ StoresRemoteDataSource storesRemoteDataSource(Ref ref) => ref.watch(appEnvProvid
 @Riverpod(keepAlive: true)
 StoresRepository storesRepository(Ref ref) => StoresRepositoryImpl(ref.watch(storesRemoteDataSourceProvider));
 
+/// Categorías con sus negocios abiertos en la ubicación de entrega actual.
 @riverpod
-Future<List<Category>> categories(Ref ref) =>
-    GetCategories(ref.watch(storesRepositoryProvider)).call().then((r) => r.getOrThrow());
+Future<List<Category>> categories(Ref ref) {
+  final location = ref.watch(currentDeliveryLocationProvider).coordinates;
+  return GetCategories(ref.watch(storesRepositoryProvider)).call(location).then((r) => r.getOrThrow());
+}
 
 /// Negocios para la ubicación de entrega actual.
 @riverpod
-Future<PageResult<StoreSummary>> stores(Ref ref, {StoreSort sort = StoreSort.distance, String? categoryId}) {
+Future<StorePage> stores(
+  Ref ref, {
+  StoreSort sort = StoreSort.distance,
+  String? categoryId,
+  StoreFilters filters = StoreFilters.none,
+  int limit = 20,
+}) {
   final location = ref.watch(currentDeliveryLocationProvider);
-  final query = StoreQuery(location: location.coordinates, sort: sort, categoryId: categoryId);
+  final query = StoreQuery(
+    location: location.coordinates,
+    sort: sort,
+    categoryId: categoryId,
+    filters: filters.values,
+    limit: limit,
+  );
   return GetStores(ref.watch(storesRepositoryProvider)).call(query).then((r) => r.getOrThrow());
 }
 
@@ -47,3 +62,8 @@ Future<StoreDetail> storeDetail(Ref ref, String storeId) {
 @riverpod
 Future<StoreMenu> storeMenu(Ref ref, String storeId) =>
     GetStoreMenu(ref.watch(storesRepositoryProvider)).call(storeId).then((r) => r.getOrThrow());
+
+/// Lo que coincide con [query] en la carta del negocio (busca el backend).
+@riverpod
+Future<List<MenuItem>> menuSearch(Ref ref, String storeId, String query) =>
+    ref.watch(storesRepositoryProvider).searchMenu(storeId, query).then((r) => r.getOrThrow());

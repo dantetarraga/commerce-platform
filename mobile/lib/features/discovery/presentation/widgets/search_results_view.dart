@@ -1,5 +1,6 @@
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/discovery/domain/search.dart';
+import 'package:chaski/features/discovery/presentation/providers/search_providers.dart';
 import 'package:chaski/features/discovery/presentation/quick_add_product.dart';
 import 'package:chaski/features/products/products.dart';
 import 'package:chaski/features/stores/stores.dart';
@@ -28,7 +29,6 @@ class _SearchResultsViewState extends ConsumerState<SearchResultsView> with Sing
     // Si no hay productos, abre directo en Negocios.
     initialIndex: widget.results.products.isEmpty ? 1 : 0,
   );
-  var _openOnly = false;
 
   @override
   void dispose() {
@@ -60,10 +60,8 @@ class _SearchResultsViewState extends ConsumerState<SearchResultsView> with Sing
     final results = widget.results;
     // Los negocios cercanos ya cargados dan el tiempo de entrega y la bolsa.
     final nearby = {for (final s in ref.watch(storesProvider()).value?.items ?? const <StoreSummary>[]) s.id: s};
-    final stores = [
-      for (final s in results.stores)
-        if (!_openOnly || s.isOpenNow) s,
-    ];
+    final openOnly = ref.watch(searchOpenOnlyProvider);
+    final stores = results.stores;
     final animate = entranceWindowOpen(results);
 
     return Column(
@@ -129,13 +127,17 @@ class _SearchResultsViewState extends ConsumerState<SearchResultsView> with Sing
               CustomScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 slivers: [
-                  if (results.stores.isNotEmpty)
+                  if (results.stores.isNotEmpty || openOnly)
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.sm, AppSpacing.gutter, AppSpacing.xxs),
                       sliver: SliverToBoxAdapter(
                         child: Row(
                           children: [
-                            AppChip(label: 'Abierto ahora', selected: _openOnly, onTap: () => setState(() => _openOnly = !_openOnly)),
+                            AppChip(
+                              label: 'Abierto ahora',
+                              selected: openOnly,
+                              onTap: ref.read(searchOpenOnlyProvider.notifier).toggle,
+                            ),
                           ],
                         ),
                       ),
@@ -144,8 +146,8 @@ class _SearchResultsViewState extends ConsumerState<SearchResultsView> with Sing
                     SliverToBoxAdapter(
                       child: AppEmptyState(
                         kind: AppEmptyKind.noResults,
-                        title: _openOnly ? 'Ninguno abierto ahora' : 'Ningún negocio con ese nombre',
-                        message: _openOnly ? 'Quita el filtro o programa tu pedido.' : 'Mira la pestaña Productos.',
+                        title: openOnly ? 'Ninguno abierto ahora' : 'Ningún negocio con ese nombre',
+                        message: openOnly ? 'Quita el filtro o programa tu pedido.' : 'Mira la pestaña Productos.',
                         compact: true,
                       ),
                     ),

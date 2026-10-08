@@ -39,7 +39,7 @@ export class SearchService {
     private readonly cities: CitiesService,
   ) {}
 
-  async search(query: string, point?: GeoPoint, now = new Date()) {
+  async search(query: string, point?: GeoPoint, openOnly = false, now = new Date()) {
     const city = await this.cities.resolve(point);
     if (!city) return { stores: [], products: [] };
     const at = point ?? city.center;
@@ -56,7 +56,7 @@ export class SearchService {
     return {
       stores: inOrder(storeIds, stores)
         .map((store) => toStoreSummary(store, city, at, now))
-        .filter((summary) => summary.deliversToYou),
+        .filter((summary) => summary.deliversToYou && (!openOnly || summary.isOpenNow)),
       products: this.toHits(inOrder(productIds, products), city, at, now),
     };
   }

@@ -7,7 +7,6 @@ export const BOARD_COLUMNS = [
   { key: 'ready', statuses: [OrderStatus.READY, OrderStatus.COURIER_ASSIGNED, OrderStatus.ON_THE_WAY] },
 ] as const;
 
-
 /**
  * Reparte los pedidos en curso en las columnas, conservando su orden. Todas
  * las columnas vienen, aunque estén vacías; los finales no entran.

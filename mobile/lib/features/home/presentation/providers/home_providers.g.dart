@@ -8,58 +8,6 @@ part of 'home_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Negocios abiertos ahora por id de categoría.
-
-@ProviderFor(openStoresByCategory)
-final openStoresByCategoryProvider = OpenStoresByCategoryProvider._();
-
-/// Negocios abiertos ahora por id de categoría.
-
-final class OpenStoresByCategoryProvider
-    extends
-        $FunctionalProvider<
-          Map<String, int>,
-          Map<String, int>,
-          Map<String, int>
-        >
-    with $Provider<Map<String, int>> {
-  /// Negocios abiertos ahora por id de categoría.
-  OpenStoresByCategoryProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'openStoresByCategoryProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$openStoresByCategoryHash();
-
-  @$internal
-  @override
-  $ProviderElement<Map<String, int>> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  Map<String, int> create(Ref ref) {
-    return openStoresByCategory(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Map<String, int> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<Map<String, int>>(value),
-    );
-  }
-}
-
-String _$openStoresByCategoryHash() =>
-    r'e5a6533ab8629ec964bcc1273ec6e14d9609f903';
-
 /// Pedidos entregados por id de negocio ("Lo pediste 4 veces").
 
 @ProviderFor(deliveredCountByStore)

@@ -6,7 +6,7 @@ import 'package:chaski/core/utils/text_utils.dart';
 import 'package:chaski/features/discovery/infrastructure/models/search_dtos.dart';
 
 abstract interface class SearchRemoteDataSource {
-  Future<SearchResponseDto> search(String query, GeoCoordinates location);
+  Future<SearchResponseDto> search(String query, GeoCoordinates location, {bool openOnly = false});
 }
 
 class ApiSearchRemoteDataSource implements SearchRemoteDataSource {
@@ -15,10 +15,10 @@ class ApiSearchRemoteDataSource implements SearchRemoteDataSource {
   final ApiClient _api;
 
   @override
-  Future<SearchResponseDto> search(String query, GeoCoordinates location) async {
+  Future<SearchResponseDto> search(String query, GeoCoordinates location, {bool openOnly = false}) async {
     final data = await _api.get(
       '/search',
-      query: {'q': query, 'lat': location.latitude, 'lng': location.longitude},
+      query: {'q': query, 'lat': location.latitude, 'lng': location.longitude, if (openOnly) 'openOnly': true},
     );
     return SearchResponseDto.fromJson(data as Map<String, dynamic>);
   }
@@ -31,7 +31,7 @@ class FakeSearchRemoteDataSource implements SearchRemoteDataSource {
   final FakeBackend _backend;
 
   @override
-  Future<SearchResponseDto> search(String query, GeoCoordinates location) async {
+  Future<SearchResponseDto> search(String query, GeoCoordinates location, {bool openOnly = false}) async {
     await _backend.delay();
     final catalog = await _backend.catalog();
     final needle = normalizeForSearch(query);
@@ -42,7 +42,8 @@ class FakeSearchRemoteDataSource implements SearchRemoteDataSource {
     return SearchResponseDto.fromJson({
       'stores': [
         for (final s in stores)
-          if (matches(s['name']) || matches(s['description'])) _backend.storeSummaryJson(s),
+          if ((matches(s['name']) || matches(s['description'])) && (!openOnly || s['isOpenNow'] == true))
+            _backend.storeSummaryJson(s),
       ],
       'products': [
         for (final p in products)

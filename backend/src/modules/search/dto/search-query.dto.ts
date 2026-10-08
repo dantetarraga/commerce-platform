@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, Length } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 import { LocationQueryDto } from '../../../common/dto/location-query.dto';
 
 export class SearchQueryDto extends LocationQueryDto {
@@ -7,4 +7,10 @@ export class SearchQueryDto extends LocationQueryDto {
   @IsString()
   @Length(2, 80, { message: 'Escribe al menos 2 letras.' })
   q!: string;
+
+  /** Solo negocios abiertos ahora. */
+  @IsOptional()
+  @Transform(({ value }: { value: unknown }) => value === true || value === 'true')
+  @IsBoolean()
+  openOnly = false;
 }

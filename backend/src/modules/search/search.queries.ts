@@ -42,6 +42,21 @@ export async function searchProductIds(prisma: PrismaService, cityId: string, qu
   return rows.map((r) => r.id);
 }
 
+/**
+ * Ids de los productos de un negocio cuyo nombre o descripción contienen
+ * [query] sin importar tildes ni mayúsculas.
+ */
+export async function storeProductIds(prisma: PrismaService, storeId: string, query: string) {
+  const pattern = `%${escapeLike(query)}%`;
+  const rows = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT p."id"
+    FROM "Product" p
+    WHERE p."storeId" = ${storeId} AND p."deletedAt" IS NULL
+      AND (${normalized(Prisma.sql`p."name"`)} LIKE immutable_unaccent(lower(${pattern}))
+        OR ${normalized(Prisma.sql`coalesce(p."description", '')`)} LIKE immutable_unaccent(lower(${pattern})))`;
+  return rows.map((r) => r.id);
+}
+
 export async function searchStoreIds(prisma: PrismaService, cityId: string, query: string, limit: number) {
   const match = matchClause(Prisma.sql`s."name"`, Prisma.sql`s."description"`, query);
   const rows = await prisma.$queryRaw<{ id: string }[]>`

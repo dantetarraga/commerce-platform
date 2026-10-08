@@ -1,13 +1,13 @@
-import 'package:chaski/core/domain/page_result.dart';
 import 'package:chaski/features/stores/domain/entities/category.dart';
 import 'package:chaski/features/stores/domain/entities/store_detail.dart';
 import 'package:chaski/features/stores/domain/entities/store_menu.dart';
+import 'package:chaski/features/stores/domain/entities/store_page.dart';
 import 'package:chaski/features/stores/domain/entities/store_summary.dart';
 import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
 import 'package:chaski/features/stores/infrastructure/models/store_dtos.dart';
 
 extension CategoryDtoMapper on CategoryDto {
-  Category toDomain() => Category(id: id, name: name, slug: slug, iconUrl: iconUrl);
+  Category toDomain() => Category(id: id, name: name, slug: slug, iconUrl: iconUrl, openStoreCount: openStoreCount);
 }
 
 extension StoreSummaryDtoMapper on StoreSummaryDto {
@@ -31,11 +31,12 @@ extension StoreSummaryDtoMapper on StoreSummaryDto {
 }
 
 extension StorePageDtoMapper on StorePageDto {
-  PageResult<StoreSummary> toDomain() => PageResult(
+  StorePage toDomain() => StorePage(
     items: items.map((dto) => dto.toDomain()).toList(),
     page: page,
     limit: limit,
     total: total,
+    openCount: openCount,
   );
 }
 
@@ -51,6 +52,19 @@ extension StoreDetailDtoMapper on StoreDetailDto {
       for (final h in schedules)
         OpeningHours(dayOfWeek: h.dayOfWeek, opensAt: h.opensAt, closesAt: h.closesAt),
     ]),
+  );
+}
+
+extension MenuItemDtoMapper on MenuItemDto {
+  MenuItem toDomain() => MenuItem(
+    id: id,
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
+    price: price.toDomain(),
+    isAvailable: isAvailable,
+    hasChoices: hasChoices,
+    isFeatured: isFeatured,
   );
 }
 

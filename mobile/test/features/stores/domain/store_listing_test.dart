@@ -1,9 +1,15 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
+import 'package:chaski/core/fake/fake_backend.dart';
+import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/features/stores/domain/entities/store_filter.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
 import 'package:chaski/features/stores/domain/entities/store_query.dart';
 import 'package:chaski/features/stores/domain/entities/store_summary.dart';
+import 'package:chaski/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
+import 'package:chaski/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
+import 'package:chaski/features/stores/presentation/providers/stores_providers.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 StoreSummary _store(String id, {bool open = true, int fee = 300, double rating = 4.0, int reviews = 10, String? promo, DateTime? opens}) => StoreSummary(
   id: id,
@@ -20,20 +26,33 @@ StoreSummary _store(String id, {bool open = true, int fee = 300, double rating =
   nextOpeningAt: opens,
 );
 
+class _MockApiClient extends Mock implements ApiClient {}
+
 void main() {
-  test('los filtros aceptan según sus reglas', () {
-    expect(StoreFilter.freeDelivery.accepts(_store('a', fee: 0)), isTrue);
-    expect(StoreFilter.topRated.accepts(_store('a', rating: 4.6)), isTrue);
-    expect(StoreFilter.topRated.accepts(_store('a', rating: 4.9, reviews: 0)), isFalse);
-    expect(StoreFilter.offers.accepts(_store('a', promo: '10 % menos')), isTrue);
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('los filtros viajan al backend con su nombre de la API', () {
+    expect(StoreFilter.values.map((f) => f.apiName), ['open_now', 'free_delivery', 'top_rated', 'no_minimum', 'offers']);
     expect(StoreFilter.quick, [StoreFilter.openNow, StoreFilter.freeDelivery, StoreFilter.topRated]);
   });
 
-  test('matching aplica todos los filtros y openFirst conserva el orden', () {
-    final stores = [_store('a', open: false), _store('b', fee: 0), _store('c'), _store('d', open: false, fee: 0)];
-    expect(stores.matching({StoreFilter.freeDelivery}).map((s) => s.id), ['b', 'd']);
-    expect(stores.matching({}).length, 4);
-    expect(stores.openFirst().map((s) => s.id), ['b', 'c', 'a', 'd']);
+  test('los mismos filtros son el mismo provider, aunque el Set sea otro', () {
+    final picked = [StoreFilter.openNow, StoreFilter.offers];
+    expect(StoreFilters({...picked}), StoreFilters({...picked.reversed}));
+    expect(storesProvider(filters: StoreFilters({...picked})), storesProvider(filters: StoreFilters({...picked})));
+  });
+
+  test('la consulta manda filtros y "abiertos primero" al backend', () async {
+    final api = _MockApiClient();
+    when(() => api.get(any(), query: any(named: 'query'))).thenAnswer(
+      (_) async => {'items': <Object?>[], 'page': 1, 'limit': 20, 'total': 0, 'openCount': 0},
+    );
+    await ApiStoresRemoteDataSource(api).getStores(
+      StoreQuery(location: GeoCoordinates.trusted(-14.79, -71.41), filters: const {StoreFilter.openNow, StoreFilter.topRated}),
+    );
+    final query = verify(() => api.get('/stores', query: captureAny(named: 'query'))).captured.single as Map<String, Object?>;
+    expect(query['filters'], 'open_now,top_rated');
+    expect(query['openFirst'], isTrue);
   });
 
   test('orden con etiqueta para la hoja y para la frase', () {
@@ -48,15 +67,13 @@ void main() {
     expect(_store('a', opens: DateTime(2026, 9, 23, 7)).opensPhrase(now), isNull);
   });
 
-  test('la búsqueda en la carta ignora tildes y mayúsculas', () {
-    const aji = MenuItem(id: '1', name: 'Ají de gallina', price: Money(1500), isAvailable: true, hasChoices: false);
-    const chairo = MenuItem(id: '2', name: 'Chairo', description: 'Sopa con chuño', price: Money(1200), isAvailable: true, hasChoices: false);
-    const menu = StoreMenu([
-      MenuSection(id: 's1', name: 'Platos', items: [aji, chairo]),
-      MenuSection(id: 's2', name: 'Destacados', items: [aji]),
-    ]);
-    expect(menu.search('AJI'), [aji]);
-    expect(menu.search('chuno'), [chairo]);
-    expect(menu.search('  '), [aji, chairo]);
+  test('la búsqueda en la carta la resuelve el datasource, sin tildes ni repetidos', () async {
+    final source = FakeStoresRemoteDataSource(FakeBackend(latency: Duration.zero));
+    final all = await source.searchMenu('st_chaski_dorado', '');
+    expect(all.map((i) => i.id).toSet(), hasLength(all.length));
+    final pollos = await source.searchMenu('st_chaski_dorado', 'POLLO');
+    expect(pollos, isNotEmpty);
+    expect(pollos.every((i) => '${i.name} ${i.description ?? ''}'.toLowerCase().contains('pollo')), isTrue);
+    expect(await source.searchMenu('st_chaski_dorado', 'nada-que-ver'), isEmpty);
   });
 }

@@ -112,6 +112,64 @@ abstract class _$SearchQuery extends $Notifier<String> {
   }
 }
 
+/// Chip "Abierto ahora" de los resultados: se manda al backend.
+
+@ProviderFor(SearchOpenOnly)
+final searchOpenOnlyProvider = SearchOpenOnlyProvider._();
+
+/// Chip "Abierto ahora" de los resultados: se manda al backend.
+final class SearchOpenOnlyProvider
+    extends $NotifierProvider<SearchOpenOnly, bool> {
+  /// Chip "Abierto ahora" de los resultados: se manda al backend.
+  SearchOpenOnlyProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'searchOpenOnlyProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$searchOpenOnlyHash();
+
+  @$internal
+  @override
+  SearchOpenOnly create() => SearchOpenOnly();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$searchOpenOnlyHash() => r'6a0baa3d38b38b521a7ee6f1d90130868a70430d';
+
+/// Chip "Abierto ahora" de los resultados: se manda al backend.
+
+abstract class _$SearchOpenOnly extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<bool, bool>,
+              bool,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(searchResults)
 final searchResultsProvider = SearchResultsProvider._();
 
@@ -149,4 +207,4 @@ final class SearchResultsProvider
   }
 }
 
-String _$searchResultsHash() => r'34ba98e8c597d5474866150135520d2091053205';
+String _$searchResultsHash() => r'3295157d368fa47fbb86606a87ecc0e42cccdaaa';

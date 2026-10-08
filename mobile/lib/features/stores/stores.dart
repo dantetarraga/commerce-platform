@@ -3,6 +3,7 @@ library;
 
 export 'domain/entities/category.dart';
 export 'domain/entities/store_filter.dart';
+export 'domain/entities/store_page.dart';
 export 'domain/entities/store_query.dart' show StoreSort, StoreSortLabel;
 export 'domain/entities/store_summary.dart';
 export 'presentation/pages/category_stores_page.dart';

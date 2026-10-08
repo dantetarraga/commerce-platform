@@ -13,6 +13,10 @@ CategoryDto _$CategoryDtoFromJson(Map<String, dynamic> json) =>
         name: $checkedConvert('name', (v) => v as String),
         slug: $checkedConvert('slug', (v) => v as String),
         iconUrl: $checkedConvert('iconUrl', (v) => v as String?),
+        openStoreCount: $checkedConvert(
+          'openStoreCount',
+          (v) => (v as num?)?.toInt() ?? 0,
+        ),
       );
       return val;
     });
@@ -67,6 +71,10 @@ StorePageDto _$StorePageDtoFromJson(Map<String, dynamic> json) =>
         page: $checkedConvert('page', (v) => (v as num).toInt()),
         limit: $checkedConvert('limit', (v) => (v as num).toInt()),
         total: $checkedConvert('total', (v) => (v as num).toInt()),
+        openCount: $checkedConvert(
+          'openCount',
+          (v) => (v as num?)?.toInt() ?? 0,
+        ),
       );
       return val;
     });

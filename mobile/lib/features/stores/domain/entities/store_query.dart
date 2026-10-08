@@ -1,4 +1,5 @@
 import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:chaski/features/stores/domain/entities/store_filter.dart';
 import 'package:equatable/equatable.dart';
 
 enum StoreSort { distance, popular, rating }
@@ -26,6 +27,8 @@ final class StoreQuery extends Equatable {
     required this.location,
     this.sort = StoreSort.distance,
     this.categoryId,
+    this.filters = const {},
+    this.openFirst = true,
     this.page = 1,
     this.limit = 20,
   });
@@ -33,9 +36,15 @@ final class StoreQuery extends Equatable {
   final GeoCoordinates location;
   final StoreSort sort;
   final String? categoryId;
+
+  /// Los aplica el backend (`?filters=`).
+  final Set<StoreFilter> filters;
+
+  /// Los abiertos primero (`?openFirst=true`).
+  final bool openFirst;
   final int page;
   final int limit;
 
   @override
-  List<Object?> get props => [location, sort, categoryId, page, limit];
+  List<Object?> get props => [location, sort, categoryId, filters, openFirst, page, limit];
 }

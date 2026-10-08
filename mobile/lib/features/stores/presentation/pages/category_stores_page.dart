@@ -64,9 +64,9 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
   @override
   Widget build(BuildContext context) {
     final category = ref.watch(categoriesProvider).value?.where((c) => c.id == widget.categoryId).firstOrNull;
-    final provider = storesProvider(sort: _sort, categoryId: widget.categoryId);
+    final provider = storesProvider(sort: _sort, categoryId: widget.categoryId, filters: StoreFilters({..._filters}));
     final stores = ref.watch(provider);
-    final items = stores.value?.items.matching(_filters).openFirst();
+    final items = stores.value?.items;
     final title = category == null ? 'Negocios' : categoryShelfLabel(category.slug, category.name);
 
     return Scaffold(

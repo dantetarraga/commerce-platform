@@ -64,7 +64,8 @@ final class SearchResults extends Equatable {
 }
 
 abstract interface class SearchRepository {
-  Future<Result<SearchResults>> search(String query, GeoCoordinates location);
+  /// Con [openOnly], solo negocios abiertos ahora (lo filtra el backend).
+  Future<Result<SearchResults>> search(String query, GeoCoordinates location, {bool openOnly = false});
 }
 
 class SearchCatalog {
@@ -75,10 +76,10 @@ class SearchCatalog {
   final SearchRepository _repository;
 
   /// No consulta al backend con textos demasiado cortos.
-  Future<Result<SearchResults>> call(String rawQuery, GeoCoordinates location) async {
+  Future<Result<SearchResults>> call(String rawQuery, GeoCoordinates location, {bool openOnly = false}) async {
     final query = rawQuery.trim();
     if (query.length < minQueryLength) return const Result.ok(SearchResults.empty);
-    return _repository.search(query, location);
+    return _repository.search(query, location, openOnly: openOnly);
   }
 }
 
