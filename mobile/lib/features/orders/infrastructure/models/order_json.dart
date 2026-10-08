@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 
@@ -41,6 +42,22 @@ abstract final class OrderJson {
     CashPayment(:final changeFor) => {'type': 'CASH', 'changeFor': changeFor == null ? null : money(changeFor)},
   };
 
+  /// `{ lat, lng }` → coordenadas; `null` si falta o está fuera de rango.
+  static GeoCoordinates? locationFromJson(Object? json) {
+    if (json is! Map) return null;
+    final lat = json['lat'];
+    final lng = json['lng'];
+    if (lat is! num || lng is! num) return null;
+    return GeoCoordinates.create(lat.toDouble(), lng.toDouble()).valueOrNull;
+  }
+
+  static CourierPosition? positionFromJson(Object? json) {
+    final coordinates = locationFromJson(json);
+    final at = json is Map ? json['at'] : null;
+    if (coordinates == null || at is! String) return null;
+    return CourierPosition(coordinates, DateTime.parse(at).toLocal());
+  }
+
   static Order fromJson(Map<String, dynamic> json) {
     final store = json['store'] as Map<String, dynamic>;
     final address = json['address'] as Map<String, dynamic>;
@@ -54,6 +71,7 @@ abstract final class OrderJson {
         name: store['name'] as String,
         logoUrl: store['logoUrl'] as String?,
         ownerName: store['ownerName'] as String?,
+        location: locationFromJson(store['location']),
       ),
       lines: [
         for (final l in (json['lines'] as List).cast<Map<String, dynamic>>())
@@ -74,6 +92,7 @@ abstract final class OrderJson {
       addressTitle: address['title'] as String,
       addressStreet: address['street'] as String,
       addressReference: address['reference'] as String? ?? '',
+      destination: locationFromJson(address['location']),
       payment: paymentFromJson(json['payment'] as Map<String, dynamic>),
       status: statusFromJson(json['status'] as String),
       events: [
@@ -88,6 +107,7 @@ abstract final class OrderJson {
               vehicle: courier['vehicle'] as String,
               since: courier['since'] as int?,
               avatarUrl: courier['avatarUrl'] as String?,
+              position: positionFromJson(courier['location']),
             ),
       estimatedArrival: date('estimatedArrival'),
       scheduledFor: date('scheduledFor'),

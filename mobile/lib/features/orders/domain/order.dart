@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/orders/domain/payment_method.dart';
@@ -59,7 +60,7 @@ final class OrderLine extends Equatable {
 }
 
 final class OrderStore extends Equatable {
-  const OrderStore({required this.id, required this.name, this.logoUrl, this.ownerName});
+  const OrderStore({required this.id, required this.name, this.logoUrl, this.ownerName, this.location});
 
   final String id;
   final String name;
@@ -68,12 +69,15 @@ final class OrderStore extends Equatable {
   /// "Rosa": quien prepara el pedido (los mensajes la nombran).
   final String? ownerName;
 
+  /// Dónde está el negocio (para el mapa del seguimiento).
+  final GeoCoordinates? location;
+
   @override
-  List<Object?> get props => [id, name, logoUrl, ownerName];
+  List<Object?> get props => [id, name, logoUrl, ownerName, location];
 }
 
 final class Courier extends Equatable {
-  const Courier({required this.name, required this.vehicle, this.since, this.avatarUrl});
+  const Courier({required this.name, required this.vehicle, this.since, this.avatarUrl, this.position});
 
   final String name;
   final String vehicle;
@@ -82,13 +86,29 @@ final class Courier extends Equatable {
   final int? since;
   final String? avatarUrl;
 
+  /// Dónde va, solo mientras lleva el pedido y si la posición es reciente.
+  final CourierPosition? position;
+
+  Courier withPosition(CourierPosition? position) =>
+      Courier(name: name, vehicle: vehicle, since: since, avatarUrl: avatarUrl, position: position);
+
   String get firstName => name.split(' ').first;
 
   /// "LQ" para el avatar: iniciales de las dos primeras palabras del nombre.
   String get initials => name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).take(2).map((p) => p[0].toUpperCase()).join();
 
   @override
-  List<Object?> get props => [name, vehicle, since, avatarUrl];
+  List<Object?> get props => [name, vehicle, since, avatarUrl, position];
+}
+
+final class CourierPosition extends Equatable {
+  const CourierPosition(this.coordinates, this.at);
+
+  final GeoCoordinates coordinates;
+  final DateTime at;
+
+  @override
+  List<Object?> get props => [coordinates, at];
 }
 
 final class OrderEvent extends Equatable {
@@ -118,6 +138,7 @@ final class Order extends Equatable {
     required this.events,
     required this.placedAt,
     this.addressReference = '',
+    this.destination,
     this.courier,
     this.estimatedArrival,
     this.scheduledFor,
@@ -142,6 +163,9 @@ final class Order extends Equatable {
   final String addressTitle;
   final String addressStreet;
   final String addressReference;
+
+  /// El punto de entrega (para el mapa del seguimiento).
+  final GeoCoordinates? destination;
   final PaymentMethod payment;
   final OrderStatus status;
   final List<OrderEvent> events;
@@ -207,7 +231,7 @@ final class Order extends Equatable {
     OrderStatus.cancelled => 'No se te cobró nada.',
   };
 
-  Order copyWith({int? rating}) => Order(
+  Order copyWith({int? rating, Courier? courier}) => Order(
     id: id,
     code: code,
     store: store,
@@ -219,11 +243,12 @@ final class Order extends Equatable {
     addressTitle: addressTitle,
     addressStreet: addressStreet,
     addressReference: addressReference,
+    destination: destination,
     payment: payment,
     status: status,
     events: events,
     placedAt: placedAt,
-    courier: courier,
+    courier: courier ?? this.courier,
     estimatedArrival: estimatedArrival,
     scheduledFor: scheduledFor,
     rating: rating ?? this.rating,
@@ -234,7 +259,7 @@ final class Order extends Equatable {
   @override
   List<Object?> get props => [
     id, code, store, lines, subtotal, deliveryFee, discount, total, addressTitle, addressStreet,
-    addressReference, payment, status, events, placedAt, courier, estimatedArrival, scheduledFor, rating, tip, notes,
+    addressReference, destination, payment, status, events, placedAt, courier, estimatedArrival, scheduledFor, rating, tip, notes,
   ];
 }
 

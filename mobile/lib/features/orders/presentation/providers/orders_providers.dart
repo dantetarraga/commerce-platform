@@ -2,6 +2,7 @@ import 'package:chaski/core/config/app_config_provider.dart';
 import 'package:chaski/core/fake/fake_providers.dart';
 import 'package:chaski/core/network/network_providers.dart';
 import 'package:chaski/core/result/result.dart';
+import 'package:chaski/features/auth/auth.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
 import 'package:chaski/features/orders/infrastructure/datasources/fake_staff_orders.dart';
@@ -13,7 +14,9 @@ part 'orders_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 OrdersRemoteDataSource ordersRemoteDataSource(Ref ref) {
-  if (!ref.watch(appEnvProvider).useFakeData) return ApiOrdersRemoteDataSource(ref.watch(apiClientProvider));
+  if (!ref.watch(appEnvProvider).useFakeData) {
+    return ApiOrdersRemoteDataSource(ref.watch(apiClientProvider), realtime: ref.watch(realtimeClientProvider));
+  }
   final fake = FakeOrdersRemoteDataSource(ref.watch(fakeBackendProvider));
   ref.onDispose(fake.dispose);
   return fake;

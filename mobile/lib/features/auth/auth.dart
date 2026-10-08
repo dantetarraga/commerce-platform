@@ -11,5 +11,6 @@ export 'presentation/providers/auth_demo.dart';
 export 'presentation/providers/auth_providers.dart' show updateProfileProvider;
 export 'presentation/providers/auth_session.dart';
 export 'presentation/providers/phone_auth_flow.dart' show phoneAuthFlowProvider;
+export 'presentation/providers/realtime_session.dart';
 export 'presentation/providers/splash_gate.dart';
 export 'presentation/widgets/auth_scaffold.dart' show AuthHeader, AuthLink, AuthScaffold;

@@ -55,7 +55,7 @@ final class OrdersRemoteDataSourceProvider
 }
 
 String _$ordersRemoteDataSourceHash() =>
-    r'026fa6e867dd29d80ed08f5f5efe23dcb24f919c';
+    r'725c172e875b2c598f299e4e37864234dd2dfa46';
 
 /// Pedidos fake de Apamuy Socios, compartidos por los modos Negocio y
 /// Repartidor. Entra un pedido nuevo cada 7 pasos de la demo.
