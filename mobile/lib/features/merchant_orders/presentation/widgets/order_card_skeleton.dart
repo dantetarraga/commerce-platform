@@ -1,10 +1,10 @@
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Comanda en blanco mientras cargan los pedidos: el mismo papel, con bloques
+/// Tarjeta de pedido en blanco mientras cargan: el mismo papel, con bloques
 /// donde irán el número, los productos y las acciones.
-class ComandaSkeleton extends StatelessWidget {
-  const ComandaSkeleton({this.withActions = true, super.key});
+class OrderCardSkeleton extends StatelessWidget {
+  const OrderCardSkeleton({this.withActions = true, super.key});
 
   final bool withActions;
 

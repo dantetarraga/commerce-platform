@@ -31,9 +31,9 @@ class _MerchantOrderCardState extends ConsumerState<MerchantOrderCard> with Part
   MerchantOrderActions get _actions => ref.read(merchantOrderActionsProvider.notifier);
 
   Future<void> _accept() =>
-      run(() => _actions.accept(widget.order.id, prepMinutes: _minutes), success: 'Al fogón. Avisamos al cliente.');
+      run(() => _actions.accept(widget.order.id, prepMinutes: _minutes), success: 'Aceptado. Le avisamos al cliente.');
 
-  Future<void> _ready() => run(() => _actions.markReady(widget.order.id), success: 'Lista. Avisamos a los repartidores.');
+  Future<void> _ready() => run(() => _actions.markReady(widget.order.id), success: 'Listo. Avisamos a los repartidores.');
 
   Future<void> _reject() async {
     final reason = await showAppBottomSheet<String>(
@@ -103,10 +103,10 @@ class _MerchantOrderCardState extends ConsumerState<MerchantOrderCard> with Part
 }
 
 String _eyebrow(OrderStatus status) => switch (status) {
-  OrderStatus.received => 'COMANDA NUEVA',
-  OrderStatus.confirmed || OrderStatus.preparing => 'EN FOGÓN',
-  OrderStatus.ready => 'LISTA · ESPERA REPARTIDOR',
-  OrderStatus.courierAssigned => 'LISTA · REPARTIDOR EN CAMINO',
+  OrderStatus.received => 'PEDIDO NUEVO',
+  OrderStatus.confirmed || OrderStatus.preparing => 'PREPARANDO',
+  OrderStatus.ready => 'LISTO · ESPERA REPARTIDOR',
+  OrderStatus.courierAssigned => 'LISTO · REPARTIDOR EN CAMINO',
   OrderStatus.onTheWay => 'EN CAMINO AL CLIENTE',
   OrderStatus.delivered => 'ENTREGADA',
   OrderStatus.cancelled => 'CANCELADA',
@@ -130,7 +130,7 @@ class _ComandaHeader extends StatelessWidget {
     ].join(' · ');
     final trailing = switch (status) {
       OrderStatus.received => CountdownRing(deadline: order.order.placedAt.add(merchantResponseWindow), total: merchantResponseWindow),
-      OrderStatus.ready || OrderStatus.courierAssigned => PartnerStamp('LISTA', color: context.chaski.accent),
+      OrderStatus.ready || OrderStatus.courierAssigned => PartnerStamp('LISTO', color: context.chaski.accent),
       OrderStatus.delivered => PartnerStamp('ENTREGADA', color: scheme.onSurfaceVariant, size: 11),
       OrderStatus.cancelled => PartnerStamp('CANCELADA', color: context.chaski.danger, size: 11),
       _ => null,
@@ -178,12 +178,12 @@ class _NewActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accept = AppButton(label: 'Al fogón · $minutes min', loading: busy, onPressed: busy ? null : onAccept);
+    final accept = AppButton(label: 'Aceptar · listo en $minutes min', loading: busy, onPressed: busy ? null : onAccept);
     final reject = AppButton.secondary(label: 'Rechazar', onPressed: busy ? null : onReject);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Sale del fogón en', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        Text('Listo en', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 6,
@@ -235,7 +235,7 @@ class _CookingActions extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
-                'En fogón desde ${Formatters.clock(prep.startedAt)}',
+                'Preparando desde ${Formatters.clock(prep.startedAt)}',
                 style: theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
               ),
             ),
@@ -251,7 +251,7 @@ class _CookingActions extends ConsumerWidget {
           ExcludeSemantics(child: _ProgressTrail(progress: fraction, color: color)),
         ],
         const SizedBox(height: AppSpacing.sm),
-        AppButton.ink(label: 'Lista para recoger', loading: busy, onPressed: busy ? null : onReady),
+        AppButton.ink(label: 'Listo para recoger', loading: busy, onPressed: busy ? null : onReady),
       ],
     );
   }

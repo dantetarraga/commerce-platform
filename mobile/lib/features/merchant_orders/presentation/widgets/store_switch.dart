@@ -33,16 +33,16 @@ class _StoreSwitchState extends ConsumerState<StoreSwitch> with PartnerActionRun
     final title = widget.named
         ? store.name
         : !on
-        ? 'Cocina en pausa'
+        ? 'Tienda en pausa'
         : widget.compact
-        ? 'Cocina abierta'
-        : 'Cocina abierta · recibiendo';
+        ? 'Tienda abierta'
+        : 'Tienda abierta · recibiendo';
     final message = !store.isOpenNow
         ? 'Fuera de tu horario de atención'
         : !on
         ? 'Actívala cuando estés listo'
         : widget.compact
-        ? 'Recibiendo comandas'
+        ? 'Recibiendo pedidos'
         : 'Los clientes ven tu negocio abierto';
     return PartnerStatusPill(title: title, message: message, value: on, busy: busy, onChanged: _toggle);
   }

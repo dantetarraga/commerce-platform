@@ -20,7 +20,7 @@ class _RejectSheetState extends State<RejectSheet> {
     super.dispose();
   }
 
-  /// "Sin stock: Pollo entero" · "Cocina llena" · el texto libre si no eligió.
+  /// "Sin stock: Pollo entero" · "Muchos pedidos" · el texto libre si no eligió.
   String? _result(String text) {
     final detail = text.trim();
     if (_reason == null) return detail.length >= 3 ? detail : null;

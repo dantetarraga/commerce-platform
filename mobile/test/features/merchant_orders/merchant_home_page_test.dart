@@ -12,7 +12,7 @@ void main() {
     final alarm = RecordingAlarm();
     final container = await pumpPartner(tester, signedInAs: merchant, alarm: alarm);
     expect(find.byType(MerchantHomePage), findsOneWidget);
-    expect(find.text('Nuevas (1)'), findsOneWidget);
+    expect(find.text('Nuevos (1)'), findsOneWidget);
     expect(alarm.ringing, isTrue);
     expect(alarm.awake, isTrue);
     expect(find.text('“Sin ají, por favor”'), findsOneWidget);
@@ -21,13 +21,13 @@ void main() {
     await settle(tester);
     await tester.tap(find.text('30 min'));
     await settle(tester);
-    await tester.ensureVisible(find.text('Al fogón · 30 min'));
+    await tester.ensureVisible(find.text('Aceptar · listo en 30 min'));
     await settle(tester);
-    await tester.tap(find.text('Al fogón · 30 min'));
+    await tester.tap(find.text('Aceptar · listo en 30 min'));
     await settle(tester);
 
-    expect(find.text('Nuevas'), findsOneWidget);
-    expect(find.text('En fogón (2)'), findsOneWidget);
+    expect(find.text('Nuevos'), findsOneWidget);
+    expect(find.text('Preparando (2)'), findsOneWidget);
     expect(alarm.ringing, isFalse);
     await unmountChaski(tester, container);
   });
@@ -44,25 +44,25 @@ void main() {
     await settle(tester);
     expect(find.text('¿Por qué lo rechazas?'), findsOneWidget);
 
-    await tester.tap(find.text('Cocina llena'));
+    await tester.tap(find.text('Muchos pedidos'));
     await settle(tester);
     await tester.tap(find.text('Rechazar pedido'));
     await settle(tester);
 
-    expect(find.text('Nuevas'), findsOneWidget);
-    expect(find.text('Sin comandas nuevas'), findsOneWidget);
+    expect(find.text('Nuevos'), findsOneWidget);
+    expect(find.text('Sin pedidos nuevos'), findsOneWidget);
     await unmountChaski(tester, container);
   });
 
   testWidgets('lista para recoger la pasa a la pestaña de listas', (tester) async {
     final container = await pumpPartner(tester, signedInAs: merchant);
-    await tester.tap(find.text('En fogón (1)'));
+    await tester.tap(find.text('Preparando (1)'));
     await settle(tester);
-    await tester.ensureVisible(find.text('Lista para recoger'));
+    await tester.ensureVisible(find.text('Listo para recoger'));
     await settle(tester);
-    await tester.tap(find.text('Lista para recoger'));
+    await tester.tap(find.text('Listo para recoger'));
     await settle(tester);
-    expect(find.text('Listas (2)'), findsOneWidget);
+    expect(find.text('Listos (2)'), findsOneWidget);
     await unmountChaski(tester, container);
   });
 

@@ -190,7 +190,7 @@ class _OfflineNote extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Tu próximo recorrido empieza aquí', style: theme.textTheme.titleMedium),
+                Text('Tu próxima entrega empieza aquí', style: theme.textTheme.titleMedium),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
                   'Al conectarte verás de dónde sale, a dónde llega y cuánto cobras antes de tomarlo.',
@@ -282,7 +282,7 @@ class _AvailableOrdersState extends ConsumerState<_AvailableOrders> with Partner
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Expanded(child: Text('Recorridos listos', style: theme.textTheme.headlineSmall)),
+            Expanded(child: Text('Pedidos por recoger', style: theme.textTheme.headlineSmall)),
             if (list.isNotEmpty)
               Text(
                 '${list.length} en $cityName',
@@ -301,8 +301,8 @@ class _AvailableOrdersState extends ConsumerState<_AvailableOrders> with Partner
             ),
             data: (_) => const AppEmptyState(
               scene: AppEmptyArt.ride,
-              title: 'Nada por ahora',
-              message: 'Te avisaremos cuando un negocio tenga un pedido listo.',
+              title: 'Sin pedidos por recoger',
+              message: 'Te avisamos cuando un negocio tenga uno listo. Conectado, no te pierdes ninguno.',
             ),
           )
         else

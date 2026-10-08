@@ -172,7 +172,7 @@ final class ProductSales extends Equatable {
 const prepTimeChoices = [10, 20, 30, 45];
 
 /// Motivos rápidos para rechazar; el cliente los lee.
-const rejectReasons = ['Sin stock', 'Estamos cerrando', 'Cocina llena'];
+const rejectReasons = ['Sin stock', 'Estamos cerrando', 'Muchos pedidos'];
 
 abstract interface class MerchantRepository {
   Future<Result<List<MerchantStore>>> stores();

@@ -135,26 +135,83 @@ class _TodayMetrics extends ConsumerWidget {
   }
 }
 
+/// Mismo orden que el resumen: lo vendido, los tres datos y una gráfica de
+/// columnas en blanco.
 class _MetricsSkeleton extends StatelessWidget {
   const _MetricsSkeleton();
 
+  // Alturas de las columnas de ejemplo, para que parezca un día con pico.
+  static const _bars = [0.2, 0.6, 1.0, 0.7, 0.25, 0.15, 0.35, 0.55, 0.6, 0.3];
+
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(AppSpacing.lg),
-    decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer, borderRadius: AppRadius.card),
-    child: const Skeleton(
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Skeleton(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SkeletonBox(width: 90),
-          SizedBox(height: 10),
-          SkeletonBox(width: 150, height: 34),
-          SizedBox(height: AppSpacing.md),
-          Row(children: [SkeletonBox(width: 90), SizedBox(width: AppSpacing.lg), SkeletonBox(width: 90)]),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: AppRadius.card),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [SkeletonBox(width: 90), SizedBox(height: 10), SkeletonBox(width: 150, height: 34)],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              for (var i = 0; i < 3; i++) ...[
+                if (i > 0) const SizedBox(width: AppSpacing.xs),
+                const Expanded(
+                  child: PartnerSurface(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs + 2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SkeletonBox(width: 60, height: 10),
+                        SizedBox(height: 6),
+                        SkeletonBox(width: 50, height: 18),
+                        SizedBox(height: 6),
+                        SkeletonBox(width: 56, height: 10),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          PartnerSurface(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SkeletonBox(width: 130, height: 16),
+                const SizedBox(height: 6),
+                const SkeletonBox(width: 190, height: 11),
+                const SizedBox(height: AppSpacing.md),
+                SizedBox(
+                  height: 110,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      for (final h in _bars)
+                        SkeletonBox(
+                          width: 14,
+                          height: 110 * h,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _TodayRowSkeleton extends StatelessWidget {

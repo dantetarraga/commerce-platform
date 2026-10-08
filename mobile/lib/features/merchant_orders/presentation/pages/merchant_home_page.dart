@@ -48,7 +48,7 @@ class MerchantHomePage extends ConsumerWidget {
     ];
 
     final tabs = wide
-        ? const ['Comandas', 'Hoy']
+        ? const ['Pedidos', 'Hoy']
         : [
             for (final column in MerchantBoardColumn.values)
               switch (board.value?[column]?.length ?? 0) {
@@ -121,13 +121,13 @@ class _KitchenHero extends ConsumerWidget {
     final summary = ref.watch(merchantSummaryProvider).value;
     final store = this.store;
     final parts = [
-      if (summary != null) '${summary.totalCount} comandas · ${Formatters.money(summary.sales)} hoy',
+      if (summary != null) '${summary.totalCount} ${summary.totalCount == 1 ? 'pedido' : 'pedidos'} · ${Formatters.money(summary.sales)} hoy',
       if (waiting > 0) '$waiting por responder' else if (summary != null) 'todo al día',
     ];
     return PartnerHero(
-      eyebrow: '$_brand · COCINA',
+      eyebrow: '$_brand · TU NEGOCIO',
       greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
-      title: 'Tu cocina,',
+      title: 'Tu negocio,',
       accent: 'al toque.',
       subtitle: summary == null ? null : parts.join(' · '),
       subtitleLoading: summary == null,

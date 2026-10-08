@@ -111,7 +111,7 @@ void main() {
     expect(find.byIcon(Icons.notifications_rounded), findsOneWidget);
     expect(find.byIcon(Icons.takeout_dining_rounded), findsOneWidget);
     expect(find.text('Recibiendo pedidos · alarma lista'), findsOneWidget);
-    expect(find.text('Hoy salieron 2'), findsOneWidget);
+    expect(find.text('Hoy entregaste 2'), findsOneWidget);
   });
 }
 

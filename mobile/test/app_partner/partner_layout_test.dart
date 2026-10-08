@@ -58,14 +58,14 @@ void main() {
         brightness: brightness,
       );
       expect(tester.takeException(), isNull);
-      expect(find.textContaining('Tu cocina', findRichText: true), findsOneWidget);
+      expect(find.textContaining('Tu negocio', findRichText: true), findsOneWidget);
       if (name == 'móvil') await _capture(find.byType(MerchantHomePage), 'tienda_pedidos');
       // Elegir el tiempo cambia el botón sin enviar el pedido al fogón.
       await tester.ensureVisible(find.text('30 min'));
       await settle(tester);
       await tester.tap(find.text('30 min'));
       await settle(tester);
-      expect(find.text('Al fogón · 30 min'), findsOneWidget);
+      expect(find.text('Aceptar · listo en 30 min'), findsOneWidget);
       expect(tester.takeException(), isNull);
       await tester.drag(find.byType(NestedScrollView), const Offset(0, 1000));
       await settle(tester);
@@ -140,14 +140,14 @@ void main() {
       brightness: Brightness.dark,
     );
     // Las tres barras a la vista: la comanda nueva cuelga a la izquierda del fogón.
-    final fresh = find.text('Al fogón · 20 min');
-    final cooking = find.text('Lista para recoger');
+    final fresh = find.text('Aceptar · listo en 20 min');
+    final cooking = find.text('Listo para recoger');
     expect(fresh, findsOneWidget);
     expect(cooking, findsOneWidget);
     expect(tester.getCenter(fresh).dx, lessThan(tester.getCenter(cooking).dx));
     await tester.tap(fresh);
     await settle(tester);
-    expect(find.text('Lista para recoger'), findsNWidgets(2));
+    expect(find.text('Listo para recoger'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
     await tester.pump(const Duration(seconds: 3));
     await tester.drag(find.byType(NestedScrollView), const Offset(0, 1000));

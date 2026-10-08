@@ -2,8 +2,8 @@ import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant.dart';
 import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/comanda_skeleton.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
+import 'package:chaski/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/store_switch.dart';
 import 'package:chaski/features/orders/orders.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
@@ -15,15 +15,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Título y texto vacío de cada columna del riel (también las pestañas del celular).
 extension MerchantBoardColumnText on MerchantBoardColumn {
   String get title => switch (this) {
-    MerchantBoardColumn.fresh => 'Nuevas',
-    MerchantBoardColumn.cooking => 'En fogón',
-    MerchantBoardColumn.ready => 'Listas',
+    MerchantBoardColumn.fresh => 'Nuevos',
+    MerchantBoardColumn.cooking => 'Preparando',
+    MerchantBoardColumn.ready => 'Listos',
   };
 
   String get emptyTitle => switch (this) {
-    MerchantBoardColumn.fresh => 'Sin comandas nuevas',
-    MerchantBoardColumn.cooking => 'Nada en el fogón',
-    MerchantBoardColumn.ready => 'Nada esperando repartidor',
+    MerchantBoardColumn.fresh => 'Sin pedidos nuevos',
+    MerchantBoardColumn.cooking => 'Nada en preparación',
+    MerchantBoardColumn.ready => 'Nada por entregar',
   };
 
   AppEmptyArt get emptyArt => switch (this) {
@@ -33,9 +33,9 @@ extension MerchantBoardColumnText on MerchantBoardColumn {
   };
 
   String get emptyMessage => switch (this) {
-    MerchantBoardColumn.fresh => 'Suena la alarma apenas llegue una.',
-    MerchantBoardColumn.cooking => 'Acepta una comanda nueva y aparece aquí.',
-    MerchantBoardColumn.ready => 'Lo que marques listo espera aquí la recogida.',
+    MerchantBoardColumn.fresh => 'Te avisamos con la alarma apenas llegue uno.',
+    MerchantBoardColumn.cooking => 'Cuando aceptes un pedido, lo verás aquí.',
+    MerchantBoardColumn.ready => 'Los pedidos que marques listos esperan aquí al repartidor.',
   };
 
   Color dot(BuildContext context) => switch (this) {
@@ -59,8 +59,8 @@ class RailHero extends ConsumerWidget {
     final store = this.store;
     return PartnerPageHeader(
       leading: PartnerStoreLogo(url: store?.logoUrl),
-      eyebrow: '$eyebrow · ${(store?.name ?? 'Riel de comandas').toUpperCase()}',
-      title: 'Tu cocina, ',
+      eyebrow: '$eyebrow · ${(store?.name ?? 'Tus pedidos').toUpperCase()}',
+      title: 'Tu negocio, ',
       accent: 'al toque.',
       titleSize: 28,
       trailing: [
@@ -98,7 +98,7 @@ class _TodayCount extends ConsumerWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Comandas hoy', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
+                Text('Pedidos hoy', style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSurfaceVariant)),
                 Text('${summary.totalCount} · ${Formatters.money(summary.sales)}', style: AppTypography.price(context, size: 18)),
               ],
             ),
@@ -123,7 +123,7 @@ class RailBoard extends ConsumerWidget {
         builder: (column) => PartnerRail(
           title: column.title,
           dot: column.dot(context),
-          children: [ComandaSkeleton(withActions: column == MerchantBoardColumn.fresh)],
+          children: [OrderCardSkeleton(withActions: column == MerchantBoardColumn.fresh)],
         ),
       ),
       data: (board) => _RailRow(
@@ -174,7 +174,7 @@ class _RailRow extends StatelessWidget {
 }
 
 /// Una columna sin comandas: su ícono, qué va ahí y un dato del momento
-/// (la tienda recibiendo, las nuevas que esperan, lo que salió hoy).
+/// (la tienda recibiendo, los nuevos que esperan, lo entregado hoy).
 class MerchantColumnEmpty extends ConsumerWidget {
   const MerchantColumnEmpty({required this.column, this.compact = false, super.key});
 
@@ -194,13 +194,13 @@ class MerchantColumnEmpty extends ConsumerWidget {
       },
       MerchantBoardColumn.cooking => switch (ref.watch(merchantBoardProvider).value?[MerchantBoardColumn.fresh]?.length) {
         final waiting? when waiting > 0 => AppEmptyChip(
-          label: '$waiting ${waiting == 1 ? 'nueva esperando' : 'nuevas esperando'}${compact ? '' : ' →'}',
+          label: '$waiting ${waiting == 1 ? 'pedido espera' : 'pedidos esperan'} respuesta${compact ? '' : ' →'}',
           onTap: compact ? null : () => DefaultTabController.maybeOf(context)?.animateTo(MerchantBoardColumn.fresh.index),
         ),
         _ => null,
       },
       MerchantBoardColumn.ready => switch (ref.watch(merchantSummaryProvider).value?.deliveredCount) {
-        final delivered? when delivered > 0 => AppEmptyChip(label: 'Hoy salieron $delivered'),
+        final delivered? when delivered > 0 => AppEmptyChip(label: 'Hoy entregaste $delivered'),
         _ => null,
       },
     };
