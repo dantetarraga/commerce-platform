@@ -15,14 +15,9 @@ async function currentUser() {
 export function requireRole(...roles: PanelRole[]) {
   return async ({ location }: { location: ParsedLocation }) => {
     const user = await currentUser()
-    if (!user) throw redirect({ to: '/ingresar', search: { redirect: location.href } })
-    if (!hasAnyRole(user, roles)) throw redirect({ to: panelHomeFor(user) ?? '/ingresar' })
+    if (!user) throw redirect({ to: '/login', search: { redirect: location.href } })
+    if (!hasAnyRole(user, roles)) throw redirect({ to: panelHomeFor(user) ?? '/login' })
   }
-}
-
-export async function redirectToHome(): Promise<never> {
-  const user = await currentUser()
-  throw redirect({ to: (user && panelHomeFor(user)) ?? '/ingresar' })
 }
 
 export async function redirectIfSignedIn() {

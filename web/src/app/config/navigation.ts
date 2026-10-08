@@ -40,7 +40,7 @@ export const navigation = {
   MERCHANT: {
     label: 'Portal Socios',
     items: [
-      { label: 'Inicio', icon: LayoutDashboard, to: '/socio' },
+      { label: 'Inicio', icon: LayoutDashboard, to: '/partner' },
       { label: 'Mi tienda', icon: Store },
       { label: 'Menú', icon: UtensilsCrossed },
       { label: 'Reportes', icon: ChartColumn },

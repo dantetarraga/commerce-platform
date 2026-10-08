@@ -4,7 +4,7 @@ import { panelHomeFor } from './user'
 describe('panelHomeFor', () => {
   it('lleva a cada rol a su portal; el admin tiene prioridad', () => {
     expect(panelHomeFor({ roles: ['ADMIN'] })).toBe('/admin')
-    expect(panelHomeFor({ roles: ['CUSTOMER', 'MERCHANT'] })).toBe('/socio')
+    expect(panelHomeFor({ roles: ['CUSTOMER', 'MERCHANT'] })).toBe('/partner')
     expect(panelHomeFor({ roles: ['MERCHANT', 'ADMIN'] })).toBe('/admin')
   })
 

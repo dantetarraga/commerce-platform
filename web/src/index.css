@@ -86,6 +86,11 @@
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
 
+  /* Fijos en ambos temas: texto y velos sobre fotos. */
+  --color-ink: #140f0d;
+  --color-ink-foreground: #fbf7f2;
+  --color-ink-accent: #f2a487;
+
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-display: 'Outfit Variable', 'Plus Jakarta Sans Variable', sans-serif;
 

@@ -4,11 +4,12 @@ import { NotFound } from '@/components/shared/not-found'
 import { RouteError } from '@/components/shared/route-error'
 import { loginRoute } from '@/features/auth'
 import { adminHomeRoute, merchantHomeRoute } from '@/features/home'
+import { landingRoute } from '@/features/landing'
 import { AdminLayout } from '@/layouts/admin-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
 import { MerchantLayout } from '@/layouts/merchant-layout'
 import { RootLayout } from '@/layouts/root-layout'
-import { redirectIfSignedIn, redirectToHome, requireRole } from './guards'
+import { redirectIfSignedIn, requireRole } from './guards'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -20,11 +21,8 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
   errorComponent: RouteError,
 })
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  beforeLoad: redirectToHome,
-})
+// La portada es pública: quien ya inició sesión entra a su panel desde "Ingresar".
+const landing = createRoute({ getParentRoute: () => rootRoute, ...landingRoute })
 
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -44,7 +42,7 @@ const adminHome = createRoute({ getParentRoute: () => adminLayoutRoute, ...admin
 
 const merchantLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: 'socio',
+  path: 'partner',
   component: MerchantLayout,
   beforeLoad: requireRole('MERCHANT'),
 })
@@ -54,7 +52,7 @@ const merchantHome = createRoute({
 })
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
+  landing,
   authLayoutRoute.addChildren([login]),
   adminLayoutRoute.addChildren([adminHome]),
   merchantLayoutRoute.addChildren([merchantHome]),

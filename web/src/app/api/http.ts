@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { env } from '@/config/env'
+import { env } from '@/app/config/env'
 import type { ApiError } from './api-error'
 
 export const http = axios.create({

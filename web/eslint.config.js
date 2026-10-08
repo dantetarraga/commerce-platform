@@ -3,26 +3,27 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import globals from 'globals'
 
-const layerMessage =
-  'Un feature no importa de otros features, de app/ ni de layouts/. Lo compartido va en components, hooks, lib o config.'
+const rule = (group, message) => ({ group, message })
 
-const restrictedLayers = (message) => [
-  'error',
-  {
-    patterns: [
-      {
-        group: ['@/features/*', '@/app/*', '@/layouts/*'],
-        message,
-      },
-    ],
-  },
-]
+const featureInternals = rule(
+  ['@/features/*/**'],
+  'Importa el feature por su index.ts (@/features/<x>), no sus archivos internos.',
+)
+const dateLibrary = rule(
+  ['date-fns', 'date-fns/*', '@date-fns/*'],
+  'Usa dateTime de @/lib/datetime: la librería de fechas solo se usa dentro de su adapter.',
+)
+const httpLibrary = rule(['axios'], 'Usa http de @/app/api: axios solo se usa dentro de app/api.')
+const upperLayers = (message) =>
+  rule(['@/features/*', '@/app/providers/*', '@/app/router/*', '@/layouts/*'], message)
+
+const restrict = (...patterns) => ['error', { patterns }]
 
 export default [
   ...neostandard({
     ts: true,
     noStyle: true,
-    ignores: [...resolveIgnoresFromGitignore(), 'src/api/generated/**'],
+    ignores: [...resolveIgnoresFromGitignore(), 'src/app/api/generated/**'],
   }),
   reactHooks.configs.flat['recommended-latest'],
   reactRefresh.configs.vite,
@@ -35,31 +36,43 @@ export default [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/features/*/**'],
-              message:
-                'Importa el feature por su index.ts (@/features/<x>), no sus archivos internos.',
-            },
-          ],
-        },
-      ],
+      'no-restricted-imports': restrict(featureInternals, dateLibrary, httpLibrary),
     },
   },
   {
     files: ['src/features/**/*.{ts,tsx}'],
-    rules: { 'no-restricted-imports': restrictedLayers(layerMessage) },
-  },
-  {
-    files: ['src/{components,hooks,lib,config,api,realtime}/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': restrictedLayers(
-        'Las capas compartidas no dependen de features, app/ ni layouts/.',
+      'no-restricted-imports': restrict(
+        upperLayers(
+          'Un feature no importa de otros features, de app/providers, app/router ni layouts/.',
+        ),
+        dateLibrary,
+        httpLibrary,
       ),
     },
+  },
+  {
+    files: ['src/{components,hooks,lib}/**/*.{ts,tsx}', 'src/app/{api,config}/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': restrict(
+        upperLayers('Las capas compartidas no dependen de features, providers, router ni layouts.'),
+        dateLibrary,
+        httpLibrary,
+      ),
+    },
+  },
+  {
+    files: ['src/app/api/**/*.ts'],
+    rules: {
+      'no-restricted-imports': restrict(
+        upperLayers('app/api no depende de features, providers, router ni layouts.'),
+        dateLibrary,
+      ),
+    },
+  },
+  {
+    files: ['src/lib/datetime/**/*.ts'],
+    rules: { 'no-restricted-imports': restrict(featureInternals, httpLibrary) },
   },
   {
     files: ['src/components/ui/**/*.tsx'],

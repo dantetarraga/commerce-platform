@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { http, setupAuthInterceptors } from '@/api'
+import { http, setupAuthInterceptors } from '@/app/api'
 import { refreshAccessToken, useSessionStore } from '@/features/auth'
 import type { AppRouter } from '../router/router'
 
@@ -10,7 +10,7 @@ export function setupHttp(queryClient: QueryClient, router: AppRouter) {
     refreshAccessToken,
     onAuthFailure: () => {
       queryClient.clear()
-      void router.navigate({ to: '/ingresar', search: { redirect: router.state.location.href } })
+      void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
     },
   })
 }

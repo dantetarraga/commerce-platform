@@ -1,11 +1,13 @@
-import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
+import { getRouteApi, Link, useNavigate, useRouter } from '@tanstack/react-router'
 import { LoginForm } from '../components/login-form'
 import { panelHomeFor, type SessionUser } from '../model/user'
+
+const loginRouteApi = getRouteApi('/auth/login')
 
 export function LoginPage() {
   const navigate = useNavigate()
   const router = useRouter()
-  const { redirect } = useSearch({ strict: false }) as { redirect?: string }
+  const { redirect } = loginRouteApi.useSearch()
 
   function goHome(user: SessionUser) {
     if (redirect) return router.history.push(redirect)
@@ -16,10 +18,18 @@ export function LoginPage() {
   return (
     <div className='space-y-8'>
       <div className='space-y-2'>
-        <h1 className='text-3xl font-semibold'>Ingresa al panel</h1>
-        <p className='text-muted-foreground'>Con el celular que registraste en Apamuy.</p>
+        <h1 className='text-4xl font-bold'>Ingresa a tu panel</h1>
+        <p className='text-muted-foreground'>
+          Escribe el celular con el que te registraste. Te enviamos un código por SMS.
+        </p>
       </div>
       <LoginForm onAuthenticated={goHome} />
+      <p className='text-muted-foreground border-t pt-6 text-sm'>
+        ¿Quieres vender con Apamuy?{' '}
+        <Link to='/' hash='negocios' className='text-primary font-semibold hover:underline'>
+          Mira cómo sumar tu negocio
+        </Link>
+      </p>
     </div>
   )
 }

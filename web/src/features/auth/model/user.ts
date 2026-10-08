@@ -12,9 +12,9 @@ export interface SessionUser {
 
 export type PanelRole = Extract<Role, 'ADMIN' | 'MERCHANT'>
 
-export function panelHomeFor(user: Pick<SessionUser, 'roles'>): '/admin' | '/socio' | null {
+export function panelHomeFor(user: Pick<SessionUser, 'roles'>): '/admin' | '/partner' | null {
   if (user.roles.includes('ADMIN')) return '/admin'
-  if (user.roles.includes('MERCHANT')) return '/socio'
+  if (user.roles.includes('MERCHANT')) return '/partner'
   return null
 }
 

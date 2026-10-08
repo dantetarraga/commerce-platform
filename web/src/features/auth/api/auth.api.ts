@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { http } from '@/api'
+import { http } from '@/app/api'
 import type { SessionUser } from '../model/user'
 
 // Escrito a mano hasta generar el cliente con orval (npm run api:generate).

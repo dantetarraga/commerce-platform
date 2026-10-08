@@ -32,6 +32,7 @@ export const useSessionStore = create<SessionState>()(
     }),
     {
       name: 'apamuy.panel.session',
+      version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: ({ refreshToken }) => ({ refreshToken }),
     },

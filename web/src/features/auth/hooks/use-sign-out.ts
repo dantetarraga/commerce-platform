@@ -10,6 +10,6 @@ export function useSignOut() {
   return useCallback(() => {
     signOut()
     queryClient.clear()
-    void navigate({ to: '/ingresar' })
+    void navigate({ to: '/login' })
   }, [queryClient, navigate])
 }

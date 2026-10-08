@@ -33,8 +33,8 @@ Ver `CLAUDE.md` (reglas) y `docs/PANEL_WEB.md` §9.
 
 ## Hecho (W0)
 
-- Ingreso con celular + código SMS (`/ingresar`), sesión que sobrevive a la recarga y renovación automática del token.
-- Portales `/admin` (rol `ADMIN`) y `/socio` (rol `MERCHANT`) con guardas; los demás roles ven "Aún no eres socio".
+- Ingreso con celular + código SMS (`/login`), sesión que sobrevive a la recarga y renovación automática del token.
+- Portales `/admin` (rol `ADMIN`) y `/partner` (rol `MERCHANT`) con guardas; los demás roles ven "Aún no eres socio".
 - Armazón con sidebar (módulos planificados como "Pronto"), header y modo oscuro.
 - Sesión JWT con Zustand; Axios con interceptores (Bearer, renovación única ante 401, `ApiError`).
 - Tokens Terracota, fuentes, componentes base (`button`, `input`, `label`, `field`), hooks reutilizables, ESLint Standard con límites entre features, tests y CI.

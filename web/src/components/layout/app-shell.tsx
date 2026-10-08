@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { NavPortal } from '@/config/navigation'
+import type { NavPortal } from '@/app/config/navigation'
 import { useDisclosure } from '@/hooks/use-disclosure'
 import { Header, type HeaderUser } from './header'
 import { Sidebar } from './sidebar'

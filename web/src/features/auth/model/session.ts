@@ -1,4 +1,4 @@
-import { ApiError } from '@/api'
+import { ApiError } from '@/app/api'
 import { fetchMe, logout, refreshTokens, type AuthResponse } from '../api/auth.api'
 import { useSessionStore } from './session.store'
 import { panelHomeFor } from './user'

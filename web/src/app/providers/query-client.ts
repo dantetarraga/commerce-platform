@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { ApiError } from '@/api'
+import { ApiError } from '@/app/api'
 
 const shouldRetry = (failureCount: number, error: unknown) =>
   failureCount < 2 && error instanceof ApiError && error.isRetriable

@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError } from '@/api'
+import { ApiError } from '@/app/api'
 import { renderWithProviders } from '@/test/render'
 import * as authApi from '../api/auth.api'
 import { useSessionStore } from '../model/session.store'

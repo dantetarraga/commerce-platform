@@ -1,4 +1,4 @@
-import { navigation } from '@/config/navigation'
+import { navigation } from '@/app/config/navigation'
 import { PortalLayout } from './portal-layout'
 
 export function AdminLayout() {

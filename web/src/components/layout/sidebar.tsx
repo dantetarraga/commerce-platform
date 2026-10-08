@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import type { NavPortal } from '@/config/navigation'
+import type { NavPortal } from '@/app/config/navigation'
 import { cn } from '@/lib/cn'
 import { BrandMark } from './brand-mark'
 

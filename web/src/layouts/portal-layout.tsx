@@ -1,6 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import { AppShell } from '@/components/layout/app-shell'
-import type { NavPortal } from '@/config/navigation'
+import type { NavPortal } from '@/app/config/navigation'
 import { displayName, initials, useCurrentUser, useSignOut } from '@/features/auth'
 
 interface PortalLayoutProps {

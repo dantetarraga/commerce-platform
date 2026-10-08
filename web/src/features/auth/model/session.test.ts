@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ApiError } from '@/api'
+import { ApiError } from '@/app/api'
 import * as authApi from '../api/auth.api'
 import { refreshAccessToken, restoreSession, signIn } from './session'
 import { useSessionStore } from './session.store'
