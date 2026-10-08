@@ -1,23 +1,22 @@
 # Apamuy — qué falta para el MVP
 
-Estado al 2026-09-26. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [OPERACION.md](OPERACION.md) (cómo se opera con negocios y repartidores).
+Estado al 2026-10-08. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [OPERACION.md](OPERACION.md) (cómo se opera con negocios y repartidores).
 
-**En corto:** la app y el backend ya cubren el ciclo completo de un pedido: pedir, confirmar, preparar, repartir, entregar, calificar y cancelar. También hay avisos in-app y direcciones sincronizadas. Para un piloto en Espinar faltan tres cosas fuera del código:
+**En corto:** la app y el backend ya cubren el ciclo completo de un pedido: pedir, confirmar, preparar, repartir, entregar, calificar y cancelar. Hay ubicación real (GPS y Google Maps en Android), zona de reparto validada en el backend y tiempo real por WebSocket: el cliente ve la moto en el mapa y el negocio recibe los pedidos al instante. Para un piloto en Espinar faltan tres cosas fuera del código:
 
 1. Crear la cuenta de **Twilio**.
 2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
-3. Hacer **push** de `main`: los commits de Apamuy Socios están solo en local y la CI todavía no los probó.
+3. Revisar con un abogado los **términos y la privacidad** (hoy son borradores dentro de las apps).
 
-La **app Apamuy Socios** (negocio y repartidor) ya opera pedidos contra la API. El equipo da de alta y suspende socios desde Swagger (`admin/*`). Lo que sigue en código es el push con plazo de aceptación. Después, la ubicación real y el panel admin web.
+En código, lo que sigue es el **push (FCM)** con plazo de aceptación y alarma con la app cerrada. Después, el panel admin web.
 
 ## Estado actual
 
 | Parte | Listo | Falta |
 |---|---|---|
-| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. `Idempotency-Key`, ubicación en detalle de negocio y producto, avisos y direcciones reales, cancelar pedido, Android e iOS listos para la API local. Solo contraentrega (sin tarjeta). Editar nombre y correo. **Apamuy Socios** (flavor `partner`): modos Negocio y Repartidor con alarma. 281 tests | Ubicación real (GPS/mapa), push |
-| Backend (`backend/`) | Alta y suspensión de socios, CRUD de catálogo, cupones y banners (`admin/*`). Auth OTP con Twilio + refresh rotativo, `/users/me`, catálogo, búsqueda, discovery, cupones, pedidos, operación del negocio y del repartidor, cancelación, avisos, direcciones, limpieza diaria. API de socios (`merchant/*`, `courier/*`): aceptar con tiempo, productos, resúmenes, disponibilidad del repartidor y registro del cobro; la hora estimada se recalcula al aceptar y al salir el repartidor; 96 unit + 97 e2e | Push, imágenes |
+| App (`mobile/`) | Todo el flujo del cliente contra la API o en modo demo. Dirección con mapa de Google, GPS y pin (llena la calle sola y vuela a la calle escrita), zona de reparto de 6 km, referencia obligatoria. Seguimiento en vivo por WebSocket con la moto en el mapa. Solo contraentrega. **Apamuy Socios** (flavor `partner`): Negocio y Repartidor en vivo, el repartidor comparte su ubicación y abre la ruta en Google Maps. Arranque con la moto, carga con tres puntos. 289 tests | Push, mapa en iOS (falta su key) |
+| Backend (`backend/`) | Auth OTP con Twilio, catálogo, pedidos, operación de negocio y repartidor, cancelación, avisos, direcciones, admin (`admin/*`). Zona de reparto por ciudad (`coverageKm`). WebSocket Socket.IO en `/ws` (rooms por pedido, negocio y ciudad) y `POST /courier/me/location`. 99 unit + 103 e2e | Push, imágenes |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend + mobile + imagen Docker + APK de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; imagen más liviana (~800 MB) |
-| Repo | `feat/backend-fase-1` ya se integró a `main` y se borró. Todo commiteado | Push de `main` (los commits de Apamuy Socios están solo en local) |
 
 ## Operación de pedidos
 
@@ -26,17 +25,25 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 | Pieza | Estado |
 |---|---|
 | Máquina de estados | ✅ `RECEIVED → CONFIRMED → PREPARING → READY → COURIER_ASSIGNED → ON_THE_WAY → DELIVERED`, con permisos por rol |
-| Negocio | ✅ Ver sus pedidos con datos del cliente, avanzar, cancelar con motivo, pausar pedidos |
-| Repartidor | ✅ Pedidos listos de su ciudad, tomar uno (solo uno gana), en camino, entregado |
-| Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente. La app cancela desde "Ayuda con tu pedido" |
-| Catálogo | ✅ El admin crea y edita negocios, horarios, secciones, productos (variantes y opciones) y categorías desde Swagger (OPERACION.md §5). Cupones y banners del inicio también (`admin/coupons`, `admin/promotions`) |
-| Paneles | ✅ App **Apamuy Socios**: el negocio acepta con tiempo, rechaza, marca listo, pausa y agota productos; el repartidor se conecta, toma, recoge y entrega registrando el cobro. Alarma con la app abierta. Alta y suspensión de socios por admin (`admin/*`). Faltan el push y el panel admin web |
+| Negocio | ✅ Ver sus pedidos al instante (WebSocket), avanzar, cancelar con motivo, pausar pedidos. Sigue consultando con la pantalla bloqueada para que suene la alarma |
+| Repartidor | ✅ Pedidos listos de su ciudad en vivo, tomar uno (solo uno gana), en camino, entregado. Comparte su ubicación cada 10 s con la app abierta |
+| Cancelación | ✅ Restaura stock y cupón, cancela el pago y avisa al cliente |
+| Catálogo | ✅ El admin crea y edita negocios, horarios, secciones, productos, categorías, cupones y banners desde Swagger |
+| Paneles | ✅ App **Apamuy Socios**. Faltan el push y el panel admin web |
+
+## Tiempo real y ubicación
+
+| Pieza | Estado |
+|---|---|
+| WebSocket | ✅ Socket.IO en `/ws`, token en el handshake. Los eventos solo avisan; la app vuelve a pedir por REST. Respaldo por consulta: 30 s con conexión, 8–10 s sin ella. Una sola instancia (con varias, adapter de Redis) |
+| Ubicación del repartidor | ✅ Solo la última posición. El cliente la ve mientras el pedido va en camino y si tiene menos de 2 minutos. Con la app de Socios cerrada no se envía (llega con el push: servicio en primer plano) |
+| Mapas | ✅ Google Maps en Android (key en `android/local.properties`, nunca en git). iOS, web y tests usan el plano o el recorrido ilustrados |
+| Geocodificación | ✅ La del teléfono (sin key ni costo). En Yauri puede no encontrar calles: el pin manda sobre el texto |
 
 ## Backend
 
 | Pendiente | Detalle |
 |---|---|
-| `nextOpeningAt` | La app ya lo lee en el resumen y el detalle del negocio (`GET /stores`, `/stores/:id`, ISO 8601) para decir cuándo abre un negocio cerrado; sin él no lo muestra |
 | Push (FCM) | Los avisos in-app ya se crean en cada cambio de estado; falta enviarlos como push (tabla `Device` lista) |
 | Imágenes | Todo usa placeholders de loremflickr. Falta subir y servir fotos reales (storage + CDN) |
 | Favoritos | Guardados en el dispositivo. Opcional: sincronizar para no perderlos al cambiar de teléfono |
@@ -45,9 +52,9 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 
 | Pendiente | Detalle |
 |---|---|
-| Ubicación real | `CurrentDeliveryLocation` arranca en el centro de Espinar. No hay GPS, mapa ni geocodificación (sin dependencia de mapas en `pubspec.yaml`); el formulario de dirección parte del punto actual |
-| Push | Registro del token FCM y apertura del pedido al tocar el aviso |
-| Seguimiento | Consulta cada 8 s. Alcanza para el MVP; WebSocket después |
+| Push | Registro del token FCM, apertura del pedido al tocar el aviso, alarma y ubicación del repartidor con la app cerrada |
+| Mapa en iOS | Falta la key de Maps SDK for iOS en `AppDelegate`; hasta entonces iOS usa el plano dibujado |
+| Radio de cobertura | Está fijo en la app (`core/config/city.dart`) y en el seed (6 km). Si cambia, tocar ambos o leerlo de `GET /cities` |
 | Probar en un teléfono | Con `adb reverse tcp:3000 tcp:3000` y `env/dev-device.json` |
 
 ## Producción, calidad y seguridad
@@ -56,13 +63,12 @@ El negocio y el repartidor operan desde **Apamuy Socios** (`/merchant/*` y `/cou
 |---|---|
 | SMS | ✅ Twilio (`SMS_PROVIDER=twilio`, obligatorio en producción). Falta crear la cuenta y el Messaging Service |
 | Deploy | ✅ Dockerfile + `railway.toml` probados localmente. Falta crear el proyecto y separar las migraciones para achicar la imagen |
-| CI | ✅ Lint, unit, e2e, build e imagen Docker del backend; `flutter analyze`, `flutter test` y APK de las dos apps. Corre al hacer push a `main` o en un PR |
-| Pagos | Efectivo, Yape y Plin se pagan **al recibir**; tarjeta está deshabilitada (sin POS). El repartidor registra lo cobrado al entregar. El MVP no necesita pasarela. Pago online (Culqi / Mercado Pago) en la Fase 4 |
+| CI | ✅ Lint, unit, e2e, build e imagen Docker del backend; `flutter analyze`, `flutter test` y APK de las dos apps |
+| Pagos | Efectivo, Yape y Plin se pagan **al recibir**; tarjeta deshabilitada. Pago online (Culqi / Mercado Pago) en la Fase 4 |
 | Limpieza de datos | ✅ Tarea diaria que borra códigos OTP viejos y refresh tokens vencidos |
-| Secretos | ✅ `OTP_SECRET` propio, distinto de `JWT_ACCESS_SECRET` |
 | Rate limit | En memoria (con `TRUST_PROXY` para Railway): vale para una instancia; con varias hace falta Redis |
 | Observabilidad | Logs JSON con `requestId`. Errores (Sentry) y métricas después del lanzamiento |
-| Legal | Se guardan celulares y direcciones: faltan la política de privacidad y los términos (Ley 29733 de protección de datos personales) |
+| Legal | Términos y privacidad en borrador dentro de las dos apps (Ley 29733). Falta la revisión legal |
 
 ## Plan
 
@@ -70,17 +76,10 @@ Esfuerzos aproximados, para una persona.
 
 | # | Trabajo | Esfuerzo | Desbloquea |
 |---|---|---|---|
-| 1 | ✅ Commit + CI básica | 0.5 día | Base segura |
-| 2 | ✅ Cupones + pedidos (crear, listar, detalle, calificar) | 2–3 días | Comprar contra la API |
-| 3 | ✅ App: `Idempotency-Key`, `lat`/`lng`, Android e iOS | 0.5 día | Probar en un dispositivo |
-| 4 | ✅ Máquina de estados, negocio, repartidor, cancelación | 2 días | Que un pedido llegue a `DELIVERED` |
-| 5 | ✅ SMS con Twilio (falta la cuenta) | 1 día | Login en producción |
-| 6 | ✅ Deploy preparado para Railway (falta el proyecto) | 1–2 días | Piloto con usuarios reales |
-| 7 | ✅ Avisos in-app, direcciones en la API, cancelar en la app, endurecimiento | 2 días | Seguimiento y datos entre dispositivos |
-| 8 | Ubicación real: GPS, mapa y geocodificación | 3–4 días | Fee y cobertura correctos |
-| 9 | ✅ App Apamuy Socios: base, modo Negocio y modo Repartidor con cobro contraentrega (app + API) | 2–3 semanas | Operar sin Swagger (demo con el seed) |
-| 10 | ✅ Alta y suspensión de socios por admin (`admin/*`, desde Swagger) | 1–2 días | Piloto con socios reales |
-| 11 | Push con FCM, alarma con la app cerrada y plazo de aceptación | 4–5 días | Que ningún pedido quede sin atender |
-| 12 | ✅ CRUD de catálogo (`admin/*`). Falta el panel admin web | 1–2 semanas | Sumar negocios sin tocar el seed |
-
-Con lo hecho hasta el paso 7 ya se puede hacer un piloto operando a mano: el negocio y el repartidor usan Swagger, o alguien del equipo lo hace por ellos. Los pasos 9 a 11 permiten la prueba con socios reales; el detalle está en [OPERACION.md](OPERACION.md).
+| 1–7 | ✅ Base, pedidos, estados, SMS, deploy preparado, avisos y direcciones | — | Piloto operando a mano |
+| 8 | ✅ Ubicación real: GPS, mapa, geocodificación del teléfono y zona de reparto | 3–4 días | Fee y cobertura correctos |
+| 9 | ✅ App Apamuy Socios: Negocio y Repartidor con cobro contraentrega | 2–3 semanas | Operar sin Swagger |
+| 10 | ✅ Alta y suspensión de socios por admin | 1–2 días | Piloto con socios reales |
+| 11 | ✅ Tiempo real: WebSocket, moto en el mapa, ubicación del repartidor | 3 días | Seguimiento en vivo |
+| 12 | Push con FCM, alarma y ubicación con la app cerrada, plazo de aceptación | 4–5 días | Que ningún pedido quede sin atender |
+| 13 | ✅ CRUD de catálogo (`admin/*`). Falta el panel admin web | 1–2 semanas | Sumar negocios sin tocar el seed |
