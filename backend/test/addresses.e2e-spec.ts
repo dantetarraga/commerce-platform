@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type { App } from 'supertest/types';
+import { PrismaService } from '../src/database/prisma.service';
 import { API, signUp, TestSession } from './helpers';
 import { createTestApp } from './test-app';
 
@@ -14,6 +15,8 @@ const casa = {
   longitude: -71.4128,
 };
 const trabajo = { ...casa, id: 'adr_2', kind: 'WORK', street: 'Av. Espinar 100', reference: '' };
+// ~11 km al norte de la plaza: fuera de los 6 km de la zona de reparto.
+const lejos = { ...casa, id: 'adr_lejos', latitude: -14.6936 };
 
 describe('Direcciones (e2e)', () => {
   let app: INestApplication<App>;
@@ -59,6 +62,35 @@ describe('Direcciones (e2e)', () => {
     await put(ana, { addresses: [casa, casa] }).expect(400);
     const bad = await put(ana, { addresses: [{ ...casa, street: 'x', kind: 'CASA' }] }).expect(400);
     expect(Object.keys(bad.body.details.fields).sort()).toEqual(['addresses.0.kind', 'addresses.0.street']);
+  });
+
+  it('rechaza una dirección nueva fuera de la zona de reparto y guarda la ciudad de las demás', async () => {
+    const res = await put(ana, { addresses: [casa, lejos] }).expect(422);
+    expect(res.body.code).toBe('ADDRESS_OUT_OF_COVERAGE');
+    expect(res.body.details).toEqual({ ids: ['adr_lejos'] });
+
+    await put(ana, { addresses: [casa] }).expect(200);
+    const prisma = app.get(PrismaService);
+    const saved = await prisma.address.findFirstOrThrow({ where: { clientId: 'adr_1', user: { phone: '963000001' } } });
+    expect(saved.cityId).toBe('city_espinar');
+  });
+
+  it('no traba la sincronización por una dirección vieja fuera de la zona', async () => {
+    const prisma = app.get(PrismaService);
+    const user = await prisma.user.findFirstOrThrow({ where: { phone: '963000002' } });
+    await prisma.address.create({
+      data: {
+        userId: user.id,
+        clientId: lejos.id,
+        kind: 'HOME',
+        street: lejos.street,
+        latitude: lejos.latitude,
+        longitude: lejos.longitude,
+      },
+    });
+    await put(beto, { addresses: [lejos, { ...casa, id: 'adr_9' }] }).expect(200);
+    // Pero no se puede mover a otro punto fuera de la zona.
+    await put(beto, { addresses: [{ ...lejos, latitude: -14.6 }] }).expect(422);
   });
 
   it('exige sesión', async () => {

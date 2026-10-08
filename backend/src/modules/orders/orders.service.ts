@@ -6,7 +6,7 @@ import { isOpenAt } from '../../common/utils/schedule';
 import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { OrderStatus, PaymentMethodType, Role } from '../../generated/prisma/enums';
-import type { CityContext } from '../cities/cities.service';
+import { inCoverage, type CityContext } from '../cities/cities.service';
 import { CouponsService } from '../coupons/coupons.service';
 import { isStoreOpen, StoreForSummary, storeDelivery } from '../stores/store-presenter';
 import { StoresService } from '../stores/stores.service';
@@ -58,7 +58,15 @@ export class OrdersService {
     const { store, city } = await this.stores.load(dto.storeId);
     const scheduledFor = this.checkSchedule(store, city, dto.scheduledFor, now);
 
-    const delivery = storeDelivery(store, city, { lat: dto.address.latitude, lng: dto.address.longitude });
+    const destination = { lat: dto.address.latitude, lng: dto.address.longitude };
+    if (!inCoverage(city, destination)) {
+      throw new AppException(
+        ErrorCode.ADDRESS_OUT_OF_COVERAGE,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+        `Esa dirección está fuera de la zona de reparto de ${city.name}.`,
+      );
+    }
+    const delivery = storeDelivery(store, city, destination);
     if (!delivery.deliversToYou) {
       throw new AppException(
         ErrorCode.ADDRESS_OUT_OF_COVERAGE,

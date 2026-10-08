@@ -26,6 +26,8 @@ const CITY = {
   feePerKm: 100,
   routeFactor: 1.3,
   maxDeliveryKm: 5,
+  // Igual que cityCoverageKm de la app (mobile/lib/core/config/city.dart).
+  coverageKm: 6,
   avgSpeedKmh: 20,
 };
 

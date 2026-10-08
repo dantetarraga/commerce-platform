@@ -83,6 +83,7 @@ model City {
   feePerKm        Int // céntimos por km (redondeado hacia arriba)
   routeFactor     Decimal  @default(1.3) @db.Decimal(3, 2) // línea recta → distancia por calle
   maxDeliveryKm   Decimal  @db.Decimal(5, 2)
+  coverageKm      Decimal  @default(6) @db.Decimal(5, 2) // zona de reparto alrededor del centro
   avgSpeedKmh     Int      @default(20) // para ETA
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())

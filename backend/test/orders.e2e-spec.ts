@@ -216,6 +216,15 @@ describe('Cupones y pedidos (e2e)', () => {
       expect(res.body.code).toBe(code);
     });
 
+    it('fuera de la zona de la ciudad lo dice con el nombre de la ciudad', async () => {
+      const res = await http()
+        .post(`${API}/orders`)
+        .set(rosa.auth)
+        .send(orderBody({ address: { title: 'Lejos', street: 'Cusco', latitude: -13.53, longitude: -71.97 } }))
+        .expect(422);
+      expect(res.body.message).toBe('Esa dirección está fuera de la zona de reparto de Espinar.');
+    });
+
     it('bajo el pedido mínimo → MIN_ORDER_NOT_REACHED', async () => {
       const [variant] = await prisma.productVariant.findMany({ where: { productId: 'pr_pizza_americana' } });
       const res = await http()
