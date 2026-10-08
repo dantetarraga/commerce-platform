@@ -63,13 +63,19 @@ final class MerchantProduct extends Equatable {
   List<Object?> get props => [id, name, imageUrl, price, section, isAvailable];
 }
 
-/// Cómo va el día del negocio.
+/// Cómo va el día del negocio. Todo lo calcula el backend (`GET /merchant/summary`).
 final class MerchantSummary extends Equatable {
   const MerchantSummary({
     required this.deliveredCount,
     required this.cancelledCount,
     required this.activeCount,
     required this.sales,
+    this.averageTicket,
+    this.averagePrepMinutes,
+    this.peakHour,
+    this.salesByHour = const [],
+    this.payments = const [],
+    this.topProducts = const [],
   });
 
   final int deliveredCount;
@@ -79,11 +85,87 @@ final class MerchantSummary extends Equatable {
   /// Suma de lo vendido en pedidos entregados (sin el envío).
   final Money sales;
 
+  /// Por pedido entregado; null sin entregas.
+  final Money? averageTicket;
+
+  /// De aceptado a listo; null si ninguno llegó a listo.
+  final int? averagePrepMinutes;
+
+  /// Hora local (0–23) con más ventas.
+  final int? peakHour;
+
+  /// Horas seguidas desde la primera hasta la última con ventas.
+  final List<HourSales> salesByHour;
+
+  /// Efectivo, Yape y Plin (y tarjeta si hubo), con porcentajes que suman 100.
+  final List<PaymentSales> payments;
+
+  /// Los más vendidos por unidades.
+  final List<ProductSales> topProducts;
+
   /// Comandas del día: entregadas más en curso (las canceladas no cuentan).
   int get totalCount => deliveredCount + activeCount;
 
   @override
-  List<Object?> get props => [deliveredCount, cancelledCount, activeCount, sales];
+  List<Object?> get props => [
+    deliveredCount,
+    cancelledCount,
+    activeCount,
+    sales,
+    averageTicket,
+    averagePrepMinutes,
+    peakHour,
+    salesByHour,
+    payments,
+    topProducts,
+  ];
+}
+
+final class HourSales extends Equatable {
+  const HourSales({required this.hour, required this.sales, required this.orders});
+
+  final int hour;
+  final Money sales;
+  final int orders;
+
+  @override
+  List<Object?> get props => [hour, sales, orders];
+}
+
+enum PaymentKind {
+  cash('Efectivo'),
+  yape('Yape'),
+  plin('Plin'),
+  card('Tarjeta');
+
+  const PaymentKind(this.label);
+
+  final String label;
+}
+
+final class PaymentSales extends Equatable {
+  const PaymentSales({required this.kind, required this.sales, required this.orders, required this.share});
+
+  final PaymentKind kind;
+  final Money sales;
+  final int orders;
+
+  /// Porcentaje entero de las ventas del día.
+  final int share;
+
+  @override
+  List<Object?> get props => [kind, sales, orders, share];
+}
+
+final class ProductSales extends Equatable {
+  const ProductSales({required this.name, required this.quantity, required this.sales});
+
+  final String name;
+  final int quantity;
+  final Money sales;
+
+  @override
+  List<Object?> get props => [name, quantity, sales];
 }
 
 /// Tiempos de preparación (minutos) que se ofrecen al aceptar un pedido.

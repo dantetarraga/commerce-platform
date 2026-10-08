@@ -1,6 +1,7 @@
 import 'package:chaski/core/utils/formatters.dart';
 import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
 import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_orders_tab.dart';
+import 'package:chaski/features/merchant_orders/presentation/widgets/today_charts.dart';
 import 'package:chaski/features/orders/orders_staff.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:chaski/shared/partner/partner.dart';
@@ -8,7 +9,8 @@ import 'package:chaski/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// "Hoy": lo vendido y la lista de pedidos del día.
+/// "Hoy": lo vendido, las gráficas del día (calculadas por el backend) y la
+/// lista de pedidos.
 class MerchantTodayTab extends ConsumerWidget {
   const MerchantTodayTab({super.key});
 
@@ -91,32 +93,43 @@ class _TodayMetrics extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final on = theme.colorScheme.onPrimaryContainer;
-    final label = theme.textTheme.labelLarge?.copyWith(color: on);
     return AsyncValueView(
       value: ref.watch(merchantSummaryProvider),
       compactError: true,
       onRetry: () => ref.invalidate(merchantSummaryProvider),
       loading: const _MetricsSkeleton(),
-      data: (summary) => Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(color: theme.colorScheme.primaryContainer, borderRadius: AppRadius.card),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Vendido hoy', style: theme.textTheme.bodyMedium?.copyWith(color: on)),
-            Text(Formatters.money(summary.sales), style: theme.textTheme.headlineLarge?.copyWith(color: on)),
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.lg,
-              runSpacing: AppSpacing.xs,
-              children: [
-                Text('${summary.deliveredCount} entregados', style: label),
-                Text('${summary.cancelledCount} cancelados', style: label),
-              ],
+      data: (summary) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TodayHeadline(summary: summary),
+          const SizedBox(height: AppSpacing.md),
+          if (summary.salesByHour.isEmpty)
+            Text(
+              'Las gráficas aparecen con la primera entrega del día.',
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            )
+          else ...[
+            TodayChartCard(
+              title: 'Ventas por hora',
+              subtitle: 'Lo vendido en cada hora, en soles',
+              child: SalesByHourChart(hours: summary.salesByHour, peakHour: summary.peakHour),
             ),
+            const SizedBox(height: AppSpacing.md),
+            TodayChartCard(
+              title: 'Cómo te pagaron',
+              subtitle: 'Lo que cobra el repartidor al entregar',
+              child: PaymentsBar(payments: summary.payments),
+            ),
+            if (summary.topProducts.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              TodayChartCard(
+                title: 'Lo más pedido',
+                subtitle: 'Unidades vendidas hoy',
+                child: TopProductsChart(products: summary.topProducts),
+              ),
+            ],
           ],
-        ),
+        ],
       ),
     );
   }

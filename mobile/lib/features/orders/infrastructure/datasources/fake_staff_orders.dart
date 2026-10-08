@@ -247,14 +247,65 @@ class FakeStaffOrders {
     await _ready();
     final today = _orders.values.where((o) => (o['store'] as Map)['id'] == merchantStoreId && _isToday(o)).toList();
     final delivered = today.where((o) => o['status'] == 'DELIVERED');
+    // Un día de ejemplo para que la demo tenga gráficas; lo entregado en la
+    // demo se suma encima. El backend real calcula todo con sus pedidos.
+    int cents(Map<String, dynamic> o) => (o['subtotal'] as Map)['amount'] as int;
+    final hours = {for (final (hour, sales) in _sampleHours) hour: sales};
+    final payments = {'CASH': 22800, 'YAPE': 19650, 'PLIN': 6200};
+    final products = {for (final (name, qty) in _sampleProducts) name: qty};
+    for (final o in delivered) {
+      final hour = DateTime.parse(o['placedAt'] as String).toLocal().hour;
+      hours[hour] = (hours[hour] ?? 0) + cents(o);
+      final method = (o['payment'] as Map)['type'] as String;
+      payments[method] = (payments[method] ?? 0) + cents(o);
+      for (final line in (o['lines'] as List).cast<Map<String, dynamic>>()) {
+        products[line['name'] as String] = (products[line['name']] ?? 0) + (line['quantity'] as int);
+      }
+    }
+    final deliveredCount = 22 + delivered.length;
+    final sales = hours.values.fold<int>(0, (a, b) => a + b);
+    final first = hours.keys.reduce((a, b) => a < b ? a : b);
+    final last = hours.keys.reduce((a, b) => a > b ? a : b);
+    final byHour = [for (var h = first; h <= last; h++) (h, hours[h] ?? 0)];
+    final peak = byHour.reduce((a, b) => b.$2 > a.$2 ? b : a).$1;
+    final shares = {for (final e in payments.entries) e.key: (e.value * 100 / sales).floor()};
+    shares['CASH'] = shares['CASH']! + 100 - shares.values.fold<int>(0, (a, b) => a + b);
+    final top = products.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     return {
       'date': _today(),
-      'deliveredCount': delivered.length,
-      'cancelledCount': today.where((o) => o['status'] == 'CANCELLED').length,
+      'deliveredCount': deliveredCount,
+      'cancelledCount': 1 + today.where((o) => o['status'] == 'CANCELLED').length,
       'activeCount': today.where(_isActive).length,
-      'sales': _backend.money(delivered.fold<int>(0, (sum, o) => sum + ((o['subtotal'] as Map)['amount'] as int))),
+      'sales': _backend.money(sales),
+      'averageTicket': _backend.money(sales ~/ deliveredCount),
+      'averagePrepMinutes': 14,
+      'peakHour': peak,
+      'salesByHour': [
+        for (final (hour, cents) in byHour) {'hour': hour, 'sales': _backend.money(cents), 'orders': cents ~/ 2100},
+      ],
+      'payments': [
+        for (final e in payments.entries)
+          {'method': e.key, 'sales': _backend.money(e.value), 'orders': e.value ~/ 2100, 'share': shares[e.key]},
+      ],
+      'topProducts': [
+        for (final e in top.take(5))
+          {'productId': null, 'name': e.key, 'quantity': e.value, 'sales': _backend.money(e.value * 1500)},
+      ],
     };
   }
+
+  static const _sampleHours = [
+    (11, 1850), (12, 6400), (13, 9850), (14, 7200), (15, 2100), (16, 800),
+    (17, 1200), (18, 3500), (19, 5750), (20, 6100), (21, 3050), (22, 850),
+  ];
+
+  static const _sampleProducts = [
+    ('1/4 pollo a la brasa', 14),
+    ('Caldo de cordero', 9),
+    ('Chicha morada 1 L', 7),
+    ('Papas fritas', 6),
+    ('Ensalada fresca', 4),
+  ];
 
   Map<String, dynamic>? get _activeDelivery => _orders.values
       .where((o) => o['_courierId'] == _courierId && (o['status'] == 'COURIER_ASSIGNED' || o['status'] == 'ON_THE_WAY'))

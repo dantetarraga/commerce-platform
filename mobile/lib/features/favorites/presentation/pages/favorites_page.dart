@@ -92,10 +92,12 @@ class _List extends StatelessWidget {
     if (ids.isEmpty) {
       return switch (kind) {
         FavoriteKind.store => const AppEmptyState(
+          scene: AppEmptyArt.favorite,
           title: 'Aún no guardas negocios',
           message: 'Toca el corazón de tu picantería o bodega de confianza y la tendrás aquí, a un toque.',
         ),
         FavoriteKind.product => const AppEmptyState(
+          scene: AppEmptyArt.favorite,
           title: 'Aún no guardas productos',
           message: 'Ese chairo que siempre pides: guárdalo con el corazón y lo encuentras aquí.',
         ),

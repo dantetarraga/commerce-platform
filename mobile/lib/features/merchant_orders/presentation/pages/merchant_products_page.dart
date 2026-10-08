@@ -51,7 +51,7 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
                   onRetry: () => ref.invalidate(merchantProductsProvider(widget.storeId)),
                   loading: const _ProductsSkeleton(),
                   isEmpty: (c) => c.total == 0,
-                  empty: const AppEmptyState(title: 'Sin productos', message: 'Todavía no cargamos tu menú.'),
+                  empty: const AppEmptyState(scene: AppEmptyArt.menu, title: 'Sin productos', message: 'Todavía no cargamos tu menú.'),
                   data: (c) => RefreshIndicator(
                     onRefresh: () => ref.refresh(merchantProductsProvider(widget.storeId).future),
                     child: CustomScrollView(
@@ -63,7 +63,7 @@ class _MerchantProductsPageState extends ConsumerState<MerchantProductsPage> {
                         ),
                         if (c.visible.isEmpty)
                           const SliverToBoxAdapter(
-                            child: AppEmptyState(title: 'Sin coincidencias', message: 'Prueba con otro nombre o cambia el filtro.'),
+                            child: AppEmptyState(kind: AppEmptyKind.noResults, title: 'Sin coincidencias', message: 'Prueba con otro nombre o cambia el filtro.'),
                           ),
                         SliverPadding(
                           padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.xl),

@@ -300,6 +300,7 @@ class _AvailableOrdersState extends ConsumerState<_AvailableOrders> with Partner
               children: [RouteCardSkeleton(), SizedBox(height: AppSpacing.md), RouteCardSkeleton()],
             ),
             data: (_) => const AppEmptyState(
+              scene: AppEmptyArt.ride,
               title: 'Nada por ahora',
               message: 'Te avisaremos cuando un negocio tenga un pedido listo.',
             ),

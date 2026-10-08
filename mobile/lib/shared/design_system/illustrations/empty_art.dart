@@ -1,145 +1,146 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
+import 'dart:math' as math;
+
 import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:lottie/lottie.dart';
 
-/// Arte de los estados vacíos: animaciones Lottie planas en la paleta de la
-/// marca (`assets/animations/empty/`, procedencia en su README). Si una no
-/// carga, se muestra su ícono en un medallón terracota con el pedido verde.
+/// Gesto que repite el ícono de un estado vacío, cada pocos segundos.
+enum EmptyMotion {
+  none,
+
+  /// Flota hacia arriba y vuelve (bolsa, comida lista).
+  bob,
+
+  /// Se balancea como una campana (avisos, comandas nuevas).
+  ring,
+
+  /// Titila como una llama (en el fogón).
+  flicker,
+
+  /// Late (favoritos).
+  beat,
+}
+
+/// Arte de los estados vacíos: el cuadro con la esquina de salida de la marca
+/// y un ícono con su gesto. Mismo lenguaje que el pin del mapa.
 enum AppEmptyArt {
   /// Bolsa vacía (carrito sin productos).
-  emptyBag(Icons.shopping_bag_outlined, 1.35),
+  emptyBag(Icons.shopping_bag_rounded, EmptyMotion.bob),
 
   /// Sin conexión.
-  cut(Icons.wifi_off_rounded, 0.87),
+  cut(Icons.wifi_off_rounded, EmptyMotion.none),
 
   /// Algo falló.
-  tangle(Icons.error_outline_rounded, 1.25),
+  tangle(Icons.error_outline_rounded, EmptyMotion.none),
 
   /// Sin resultados.
-  search(Icons.search_off_rounded, 1),
+  search(Icons.search_off_rounded, EmptyMotion.none),
 
-  /// Listo, pedido confirmado.
-  knot(Icons.check_rounded, 0.73),
+  /// Listo, confirmado.
+  knot(Icons.check_rounded, EmptyMotion.beat),
 
-  /// Dirección, entregado.
-  door(Icons.location_on_outlined, 1.35),
+  /// Direcciones, entregado.
+  door(Icons.home_rounded, EmptyMotion.bob),
 
   /// Sin pedidos todavía.
-  receipt(Icons.receipt_long_outlined, 1.3);
+  receipt(Icons.receipt_long_rounded, EmptyMotion.none),
 
-  const AppEmptyArt(this.icon, this.lottieScale);
+  /// Favoritos.
+  favorite(Icons.favorite_rounded, EmptyMotion.beat),
+
+  /// Avisos o comandas nuevas.
+  bell(Icons.notifications_rounded, EmptyMotion.ring),
+
+  /// En el fogón.
+  flame(Icons.local_fire_department_rounded, EmptyMotion.flicker),
+
+  /// Listo para recoger.
+  takeout(Icons.takeout_dining_rounded, EmptyMotion.bob),
+
+  /// Productos del menú.
+  menu(Icons.restaurant_menu_rounded, EmptyMotion.none),
+
+  /// Entregas del repartidor.
+  ride(Icons.two_wheeler_rounded, EmptyMotion.bob);
+
+  const AppEmptyArt(this.icon, this.motion);
 
   final IconData icon;
-
-  /// Cada animación trae su propio encuadre: esto las iguala en tamaño.
-  final double lottieScale;
-
-  String get lottieAsset => 'assets/animations/empty/$name.json';
+  final EmptyMotion motion;
 }
 
-/// Dibuja un [AppEmptyArt]. La animación se reproduce una vez y queda en su
-/// último cuadro; con movimiento reducido aparece ya en ese cuadro.
-class EmptyArtView extends StatefulWidget {
-  const EmptyArtView(this.art, {this.size = 160, super.key});
+/// Dibuja un [AppEmptyArt]: entra con un pequeño rebote y repite su gesto.
+/// Con movimiento reducido queda quieto.
+class EmptyArtView extends StatelessWidget {
+  const EmptyArtView(this.art, {this.size = 96, super.key});
 
   final AppEmptyArt art;
   final double size;
 
-  @override
-  State<EmptyArtView> createState() => _EmptyArtViewState();
-}
-
-class _EmptyArtViewState extends State<EmptyArtView> with SingleTickerProviderStateMixin {
-  late final _controller = AnimationController(vsync: this);
-
-  void _onLoaded(LottieComposition composition) {
-    _controller.duration = composition.duration;
-    if (reduceMotionOf(context)) {
-      _controller.value = 1;
-    } else {
-      _controller.forward(from: 0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final art = widget.art;
-    return ExcludeSemantics(
-      child: SizedBox.square(
-        dimension: widget.size,
-        child: Transform.scale(
-          scale: art.lottieScale,
-          child: Lottie.asset(
-            art.lottieAsset,
-            key: ValueKey(art),
-            controller: _controller,
-            onLoaded: _onLoaded,
-            errorBuilder: (_, _, _) => Transform.scale(
-              scale: 1 / art.lottieScale,
-              child: _Medallion(art: art, size: widget.size, animate: !reduceMotionOf(context)),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Medallion extends StatelessWidget {
-  const _Medallion({required this.art, required this.size, required this.animate});
-
-  final AppEmptyArt art;
-  final double size;
-  final bool animate;
+  /// Pausa entre un gesto y el siguiente.
+  static const _rest = Duration(milliseconds: 1800);
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final disc = size * 0.72;
-    final dot = size * 0.13;
-    Widget circle = Container(
-      width: disc,
-      height: disc,
-      decoration: BoxDecoration(color: scheme.primaryContainer, shape: BoxShape.circle),
-      child: Icon(art.icon, size: disc * 0.46, color: scheme.primary),
-    );
-    // El pedido: el punto verde del logo, arriba a la derecha.
-    Widget order = Container(
-      width: dot,
-      height: dot,
-      decoration: BoxDecoration(
-        color: AppColors.hierba,
-        shape: BoxShape.circle,
-        border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: dot * 0.18),
-      ),
-    );
-    if (animate) {
-      circle = circle
-          .animate()
-          .fadeIn(duration: AppMotion.base, curve: AppMotion.arrive)
-          .scaleXY(begin: 0.86, end: 1, duration: AppMotion.story, curve: AppMotion.knot);
-      order = order
-          .animate(delay: AppMotion.base)
-          .scaleXY(begin: 0, end: 1, duration: AppMotion.move, curve: AppMotion.knot)
-          .then(delay: AppMotion.pulse)
-          .moveY(begin: 0, end: -dot * 0.5, duration: AppMotion.quick, curve: Curves.easeOut)
-          .then()
-          .moveY(begin: 0, end: dot * 0.5, duration: AppMotion.base, curve: Curves.bounceOut);
-    }
-    return Stack(
+    final r = size * 0.29;
+    final still = reduceMotionOf(context);
+    final icon = Icon(art.icon, size: size * 0.5, color: scheme.primary);
+    Widget tile(Widget child) => Container(
+      width: size,
+      height: size,
       alignment: Alignment.center,
-      children: [
-        circle,
-        Positioned(right: (size - disc) / 2 + disc * 0.06, top: (size - disc) / 2 + disc * 0.06, child: order),
-      ],
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer,
+        // La esquina de salida: abajo a la izquierda, corta.
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(r),
+          topRight: Radius.circular(r),
+          bottomRight: Radius.circular(r),
+          bottomLeft: Radius.circular(size * 0.08),
+        ),
+      ),
+      child: child,
+    );
+    if (still) return ExcludeSemantics(child: tile(icon));
+
+    final moving = switch (art.motion) {
+      EmptyMotion.none => icon,
+      EmptyMotion.bob => icon
+          .animate(onPlay: (c) => c.repeat())
+          .moveY(begin: 0, end: -size * 0.05, duration: AppMotion.pulse ~/ 2, curve: Curves.easeInOut)
+          .then()
+          .moveY(begin: 0, end: size * 0.05, duration: AppMotion.pulse ~/ 2, curve: Curves.easeInOut)
+          .then(delay: _rest ~/ 2),
+      EmptyMotion.ring => icon
+          .animate(onPlay: (c) => c.repeat())
+          .then(delay: _rest)
+          .custom(
+            duration: const Duration(milliseconds: 700),
+            builder: (_, t, child) => Transform.rotate(
+              alignment: const Alignment(0, -0.7),
+              // Se balancea y se va calmando.
+              angle: math.sin(t * math.pi * 4) * (1 - t) * 0.3,
+              child: child,
+            ),
+          ),
+      EmptyMotion.flicker => icon
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .scaleXY(begin: 1, end: 1.07, duration: const Duration(milliseconds: 900), curve: Curves.easeInOut, alignment: Alignment.bottomCenter),
+      EmptyMotion.beat => icon
+          .animate(onPlay: (c) => c.repeat())
+          .then(delay: _rest)
+          .scaleXY(begin: 1, end: 1.12, duration: AppMotion.quick, curve: Curves.easeOut)
+          .then()
+          .scaleXY(begin: 1, end: 1 / 1.12, duration: AppMotion.base, curve: Curves.easeIn),
+    };
+    return ExcludeSemantics(
+      child: tile(moving).animate().fadeIn(duration: AppMotion.base, curve: AppMotion.arrive).scaleXY(
+        begin: 0.86,
+        end: 1,
+        duration: AppMotion.story,
+        curve: AppMotion.knot,
+      ),
     );
   }
 }

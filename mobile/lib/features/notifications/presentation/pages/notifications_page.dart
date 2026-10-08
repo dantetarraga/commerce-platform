@@ -61,6 +61,7 @@ class NotificationsPage extends ConsumerWidget {
           loading: const Skeleton(child: _NoticesSkeleton()),
           isEmpty: (_) => !hasNotices,
           empty: const AppEmptyState(
+            scene: AppEmptyArt.bell,
             title: 'Todo tranquilo por aquí',
             message: 'Cuando tu pedido avance o haya una oferta cerca, te avisamos aquí.',
           ),
@@ -167,7 +168,7 @@ class _NoticeList extends ConsumerWidget {
           _Row(:final notice) => NoticeTile(notice: notice, onTap: () => onOpen(notice)),
           _Empty() => AppEmptyState(
             compact: true,
-            scene: filter == NoticeFilter.offers ? AppEmptyArt.emptyBag : AppEmptyArt.receipt,
+            scene: filter == NoticeFilter.offers ? AppEmptyArt.emptyBag : AppEmptyArt.bell,
             title: filter == NoticeFilter.offers ? 'Sin ofertas por ahora' : 'Sin avisos de pedidos',
             message: 'Te avisamos aquí apenas haya algo nuevo.',
           ),

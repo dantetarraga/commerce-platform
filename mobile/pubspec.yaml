@@ -35,9 +35,6 @@ dependencies:
   geolocator: ^14.0.1
   geocoding: ^5.0.0
   socket_io_client: ^3.1.6
-
-# toastification 3.2.0 pide equatable ^2, pero solo usa `extends Equatable`,
-# que no cambió en la 3 (la 3 quitó EquatableMixin). Quitar cuando lo actualicen.
 dependency_overrides:
   equatable: ^3.0.0
 
@@ -57,7 +54,6 @@ flutter:
   assets:
     - assets/images/demo/
     - assets/animations/
-    - assets/animations/empty/
     - assets/avatars/
     - assets/fixtures/
     - assets/icons/

@@ -1,8 +1,8 @@
 """Lleva las animaciones Lottie de LottieFiles a la paleta de Apamuy.
 
 Uso (desde mobile/): python tool/brand/recolor_lotties.py
-Lee los originales de tool/brand/lottie_src/ y escribe assets/animations/empty/
-(estados vacíos) y assets/animations/ (la moto de las esperas largas).
+Lee los originales de tool/brand/lottie_src/ y escribe assets/animations/
+(la moto de las esperas largas y del arranque).
 Cada archivo tiene su propio mapa para respetar el orden claro→oscuro del dibujo.
 """
 import json
@@ -19,26 +19,6 @@ PIEDRA = '6E5F56'
 ARENA = 'C9B8A8'
 GRIS_ALTO = 'EADFD3'
 
-MAPS = {
-    'cut': {'fb743d': TERRACOTA, 'e3361f': TERRACOTA_700, 'ffc039': TERRACOTA_300, 'f9ebd0': TERRACOTA_50},
-    'emptyBag': {
-        '313ed3': TERRACOTA_700, '4e6aff': TERRACOTA, '8fa1ff': TERRACOTA_300, 'e7eeff': TERRACOTA_50,
-        '00c89f': HIERBA, 'ffa000': TERRACOTA_300, 'ff4d69': HIERBA,
-    },
-    'door': {
-        'ff4d69': TERRACOTA, '4e6aff': PIEDRA, '8fa1ff': ARENA, 'a4bbec': GRIS_ALTO, 'e7eeff': TERRACOTA_50,
-        '00c89f': HIERBA, 'ffa000': TERRACOTA_300,
-    },
-    'knot': {'1138f7': HIERBA},
-    'tangle': {'ff3838': TERRACOTA},
-    'search': {
-        '3a5792': TERRACOTA_700, '4b6cb5': TERRACOTA, '5e86c9': TERRACOTA, '789fd3': TERRACOTA_300,
-        'e1e7f6': TERRACOTA_50, 'f1f1f1': PAPEL, 'd23e34': TINTA,
-    },
-    'receipt': {
-        '05bba9': TERRACOTA, 'b0ebd7': TERRACOTA_50, 'ffde54': HIERBA, '2c4053': PAPEL, '37373c': TINTA,
-    },
-}
 
 
 # La moto de AppWaitLoader: piel y faro quedan; la caja es el pedido (hierba).
@@ -90,8 +70,7 @@ def recolor(node, mapping, missing):
 def main():
     root = pathlib.Path(__file__).resolve().parents[2]
     src = root / 'tool/brand/lottie_src'
-    targets = [(name, mapping, root / 'assets/animations/empty') for name, mapping in MAPS.items()]
-    targets += [(name, mapping, root / 'assets/animations') for name, mapping in LOADERS.items()]
+    targets = [(name, mapping, root / 'assets/animations') for name, mapping in LOADERS.items()]
     for name, mapping, out in targets:
         data = json.loads((src / f'{name}.json').read_text(encoding='utf-8'))
         missing = set()

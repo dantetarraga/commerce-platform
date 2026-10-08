@@ -36,7 +36,7 @@ class MerchantOrdersTab extends ConsumerWidget {
           itemCount: 1,
           itemBuilder: (_, _) => Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xl),
-            child: AppEmptyState(title: column.emptyTitle, message: column.emptyMessage),
+            child: MerchantColumnEmpty(column: column),
           ),
         ),
         data: (board) {

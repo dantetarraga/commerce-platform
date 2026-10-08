@@ -63,7 +63,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> with Pa
         onRetry: () => ref.invalidate(courierActiveDeliveryProvider),
         loading: const DeliverySkeleton(),
         isEmpty: (order) => order == null || order.id != widget.orderId,
-        empty: const AppEmptyState(title: 'Este pedido ya no está en curso', message: 'Vuelve al inicio para ver otros.'),
+        empty: const AppEmptyState(scene: AppEmptyArt.ride, title: 'Este pedido ya no está en curso', message: 'Vuelve al inicio para ver otros.'),
         data: (order) => _content(order!),
       ),
     );

@@ -26,10 +26,16 @@ extension MerchantBoardColumnText on MerchantBoardColumn {
     MerchantBoardColumn.ready => 'Nada esperando repartidor',
   };
 
+  AppEmptyArt get emptyArt => switch (this) {
+    MerchantBoardColumn.fresh => AppEmptyArt.bell,
+    MerchantBoardColumn.cooking => AppEmptyArt.flame,
+    MerchantBoardColumn.ready => AppEmptyArt.takeout,
+  };
+
   String get emptyMessage => switch (this) {
-    MerchantBoardColumn.fresh => 'Te avisaremos con una alarma cuando llegue la siguiente.',
-    MerchantBoardColumn.cooking => 'Las comandas que aceptes aparecen aquí hasta que estén listas.',
-    MerchantBoardColumn.ready => 'Aquí sigues la recogida y la entrega de lo que ya salió.',
+    MerchantBoardColumn.fresh => 'Suena la alarma apenas llegue una.',
+    MerchantBoardColumn.cooking => 'Acepta una comanda nueva y aparece aquí.',
+    MerchantBoardColumn.ready => 'Lo que marques listo espera aquí la recogida.',
   };
 
   Color dot(BuildContext context) => switch (this) {
@@ -127,7 +133,7 @@ class RailBoard extends ConsumerWidget {
             title: column.title,
             count: orders.length,
             dot: column.dot(context),
-            empty: _RailEmpty(column.emptyTitle),
+            empty: MerchantColumnEmpty(column: column, compact: true),
             children: [for (final o in orders) MerchantOrderCard(key: ValueKey(o.id), order: o)],
           );
         },
@@ -167,18 +173,43 @@ class _RailRow extends StatelessWidget {
   );
 }
 
-class _RailEmpty extends StatelessWidget {
-  const _RailEmpty(this.text);
+/// Una columna sin comandas: su ícono, qué va ahí y un dato del momento
+/// (la tienda recibiendo, las nuevas que esperan, lo que salió hoy).
+class MerchantColumnEmpty extends ConsumerWidget {
+  const MerchantColumnEmpty({required this.column, this.compact = false, super.key});
 
-  final String text;
+  final MerchantBoardColumn column;
+
+  /// En el riel de la tablet: más chico y sin saltar de pestaña.
+  final bool compact;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-    child: Text(
-      text,
-      textAlign: TextAlign.center,
-      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-    ),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final extra = switch (column) {
+      MerchantBoardColumn.fresh => switch (ref.watch(merchantStoresProvider).value) {
+        final stores? when stores.isNotEmpty => stores.any((s) => s.isAcceptingOrders)
+            ? const AppEmptyChip(label: 'Recibiendo pedidos · alarma lista', live: true)
+            : const AppEmptyChip(label: 'Pedidos en pausa'),
+        _ => null,
+      },
+      MerchantBoardColumn.cooking => switch (ref.watch(merchantBoardProvider).value?[MerchantBoardColumn.fresh]?.length) {
+        final waiting? when waiting > 0 => AppEmptyChip(
+          label: '$waiting ${waiting == 1 ? 'nueva esperando' : 'nuevas esperando'}${compact ? '' : ' →'}',
+          onTap: compact ? null : () => DefaultTabController.maybeOf(context)?.animateTo(MerchantBoardColumn.fresh.index),
+        ),
+        _ => null,
+      },
+      MerchantBoardColumn.ready => switch (ref.watch(merchantSummaryProvider).value?.deliveredCount) {
+        final delivered? when delivered > 0 => AppEmptyChip(label: 'Hoy salieron $delivered'),
+        _ => null,
+      },
+    };
+    return AppEmptyState(
+      scene: column.emptyArt,
+      title: column.emptyTitle,
+      message: column.emptyMessage,
+      extra: extra,
+      compact: compact,
+    );
+  }
 }
