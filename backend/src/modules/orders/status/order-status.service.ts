@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppException, ErrorCode } from '../../../common/exceptions/app.exception';
 import { PrismaService } from '../../../database/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
@@ -6,6 +7,7 @@ import { CourierStatus, OrderStatus, PaymentMethodType, PaymentStatus, Role } fr
 import { estimateAfterAccept, estimateOnTheWay } from '../../delivery/delivery';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { orderNotice } from '../../notifications/order-notices';
+import { ORDER_CHANGED, OrderChangedEvent } from '../../realtime/realtime.events';
 import { orderInclude, OrderWithDetails } from '../order-presenter';
 import { canTransition } from './order-status.machine';
 
@@ -51,6 +53,7 @@ export class OrderStatusService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
+    private readonly events: EventEmitter2,
   ) {}
 
   async find(actor: OrderActor, orderId: string): Promise<OrderWithDetails> {
@@ -127,6 +130,7 @@ export class OrderStatusService {
       };
       await this.notifyCustomer(tx, order, to, { courier });
     });
+    this.changed(order, to);
     return this.find(actor, orderId);
   }
 
@@ -158,6 +162,7 @@ export class OrderStatusService {
       await this.move(tx, actor, order.id, OrderStatus.CONFIRMED, OrderStatus.PREPARING, note, { estimatedAt });
       await this.notifyCustomer(tx, order, OrderStatus.PREPARING, {});
     });
+    this.changed(order, OrderStatus.PREPARING);
     return this.find(actor, orderId);
   }
 
@@ -188,7 +193,7 @@ export class OrderStatusService {
   async accept(courierUserId: string, orderId: string): Promise<OrderWithDetails> {
     const courier = await this.courierFor(courierUserId);
 
-    await this.prisma.$transaction(async (tx) => {
+    const taken = await this.prisma.$transaction(async (tx) => {
       const busy = await tx.courier.updateMany({
         where: { id: courier.id, status: CourierStatus.AVAILABLE },
         data: { status: CourierStatus.BUSY },
@@ -228,7 +233,9 @@ export class OrderStatusService {
       await this.notifyCustomer(tx, order, OrderStatus.COURIER_ASSIGNED, {
         courier: { firstName: courier.user.firstName, vehicleLabel: courier.vehicleLabel },
       });
+      return order;
     });
+    this.changed({ ...taken, cityId: courier.cityId }, OrderStatus.COURIER_ASSIGNED);
     return this.find({ userId: courierUserId, role: Role.COURIER }, orderId);
   }
 
@@ -275,7 +282,18 @@ export class OrderStatusService {
         await this.notifyCustomer(tx, order, OrderStatus.CANCELLED, { cancelReason: reason });
       }
     });
+    this.changed(order, OrderStatus.CANCELLED);
     return this.find(actor, orderId);
+  }
+
+  /** Avisa por WebSocket (después del commit). */
+  private changed(order: { id: string; storeId: string; cityId: string }, status: OrderStatus) {
+    this.events.emit(ORDER_CHANGED, {
+      orderId: order.id,
+      storeId: order.storeId,
+      cityId: order.cityId,
+      status,
+    } satisfies OrderChangedEvent);
   }
 
   /** El repartidor terminó (entregó o se canceló su pedido): vuelve a estar disponible. */

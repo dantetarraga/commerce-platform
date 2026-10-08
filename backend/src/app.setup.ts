@@ -5,6 +5,7 @@ import type { Express } from 'express';
 import helmet from 'helmet';
 import { Logger } from 'nestjs-pino';
 import { createValidationPipe } from './common/validation';
+import { CorsIoAdapter } from './modules/realtime/socket-io.adapter';
 import type { Env } from './config/env';
 
 export const API_PREFIX = 'api/v1';
@@ -17,7 +18,9 @@ export function configureApp(app: INestApplication): void {
   // Detrás de un proxy (Railway), la IP real del cliente viene en X-Forwarded-For.
   const trustProxy = config.get('TRUST_PROXY', { infer: true });
   if (trustProxy > 0) (app.getHttpAdapter().getInstance() as Express).set('trust proxy', trustProxy);
-  app.enableCors({ origin: config.get('CORS_ORIGINS', { infer: true }) });
+  const origins = config.get('CORS_ORIGINS', { infer: true });
+  app.enableCors({ origin: origins });
+  app.useWebSocketAdapter(new CorsIoAdapter(app, origins));
   app.setGlobalPrefix(API_PREFIX);
   app.useGlobalPipes(createValidationPipe());
   app.enableShutdownHooks();

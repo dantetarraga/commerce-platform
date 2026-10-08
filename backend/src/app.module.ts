@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
@@ -25,6 +26,7 @@ import { MerchantModule } from './modules/merchant/merchant.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ProductsModule } from './modules/products/products.module';
 import { PromotionsModule } from './modules/promotions/promotions.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 import { SearchModule } from './modules/search/search.module';
 import { StoresModule } from './modules/stores/stores.module';
 import { UsersModule } from './modules/users/users.module';
@@ -71,8 +73,10 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
       }),
     }),
     ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     HealthModule,
+    RealtimeModule,
     AuthModule,
     UsersModule,
     AdminModule,

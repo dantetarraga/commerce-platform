@@ -1,21 +1,27 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { DEFAULT_TIMEZONE, zonedTime } from '../../common/time';
 import { money } from '../../common/utils/money';
 import { PrismaService } from '../../database/prisma.service';
 import { CourierStatus, OrderStatus } from '../../generated/prisma/enums';
 import { OrderStatusService } from '../orders/status/order-status.service';
+import { COURIER_MOVED, CourierMovedEvent } from '../realtime/realtime.events';
 import { sumCollected } from './courier-summary';
 
 /** Lo que el repartidor puede elegir; BUSY lo pone el sistema al tomar un pedido. */
 export type CourierToggle = typeof CourierStatus.AVAILABLE | typeof CourierStatus.OFFLINE;
 
-/** Perfil, disponibilidad y resumen del día del repartidor. */
+/** Entre dos posiciones guardadas; las que llegan antes se ignoran. */
+export const LOCATION_MIN_INTERVAL_MS = 2_000;
+
+/** Perfil, disponibilidad, ubicación y resumen del día del repartidor. */
 @Injectable()
 export class CouriersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly status: OrderStatusService,
+    private readonly events: EventEmitter2,
   ) {}
 
   /** `Courier` del contrato: perfil, vehículo, estado y pedido en curso. */
@@ -65,6 +71,36 @@ export class CouriersService {
       }
     }
     return this.me(userId);
+  }
+
+  /**
+   * Guarda la última posición (no el recorrido). Si su pedido va en camino, el
+   * cliente la recibe al instante por WebSocket.
+   */
+  async updateLocation(userId: string, lat: number, lng: number, now = new Date()) {
+    const courier = await this.status.courierFor(userId);
+    if (courier.status === CourierStatus.OFFLINE) {
+      throw new AppException(
+        ErrorCode.COURIER_NOT_AVAILABLE,
+        HttpStatus.CONFLICT,
+        'Conéctate para compartir tu ubicación.',
+      );
+    }
+    const { count } = await this.prisma.courier.updateMany({
+      where: {
+        id: courier.id,
+        OR: [{ lastLocationAt: null }, { lastLocationAt: { lte: new Date(now.getTime() - LOCATION_MIN_INTERVAL_MS) } }],
+      },
+      data: { currentLat: lat, currentLng: lng, lastLocationAt: now },
+    });
+    if (count === 0) return;
+    const order = await this.prisma.order.findFirst({
+      where: { courierId: courier.id, status: OrderStatus.ON_THE_WAY },
+      select: { id: true },
+    });
+    if (order) {
+      this.events.emit(COURIER_MOVED, { orderId: order.id, lat, lng, at: now } satisfies CourierMovedEvent);
+    }
   }
 
   /** Entregas de ese día (hora local) y lo cobrado, por método. */

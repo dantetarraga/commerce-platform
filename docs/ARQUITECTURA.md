@@ -943,11 +943,14 @@ model Device {                           // tokens FCM (Fase 3)
 ### Notifications (Fase 3) 🔒
 `GET /notifications?cursor=&limit=` · `PATCH /notifications/:id/read` · `POST /notifications/read-all` · `POST /devices` (registrar token push)
 
-### WebSocket (Fase 3)
-- Namespace `/ws`. El JWT va en `auth.token` del handshake y **se valida solo al conectar**.
-- El cliente emite `order.subscribe { orderId }` (se valida ownership).
-- El servidor envía `order.updated { orderId, status, updatedAt, courier? }` y `courier.location { orderId, lat, lng }`.
-- Si el token expira, el cliente refresca, reconecta y se vuelve a suscribir.
+### WebSocket (Socket.IO)
+- Namespace `/ws` (`modules/realtime`). El access token va en `auth.token` del handshake y **se valida solo al conectar**: sin token válido, el cliente recibe `connect_error` con mensaje `UNAUTHORIZED`, refresca y reconecta.
+- Los eventos solo avisan qué cambió; la app vuelve a pedir el detalle o la lista por REST, que sigue siendo la fuente de verdad. Se emiten con `@nestjs/event-emitter` después del commit.
+- **Cliente:** emite `order.subscribe { orderId }` (ack `{ ok }` o `{ ok: false, code: 'NOT_FOUND' }`; valen el cliente, el negocio y el repartidor del pedido) y recibe `order.updated { orderId, status }` y `courier.location { orderId, lat, lng, at }` (solo con el pedido `ON_THE_WAY`).
+- **Negocio:** al conectar entra a `store:{id}` de sus negocios y recibe `store.orders.changed { orderId, status }`, incluido el pedido nuevo (`RECEIVED`).
+- **Repartidor:** entra a `couriers:{cityId}` y recibe `courier.orders.changed` cuando un pedido queda listo, lo toman o se cancela.
+- **Ubicación:** el repartidor manda `POST /courier/me/location { lat, lng }` cada ~10 s (se guarda una cada 2 s como máximo, solo la última). El detalle del pedido trae `courier.location` mientras va en camino y si tiene menos de 2 minutos; también `store.location` y `address.location`.
+- Una sola instancia: con varias hace falta el adapter de Redis para Socket.IO.
 
 ### Formato de error
 ```json

@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { zonedTime } from '../../common/time';
@@ -8,6 +9,7 @@ import { Prisma } from '../../generated/prisma/client';
 import { OrderStatus, PaymentMethodType, Role } from '../../generated/prisma/enums';
 import { inCoverage, type CityContext } from '../cities/cities.service';
 import { CouponsService } from '../coupons/coupons.service';
+import { ORDER_CHANGED, OrderChangedEvent } from '../realtime/realtime.events';
 import { isStoreOpen, StoreForSummary, storeDelivery } from '../stores/store-presenter';
 import { StoresService } from '../stores/stores.service';
 import type { RateOrderDto } from './dto/order-queries.dto';
@@ -33,6 +35,7 @@ export class OrdersService {
     private readonly prisma: PrismaService,
     private readonly stores: StoresService,
     private readonly coupons: CouponsService,
+    private readonly events: EventEmitter2,
   ) {}
 
   /**
@@ -178,6 +181,13 @@ export class OrdersService {
         }
         return order.id;
       });
+      // Al negocio le llega el pedido nuevo al instante.
+      this.events.emit(ORDER_CHANGED, {
+        orderId,
+        storeId: store.id,
+        cityId: city.id,
+        status: OrderStatus.RECEIVED,
+      } satisfies OrderChangedEvent);
       return this.detail(userId, orderId);
     } catch (error) {
       // Dos requests con la misma key a la vez: gana una y la otra devuelve ese pedido.

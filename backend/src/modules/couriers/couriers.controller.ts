@@ -11,6 +11,7 @@ import { toStaffOrderResponse } from '../orders/order-presenter';
 import { OrdersService } from '../orders/orders.service';
 import { OrderStatusService, scopeFor } from '../orders/status/order-status.service';
 import { CouriersService } from './couriers.service';
+import { CourierLocationDto } from './dto/courier-location.dto';
 import { UpdateCourierStatusDto } from './dto/update-courier-status.dto';
 
 /**
@@ -38,6 +39,16 @@ export class CouriersController {
   @Patch('me/status')
   setStatus(@CurrentUser() user: AuthUser, @Body() dto: UpdateCourierStatusDto) {
     return this.couriers.setStatus(user.id, dto.status);
+  }
+
+  /**
+   * Última posición, cada ~10 s mientras lleva un pedido. Las que llegan con
+   * menos de 2 s de diferencia se ignoran. Desconectado responde 409.
+   */
+  @Post('me/location')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async location(@CurrentUser() user: AuthUser, @Body() dto: CourierLocationDto) {
+    await this.couriers.updateLocation(user.id, dto.lat, dto.lng);
   }
 
   /** Entregas y cobros del día (hora de Lima). */

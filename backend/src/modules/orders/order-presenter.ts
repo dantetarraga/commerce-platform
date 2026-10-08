@@ -1,6 +1,6 @@
 import { money } from '../../common/utils/money';
 import { Prisma } from '../../generated/prisma/client';
-import { PaymentMethodType } from '../../generated/prisma/enums';
+import { OrderStatus, PaymentMethodType } from '../../generated/prisma/enums';
 
 export const orderInclude = {
   items: { include: { options: true }, orderBy: { id: 'asc' } },
@@ -17,6 +17,28 @@ export const orderInclude = {
 
 export type OrderWithDetails = Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
 
+/** Una posición de más de 2 minutos ya no dice dónde está el repartidor. */
+export const COURIER_LOCATION_MAX_AGE_MS = 2 * 60_000;
+
+/**
+ * Dónde va el repartidor, solo mientras lleva el pedido (ON_THE_WAY) y si la
+ * posición es reciente. Antes de salir y después de entregar no se muestra.
+ */
+export function courierLocation(
+  status: OrderStatus,
+  courier: { currentLat: Prisma.Decimal | null; currentLng: Prisma.Decimal | null; lastLocationAt: Date | null } | null,
+  now: Date,
+) {
+  if (status !== OrderStatus.ON_THE_WAY || !courier?.lastLocationAt) return null;
+  if (courier.currentLat === null || courier.currentLng === null) return null;
+  if (now.getTime() - courier.lastLocationAt.getTime() > COURIER_LOCATION_MAX_AGE_MS) return null;
+  return {
+    lat: Number(courier.currentLat),
+    lng: Number(courier.currentLng),
+    at: courier.lastLocationAt.toISOString(),
+  };
+}
+
 /**
  * JSON de pedido que lee la app (`OrderJson.fromJson`). Se arma solo con los
  * snapshots guardados al crear el pedido, salvo logo y dueño del negocio.
@@ -32,6 +54,7 @@ export function toOrderResponse(order: OrderWithDetails) {
       name: order.storeName,
       logoUrl: order.store.logoUrl,
       ownerName: order.store.ownerDisplayName,
+      location: { lat: Number(order.store.latitude), lng: Number(order.store.longitude) },
     },
     lines: order.items.map((item) => ({
       productId: item.productId,
@@ -46,7 +69,12 @@ export function toOrderResponse(order: OrderWithDetails) {
     tip: m(order.tip),
     total: m(order.total),
     notes: order.notes ?? '',
-    address: { title: order.addressTitle, street: order.addressStreet, reference: order.addressRef ?? '' },
+    address: {
+      title: order.addressTitle,
+      street: order.addressStreet,
+      reference: order.addressRef ?? '',
+      location: { lat: Number(order.deliveryLat), lng: Number(order.deliveryLng) },
+    },
     payment: {
       type: order.paymentMethod,
       changeFor:
@@ -60,6 +88,7 @@ export function toOrderResponse(order: OrderWithDetails) {
       vehicle: courier.vehicleLabel,
       since: courier.activeSince,
       avatarUrl: courier.user.avatarUrl,
+      location: courierLocation(order.status, courier, new Date()),
     },
     estimatedArrival: order.estimatedAt?.toISOString() ?? null,
     scheduledFor: order.scheduledFor?.toISOString() ?? null,
