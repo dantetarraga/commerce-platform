@@ -329,9 +329,16 @@ export class OrderStatusService {
     note: string | undefined,
     data: Prisma.OrderUpdateManyMutationInput,
   ) {
+    // Horas para el resumen del negocio (tiempo de preparación).
+    const stamp =
+      to === OrderStatus.CONFIRMED
+        ? { acceptedAt: new Date() }
+        : to === OrderStatus.READY
+          ? { readyAt: new Date() }
+          : {};
     const { count } = await tx.order.updateMany({
       where: { id: orderId, status: from },
-      data: { ...data, status: to },
+      data: { ...data, ...stamp, status: to },
     });
     // Otra persona lo cambió entre la lectura y este update.
     if (count === 0) throw invalidTransition(from, to);

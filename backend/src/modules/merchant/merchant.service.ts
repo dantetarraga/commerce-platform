@@ -85,9 +85,38 @@ export class MerchantService {
     const { start, end } = zonedTime.dayRange(day, DEFAULT_TIMEZONE);
     const orders = await this.prisma.order.findMany({
       where: { createdAt: { gte: start, lt: end }, ...(ownerId && { store: { ownerId } }) },
-      select: { status: true, subtotal: true },
+      select: {
+        status: true,
+        subtotal: true,
+        createdAt: true,
+        acceptedAt: true,
+        readyAt: true,
+        paymentMethod: true,
+        payment: { select: { collectedMethod: true } },
+        items: { select: { productId: true, productName: true, quantity: true, subtotal: true } },
+      },
     });
-    const { sales, ...counts } = summarizeMerchantDay(orders);
-    return { date: day, ...counts, sales: money(sales) };
+    const s = summarizeMerchantDay(
+      orders.map(({ payment, ...order }) => ({ ...order, collectedMethod: payment?.collectedMethod ?? null })),
+      (at) => Math.floor(zonedTime.localTime(at, DEFAULT_TIMEZONE).minutes / 60),
+    );
+    return {
+      date: day,
+      deliveredCount: s.deliveredCount,
+      cancelledCount: s.cancelledCount,
+      activeCount: s.activeCount,
+      sales: money(s.sales),
+      averageTicket: s.averageTicket === null ? null : money(s.averageTicket),
+      averagePrepMinutes: s.averagePrepMinutes,
+      peakHour: s.peakHour,
+      salesByHour: s.salesByHour.map((h) => ({ hour: h.hour, sales: money(h.sales), orders: h.orders })),
+      payments: s.payments.map((p) => ({ method: p.method, sales: money(p.sales), orders: p.orders, share: p.share })),
+      topProducts: s.topProducts.map((p) => ({
+        productId: p.productId,
+        name: p.name,
+        quantity: p.quantity,
+        sales: money(p.sales),
+      })),
+    };
   }
 }

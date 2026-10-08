@@ -399,6 +399,8 @@ model Order {
   cancelReason   String?
   cancelledBy    Role?
   estimatedAt    DateTime?
+  acceptedAt     DateTime? // el negocio lo aceptó (CONFIRMED): inicio de la preparación
+  readyAt        DateTime? // listo para recoger (READY)
   deliveredAt    DateTime?
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
@@ -417,6 +419,7 @@ model Order {
   @@unique([customerId, idempotencyKey])
   @@index([customerId, createdAt])
   @@index([storeId, status])
+  @@index([storeId, createdAt]) // resumen y pedidos del día del negocio
   @@index([courierId, status])
 }
 
@@ -435,6 +438,9 @@ model OrderItem {
   order       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product     Product?          @relation(fields: [productId], references: [id], onDelete: SetNull)
   options     OrderItemOption[]
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model OrderItemOption {

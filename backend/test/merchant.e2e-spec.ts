@@ -29,7 +29,19 @@ const body = () => ({
   notes: '',
 });
 
-type Summary = { date: string; deliveredCount: number; cancelledCount: number; activeCount: number; sales: Money };
+type Summary = {
+  date: string;
+  deliveredCount: number;
+  cancelledCount: number;
+  activeCount: number;
+  sales: Money;
+  averageTicket: Money | null;
+  averagePrepMinutes: number | null;
+  peakHour: number | null;
+  salesByHour: { hour: number; sales: Money; orders: number }[];
+  payments: { method: string; sales: Money; orders: number; share: number }[];
+  topProducts: { productId: string | null; name: string; quantity: number; sales: Money }[];
+};
 type Money = { amount: number; currency: string };
 
 describe('Chaski Socios: negocio (e2e)', () => {
@@ -226,7 +238,16 @@ describe('Chaski Socios: negocio (e2e)', () => {
     const otherBefore = await otherSummary();
 
     const delivered = await place();
-    await prisma.order.update({ where: { id: delivered.id }, data: { status: 'DELIVERED', deliveredAt: new Date() } });
+    const now = Date.now();
+    await prisma.order.update({
+      where: { id: delivered.id },
+      data: {
+        status: 'DELIVERED',
+        acceptedAt: new Date(now - 12 * 60_000),
+        readyAt: new Date(now - 60_000),
+        deliveredAt: new Date(now),
+      },
+    });
     const cancelled = await place();
     await http()
       .post(`${API}/merchant/orders/${cancelled.id}/cancel`)
@@ -236,13 +257,35 @@ describe('Chaski Socios: negocio (e2e)', () => {
     await place(); // queda activo
 
     const after = await summary({ date: before.date });
-    expect(after).toEqual({
+    expect(after).toMatchObject({
       date: before.date,
       deliveredCount: before.deliveredCount + 1,
       cancelledCount: before.cancelledCount + 1,
       activeCount: before.activeCount + 1,
       sales: { amount: before.sales.amount + delivered.subtotal.amount, currency: 'PEN' },
     });
+    // Las gráficas salen del backend: horas, pagos y productos de los entregados.
+    expect(after.averagePrepMinutes).toEqual(expect.any(Number));
+    expect(after.averageTicket?.amount).toBe(Math.round(after.sales.amount / after.deliveredCount));
+    expect(after.salesByHour.reduce((sum, h) => sum + h.sales.amount, 0)).toBe(after.sales.amount);
+    expect(after.salesByHour.map((h) => h.hour)).toContain(after.peakHour);
+    expect(after.payments.map((p) => p.method)).toEqual(['CASH', 'YAPE', 'PLIN']);
+    expect(after.payments.reduce((sum, p) => sum + p.share, 0)).toBe(100);
+    expect(after.topProducts.map((p) => p.productId)).toEqual(
+      expect.arrayContaining(['pr_pollo_medio', 'pr_pollo_cuarto']),
+    );
+
+    // Aceptar y marcar listo guarda las horas que usa el tiempo de preparación.
+    const cooked = await place();
+    await accept(cooked.id, 15).expect(200);
+    await http()
+      .post(`${API}/merchant/orders/${cooked.id}/status`)
+      .set(merchant.auth)
+      .send({ status: 'READY' })
+      .expect(200);
+    const stamped = await prisma.order.findUniqueOrThrow({ where: { id: cooked.id } });
+    expect(stamped.acceptedAt).toEqual(expect.any(Date));
+    expect(stamped.readyAt!.getTime()).toBeGreaterThanOrEqual(stamped.acceptedAt!.getTime());
 
     // Otro día: nada. Fecha inválida: 400.
     expect(await summary({ date: '2020-01-01' })).toEqual({
@@ -251,6 +294,17 @@ describe('Chaski Socios: negocio (e2e)', () => {
       cancelledCount: 0,
       activeCount: 0,
       sales: { amount: 0, currency: 'PEN' },
+      averageTicket: null,
+      averagePrepMinutes: null,
+      peakHour: null,
+      salesByHour: [],
+      payments: ['CASH', 'YAPE', 'PLIN'].map((method) => ({
+        method,
+        sales: { amount: 0, currency: 'PEN' },
+        orders: 0,
+        share: 0,
+      })),
+      topProducts: [],
     });
     await http().get(`${API}/merchant/summary`).query({ date: '2026-13-40' }).set(merchant.auth).expect(400);
 
