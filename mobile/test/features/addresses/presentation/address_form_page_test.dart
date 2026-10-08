@@ -1,3 +1,5 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:chaski/core/maps/geocoding_service.dart';
 import 'package:chaski/features/addresses/addresses.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
@@ -10,7 +12,9 @@ import 'package:mocktail/mocktail.dart';
 
 class _MockAddressRepository extends Mock implements AddressRepository {}
 
-Future<_MockAddressRepository> _pumpForm(WidgetTester tester) async {
+class _MockGeocodingService extends Mock implements GeocodingService {}
+
+Future<_MockAddressRepository> _pumpForm(WidgetTester tester, {GeocodingService geocoding = const NoGeocodingService()}) async {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
@@ -19,7 +23,10 @@ Future<_MockAddressRepository> _pumpForm(WidgetTester tester) async {
   when(repository.load).thenAnswer((_) async => AddressBook.empty);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [addressRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        addressRepositoryProvider.overrideWithValue(repository),
+        geocodingServiceProvider.overrideWithValue(geocoding),
+      ],
       child: MaterialApp(theme: AppTheme.light(), home: const AddressFormPage()),
     ),
   );
@@ -30,7 +37,10 @@ Future<_MockAddressRepository> _pumpForm(WidgetTester tester) async {
 AppButton _saveButton(WidgetTester tester) => tester.widget<AppButton>(find.widgetWithText(AppButton, 'Guardar dirección'));
 
 void main() {
-  setUpAll(() => registerFallbackValue(AddressBook.empty));
+  setUpAll(() {
+    registerFallbackValue(AddressBook.empty);
+    registerFallbackValue(GeoCoordinates.trusted(0, 0));
+  });
 
   testWidgets('si guardar falla, el botón deja de cargar y avisa', (tester) async {
     final repository = await _pumpForm(tester);
@@ -48,6 +58,25 @@ void main() {
     expect(find.text('No pudimos guardar la dirección. Inténtalo otra vez.'), findsOneWidget);
     AppToast.dismiss();
     await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('mover el mapa llena la calle, pero no pisa lo que escribió el usuario', (tester) async {
+    final geocoding = _MockGeocodingService();
+    when(() => geocoding.streetAt(any())).thenAnswer((_) async => 'Jr. Bolognesi 305');
+    when(() => geocoding.find(any())).thenAnswer((_) async => null);
+    await _pumpForm(tester, geocoding: geocoding);
+    final street = find.byType(TextFormField).first;
+
+    await tester.drag(find.byType(NeighborhoodPlan), const Offset(40, 0));
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: street, matching: find.text('Jr. Bolognesi 305')), findsOneWidget);
+
+    await tester.enterText(street, 'Av. Garcilaso 120');
+    await tester.pump(const Duration(seconds: 1));
+    verify(() => geocoding.find('Av. Garcilaso 120')).called(1);
+    await tester.drag(find.byType(NeighborhoodPlan), const Offset(40, 0));
+    await tester.pumpAndSettle();
+    expect(find.descendant(of: street, matching: find.text('Av. Garcilaso 120')), findsOneWidget);
   });
 
   testWidgets('pide una referencia para el repartidor', (tester) async {

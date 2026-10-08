@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chaski/core/config/city.dart';
 import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/maps/delivery_location.dart';
+import 'package:chaski/core/maps/geocoding_service.dart';
 import 'package:chaski/core/maps/location_service.dart';
 import 'package:chaski/features/addresses/domain/address.dart';
 import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
@@ -41,6 +42,12 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
   GeoCoordinates? _focus;
   var _locating = false;
 
+  /// La última calle que puso el mapa. Mientras el campo la tenga (o esté
+  /// vacío) el mapa puede cambiarla; si el usuario escribe, ya no.
+  String? _autoStreet;
+  var _streetLookup = 0;
+  Timer? _findDebounce;
+
   @override
   void initState() {
     super.initState();
@@ -76,8 +83,36 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
     }
   }
 
+  void _onCenter(GeoCoordinates door) {
+    setState(() => _door = door);
+    unawaited(_fillStreet(door));
+  }
+
+  bool get _streetIsAuto => _street.text.trim().isEmpty || _street.text == _autoStreet;
+
+  Future<void> _fillStreet(GeoCoordinates door) async {
+    if (!_streetIsAuto) return;
+    final lookup = ++_streetLookup;
+    final street = await ref.read(geocodingServiceProvider).streetAt(door);
+    if (!mounted || lookup != _streetLookup || street == null || !_streetIsAuto) return;
+    _autoStreet = street;
+    _street.text = street;
+  }
+
+  /// Al dejar de escribir, lleva el mapa a la calle si la encuentra en la zona.
+  void _onStreetTyped(String value) {
+    if (value.trim().length >= StreetLine.minLength) setState(() => _seed = value);
+    _findDebounce?.cancel();
+    if (value == _autoStreet || value.trim().length < StreetLine.minLength) return;
+    _findDebounce = Timer(const Duration(milliseconds: 900), () async {
+      final point = await ref.read(geocodingServiceProvider).find(value);
+      if (mounted && point != null && _street.text == value) setState(() => _focus = point);
+    });
+  }
+
   @override
   void dispose() {
+    _findDebounce?.cancel();
     _street.dispose();
     _reference.dispose();
     _label.dispose();
@@ -130,7 +165,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                 seed: _seed,
                 height: mapHeight,
                 hint: isInCoverage(_door) ? 'Mueve el mapa hasta tu puerta' : 'Fuera de la zona de reparto',
-                onCenter: (door) => setState(() => _door = door),
+                onCenter: _onCenter,
               ),
               SafeArea(
                 bottom: false,
@@ -176,9 +211,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                             controller: _street,
                             hint: 'Jr. Tacna 214',
                             textCapitalization: TextCapitalization.words,
-                            onChanged: (value) {
-                                if (value.trim().length >= StreetLine.minLength) setState(() => _seed = value);
-                            },
+                            onChanged: _onStreetTyped,
                             validator: (v) => StreetLine.create(v ?? '').failureOrNull?.message,
                           ),
                           const SizedBox(height: AppSpacing.md),
