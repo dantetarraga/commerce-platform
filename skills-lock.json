@@ -12,6 +12,12 @@
       "sourceType": "github",
       "skillPath": "skills/nestjs-expert/SKILL.md",
       "computedHash": "f6b338bd99505c93eca3877169a121dd909556058db36fd8b6510c5bde2c4acc"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "3219a1944e404ffc14d1d9d6aef6dd2e3855b81387ee0a044ccbfe14d34c2357"
     }
   }
 }
