@@ -65,7 +65,15 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
     add('st_tanta_wasi', [('pr_pan_chuta', 1), ('pr_pan_anis', 1)], const Duration(days: 5, hours: 1), 3);
   }
 
-  static const _demoAddress = {'title': 'Casa', 'street': 'Jr. Túpac Amaru 214', 'reference': 'Puerta verde'};
+  static const Map<String, Object?> _demoAddress = {
+    'title': 'Casa',
+    'street': 'Jr. Túpac Amaru 214',
+    'reference': 'Puerta verde',
+    'location': {'lat': -14.7954, 'lng': -71.4097},
+  };
+
+  /// Cuántas veces se mueve la moto de la demo mientras va en camino.
+  static const _courierMoves = 12;
 
   Map<String, dynamic> _line(Map<String, dynamic> p, int qty, int unit, String description) => {
     'productId': p['id'],
@@ -101,6 +109,7 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
         'name': store['name'],
         'logoUrl': store['logoUrl'],
         'ownerName': store['ownerName'],
+        'location': {'lat': store['latitude'], 'lng': store['longitude']},
       },
       'lines': lines,
       'subtotal': _backend.money(subtotal),
@@ -176,7 +185,12 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
       lines,
       DateTime.now(),
       couponCents: coupon,
-      address: {'title': address['title'], 'street': address['street'], 'reference': address['reference']},
+      address: {
+        'title': address['title'],
+        'street': address['street'],
+        'reference': address['reference'],
+        'location': {'lat': address['latitude'], 'lng': address['longitude']},
+      },
       payment: body['payment']! as Map<String, Object?>,
       scheduledFor: scheduledFor,
       tipCents: ((body['tip'] as Map?)?['amount'] as int?) ?? 0,
@@ -230,8 +244,37 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
     if (status == 'COURIER_ASSIGNED') order['courier'] = _couriers[_nextCode % _couriers.length];
     if (status == 'ON_THE_WAY') {
       order['estimatedArrival'] = now.add(_backend.orderStep * 3).toUtc().toIso8601String();
+      _driveCourier(id);
+    }
+    if (status == 'DELIVERED' && order['courier'] is Map<String, Object?>) {
+      order['courier'] = {...order['courier'] as Map<String, Object?>, 'location': null};
     }
     if (!_changes.isClosed) _changes.add(Map.of(order));
+  }
+
+  /// La moto avanza en línea recta del negocio a la puerta durante el reparto,
+  /// como si llegaran avisos `courier.location`.
+  void _driveCourier(String id) {
+    final duration = _backend.orderStep * (_stepsPerStatus['ON_THE_WAY'] ?? 1);
+    final from = (_orders[id]?['store'] as Map?)?['location'] as Map?;
+    final to = (_orders[id]?['address'] as Map?)?['location'] as Map?;
+    if (from == null || to == null || from['lat'] == null || to['lat'] == null) return;
+    for (var i = 0; i <= _courierMoves; i++) {
+      _timers.add(
+        Timer(duration * (i / (_courierMoves + 1)), () {
+          final order = _orders[id];
+          final courier = order?['courier'];
+          if (order == null || order['status'] != 'ON_THE_WAY' || courier is! Map<String, Object?>) return;
+          final t = i / _courierMoves;
+          double lerp(String key) => (from[key] as num) + ((to[key] as num) - (from[key] as num)) * t;
+          order['courier'] = {
+            ...courier,
+            'location': {'lat': lerp('lat'), 'lng': lerp('lng'), 'at': DateTime.now().toUtc().toIso8601String()},
+          };
+          if (!_changes.isClosed) _changes.add(Map.of(order));
+        }),
+      );
+    }
   }
 
   @override

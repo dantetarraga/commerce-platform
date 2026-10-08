@@ -169,6 +169,9 @@ class _TrackingMap extends ConsumerWidget {
     storeLabel: order.store.name,
     destinationLabel: order.addressTitle,
     showCourier: order.courier != null && order.reached(OrderStatus.courierAssigned),
+    store: order.store.location,
+    destination: order.destination,
+    courier: order.status == OrderStatus.onTheWay ? order.courier?.position?.coordinates : null,
   );
 }
 

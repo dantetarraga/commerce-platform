@@ -1,3 +1,4 @@
+import 'package:chaski/core/domain/geo_coordinates.dart';
 import 'package:chaski/core/domain/money.dart';
 import 'package:chaski/features/orders/domain/order.dart';
 import 'package:chaski/features/orders/infrastructure/models/order_json.dart';
@@ -82,6 +83,17 @@ void main() {
     expect(parsed.total, const Money(1700));
     expect(parsed.courier, isNull);
     expect(parsed.tip, const Money.zero()); // pedidos viejos sin propina
+  });
+
+  test('OrderJson lee dónde están el negocio, la puerta y el repartidor', () {
+    expect(OrderJson.locationFromJson({'lat': -14.79, 'lng': -71.41}), GeoCoordinates.trusted(-14.79, -71.41));
+    expect(OrderJson.locationFromJson(null), isNull);
+    expect(OrderJson.locationFromJson({'lat': 200, 'lng': 0}), isNull);
+    final position = OrderJson.positionFromJson({'lat': -14.79, 'lng': -71.41, 'at': '2026-10-08T15:00:00Z'})!;
+    expect(position.coordinates, GeoCoordinates.trusted(-14.79, -71.41));
+    expect(position.at, DateTime.utc(2026, 10, 8, 15).toLocal());
+    // Sin hora no es una posición en vivo.
+    expect(OrderJson.positionFromJson({'lat': -14.79, 'lng': -71.41}), isNull);
   });
 
   test('la propina viaja en el pedido y en la respuesta', () {

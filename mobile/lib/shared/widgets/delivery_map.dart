@@ -1,5 +1,7 @@
 import 'package:chaski/core/maps/delivery_map_data.dart';
+import 'package:chaski/core/maps/location_service.dart';
 import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:chaski/shared/widgets/google_delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,8 +10,10 @@ abstract interface class DeliveryMapAdapter {
   Widget build(BuildContext context, DeliveryMapData data);
 }
 
-/// Sustituir mediante ProviderScope al integrar un proveedor de mapas real.
-final deliveryMapAdapterProvider = Provider<DeliveryMapAdapter>((ref) => const IllustratedDeliveryMapAdapter());
+/// Google Maps donde está configurado (Android); si no, el recorrido ilustrado.
+final deliveryMapAdapterProvider = Provider<DeliveryMapAdapter>(
+  (ref) => googleMapsSupported ? const GoogleDeliveryMapAdapter() : const IllustratedDeliveryMapAdapter(),
+);
 
 class DeliveryMap extends ConsumerWidget {
   const DeliveryMap({required this.data, super.key});
