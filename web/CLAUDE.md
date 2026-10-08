@@ -26,7 +26,7 @@ React 19 + Vite + TypeScript. Alcance y decisiones en [`docs/PANEL_WEB.md`](../d
 - Un componente hace una sola cosa. Si un formulario tiene pasos, cada paso es su propio componente (ver `features/auth/components`).
 - La lógica que se repite va en un custom hook: en `src/hooks/` si es genérica (`use-countdown`, `use-disclosure`) o en `features/<x>/hooks/` si es del dominio (`use-sign-out`).
 - Las props de eventos se llaman `onX` y los handlers `handleX` (regla de Standard).
-- Los componentes base van en `components/ui`, al estilo shadcn: `Button`, `Input`, `Label` y `Field`. Para agregar uno nuevo: `npx shadcn@latest add <componente>` y adaptarlo a los tokens.
+- Los componentes base van en `components/ui`, al estilo shadcn: `Button`, `Input`, `Label` y `Field`. Para agregar uno nuevo: `pnpm dlx shadcn@latest add <componente>` y adaptarlo a los tokens.
 
 ## Tailwind (v4)
 
@@ -44,4 +44,4 @@ ESLint con **Standard** (`neostandard`, que agrega TypeScript, react-hooks y rea
 
 ## Comandos
 
-`npm run dev` · `npm run build` · `npm run typecheck` · `npm run lint` (`lint:fix`) · `npm run format` · `npm test` · `npm run test:e2e` · `npm run api:generate` (con el backend levantado).
+Con **pnpm** (`packageManager` en `package.json`): `pnpm run dev` · `pnpm run build` · `pnpm run typecheck` · `pnpm run lint` (`lint:fix`) · `pnpm run format` · `pnpm test` · `pnpm run test:e2e` · `pnpm run api:generate` (con el backend levantado).

@@ -1,0 +1,46 @@
+# pnpm solo ejecuta scripts de instalación de los paquetes listados aquí.
+allowBuilds:
+  esbuild: true
+
+# pnpm 11 no instala versiones con menos de 24 h publicadas (protección ante
+# paquetes comprometidos). Estas versiones exactas venían en el lockfile de npm
+# al migrar a pnpm (2026-10-08) y cumplen las 24 h el 2026-10-09 a las 01:02
+# UTC: desde entonces esta lista sobra y se puede borrar.
+minimumReleaseAgeExclude:
+  - '@babel/helpers@7.29.10'
+  - '@babel/runtime@7.29.10'
+  - '@babel/traverse@7.29.10'
+  - '@internationalized/number@3.6.9'
+  - '@playwright/test@1.64.0'
+  - '@rolldown/binding-android-arm-eabi@1.2.13'
+  - '@rolldown/binding-android-arm64@1.2.13'
+  - '@rolldown/binding-darwin-arm64@1.2.13'
+  - '@rolldown/binding-darwin-x64@1.2.13'
+  - '@rolldown/binding-freebsd-x64@1.2.13'
+  - '@rolldown/binding-linux-arm-gnueabihf@1.2.13'
+  - '@rolldown/binding-linux-arm64-gnu@1.2.13'
+  - '@rolldown/binding-linux-arm64-musl@1.2.13'
+  - '@rolldown/binding-linux-ppc64-gnu@1.2.13'
+  - '@rolldown/binding-linux-s390x-gnu@1.2.13'
+  - '@rolldown/binding-linux-x64-gnu@1.2.13'
+  - '@rolldown/binding-linux-x64-musl@1.2.13'
+  - '@rolldown/binding-openharmony-arm64@1.2.13'
+  - '@rolldown/binding-win32-arm64-msvc@1.2.13'
+  - '@rolldown/binding-win32-x64-msvc@1.2.13'
+  - '@scalar/helpers@0.16.2'
+  - '@scalar/json-magic@0.15.6'
+  - '@scalar/json-schema-validator@0.1.11'
+  - '@scalar/openapi-parser@0.29.12'
+  - '@scalar/openapi-upgrader@0.4.3'
+  - '@scalar/openapi-validator@0.1.11'
+  - '@scalar/types@0.23.1'
+  - 'caniuse-lite@1.0.30001815'
+  - 'electron-to-chromium@1.5.451'
+  - 'lucide-react@1.53.0'
+  - 'playwright-core@1.64.0'
+  - 'playwright@1.64.0'
+  - 'rolldown@1.2.13'
+  - 'solid-js@1.9.17'
+  - 'tldts-core@7.4.18'
+  - 'tldts@7.4.18'
+  - 'update-browserslist-db@1.3.4'

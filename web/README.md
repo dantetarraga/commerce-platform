@@ -12,20 +12,20 @@ Requiere Node 22.12 o superior.
 
 ```bash
 cd web
-npm install
+pnpm install
 cp .env.example .env.local
-npm run dev          # http://localhost:5173 (redirige /api y /ws al backend en :3000)
+pnpm run dev          # http://localhost:5173 (redirige /api y /ws al backend en :3000)
 ```
 
-| Script              | Qué hace                                              |
-| ------------------- | ----------------------------------------------------- |
-| `npm run dev`       | Servidor de desarrollo                                |
-| `npm run build`     | Typecheck + build estático en `dist/`                 |
-| `npm run typecheck` | Solo TypeScript                                       |
-| `npm run lint`      | ESLint (Standard); `lint:fix` corrige lo automático   |
-| `npm run format`    | Prettier (ordena las clases de Tailwind)              |
-| `npm test`          | Vitest                                                |
-| `npm run test:e2e`  | Playwright (antes: `npx playwright install chromium`) |
+| Script               | Qué hace                                                    |
+| -------------------- | ----------------------------------------------------------- |
+| `pnpm run dev`       | Servidor de desarrollo                                      |
+| `pnpm run build`     | Typecheck + build estático en `dist/`                       |
+| `pnpm run typecheck` | Solo TypeScript                                             |
+| `pnpm run lint`      | ESLint (Standard); `lint:fix` corrige lo automático         |
+| `pnpm run format`    | Prettier (ordena las clases de Tailwind)                    |
+| `pnpm test`          | Vitest                                                      |
+| `pnpm run test:e2e`  | Playwright (antes: `pnpm exec playwright install chromium`) |
 
 ## Estructura
 
@@ -41,6 +41,6 @@ Ver `CLAUDE.md` (reglas) y `docs/PANEL_WEB.md` §9.
 
 ## Pendiente
 
-- `npm run api:generate` con el backend levantado (crea `src/api/generated/`) y pasar `features/auth/api` al cliente generado.
+- `pnpm run api:generate` con el backend levantado (crea `src/api/generated/`) y pasar `features/auth/api` al cliente generado.
 - Backend: refresh token en cookie httpOnly (hoy queda en `localStorage`, ver `docs/PANEL_WEB.md` §9).
 - W1: Socios, Catálogo y Marketing sobre los endpoints `admin/*`.
