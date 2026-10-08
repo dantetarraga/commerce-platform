@@ -3,6 +3,8 @@ import type { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { PrismaService } from '../../database/prisma.service';
 import type { Notification, Prisma } from '../../generated/prisma/client';
 import { NotificationType } from '../../generated/prisma/enums';
+import { DEFAULT_TIMEZONE, zonedTime } from '../../common/time';
+import { buildNoticeFeed, NoticeFilter } from './notice-feed';
 import { NoticeData, NoticeKind, OrderNotice } from './order-notices';
 
 /** Aviso como lo lee la app (`Notice`). */
@@ -38,6 +40,30 @@ export class NotificationsService {
       nextCursor: rows.length > query.limit ? page[page.length - 1].id : null,
       unreadCount,
     };
+  }
+
+  /** Avisos que trae el centro de avisos (los más recientes). */
+  static readonly FEED_LIMIT = 50;
+
+  /**
+   * El centro de avisos armado para una pestaña: el hilo del pedido en curso,
+   * el resto por día (hora de Lima) y cuántos hay sin leer.
+   */
+  async feed(userId: string, filter: NoticeFilter, now = new Date()) {
+    const [rows, unreadCount] = await Promise.all([
+      this.prisma.notification.findMany({
+        where: { userId },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: NotificationsService.FEED_LIMIT,
+      }),
+      this.prisma.notification.count({ where: { userId, readAt: null } }),
+    ]);
+    const today = zonedTime.localDate(now, DEFAULT_TIMEZONE);
+    const yesterday = zonedTime.localDate(new Date(now.getTime() - 24 * 60 * 60_000), DEFAULT_TIMEZONE);
+    const feed = buildNoticeFeed(rows.map(toNoticeResponse), filter, today, yesterday, (at) =>
+      zonedTime.localDate(new Date(at), DEFAULT_TIMEZONE),
+    );
+    return { ...feed, unreadCount, total: rows.length };
   }
 
   async markAllRead(userId: string): Promise<void> {

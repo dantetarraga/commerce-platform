@@ -47,6 +47,8 @@ void main() {
     );
     await tester.pump(const Duration(seconds: 1));
     await tester.tap(find.text('Ofertas'));
+    // La pestaña nueva es otra consulta al backend.
+    await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('EN CURSO'), findsNothing);

@@ -30,7 +30,7 @@ class NotificationsPage extends ConsumerWidget {
   }
 
   Future<void> _markAllRead(BuildContext context, WidgetRef ref) async {
-    final failure = await ref.read(notificationsProvider.notifier).markAllRead();
+    final failure = await ref.read(noticeActionsProvider.notifier).markAllRead();
     if (failure != null && context.mounted) {
       AppToast.show(context, 'No pudimos marcarlos como leídos. Inténtalo otra vez.', kind: AppToastKind.error);
     }
@@ -38,9 +38,9 @@ class NotificationsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final feed = ref.watch(noticeFeedProvider);
-    final unread = ref.watch(unreadNoticesCountProvider);
-    final hasNotices = ref.watch(notificationsProvider.select((s) => s.value?.isNotEmpty ?? false));
+    final provider = noticeFeedProvider(ref.watch(noticeFilterSelectionProvider));
+    final feed = ref.watch(provider);
+    final unread = feed.value?.unreadCount ?? 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,12 +54,15 @@ class NotificationsPage extends ConsumerWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref.refresh(notificationsProvider.future),
+        onRefresh: () async {
+          ref.invalidate(noticeFeedProvider);
+          await ref.read(provider.future);
+        },
         child: AsyncValueView(
           value: feed,
-          onRetry: () => ref.invalidate(notificationsProvider),
+          onRetry: () => ref.invalidate(provider),
           loading: const Skeleton(child: _NoticesSkeleton()),
-          isEmpty: (_) => !hasNotices,
+          isEmpty: (feed) => feed.total == 0,
           empty: const AppEmptyState(
             scene: AppEmptyArt.bell,
             title: 'Todo tranquilo por aquí',
@@ -115,9 +118,9 @@ class _NoticeList extends ConsumerWidget {
     final filter = ref.watch(noticeFilterSelectionProvider);
     final items = <_Item>[
       if (feed.thread.isNotEmpty) ...[const _Header('EN CURSO'), _Thread(feed.thread)],
-      for (final MapEntry(key: day, value: notices) in feed.groups.entries) ...[
-        _Header(day.label),
-        for (final n in notices) _Row(n),
+      for (final group in feed.groups) ...[
+        _Header(group.day.label),
+        for (final n in group.items) _Row(n),
       ],
       if (feed.thread.isEmpty && feed.groups.isEmpty) const _Empty(),
     ];

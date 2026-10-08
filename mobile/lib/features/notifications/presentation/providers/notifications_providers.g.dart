@@ -57,49 +57,145 @@ final class NotificationsRepositoryProvider
 String _$notificationsRepositoryHash() =>
     r'525cb9cfb5bee84397ee2d62439c5d95e74afd62';
 
-/// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".
+/// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+/// pestaña: volver a una ya vista es instantáneo.
 
-@ProviderFor(Notifications)
-final notificationsProvider = NotificationsProvider._();
+@ProviderFor(noticeFeed)
+final noticeFeedProvider = NoticeFeedFamily._();
 
-/// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".
-final class NotificationsProvider
-    extends $AsyncNotifierProvider<Notifications, List<Notice>> {
-  /// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".
-  NotificationsProvider._()
+/// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+/// pestaña: volver a una ya vista es instantáneo.
+
+final class NoticeFeedProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<NoticeFeed>,
+          NoticeFeed,
+          FutureOr<NoticeFeed>
+        >
+    with $FutureModifier<NoticeFeed>, $FutureProvider<NoticeFeed> {
+  /// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+  /// pestaña: volver a una ya vista es instantáneo.
+  NoticeFeedProvider._({
+    required NoticeFeedFamily super.from,
+    required NoticeFilter super.argument,
+  }) : super(
+         retry: null,
+         name: r'noticeFeedProvider',
+         isAutoDispose: false,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$noticeFeedHash();
+
+  @override
+  String toString() {
+    return r'noticeFeedProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<NoticeFeed> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<NoticeFeed> create(Ref ref) {
+    final argument = this.argument as NoticeFilter;
+    return noticeFeed(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is NoticeFeedProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$noticeFeedHash() => r'cf644315798b4ea5927a9fda8de7cf64705946ff';
+
+/// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+/// pestaña: volver a una ya vista es instantáneo.
+
+final class NoticeFeedFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<NoticeFeed>, NoticeFilter> {
+  NoticeFeedFamily._()
+    : super(
+        retry: null,
+        name: r'noticeFeedProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: false,
+      );
+
+  /// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+  /// pestaña: volver a una ya vista es instantáneo.
+
+  NoticeFeedProvider call(NoticeFilter filter) =>
+      NoticeFeedProvider._(argument: filter, from: this);
+
+  @override
+  String toString() => r'noticeFeedProvider';
+}
+
+/// "Marcar leídos". Al terminar vuelve a pedir el centro de avisos.
+
+@ProviderFor(NoticeActions)
+final noticeActionsProvider = NoticeActionsProvider._();
+
+/// "Marcar leídos". Al terminar vuelve a pedir el centro de avisos.
+final class NoticeActionsProvider
+    extends $NotifierProvider<NoticeActions, void> {
+  /// "Marcar leídos". Al terminar vuelve a pedir el centro de avisos.
+  NoticeActionsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'notificationsProvider',
+        name: r'noticeActionsProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$notificationsHash();
+  String debugGetCreateSourceHash() => _$noticeActionsHash();
 
   @$internal
   @override
-  Notifications create() => Notifications();
+  NoticeActions create() => NoticeActions();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
 }
 
-String _$notificationsHash() => r'c5bedfe3beac95795c125183d37e524e0211f77f';
+String _$noticeActionsHash() => r'97cc6fee9a3824c8b5c03e148e2a5c204e6da564';
 
-/// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".
+/// "Marcar leídos". Al terminar vuelve a pedir el centro de avisos.
 
-abstract class _$Notifications extends $AsyncNotifier<List<Notice>> {
-  FutureOr<List<Notice>> build();
+abstract class _$NoticeActions extends $Notifier<void> {
+  void build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<Notice>>, List<Notice>>;
+    final ref = this.ref as $Ref<void, void>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<Notice>>, List<Notice>>,
-              AsyncValue<List<Notice>>,
+              AnyNotifier<void, void>,
+              void,
               Object?,
               Object?
             >;
@@ -107,17 +203,17 @@ abstract class _$Notifications extends $AsyncNotifier<List<Notice>> {
   }
 }
 
-/// Avisos sin leer (el punto de la campana en Cerca).
+/// Avisos sin leer (el punto de la campana en Cerca), según el backend.
 
 @ProviderFor(unreadNoticesCount)
 final unreadNoticesCountProvider = UnreadNoticesCountProvider._();
 
-/// Avisos sin leer (el punto de la campana en Cerca).
+/// Avisos sin leer (el punto de la campana en Cerca), según el backend.
 
 final class UnreadNoticesCountProvider
     extends $FunctionalProvider<int, int, int>
     with $Provider<int> {
-  /// Avisos sin leer (el punto de la campana en Cerca).
+  /// Avisos sin leer (el punto de la campana en Cerca), según el backend.
   UnreadNoticesCountProvider._()
     : super(
         from: null,
@@ -152,7 +248,7 @@ final class UnreadNoticesCountProvider
 }
 
 String _$unreadNoticesCountHash() =>
-    r'ec9fbdffe9c0ce660b8a61d12667b86d95e73bda';
+    r'113677449cac417db3e04dc0c187d77597ae2eaa';
 
 @ProviderFor(NoticeFilterSelection)
 final noticeFilterSelectionProvider = NoticeFilterSelectionProvider._();
@@ -206,50 +302,3 @@ abstract class _$NoticeFilterSelection extends $Notifier<NoticeFilter> {
     return element.handleCreate(ref, build);
   }
 }
-
-@ProviderFor(noticeFeed)
-final noticeFeedProvider = NoticeFeedProvider._();
-
-final class NoticeFeedProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<NoticeFeed>,
-          AsyncValue<NoticeFeed>,
-          AsyncValue<NoticeFeed>
-        >
-    with $Provider<AsyncValue<NoticeFeed>> {
-  NoticeFeedProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'noticeFeedProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$noticeFeedHash();
-
-  @$internal
-  @override
-  $ProviderElement<AsyncValue<NoticeFeed>> $createElement(
-    $ProviderPointer pointer,
-  ) => $ProviderElement(pointer);
-
-  @override
-  AsyncValue<NoticeFeed> create(Ref ref) {
-    return noticeFeed(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AsyncValue<NoticeFeed> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<AsyncValue<NoticeFeed>>(value),
-    );
-  }
-}
-
-String _$noticeFeedHash() => r'dee2a461dc1eba1806bcd83a70ce755505dc2fe8';

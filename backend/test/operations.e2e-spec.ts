@@ -168,6 +168,21 @@ describe('Operación del pedido (e2e)', () => {
       at: expect.any(String),
     });
     expect(notices.body.unreadCount).toBe(5);
+
+    // El centro de avisos lo arma el backend: el pedido terminó, así que no hay
+    // hilo y todo cae en "Hoy"; en Ofertas no hay nada.
+    type Feed = { thread: unknown[]; groups: { day: string; items: { kind: string }[] }[]; unreadCount: number };
+    const feed = (await http().get(`${API}/notifications/feed`).set(customer.auth).expect(200)).body as Feed;
+    expect(feed.thread).toEqual([]);
+    expect(feed.groups.map((g) => g.day)).toEqual(['TODAY']);
+    expect(feed.groups[0].items).toHaveLength(5);
+    expect(feed.unreadCount).toBe(5);
+    const offers = (
+      await http().get(`${API}/notifications/feed`).query({ filter: 'offers' }).set(customer.auth).expect(200)
+    ).body as Feed;
+    expect(offers.groups).toEqual([]);
+    await http().get(`${API}/notifications/feed`).query({ filter: 'todo' }).set(customer.auth).expect(400);
+
     await http().post(`${API}/notifications/read-all`).set(customer.auth).expect(204);
     const read = await http().get(`${API}/notifications`).set(customer.auth).expect(200);
     expect(read.body.unreadCount).toBe(0);

@@ -15,51 +15,32 @@ NotificationsRepository notificationsRepository(Ref ref) => ref.watch(appEnvProv
     ? FakeNotificationsRepository(ref.watch(fakeBackendProvider))
     : ApiNotificationsRepository(ref.watch(apiClientProvider));
 
-/// Avisos del usuario (más reciente primero) y la acción "Marcar leídos".
+/// El centro de avisos de una pestaña, armado por el backend. Se guarda por
+/// pestaña: volver a una ya vista es instantáneo.
 @Riverpod(keepAlive: true)
-class Notifications extends _$Notifications {
+Future<NoticeFeed> noticeFeed(Ref ref, NoticeFilter filter) =>
+    ref.watch(notificationsRepositoryProvider).feed(filter).then((r) => r.getOrThrow());
+
+/// "Marcar leídos". Al terminar vuelve a pedir el centro de avisos.
+@Riverpod(keepAlive: true)
+class NoticeActions extends _$NoticeActions {
   @override
-  Future<List<Notice>> build() async {
-    final notices = (await ref.watch(notificationsRepositoryProvider).list()).getOrThrow();
-    return [...notices]..sort((a, b) => b.at.compareTo(a.at));
-  }
+  void build() {}
 
-  /// Optimista: la lista cambia al instante; si falla, vuelve a la anterior y
-  /// devuelve el error para avisarlo.
   Future<Failure?> markAllRead() async {
-    final previous = state.value;
-    if (previous == null || previous.every((n) => n.read)) return null;
-    state = AsyncData([for (final n in previous) n.markRead()]);
     final result = await ref.read(notificationsRepositoryProvider).markAllRead();
-    switch (result) {
-      case Ok():
-        return null;
-      case Err(:final failure):
-        if (ref.mounted) state = AsyncData(previous);
-        return failure;
-    }
+    if (!ref.mounted) return null;
+    ref.invalidate(noticeFeedProvider);
+    return switch (result) {
+      Ok() => null,
+      Err(:final failure) => failure,
+    };
   }
 }
 
-/// Avisos sin leer (el punto de la campana en Cerca).
+/// Avisos sin leer (el punto de la campana en Cerca), según el backend.
 @riverpod
-int unreadNoticesCount(Ref ref) => ref.watch(notificationsProvider).value?.where((n) => !n.read).length ?? 0;
-
-enum NoticeFilter {
-  all('Todos'),
-  orders('Pedidos'),
-  offers('Ofertas');
-
-  const NoticeFilter(this.label);
-
-  final String label;
-
-  bool accepts(Notice n) => switch (this) {
-    all => true,
-    orders => n.kind.isOrder,
-    offers => !n.kind.isOrder,
-  };
-}
+int unreadNoticesCount(Ref ref) => ref.watch(noticeFeedProvider(NoticeFilter.all)).value?.unreadCount ?? 0;
 
 @riverpod
 class NoticeFilterSelection extends _$NoticeFilterSelection {
@@ -67,19 +48,4 @@ class NoticeFilterSelection extends _$NoticeFilterSelection {
   NoticeFilter build() => NoticeFilter.all;
 
   void select(NoticeFilter filter) => state = filter;
-}
-
-/// Lo que muestra el centro de avisos con el filtro elegido: el hilo del pedido
-/// en curso (si hay) y el resto agrupado por día.
-typedef NoticeFeed = ({List<Notice> thread, Map<NoticeDay, List<Notice>> groups});
-
-@riverpod
-AsyncValue<NoticeFeed> noticeFeed(Ref ref) {
-  final filter = ref.watch(noticeFilterSelectionProvider);
-  return ref.watch(notificationsProvider).whenData((list) {
-    final thread = filter == NoticeFilter.offers ? const <Notice>[] : activeOrderThread(list);
-    final inThread = {for (final n in thread) n.id};
-    final rest = list.where((n) => !inThread.contains(n.id) && filter.accepts(n)).toList();
-    return (thread: thread, groups: groupNotices(rest, DateTime.now()));
-  });
 }

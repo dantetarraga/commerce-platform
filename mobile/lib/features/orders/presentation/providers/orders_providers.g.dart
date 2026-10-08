@@ -352,7 +352,7 @@ final class ActiveOrderIdProvider
   ActiveOrderId create() => ActiveOrderId();
 }
 
-String _$activeOrderIdHash() => r'82c597b9b8d7abc38b0ff1ecf42056c44156a862';
+String _$activeOrderIdHash() => r'bd34972b08eb3cdb34a5b24811440a7c0e2d945e';
 
 /// Id del pedido en curso (el que muestra la barra de compra). Al abrir la app se
 /// recupera del historial; al confirmar un pedido se fija aquí.

@@ -4,8 +4,11 @@ import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// "7:03 pm" si es de hoy; "Ayer, 7:03 pm" o la fecha si no.
-String noticeTime(DateTime at, {DateTime? now}) =>
-    NoticeDay.of(at, now ?? DateTime.now()) == NoticeDay.today ? Formatters.clock(at) : Formatters.relativeDay(at, now: now);
+String noticeTime(DateTime at, {DateTime? now}) {
+  final today = now ?? DateTime.now();
+  final sameDay = at.year == today.year && at.month == today.month && at.day == today.day;
+  return sameDay ? Formatters.clock(at) : Formatters.relativeDay(at, now: now);
+}
 
 /// Un aviso: ícono (terracota para pedidos, hierba para ofertas), título con
 /// la hora y cuerpo. Sin leer, la fila va tintada y con el punto de la marca.

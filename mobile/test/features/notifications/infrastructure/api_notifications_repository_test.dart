@@ -15,46 +15,44 @@ void main() {
     repository = ApiNotificationsRepository(api);
   });
 
-  test('lee los avisos con el formato del backend', () async {
-    when(
-      () => api.get('/notifications', query: any(named: 'query')),
-    ).thenAnswer(
+  test('lee el feed tal como lo arma el backend', () async {
+    Map<String, Object?> notice(String id, String kind, {bool read = false, String? orderId}) => {
+      'id': id,
+      'kind': kind,
+      'title': 'Luis va por tu pedido',
+      'body': 'Moto roja',
+      'at': '2026-09-25T15:00:00.000Z',
+      'read': read,
+      'orderId': orderId,
+      'storeId': null,
+    };
+    when(() => api.get('/notifications/feed', query: any(named: 'query'))).thenAnswer(
       (_) async => <String, dynamic>{
-        'items': [
+        'thread': [notice('t1', 'ORDER_CONFIRMED', orderId: 'ord_1'), notice('t2', 'COURIER_ASSIGNED', orderId: 'ord_1')],
+        'groups': [
           {
-            'id': 'nt_1',
-            'kind': 'COURIER_ASSIGNED',
-            'title': 'Luis va por tu pedido',
-            'body': 'Moto roja · lo recoge en Doña Rosa',
-            'at': '2026-09-25T15:00:00.000Z',
-            'read': false,
-            'orderId': 'ord_1',
-            'storeId': null,
+            'day': 'TODAY',
+            'items': [notice('n1', 'PROMOTION')],
           },
           {
-            'id': 'nt_2',
-            'kind': 'ALGO_NUEVO',
-            'title': 'x',
-            'body': 'y',
-            'at': '2026-09-25T14:00:00.000Z',
-            'read': true,
-            'orderId': null,
-            'storeId': null,
+            'day': 'EARLIER',
+            'items': [notice('n2', 'ALGO_NUEVO', read: true)],
           },
         ],
-        'nextCursor': null,
-        'unreadCount': 1,
+        'unreadCount': 3,
+        'total': 4,
       },
     );
 
-    final notices = (await repository.list()).getOrThrow();
+    final feed = (await repository.feed(NoticeFilter.orders)).getOrThrow();
 
-    expect(notices.first.kind, NoticeKind.courierAssigned);
-    expect(notices.first.orderId, 'ord_1');
-    expect(notices.first.read, isFalse);
-    expect(notices.first.at.isUtc, isFalse);
+    verify(() => api.get('/notifications/feed', query: {'filter': 'orders'})).called(1);
+    expect(feed.thread.map((n) => n.kind), [NoticeKind.orderConfirmed, NoticeKind.courierAssigned]);
+    expect(feed.thread.first.at.isUtc, isFalse);
+    expect(feed.groups.map((g) => g.day), [NoticeDay.today, NoticeDay.earlier]);
     // Un tipo que la app no conoce no rompe la lista.
-    expect(notices.last.kind, NoticeKind.orderConfirmed);
+    expect(feed.groups.last.items.single.kind, NoticeKind.orderConfirmed);
+    expect((feed.unreadCount, feed.total), (3, 4));
   });
 
   test('marcar leídos llama a read-all', () async {

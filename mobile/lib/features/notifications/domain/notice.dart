@@ -54,20 +54,11 @@ final class Notice extends Equatable {
   List<Object?> get props => [id, kind, title, body, at, read, orderId, storeId];
 }
 
-/// Grupo de la lista: HOY, AYER o ANTES.
+/// Grupo de la lista: HOY, AYER o ANTES (lo decide el backend, en hora local).
 enum NoticeDay {
   today,
   yesterday,
   earlier;
-
-  static NoticeDay of(DateTime at, DateTime now) {
-    final days = DateTime(now.year, now.month, now.day).difference(DateTime(at.year, at.month, at.day)).inDays;
-    return switch (days) {
-      <= 0 => today,
-      1 => yesterday,
-      _ => earlier,
-    };
-  }
 
   String get label => switch (this) {
     today => 'HOY',
@@ -76,38 +67,48 @@ enum NoticeDay {
   };
 }
 
-/// Agrupa los avisos (más reciente primero) por día, sin grupos vacíos.
-Map<NoticeDay, List<Notice>> groupNotices(List<Notice> notices, DateTime now) {
-  final sorted = [...notices]..sort((a, b) => b.at.compareTo(a.at));
-  final groups = <NoticeDay, List<Notice>>{};
-  for (final n in sorted) {
-    (groups[NoticeDay.of(n.at, now)] ??= []).add(n);
-  }
-  return {for (final day in NoticeDay.values) day: ?groups[day]};
+/// Pestañas del centro de avisos.
+enum NoticeFilter {
+  all('Todos'),
+  orders('Pedidos'),
+  offers('Ofertas');
+
+  const NoticeFilter(this.label);
+
+  final String label;
+
+  /// Nombre en la API (`?filter=`).
+  String get apiName => name;
 }
 
-/// Avisos del pedido en camino (antiguo → reciente) para mostrarlos como un hilo;
-/// vacío si hay menos de dos. Los sin [Notice.orderId] (de prueba) cuentan como uno.
-List<Notice> activeOrderThread(List<Notice> notices) {
-  final byOrder = <String?, List<Notice>>{};
-  for (final n in notices.where((n) => n.kind.isOrder)) {
-    (byOrder[n.orderId] ??= []).add(n);
-  }
-  List<Notice>? latest;
-  for (final group in byOrder.values) {
-    group.sort((a, b) => a.at.compareTo(b.at));
-    if (group.last.kind.closesOrder) continue;
-    if (latest == null || group.last.at.isAfter(latest.last.at)) latest = group;
-  }
-  if (latest == null || latest.length < 2) return const [];
-  // Solo el tramo desde el último cierre (un pedido anterior sin orderId).
-  final start = latest.lastIndexWhere((n) => n.kind.closesOrder) + 1;
-  final thread = latest.sublist(start);
-  return thread.length < 2 ? const [] : thread;
+final class NoticeGroup extends Equatable {
+  const NoticeGroup({required this.day, required this.items});
+
+  final NoticeDay day;
+  final List<Notice> items;
+
+  @override
+  List<Object?> get props => [day, items];
+}
+
+/// El centro de avisos armado por el backend para una pestaña: el hilo del
+/// pedido en curso, el resto por día y cuántos hay sin leer.
+final class NoticeFeed extends Equatable {
+  const NoticeFeed({required this.thread, required this.groups, required this.unreadCount, required this.total});
+
+  final List<Notice> thread;
+  final List<NoticeGroup> groups;
+  final int unreadCount;
+
+  /// Avisos del usuario en total (sin filtro): 0 es "Todo tranquilo".
+  final int total;
+
+  @override
+  List<Object?> get props => [thread, groups, unreadCount, total];
 }
 
 abstract interface class NotificationsRepository {
-  Future<Result<List<Notice>>> list();
+  Future<Result<NoticeFeed>> feed(NoticeFilter filter);
 
   Future<Result<void>> markAllRead();
 }

@@ -2,6 +2,7 @@ import { Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/comm
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../common/decorators/auth.decorators';
+import { NoticeFeedQueryDto } from './notice-feed-query.dto';
 import { NotificationsService } from './notifications.service';
 import { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 
@@ -15,6 +16,12 @@ export class NotificationsController {
   @Get()
   list(@CurrentUser() user: AuthUser, @Query() query: CursorQueryDto) {
     return this.notifications.list(user.id, query);
+  }
+
+  /** `?filter=all|orders|offers`: `{ thread, groups: [{ day, items }], unreadCount, total }`. */
+  @Get('feed')
+  feed(@CurrentUser() user: AuthUser, @Query() query: NoticeFeedQueryDto) {
+    return this.notifications.feed(user.id, query.filter);
   }
 
   @Post('read-all')

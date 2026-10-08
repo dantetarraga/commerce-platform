@@ -91,11 +91,54 @@ class FakeNotificationsRepository implements NotificationsRepository {
     ];
   }
 
+  /// Como `GET /notifications/feed`: hilo del pedido en curso, resto por día.
   @override
-  Future<Result<List<Notice>>> list() => guard(() async {
+  Future<Result<NoticeFeed>> feed(NoticeFilter filter) => guard(() async {
     await _backend.delay();
-    return List.unmodifiable(_notices ??= _seed());
+    final all = _notices ??= _seed();
+    final thread = filter == NoticeFilter.offers ? const <Notice>[] : _activeOrderThread(all);
+    final inThread = {for (final n in thread) n.id};
+    bool accepts(Notice n) => switch (filter) {
+      NoticeFilter.all => true,
+      NoticeFilter.orders => n.kind.isOrder,
+      NoticeFilter.offers => !n.kind.isOrder,
+    };
+    final rest = all.where((n) => !inThread.contains(n.id) && accepts(n)).toList()..sort((a, b) => b.at.compareTo(a.at));
+    final now = _clock();
+    NoticeDay dayOf(DateTime at) =>
+        switch (DateTime(now.year, now.month, now.day).difference(DateTime(at.year, at.month, at.day)).inDays) {
+          <= 0 => NoticeDay.today,
+          1 => NoticeDay.yesterday,
+          _ => NoticeDay.earlier,
+        };
+    final groups = <NoticeGroup>[];
+    for (final n in rest) {
+      final day = dayOf(n.at);
+      if (groups.lastOrNull?.day == day) {
+        groups.last.items.add(n);
+      } else {
+        groups.add(NoticeGroup(day: day, items: [n]));
+      }
+    }
+    return NoticeFeed(thread: thread, groups: groups, unreadCount: all.where((n) => !n.read).length, total: all.length);
   });
+
+  /// Avisos del pedido en curso (antiguo → reciente); vacío si hay menos de dos.
+  static List<Notice> _activeOrderThread(List<Notice> notices) {
+    final byOrder = <String?, List<Notice>>{};
+    for (final n in notices.where((n) => n.kind.isOrder)) {
+      (byOrder[n.orderId] ??= []).add(n);
+    }
+    List<Notice>? latest;
+    for (final group in byOrder.values) {
+      group.sort((a, b) => a.at.compareTo(b.at));
+      if (group.last.kind.closesOrder) continue;
+      if (latest == null || group.last.at.isAfter(latest.last.at)) latest = group;
+    }
+    if (latest == null || latest.length < 2) return const [];
+    final thread = latest.sublist(latest.lastIndexWhere((n) => n.kind.closesOrder) + 1);
+    return thread.length < 2 ? const [] : thread;
+  }
 
   @override
   Future<Result<void>> markAllRead() => guard(() async {

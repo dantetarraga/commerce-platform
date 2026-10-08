@@ -11,51 +11,48 @@ import 'package:mocktail/mocktail.dart';
 class _MockNotificationsRepository extends Mock implements NotificationsRepository {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   ProviderContainer container() {
     final c = ProviderContainer(overrides: [fakeBackendProvider.overrideWithValue(FakeBackend(latency: Duration.zero))]);
     addTearDown(c.dispose);
     return c;
   }
 
-  test('cuenta los no leídos y "Marcar leídos" los deja en cero', () async {
+  test('los no leídos vienen del backend y "Marcar leídos" los deja en cero', () async {
     final c = container()..listen(unreadNoticesCountProvider, (_, _) {});
-    final notices = await c.read(notificationsProvider.future);
-    expect(notices, isNotEmpty);
+    await c.read(noticeFeedProvider(NoticeFilter.all).future);
     expect(c.read(unreadNoticesCountProvider), greaterThan(0));
 
-    expect(await c.read(notificationsProvider.notifier).markAllRead(), isNull);
-    expect(c.read(unreadNoticesCountProvider), 0);
-
-    // El repositorio también quedó al día (sobrevive a recargar).
-    c.invalidate(notificationsProvider);
-    await c.read(notificationsProvider.future);
+    expect(await c.read(noticeActionsProvider.notifier).markAllRead(), isNull);
+    await c.read(noticeFeedProvider(NoticeFilter.all).future);
     expect(c.read(unreadNoticesCountProvider), 0);
   });
 
-  test('si "Marcar leídos" falla, vuelve a la lista anterior y devuelve el error', () async {
+  test('si "Marcar leídos" falla, devuelve el error y el conteo sigue igual', () async {
     final repository = _MockNotificationsRepository();
-    when(repository.list).thenAnswer(
-      (_) async => Ok([Notice(id: 'n1', kind: NoticeKind.promotion, title: 'Promo', body: '2x1', at: DateTime(2026, 9, 22))]),
+    final promo = Notice(id: 'n1', kind: NoticeKind.promotion, title: 'Promo', body: '2x1', at: DateTime(2026, 9, 22));
+    when(() => repository.feed(NoticeFilter.all)).thenAnswer(
+      (_) async => Ok(NoticeFeed(thread: const [], groups: [NoticeGroup(day: NoticeDay.earlier, items: [promo])], unreadCount: 1, total: 1)),
     );
     when(repository.markAllRead).thenAnswer((_) async => const Err(NetworkFailure()));
     final c = ProviderContainer(overrides: [notificationsRepositoryProvider.overrideWithValue(repository)]);
     addTearDown(c.dispose);
     c.listen(unreadNoticesCountProvider, (_, _) {});
-    await c.read(notificationsProvider.future);
+    await c.read(noticeFeedProvider(NoticeFilter.all).future);
 
-    final failure = await c.read(notificationsProvider.notifier).markAllRead();
+    final failure = await c.read(noticeActionsProvider.notifier).markAllRead();
     expect(failure, isA<NetworkFailure>());
+    await c.read(noticeFeedProvider(NoticeFilter.all).future);
     expect(c.read(unreadNoticesCountProvider), 1);
   });
 
-  test('el filtro Ofertas deja fuera el hilo del pedido', () async {
-    final c = container()..listen(noticeFeedProvider, (_, _) {});
-    await c.read(notificationsProvider.future);
-    expect(c.read(noticeFeedProvider).value!.thread, isNotEmpty);
-
-    c.read(noticeFilterSelectionProvider.notifier).select(NoticeFilter.offers);
-    final feed = c.read(noticeFeedProvider).value!;
-    expect(feed.thread, isEmpty);
-    expect(feed.groups.values.expand((g) => g).every((n) => !n.kind.isOrder), isTrue);
+  test('cada pestaña pide su propio feed', () async {
+    final c = container();
+    final all = await c.read(noticeFeedProvider(NoticeFilter.all).future);
+    final offers = await c.read(noticeFeedProvider(NoticeFilter.offers).future);
+    expect(all.thread, isNotEmpty);
+    expect(offers.thread, isEmpty);
+    expect(offers.groups.expand((g) => g.items).every((n) => !n.kind.isOrder), isTrue);
   });
 }

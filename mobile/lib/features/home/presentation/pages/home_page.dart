@@ -24,7 +24,7 @@ class HomePage extends ConsumerWidget {
       ..invalidate(storesProvider)
       ..invalidate(localProductsProvider)
       ..invalidate(ordersHistoryProvider)
-      ..invalidate(notificationsProvider);
+      ..invalidate(noticeFeedProvider);
     await ref.read(storesProvider(sort: StoreSort.popular).future);
   }
 

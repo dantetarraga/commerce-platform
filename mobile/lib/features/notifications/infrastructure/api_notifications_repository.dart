@@ -3,24 +3,16 @@ import 'package:chaski/core/network/api_client.dart';
 import 'package:chaski/core/result/result.dart';
 import 'package:chaski/features/notifications/domain/notice.dart';
 
-/// `GET /notifications` y `POST /notifications/read-all`.
+/// `GET /notifications/feed` y `POST /notifications/read-all`.
 class ApiNotificationsRepository implements NotificationsRepository {
   const ApiNotificationsRepository(this._api);
-
-  /// El centro de avisos muestra los más recientes; no pagina todavía.
-  static const _limit = 50;
 
   final ApiClient _api;
 
   @override
-  Future<Result<List<Notice>>> list() => guard(() async {
-    final data =
-        await _api.get('/notifications', query: {'limit': _limit})
-            as Map<String, dynamic>;
-    return [
-      for (final json in (data['items'] as List).cast<Map<String, dynamic>>())
-        NoticeJson.fromJson(json),
-    ];
+  Future<Result<NoticeFeed>> feed(NoticeFilter filter) => guard(() async {
+    final data = await _api.get('/notifications/feed', query: {'filter': filter.apiName}) as Map<String, dynamic>;
+    return NoticeJson.feed(data);
   });
 
   @override
@@ -39,6 +31,26 @@ abstract final class NoticeJson {
     'ORDER_CANCELLED': NoticeKind.orderCancelled,
     'PROMOTION': NoticeKind.promotion,
   };
+
+  static const Map<String, NoticeDay> _days = {
+    'TODAY': NoticeDay.today,
+    'YESTERDAY': NoticeDay.yesterday,
+    'EARLIER': NoticeDay.earlier,
+  };
+
+  static List<Notice> _list(Object? json) => [
+    for (final n in (json as List? ?? const []).cast<Map<String, dynamic>>()) fromJson(n),
+  ];
+
+  static NoticeFeed feed(Map<String, dynamic> json) => NoticeFeed(
+    thread: _list(json['thread']),
+    groups: [
+      for (final g in (json['groups'] as List).cast<Map<String, dynamic>>())
+        NoticeGroup(day: _days[g['day']] ?? NoticeDay.earlier, items: _list(g['items'])),
+    ],
+    unreadCount: json['unreadCount'] as int,
+    total: json['total'] as int,
+  );
 
   static Notice fromJson(Map<String, dynamic> json) => Notice(
     id: json['id'] as String,
