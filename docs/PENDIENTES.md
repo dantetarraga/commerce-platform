@@ -8,7 +8,7 @@ Estado al 2026-10-08. Complementa [ARQUITECTURA.md](ARQUITECTURA.md) (v0.5) y [O
 2. Crear el proyecto en **Railway**; la guía está en `backend/README.md`.
 3. Revisar con un abogado los **términos y la privacidad** (hoy son borradores dentro de las apps).
 
-En código, lo que sigue es el **push (FCM)** con plazo de aceptación y alarma con la app cerrada. Después, el panel admin web.
+En código, lo que sigue es el **push (FCM)** con plazo de aceptación y alarma con la app cerrada. Después, el panel web (Admin y Portal Socios): alcance y tecnología en [PANEL_WEB.md](PANEL_WEB.md).
 
 ## Estado actual
 
