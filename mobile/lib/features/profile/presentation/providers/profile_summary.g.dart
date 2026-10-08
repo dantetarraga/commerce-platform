@@ -48,4 +48,4 @@ final class ProfileSummaryProvider
   }
 }
 
-String _$profileSummaryHash() => r'22f50e0c330f79a4686f46626cb6ed016babee43';
+String _$profileSummaryHash() => r'6513d301500cb8115acd6a26e7779147f780305d';

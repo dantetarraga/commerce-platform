@@ -11,17 +11,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_providers.g.dart';
 
-/// Pedidos entregados por id de negocio ("Lo pediste 4 veces").
-@riverpod
-Map<String, int> deliveredCountByStore(Ref ref) {
-  final history = ref.watch(ordersHistoryProvider).value ?? const <Order>[];
-  final count = <String, int>{};
-  for (final order in history.where((o) => o.status == OrderStatus.delivered)) {
-    count[order.store.id] = (count[order.store.id] ?? 0) + 1;
-  }
-  return count;
-}
-
 sealed class RepeatOutcome {
   const RepeatOutcome();
 }

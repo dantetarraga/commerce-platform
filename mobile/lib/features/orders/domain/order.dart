@@ -323,6 +323,56 @@ final class PlaceOrderItem extends Equatable {
   List<Object?> get props => [productId, variantId, optionValueIds, quantity, notes];
 }
 
+/// Mis pedidos ya separados por el backend (`?scope=active|past`).
+final class OrderLists extends Equatable {
+  const OrderLists({required this.active, required this.past});
+
+  static const empty = OrderLists(active: [], past: []);
+
+  final List<Order> active;
+  final List<Order> past;
+
+  bool get isEmpty => active.isEmpty && past.isEmpty;
+
+  @override
+  List<Object?> get props => [active, past];
+}
+
+/// Un negocio de "Volver a pedir": su último pedido entregado y cuántos hubo.
+final class RepeatEntry extends Equatable {
+  const RepeatEntry({required this.order, required this.deliveredCount});
+
+  final Order order;
+  final int deliveredCount;
+
+  @override
+  List<Object?> get props => [order, deliveredCount];
+}
+
+/// Lo que el backend resume de los pedidos del cliente (`GET /orders/summary`).
+final class OrdersSummary extends Equatable {
+  const OrdersSummary({
+    required this.orderCount,
+    required this.activeCount,
+    required this.saved,
+    required this.repeat,
+    this.latestOrderId,
+  });
+
+  static const empty = OrdersSummary(orderCount: 0, activeCount: 0, saved: Money.zero(), repeat: []);
+
+  final int orderCount;
+  final int activeCount;
+
+  /// Lo ahorrado con cupones.
+  final Money saved;
+  final String? latestOrderId;
+  final List<RepeatEntry> repeat;
+
+  @override
+  List<Object?> get props => [orderCount, activeCount, saved, latestOrderId, repeat];
+}
+
 abstract interface class OrdersRepository {
   /// [idempotencyKey]: repetir la llamada con la misma clave (doble tap,
   /// reintento tras un corte) devuelve el mismo pedido en vez de crear otro.
@@ -333,7 +383,10 @@ abstract interface class OrdersRepository {
 
   Future<Result<Order>> getOrder(String orderId);
 
-  Future<Result<List<Order>>> history();
+  /// En curso y anteriores, cada lista pedida por separado al backend.
+  Future<Result<OrderLists>> history();
+
+  Future<Result<OrdersSummary>> summary();
 
   Future<Result<Order>> rate(String orderId, {required int rating, String comment = ''});
 

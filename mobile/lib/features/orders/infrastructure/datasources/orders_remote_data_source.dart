@@ -9,7 +9,11 @@ abstract interface class OrdersRemoteDataSource {
 
   Future<Map<String, dynamic>> get(String orderId);
 
-  Future<List<Map<String, dynamic>>> list();
+  /// `scope`: `active` (en curso) o `past` (entregados y cancelados).
+  Future<List<Map<String, dynamic>>> list({String? scope});
+
+  /// `GET /orders/summary`.
+  Future<Map<String, dynamic>> summary();
 
   Future<Map<String, dynamic>> rate(String orderId, {required int rating, required String comment});
 
@@ -50,10 +54,13 @@ class ApiOrdersRemoteDataSource implements OrdersRemoteDataSource {
   Future<Map<String, dynamic>> get(String orderId) async => (await _api.get('/orders/$orderId')) as Map<String, dynamic>;
 
   @override
-  Future<List<Map<String, dynamic>>> list() async {
-    final data = await _api.get('/orders', query: {'limit': 30});
+  Future<List<Map<String, dynamic>>> list({String? scope}) async {
+    final data = await _api.get('/orders', query: {'limit': 30, 'scope': ?scope});
     return ((data as Map<String, dynamic>)['items'] as List).cast<Map<String, dynamic>>();
   }
+
+  @override
+  Future<Map<String, dynamic>> summary() async => (await _api.get('/orders/summary')) as Map<String, dynamic>;
 
   @override
   Future<Map<String, dynamic>> rate(String orderId, {required int rating, required String comment}) async =>

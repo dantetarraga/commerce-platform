@@ -158,7 +158,7 @@ void main() {
       // Historial fresco del repositorio: el fake responde con demoras, así que
       // se avanza el reloj de prueba hasta que llegue.
       List<Order>? history;
-      container.read(ordersRepositoryProvider).history().then((r) => history = r.getOrThrow()).ignore();
+      container.read(ordersRepositoryProvider).history().then((r) => history = r.getOrThrow().past).ignore();
       for (var i = 0; i < 40 && history == null; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }

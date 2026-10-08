@@ -163,11 +163,11 @@ final ordersHistoryProvider = OrdersHistoryProvider._();
 final class OrdersHistoryProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<Order>>,
-          List<Order>,
-          FutureOr<List<Order>>
+          AsyncValue<OrderLists>,
+          OrderLists,
+          FutureOr<OrderLists>
         >
-    with $FutureModifier<List<Order>>, $FutureProvider<List<Order>> {
+    with $FutureModifier<OrderLists>, $FutureProvider<OrderLists> {
   /// Historial (más reciente primero).
   OrdersHistoryProvider._()
     : super(
@@ -185,17 +185,63 @@ final class OrdersHistoryProvider
 
   @$internal
   @override
-  $FutureProviderElement<List<Order>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
+  $FutureProviderElement<OrderLists> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
-  FutureOr<List<Order>> create(Ref ref) {
+  FutureOr<OrderLists> create(Ref ref) {
     return ordersHistory(ref);
   }
 }
 
-String _$ordersHistoryHash() => r'c578af09a3c9eef2fcbeea1585d6cf7aebfdfc9e';
+String _$ordersHistoryHash() => r'72ccad16dc405386a4b873bf124ae3cc5ab25d36';
+
+/// Conteos, lo ahorrado y "Volver a pedir". Se vuelve a pedir cada vez que se
+/// refresca el historial (al pedir, calificar, cancelar o tirar para recargar).
+
+@ProviderFor(ordersSummary)
+final ordersSummaryProvider = OrdersSummaryProvider._();
+
+/// Conteos, lo ahorrado y "Volver a pedir". Se vuelve a pedir cada vez que se
+/// refresca el historial (al pedir, calificar, cancelar o tirar para recargar).
+
+final class OrdersSummaryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<OrdersSummary>,
+          OrdersSummary,
+          FutureOr<OrdersSummary>
+        >
+    with $FutureModifier<OrdersSummary>, $FutureProvider<OrdersSummary> {
+  /// Conteos, lo ahorrado y "Volver a pedir". Se vuelve a pedir cada vez que se
+  /// refresca el historial (al pedir, calificar, cancelar o tirar para recargar).
+  OrdersSummaryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'ordersSummaryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$ordersSummaryHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<OrdersSummary> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<OrdersSummary> create(Ref ref) {
+    return ordersSummary(ref);
+  }
+}
+
+String _$ordersSummaryHash() => r'8d9e2f702b75fb1db13b1112c7e0feb7730012b1';
 
 /// Estado vivo de un pedido.
 
@@ -366,48 +412,3 @@ final class ActiveOrderProvider
 }
 
 String _$activeOrderHash() => r'ca153e9c21483509cf0526e0c603170bd9315351';
-
-/// Negocios de pedidos anteriores, sin repetir (para "Volver a pedir").
-
-@ProviderFor(recentOrdersByStore)
-final recentOrdersByStoreProvider = RecentOrdersByStoreProvider._();
-
-/// Negocios de pedidos anteriores, sin repetir (para "Volver a pedir").
-
-final class RecentOrdersByStoreProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<List<Order>>,
-          List<Order>,
-          FutureOr<List<Order>>
-        >
-    with $FutureModifier<List<Order>>, $FutureProvider<List<Order>> {
-  /// Negocios de pedidos anteriores, sin repetir (para "Volver a pedir").
-  RecentOrdersByStoreProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'recentOrdersByStoreProvider',
-        isAutoDispose: true,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$recentOrdersByStoreHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<List<Order>> $createElement(
-    $ProviderPointer pointer,
-  ) => $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<List<Order>> create(Ref ref) {
-    return recentOrdersByStore(ref);
-  }
-}
-
-String _$recentOrdersByStoreHash() =>
-    r'165d324c87eb4e0bc5c4f60f7e3866cff4e7d8bd';

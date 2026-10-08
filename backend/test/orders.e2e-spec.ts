@@ -301,6 +301,44 @@ describe('Cupones y pedidos (e2e)', () => {
     });
   });
 
+  describe('GET /orders?scope y /orders/summary', () => {
+    it('separa en curso y terminados, y resume sin que la app cuente', async () => {
+      type Item = { id: string; status: string };
+      const list = async (scope?: string) =>
+        (
+          await http()
+            .get(`${API}/orders`)
+            .query(scope ? { scope } : {})
+            .set(rosa.auth)
+            .expect(200)
+        ).body.items as Item[];
+      const all = await list();
+      const active = await list('active');
+      const past = await list('past');
+      expect(active.every((o) => !['DELIVERED', 'CANCELLED'].includes(o.status))).toBe(true);
+      expect(past.every((o) => ['DELIVERED', 'CANCELLED'].includes(o.status))).toBe(true);
+      expect(active.length + past.length).toBe(all.length);
+
+      // Uno entregado aparece en "Volver a pedir" con las veces que se pidió.
+      await prisma.order.update({ where: { id: all[0].id }, data: { status: 'DELIVERED' } });
+      const summary = (await http().get(`${API}/orders/summary`).set(rosa.auth).expect(200)).body as {
+        orderCount: number;
+        activeCount: number;
+        saved: { amount: number; currency: string };
+        latestOrderId: string;
+        repeat: { order: { id: string; store: { id: string } }; deliveredCount: number }[];
+      };
+      expect(summary.orderCount).toBe(all.length);
+      expect(summary.activeCount).toBe(active.length - 1);
+      expect(summary.latestOrderId).toBe(all[0].id);
+      expect(summary.saved.currency).toBe('PEN');
+      expect(summary.repeat[0]).toMatchObject({ order: { id: all[0].id }, deliveredCount: expect.any(Number) });
+
+      await http().get(`${API}/orders`).query({ scope: 'ayer' }).set(rosa.auth).expect(400);
+      await http().get(`${API}/orders/summary`).expect(401);
+    });
+  });
+
   describe('POST /orders/:id/rating', () => {
     it('solo cuando está entregado, una vez, y actualiza el rating del negocio', async () => {
       const { body } = await http().get(`${API}/orders`).set(alex.auth).expect(200);

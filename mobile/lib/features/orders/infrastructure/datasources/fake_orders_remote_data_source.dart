@@ -287,12 +287,41 @@ class FakeOrdersRemoteDataSource implements OrdersRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> list() async {
+  Future<List<Map<String, dynamic>>> list({String? scope}) async {
     await _backend.delay();
     await _seed();
-    final all = _orders.values.map(Map<String, dynamic>.of).toList()
-      ..sort((a, b) => (b['placedAt'] as String).compareTo(a['placedAt'] as String));
+    bool finished(Map<String, dynamic> o) => o['status'] == 'DELIVERED' || o['status'] == 'CANCELLED';
+    final all =
+        _orders.values
+            .where((o) => switch (scope) {
+              'active' => !finished(o),
+              'past' => finished(o),
+              _ => true,
+            })
+            .map(Map<String, dynamic>.of)
+            .toList()
+          ..sort((a, b) => (b['placedAt'] as String).compareTo(a['placedAt'] as String));
     return all;
+  }
+
+  /// Como `GET /orders/summary`.
+  @override
+  Future<Map<String, dynamic>> summary() async {
+    final all = await list();
+    final delivered = all.where((o) => o['status'] == 'DELIVERED').toList();
+    final seen = <String>{};
+    String storeOf(Map<String, dynamic> o) => (o['store'] as Map)['id'] as String;
+    return {
+      'orderCount': all.length,
+      'activeCount': all.where((o) => o['status'] != 'DELIVERED' && o['status'] != 'CANCELLED').length,
+      'saved': _backend.money(all.fold<int>(0, (sum, o) => sum + ((o['discount'] as Map)['amount'] as int))),
+      'latestOrderId': all.firstOrNull?['id'],
+      'repeat': [
+        for (final o in delivered)
+          if (seen.add(storeOf(o)))
+            {'order': o, 'deliveredCount': delivered.where((d) => storeOf(d) == storeOf(o)).length},
+      ].take(8).toList(),
+    };
   }
 
   @override

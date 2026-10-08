@@ -18,20 +18,15 @@ typedef ProfileSummary = ({
 
 @riverpod
 ProfileSummary profileSummary(Ref ref) {
-  final history = ref.watch(ordersHistoryProvider).value ?? const [];
-  final active = ref.watch(activeOrderProvider).value;
+  // Pedidos, en curso, ahorro y el último los cuenta el backend.
+  final orders = ref.watch(ordersSummaryProvider).value ?? OrdersSummary.empty;
   final favorites = ref.watch(favoritesProvider).value;
-  // El pedido activo puede no estar aún en el historial: se cuenta una vez.
-  final activeIds = {
-    ...history.where((o) => o.isActive).map((o) => o.id),
-    if (active != null && active.isActive) active.id,
-  };
   return (
-    orderCount: history.length,
-    activeCount: activeIds.length,
-    saved: history.fold(const Money.zero(), (sum, o) => sum + o.discount),
+    orderCount: orders.orderCount,
+    activeCount: orders.activeCount,
+    saved: orders.saved,
     favoriteCount: favorites == null ? 0 : favorites.storeIds.length + favorites.productIds.length,
     addressCount: ref.watch(addressBookControllerProvider).value?.addresses.length ?? 0,
-    latestOrderId: history.firstOrNull?.id,
+    latestOrderId: orders.latestOrderId,
   );
 }

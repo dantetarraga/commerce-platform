@@ -4,6 +4,7 @@ import type { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { zonedTime } from '../../common/time';
 import { isOpenAt } from '../../common/utils/schedule';
+import { money } from '../../common/utils/money';
 import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
 import { OrderStatus, PaymentMethodType, Role } from '../../generated/prisma/enums';
@@ -12,10 +13,12 @@ import { CouponsService } from '../coupons/coupons.service';
 import { ORDER_CHANGED, OrderChangedEvent } from '../realtime/realtime.events';
 import { isStoreOpen, StoreForSummary, storeDelivery } from '../stores/store-presenter';
 import { StoresService } from '../stores/stores.service';
-import type { RateOrderDto } from './dto/order-queries.dto';
+import type { CustomerOrdersQueryDto, RateOrderDto } from './dto/order-queries.dto';
 import type { PlaceOrderDto } from './dto/place-order.dto';
 import { MAX_TIP } from './dto/place-order.dto';
 import { orderTotals, priceItem, PricedItem, unavailable } from './order-pricing';
+import { summarizeCustomerOrders } from './customer-orders-summary';
+import { FINAL_STATUSES } from './order-list-scope';
 import { orderInclude, toOrderResponse } from './order-presenter';
 
 const MAX_SCHEDULE_DAYS = 7;
@@ -199,9 +202,43 @@ export class OrdersService {
     }
   }
 
-  async list(userId: string, query: CursorQueryDto) {
-    const { orders, nextCursor } = await this.page({ customerId: userId }, query);
+  async list(userId: string, query: CustomerOrdersQueryDto) {
+    const scope =
+      query.scope === 'active'
+        ? { status: { notIn: FINAL_STATUSES } }
+        : query.scope === 'past'
+          ? { status: { in: FINAL_STATUSES } }
+          : {};
+    const { orders, nextCursor } = await this.page({ customerId: userId, ...scope }, query);
     return { items: orders.map(toOrderResponse), nextCursor };
+  }
+
+  /**
+   * Lo que la app muestra de los pedidos del cliente sin calcularlo: cuántos,
+   * cuántos en curso, cuánto ahorró, el último y "Volver a pedir".
+   */
+  async summary(userId: string) {
+    const all = await this.prisma.order.findMany({
+      where: { customerId: userId },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      select: { id: true, storeId: true, status: true, discountTotal: true, currency: true },
+    });
+    const summary = summarizeCustomerOrders(all);
+    const repeatOrders = await this.prisma.order.findMany({
+      where: { id: { in: summary.repeat.map((r) => r.order.id) } },
+      include: orderInclude,
+    });
+    const byId = new Map(repeatOrders.map((o) => [o.id, o]));
+    return {
+      orderCount: summary.orderCount,
+      activeCount: summary.activeCount,
+      saved: money(summary.saved, all[0]?.currency),
+      latestOrderId: summary.latestOrderId,
+      repeat: summary.repeat.map((r) => ({
+        order: toOrderResponse(byId.get(r.order.id)!),
+        deliveredCount: r.deliveredCount,
+      })),
+    };
   }
 
   /** Página por cursor, del más reciente al más antiguo. La usan también negocio y courier. */

@@ -2,10 +2,9 @@ import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Param, Post, Quer
 import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../common/decorators/auth.decorators';
-import { CursorQueryDto } from '../../common/dto/cursor-query.dto';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { Role } from '../../generated/prisma/enums';
-import { RateOrderDto } from './dto/order-queries.dto';
+import { CustomerOrdersQueryDto, RateOrderDto } from './dto/order-queries.dto';
 import { CancelOrderDto } from './dto/order-status.dto';
 import { PlaceOrderDto } from './dto/place-order.dto';
 import { toOrderResponse } from './order-presenter';
@@ -39,9 +38,16 @@ export class OrdersController {
     return this.orders.place(user.id, dto, idempotencyKey);
   }
 
+  /** `scope=active|past` separa en curso y terminados. */
   @Get()
-  list(@CurrentUser() user: AuthUser, @Query() query: CursorQueryDto) {
+  list(@CurrentUser() user: AuthUser, @Query() query: CustomerOrdersQueryDto) {
     return this.orders.list(user.id, query);
+  }
+
+  /** Conteos, lo ahorrado y "Volver a pedir" (antes de `:id`). */
+  @Get('summary')
+  summary(@CurrentUser() user: AuthUser) {
+    return this.orders.summary(user.id);
   }
 
   @Get(':id')

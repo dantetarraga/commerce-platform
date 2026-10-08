@@ -88,7 +88,7 @@ void main() {
     var rated = false;
     final delivered = order(OrderStatus.delivered, events: [OrderEvent(OrderStatus.received, placed), OrderEvent(OrderStatus.delivered, placed)]);
     when(() => repository.watch('o1')).thenAnswer((_) => Stream.value(rated ? delivered.copyWith(rating: 5) : delivered));
-    when(repository.history).thenAnswer((_) async => const Result.ok(<Order>[]));
+    when(repository.history).thenAnswer((_) async => const Result.ok(OrderLists.empty));
     when(() => repository.rate('o1', rating: 5, comment: any(named: 'comment'))).thenAnswer((_) async {
       rated = true;
       return Result.ok(delivered.copyWith(rating: 5));
@@ -167,7 +167,7 @@ void main() {
       when(
         () => repository.cancel('o1', reason: any(named: 'reason')),
       ).thenAnswer((_) async => Result.ok(order(OrderStatus.cancelled)));
-      when(repository.history).thenAnswer((_) async => const Result.ok(<Order>[]));
+      when(repository.history).thenAnswer((_) async => const Result.ok(OrderLists.empty));
       when(() => repository.watch('o1')).thenAnswer((_) => Stream.value(order(OrderStatus.cancelled)));
 
       await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.received), repository: repository);

@@ -30,7 +30,7 @@ class OrdersPage extends ConsumerWidget {
         onRefresh: () => ref.refresh(ordersHistoryProvider.future),
         // AsyncValueView pinta su error sin scroll; aquí debe poder arrastrarse
         // para reintentar, así que el error sin datos se resuelve antes.
-        child: history is AsyncError<List<Order>> && !history.hasValue
+        child: history is AsyncError<OrderLists> && !history.hasValue
             ? _Pullable(child: AppEmptyState.fromError(history.error, onRetry: retry))
             : AsyncValueView(
                 value: history,
@@ -46,7 +46,7 @@ class OrdersPage extends ConsumerWidget {
                     onAction: onExplore,
                   ),
                 ),
-                data: (orders) => _OrdersList(orders: orders, onOpenStore: onOpenStore),
+                data: (lists) => _OrdersList(lists: lists, onOpenStore: onOpenStore),
               ),
       ),
     );
@@ -72,16 +72,16 @@ class _Pullable extends StatelessWidget {
 }
 
 class _OrdersList extends StatelessWidget {
-  const _OrdersList({required this.orders, this.onOpenStore});
+  const _OrdersList({required this.lists, this.onOpenStore});
 
-  final List<Order> orders;
+  final OrderLists lists;
   final ValueChanged<String>? onOpenStore;
 
   @override
   Widget build(BuildContext context) {
-    final active = orders.where((o) => o.isActive).toList();
-    final past = orders.where((o) => !o.isActive).toList();
-    final animate = entranceWindowOpen(orders);
+    final active = lists.active;
+    final past = lists.past;
+    final animate = entranceWindowOpen(lists);
     // Activos, luego (si hay anteriores) título, anteriores y el enlace de ayuda.
     final count = active.length + (past.isEmpty ? 0 : past.length + 2);
 

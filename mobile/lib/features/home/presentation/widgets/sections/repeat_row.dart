@@ -18,15 +18,15 @@ class RepeatRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final orders = ref.watch(recentOrdersByStoreProvider).value ?? const [];
-    if (orders.isEmpty) return const SizedBox.shrink();
+    final repeat = ref.watch(ordersSummaryProvider).value?.repeat ?? const [];
+    if (repeat.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const AppSectionHeader('Volver a pedir'),
         RepeatShelf(
-          orders: orders,
-          timesByStore: ref.watch(deliveredCountByStoreProvider),
+          orders: [for (final r in repeat) r.order],
+          timesByStore: {for (final r in repeat) r.order.store.id: r.deliveredCount},
           onOpen: (order) => openStore(context, order.store.id),
           onRepeat: (order) => repeatOrder(context, ref, order),
         ),

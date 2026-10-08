@@ -21,7 +21,28 @@ class OrdersRepositoryImpl implements OrdersRepository {
   Future<Result<Order>> getOrder(String orderId) => guard(() async => OrderJson.fromJson(await _remote.get(orderId)));
 
   @override
-  Future<Result<List<Order>>> history() => guard(() async => (await _remote.list()).map(OrderJson.fromJson).toList());
+  Future<Result<OrderLists>> history() => guard(() async {
+    final (active, past) = (_remote.list(scope: 'active'), _remote.list(scope: 'past'));
+    return OrderLists(
+      active: (await active).map(OrderJson.fromJson).toList(),
+      past: (await past).map(OrderJson.fromJson).toList(),
+    );
+  });
+
+  @override
+  Future<Result<OrdersSummary>> summary() => guard(() async {
+    final json = await _remote.summary();
+    return OrdersSummary(
+      orderCount: json['orderCount'] as int,
+      activeCount: json['activeCount'] as int,
+      saved: OrderJson.moneyFromJson(json['saved']),
+      latestOrderId: json['latestOrderId'] as String?,
+      repeat: [
+        for (final r in (json['repeat'] as List).cast<Map<String, dynamic>>())
+          RepeatEntry(order: OrderJson.fromJson(r['order'] as Map<String, dynamic>), deliveredCount: r['deliveredCount'] as int),
+      ],
+    );
+  });
 
   @override
   Future<Result<Order>> cancel(String orderId, {String? reason}) =>

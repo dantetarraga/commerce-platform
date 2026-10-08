@@ -37,8 +37,16 @@ OrdersRepository ordersRepository(Ref ref) => OrdersRepositoryImpl(ref.watch(ord
 
 /// Historial (más reciente primero).
 @riverpod
-Future<List<Order>> ordersHistory(Ref ref) =>
+Future<OrderLists> ordersHistory(Ref ref) =>
     ref.watch(ordersRepositoryProvider).history().then((r) => r.getOrThrow());
+
+/// Conteos, lo ahorrado y "Volver a pedir". Se vuelve a pedir cada vez que se
+/// refresca el historial (al pedir, calificar, cancelar o tirar para recargar).
+@riverpod
+Future<OrdersSummary> ordersSummary(Ref ref) async {
+  await ref.watch(ordersHistoryProvider.future);
+  return (await ref.read(ordersRepositoryProvider).summary()).getOrThrow();
+}
 
 /// Estado vivo de un pedido.
 @riverpod
@@ -52,7 +60,7 @@ class ActiveOrderId extends _$ActiveOrderId {
   Future<String?> build() async {
     final history = await ref.watch(ordersRepositoryProvider).history();
     return switch (history) {
-      Ok(:final value) => value.where((o) => o.isActive).firstOrNull?.id,
+      Ok(:final value) => value.active.firstOrNull?.id,
       Err() => null,
     };
   }
@@ -71,15 +79,4 @@ Stream<Order?> activeOrder(Ref ref) async* {
     return;
   }
   yield* ref.watch(ordersRepositoryProvider).watch(id);
-}
-
-/// Negocios de pedidos anteriores, sin repetir (para "Volver a pedir").
-@riverpod
-Future<List<Order>> recentOrdersByStore(Ref ref) async {
-  final history = await ref.watch(ordersHistoryProvider.future);
-  final seen = <String>{};
-  return [
-    for (final order in history)
-      if (order.status == OrderStatus.delivered && seen.add(order.store.id)) order,
-  ].take(8).toList();
 }

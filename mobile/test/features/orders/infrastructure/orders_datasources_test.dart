@@ -107,6 +107,16 @@ void main() {
     });
   });
 
+  test('Mis pedidos pide en curso y anteriores por separado al backend', () async {
+    final api = _MockApiClient();
+    when(() => api.get('/orders', query: any(named: 'query'))).thenAnswer((_) async => {'items': <Object?>[]});
+    final source = ApiOrdersRemoteDataSource(api);
+    await source.list(scope: 'active');
+    await source.list(scope: 'past');
+    verify(() => api.get('/orders', query: {'limit': 30, 'scope': 'active'})).called(1);
+    verify(() => api.get('/orders', query: {'limit': 30, 'scope': 'past'})).called(1);
+  });
+
   group('ApiOrdersRemoteDataSource.place', () {
     test('envía la Idempotency-Key como header', () async {
       final api = _MockApiClient();
