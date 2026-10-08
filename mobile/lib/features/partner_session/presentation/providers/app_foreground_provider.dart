@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chaski/features/auth/auth.dart';
+import 'package:apamuy/features/auth/auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

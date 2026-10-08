@@ -1,7 +1,7 @@
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/fake/fake_catalog_json.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/discovery/infrastructure/models/search_dtos.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_catalog_json.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/discovery/infrastructure/models/search_dtos.dart';
 
 /// `GET /discovery/local-products`: productos hechos en la ciudad.
 abstract interface class LocalProductsRemoteDataSource {

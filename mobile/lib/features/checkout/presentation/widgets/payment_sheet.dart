@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
-import 'package:chaski/features/checkout/presentation/widgets/payment_brand.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/payment_brand.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,7 +109,7 @@ class _PaymentOption extends StatelessWidget {
       child: AnimatedContainer(
         duration: duration,
         decoration: BoxDecoration(
-          color: selected ? scheme.primaryContainer : context.chaski.raised,
+          color: selected ? scheme.primaryContainer : context.apamuy.raised,
           borderRadius: const BorderRadius.all(AppRadius.lg),
           border: Border.all(color: selected ? scheme.primary : Colors.transparent, width: 1.5),
         ),
@@ -204,7 +204,7 @@ class _CashChange extends StatelessWidget {
           Text(
             change == null ? 'Ten el monto exacto a mano.' : 'Te llevamos ${Formatters.money(change)} de vuelto.',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: change == null ? theme.colorScheme.onSurfaceVariant : context.chaski.success,
+              color: change == null ? theme.colorScheme.onSurfaceVariant : context.apamuy.success,
               fontWeight: FontWeight.w700,
               fontFeatures: AppTypography.tabularFigures,
             ),

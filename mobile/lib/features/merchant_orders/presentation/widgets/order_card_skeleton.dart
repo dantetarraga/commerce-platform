@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Tarjeta de pedido en blanco mientras cargan: el mismo papel, con bloques

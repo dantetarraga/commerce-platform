@@ -1,8 +1,8 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/value_failure.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/infrastructure/address_repository_impl.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/infrastructure/address_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

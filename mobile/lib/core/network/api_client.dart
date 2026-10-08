@@ -1,4 +1,4 @@
-import 'package:chaski/core/errors/app_exception.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
 import 'package:dio/dio.dart';
 
 /// Envoltura mínima sobre Dio: devuelve el `data` decodificado y convierte

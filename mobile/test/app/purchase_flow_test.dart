@@ -1,13 +1,13 @@
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/app/router/routes.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/checkout/checkout.dart';
-import 'package:chaski/features/home/home.dart';
-import 'package:chaski/features/home/presentation/widgets/home_editorial.dart';
-import 'package:chaski/features/orders/orders_customer.dart';
-import 'package:chaski/features/products/products.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/app/router/routes.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/checkout/checkout.dart';
+import 'package:apamuy/features/home/home.dart';
+import 'package:apamuy/features/home/presentation/widgets/home_editorial.dart';
+import 'package:apamuy/features/orders/orders_customer.dart';
+import 'package:apamuy/features/products/products.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -24,7 +24,7 @@ void main() {
     ('oscuro', const Size(390, 844), 1.0, Brightness.dark),
   ]) {
     testWidgets('de Cerca a un pedido entregado y calificado: $name', (tester) async {
-      final container = await pumpChaski(tester, signedIn: true, size: size, textScale: scale, brightness: brightness);
+      final container = await pumpApamuy(tester, signedIn: true, size: size, textScale: scale, brightness: brightness);
       final router = container.read(appRouterProvider);
 
       expect(currentPath(container), RoutePaths.home);
@@ -167,7 +167,7 @@ void main() {
       expect(order.rating, 5);
 
       AppToast.dismiss();
-      await unmountChaski(tester, container);
+      await unmountApamuy(tester, container);
       expect(tester.takeException(), isNull);
     });
   }

@@ -45,7 +45,7 @@ final class PartnerModePreferenceProvider
 }
 
 String _$partnerModePreferenceHash() =>
-    r'76b63ff901ecb7d8c5b1f6e07e649ee13132e7f9';
+    r'433b35c73da81faf866f06d53a0021a1f86d2c0f';
 
 /// Modo que el socio eligió la última vez, guardado en el dispositivo.
 

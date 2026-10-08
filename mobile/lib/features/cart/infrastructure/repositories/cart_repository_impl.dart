@@ -1,17 +1,17 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/network/dto/money_dto.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/domain/repositories/cart_repository.dart';
-import 'package:chaski/features/cart/infrastructure/datasources/coupon_remote_data_source.dart';
-import 'package:chaski/features/cart/infrastructure/models/cart_json.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/network/dto/money_dto.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/domain/repositories/cart_repository.dart';
+import 'package:apamuy/features/cart/infrastructure/datasources/coupon_remote_data_source.dart';
+import 'package:apamuy/features/cart/infrastructure/models/cart_json.dart';
 
 class CartRepositoryImpl implements CartRepository {
   const CartRepositoryImpl(this._store, this._coupons);
 
-  static const _key = 'chaski.cart';
+  static const _key = 'apamuy.cart';
 
   final LocalJsonStore _store;
   final CouponRemoteDataSource _coupons;

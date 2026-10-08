@@ -1,6 +1,6 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 enum AppChipVariant {
@@ -36,9 +36,9 @@ class AppChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final active = selected && variant != AppChipVariant.suggestion;
-    final bg = active ? scheme.inverseSurface : chaski.raised;
+    final bg = active ? scheme.inverseSurface : apamuy.raised;
     final fg = active ? scheme.onInverseSurface : scheme.onSurface;
 
     return Semantics(

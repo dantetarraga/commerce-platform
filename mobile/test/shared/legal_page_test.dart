@@ -1,5 +1,5 @@
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/shared/legal/legal_page.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/shared/legal/legal_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,7 +13,7 @@ void main() {
     FlutterError.onError = (d) => d.toString().contains('overflowed') ? null : original?.call(d);
     addTearDown(() => FlutterError.onError = original);
 
-    final container = await pumpChaski(tester);
+    final container = await pumpApamuy(tester);
     await settle(tester, frames: 30);
 
     expect(find.textContaining('Al continuar aceptas', findRichText: true), findsOneWidget);
@@ -28,7 +28,7 @@ void main() {
     final matches = container.read(appRouterProvider).routerDelegate.currentConfiguration.matches;
     expect(matches.map((m) => m.matchedLocation), ['/entrar', '/legal/terminos', '/legal/privacidad']);
 
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }
 

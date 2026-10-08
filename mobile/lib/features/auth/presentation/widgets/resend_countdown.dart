@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// "¿No llegó? Reenviar en 0:42" que pasa a "Reenviar código" en cero.

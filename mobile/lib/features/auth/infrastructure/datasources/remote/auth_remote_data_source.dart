@@ -1,5 +1,5 @@
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/auth/infrastructure/models/auth_dtos.dart';
 
 abstract interface class AuthRemoteDataSource {
   Future<OtpChallengeDto> requestCode(String phone);

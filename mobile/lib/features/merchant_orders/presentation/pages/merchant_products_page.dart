@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/presentation/providers/merchant_providers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -213,7 +213,7 @@ class _ProductRowState extends ConsumerState<_ProductRow> with PartnerActionRunn
                 Text(
                   product.isAvailable ? 'Disponible' : 'Agotado',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: product.isAvailable ? context.chaski.success : theme.colorScheme.error,
+                    color: product.isAvailable ? context.apamuy.success : theme.colorScheme.error,
                   ),
                 ),
               ],

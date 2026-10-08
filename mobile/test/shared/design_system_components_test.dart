@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,8 +21,8 @@ void main() {
   });
 
   test('card es blanca en claro y raised en oscuro', () {
-    expect(ChaskiColors.light.card, AppColors.blanco);
-    expect(ChaskiColors.dark.card, ChaskiColors.dark.raised);
+    expect(ApamuyColors.light.card, AppColors.blanco);
+    expect(ApamuyColors.dark.card, ApamuyColors.dark.raised);
   });
 
   testWidgets('AppSearchBar escucha al controller nuevo si cambia', (tester) async {

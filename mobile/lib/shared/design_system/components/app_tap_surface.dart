@@ -1,5 +1,5 @@
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// Superficie tocable de mosaicos y tarjetas: semántica de botón, escala al

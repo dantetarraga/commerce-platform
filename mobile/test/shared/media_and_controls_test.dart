@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';

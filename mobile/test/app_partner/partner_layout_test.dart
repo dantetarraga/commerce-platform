@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
-import 'package:chaski/features/merchant_orders/merchant_orders.dart';
+import 'package:apamuy/features/courier_deliveries/courier_deliveries.dart';
+import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,7 +19,7 @@ Future<void> _capture(Finder page, String name) async {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
-    final cache = Directory.systemTemp.createTempSync('chaski_partner_ui_');
+    final cache = Directory.systemTemp.createTempSync('apamuy_partner_ui_');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
       const MethodChannel('plugins.flutter.io/path_provider'),
       (_) async => cache.path,
@@ -80,7 +80,7 @@ void main() {
       await tester.tap(find.byTooltip('Limpiar búsqueda'));
       await settle(tester);
       expect(find.text('Sin coincidencias'), findsNothing);
-      await unmountChaski(tester, container);
+      await unmountApamuy(tester, container);
     });
 
     testWidgets('repartidor: disponibilidad, recorrido y cobro en $name', (tester) async {
@@ -128,7 +128,7 @@ void main() {
       expect(find.text('Escribe un monto válido'), findsOneWidget);
       expect(tester.takeException(), isNull);
       tester.view.resetViewInsets();
-      await unmountChaski(tester, container);
+      await unmountApamuy(tester, container);
     });
   }
 
@@ -157,7 +157,7 @@ void main() {
     await settle(tester);
     expect(find.text('Vendido hoy'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('catálogo: buscar, agotar y recuperar el producto desde el filtro', (tester) async {
@@ -183,6 +183,6 @@ void main() {
     await tester.tap(find.byType(Switch));
     await settle(tester);
     expect(find.text('Sin coincidencias'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

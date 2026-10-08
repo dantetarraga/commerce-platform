@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 
 /// Lo vendido en grande y tres datos del día: pedidos, ticket y preparación.

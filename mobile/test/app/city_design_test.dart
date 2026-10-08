@@ -1,7 +1,7 @@
-import 'package:chaski/core/maps/delivery_map_data.dart';
-import 'package:chaski/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/delivery_map.dart';
+import 'package:apamuy/core/maps/delivery_map_data.dart';
+import 'package:apamuy/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,7 +29,7 @@ void main() {
     ('inicio_tablet', const Size(768, 1024), 1.0, Brightness.light),
   ]) {
     testWidgets('ciudad: navegación y composición $name', (tester) async {
-      final container = await pumpChaski(tester, signedIn: true, size: size, textScale: scale, brightness: brightness, disableAnimations: true);
+      final container = await pumpApamuy(tester, signedIn: true, size: size, textScale: scale, brightness: brightness, disableAnimations: true);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
       await settle(tester);
       expect(find.textContaining('al toque.', findRichText: true), findsOneWidget);
@@ -47,13 +47,13 @@ void main() {
       await settle(tester);
       if (name == 'inicio') await captureCity(tester, 'descubrir');
       expect(tester.takeException(), isNull);
-      await unmountChaski(tester, container);
+      await unmountApamuy(tester, container);
       await tester.pump(const Duration(seconds: 12));
     });
   }
 
   testWidgets('el onboarding responde al swipe y permite volver', (tester) async {
-    final container = await pumpChaski(tester, onboardingSeen: false, disableAnimations: true);
+    final container = await pumpApamuy(tester, onboardingSeen: false, disableAnimations: true);
     await captureCity(tester, 'onboarding_descubre');
     await tester.drag(find.byType(PageView), const Offset(-300, 0));
     await settle(tester);
@@ -66,11 +66,11 @@ void main() {
     await tester.drag(find.byType(PageView), const Offset(300, 0));
     await settle(tester);
     expect(find.text('Tu antojo tiene\nbuenas manos.'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('la ilustración del onboarding sigue al dedo y encaja en una estación', (tester) async {
-    final container = await pumpChaski(tester, onboardingSeen: false);
+    final container = await pumpApamuy(tester, onboardingSeen: false);
     final gesture = await tester.startGesture(tester.getCenter(find.byType(CityOnboardingScene)));
     await gesture.moveBy(const Offset(-120, 0));
     await tester.pump();
@@ -81,7 +81,7 @@ void main() {
     await settle(tester);
     final settled = tester.widget<CityOnboardingScene>(find.byType(CityOnboardingScene)).page;
     expect(settled, settled.roundToDouble());
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('el mapa entrega coordenadas al adaptador sin tipos de un SDK', (tester) async {

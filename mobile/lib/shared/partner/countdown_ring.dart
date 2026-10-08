@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Tiempo que queda para responder, en un anillo que se vacía. Se pone rojo al
@@ -62,7 +62,7 @@ class _CountdownRingState extends State<CountdownRing> {
     final seconds = _secondsLeft.clamp(0, widget.total.inSeconds);
     final fraction = widget.total.inSeconds == 0 ? 0.0 : seconds / widget.total.inSeconds;
     final urgent = seconds <= 120;
-    final color = urgent ? context.chaski.danger : scheme.primary;
+    final color = urgent ? context.apamuy.danger : scheme.primary;
     final label = Formatters.minutesSeconds(seconds);
     return Semantics(
       label: 'Quedan $label para responder',

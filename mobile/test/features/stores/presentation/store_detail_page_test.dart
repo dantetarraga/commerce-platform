@@ -1,7 +1,7 @@
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/features/favorites/favorites.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,7 +14,7 @@ void main() {
     FlutterError.onError = (d) => d.toString().contains('overflowed') ? null : original?.call(d);
     addTearDown(() => FlutterError.onError = original);
 
-    final container = await pumpChaski(tester, signedIn: true);
+    final container = await pumpApamuy(tester, signedIn: true);
     final router = container.read(appRouterProvider);
 
     router.pushNamed(StoreDetailPage.name, pathParameters: {'storeId': 'st_dona_rosa'}).ignore();
@@ -37,6 +37,6 @@ void main() {
     await settle(tester);
     expect(find.text('Aún no guardas productos'), findsOneWidget);
 
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

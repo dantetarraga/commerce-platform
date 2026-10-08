@@ -1,5 +1,5 @@
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Quién lleva el pedido, con atajos para escribirle o llamarle.
@@ -13,7 +13,7 @@ class CourierCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.xs, AppSpacing.xxs, AppSpacing.xs),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.card),
       child: Row(
         children: [
           AppAvatar(

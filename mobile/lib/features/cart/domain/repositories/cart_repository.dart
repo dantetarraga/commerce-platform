@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
 
 /// La bolsa vive en el dispositivo (sobrevive a cerrar la app y a la falta de
 /// red); los cupones se validan en el backend.

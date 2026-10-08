@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
 
 /// Serialización local de la bolsa. Versionada: si el formato cambia, una
 /// bolsa vieja se descarta en vez de romper la app.

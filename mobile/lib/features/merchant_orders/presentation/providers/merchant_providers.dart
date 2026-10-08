@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/realtime/realtime_client.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
-import 'package:chaski/features/merchant_orders/infrastructure/merchant_repository_impl.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/partner_session/partner_session.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/realtime/realtime_client.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
+import 'package:apamuy/features/merchant_orders/infrastructure/merchant_repository_impl.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/partner_session/partner_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'merchant_providers.g.dart';

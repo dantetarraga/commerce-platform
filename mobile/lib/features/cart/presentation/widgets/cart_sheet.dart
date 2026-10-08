@@ -1,10 +1,10 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/presentation/providers/cart_providers.dart';
-import 'package:chaski/features/cart/presentation/widgets/cart_line_tile.dart';
-import 'package:chaski/features/cart/presentation/widgets/cart_summary.dart';
-import 'package:chaski/features/cart/presentation/widgets/note_sheet.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/presentation/providers/cart_providers.dart';
+import 'package:apamuy/features/cart/presentation/widgets/cart_line_tile.dart';
+import 'package:apamuy/features/cart/presentation/widgets/cart_summary.dart';
+import 'package:apamuy/features/cart/presentation/widgets/note_sheet.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

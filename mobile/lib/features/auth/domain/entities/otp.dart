@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/features/auth/domain/entities/auth_user.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/features/auth/domain/entities/auth_user.dart';
 import 'package:equatable/equatable.dart';
 
 /// Código enviado: a qué número, de cuántos dígitos y cuándo se puede reenviar.

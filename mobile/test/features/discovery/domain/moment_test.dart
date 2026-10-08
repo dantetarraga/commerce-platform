@@ -1,4 +1,4 @@
-import 'package:chaski/features/discovery/domain/moment.dart';
+import 'package:apamuy/features/discovery/domain/moment.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

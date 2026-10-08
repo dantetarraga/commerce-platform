@@ -1,4 +1,4 @@
-import 'package:chaski/shared/partner/alarm/order_alarm.dart';
+import 'package:apamuy/shared/partner/alarm/order_alarm.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

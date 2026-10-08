@@ -1,4 +1,4 @@
-import 'package:chaski/features/stores/stores.dart';
+import 'package:apamuy/features/stores/stores.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 

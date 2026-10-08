@@ -1,8 +1,8 @@
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/features/notifications/notifications.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/discovery/discovery.dart';
+import 'package:apamuy/features/notifications/notifications.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

@@ -36,7 +36,7 @@ final class RecentSearchesProvider
   RecentSearches create() => RecentSearches();
 }
 
-String _$recentSearchesHash() => r'041499e225095b23740f1d9ad75ac9901bab58ab';
+String _$recentSearchesHash() => r'b7b66a86b88cf5f71d0a36bd49558f9cce8ded0f';
 
 /// Últimas búsquedas (máximo [max]), guardadas en el dispositivo.
 

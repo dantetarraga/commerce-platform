@@ -1,10 +1,10 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/geocoding_service.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
-import 'package:chaski/features/addresses/presentation/widgets/neighborhood_plan.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/geocoding_service.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/presentation/providers/address_providers.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/neighborhood_plan.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -1,5 +1,5 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Tarjeta con borde fino que agrupa filas ([AppGroupedRow]) separadas por
@@ -85,7 +85,7 @@ class AppGroupedRow extends StatelessWidget {
         : Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(color: context.chaski.raised, shape: BoxShape.circle),
+            decoration: BoxDecoration(color: context.apamuy.raised, shape: BoxShape.circle),
             child: Icon(icon, size: 18, color: scheme.onSurface),
           );
     final titleText = Text(title, style: _link ? theme.textTheme.labelLarge : theme.textTheme.titleSmall);

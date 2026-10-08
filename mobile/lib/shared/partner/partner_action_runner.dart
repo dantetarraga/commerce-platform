@@ -1,5 +1,5 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Acciones de los socios con un solo patrón: marca [busy], espera, revisa que la

@@ -1,5 +1,5 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_typography.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
 const brandName = 'Apamuy';

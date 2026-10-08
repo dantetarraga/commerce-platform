@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
 
 /// Simula `/orders` en memoria: un pedido nuevo avanza solo por los estados (cada
 /// [FakeBackend.orderStep]). Arranca con dos entregados para "Volver a pedir".

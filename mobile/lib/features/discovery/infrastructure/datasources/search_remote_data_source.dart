@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/fake/fake_catalog_json.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/utils/text_utils.dart';
-import 'package:chaski/features/discovery/infrastructure/models/search_dtos.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_catalog_json.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/utils/text_utils.dart';
+import 'package:apamuy/features/discovery/infrastructure/models/search_dtos.dart';
 
 abstract interface class SearchRemoteDataSource {
   Future<SearchResponseDto> search(String query, GeoCoordinates location, {bool openOnly = false});

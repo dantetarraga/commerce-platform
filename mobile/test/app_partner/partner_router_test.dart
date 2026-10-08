@@ -1,9 +1,9 @@
-import 'package:chaski/app_partner/router/partner_routes.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_fields.dart';
-import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
-import 'package:chaski/features/merchant_orders/merchant_orders.dart';
-import 'package:chaski/features/partner_session/partner_session.dart';
+import 'package:apamuy/app_partner/router/partner_routes.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/auth/presentation/widgets/auth_fields.dart';
+import 'package:apamuy/features/courier_deliveries/courier_deliveries.dart';
+import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
+import 'package:apamuy/features/partner_session/partner_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -25,21 +25,21 @@ void main() {
     final container = await pumpPartner(tester);
     expect(currentPartnerPath(container), PartnerRoutePaths.login);
     expect(find.text('Entra a Apamuy Socios'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('un negocio entra al modo Negocio', (tester) async {
     final container = await pumpPartner(tester, signedInAs: 'usr_owner_chaski_dorado');
     expect(currentPartnerPath(container), PartnerRoutePaths.merchantHome);
     expect(find.byType(MerchantHomePage), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('un repartidor entra al modo Repartidor', (tester) async {
     final container = await pumpPartner(tester, signedInAs: 'usr_courier_luis');
     expect(currentPartnerPath(container), PartnerRoutePaths.courierHome);
     expect(find.byType(CourierHomePage), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('un cliente ve que no es socio y puede usar otro número', (tester) async {
@@ -50,7 +50,7 @@ void main() {
     await tester.tap(find.text('Usar otro número'));
     await settle(tester);
     expect(currentPartnerPath(container), PartnerRoutePaths.login);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('un número sin cuenta no pasa al registro de cliente', (tester) async {
@@ -62,13 +62,13 @@ void main() {
     await tester.tap(find.text('Usar otro número'));
     await settle(tester);
     expect(currentPartnerPath(container), PartnerRoutePaths.login);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('el negocio del seed entra con su celular y el código', (tester) async {
     final container = await pumpPartner(tester);
     await logIn(tester, AuthDemo.merchant.phone);
     expect(currentPartnerPath(container), PartnerRoutePaths.merchantHome);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

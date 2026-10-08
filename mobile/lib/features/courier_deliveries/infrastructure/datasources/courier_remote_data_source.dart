@@ -1,5 +1,5 @@
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/orders/orders_infrastructure.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/orders/orders_infrastructure.dart';
 
 /// Fuente remota de `courier/*` (ver `docs/OPERACION.md` §7). JSON crudo.
 abstract interface class CourierRemoteDataSource {

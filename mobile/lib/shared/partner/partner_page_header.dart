@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Cabecera de color de las pantallas de trabajo de Apamuy Socios: volver, etiqueta,

@@ -1,4 +1,4 @@
-import 'package:chaski/core/storage/token_storage.dart';
+import 'package:apamuy/core/storage/token_storage.dart';
 import 'package:dio/dio.dart';
 
 /// Agrega el Bearer token y, ante un 401, refresca una sola vez y reintenta.

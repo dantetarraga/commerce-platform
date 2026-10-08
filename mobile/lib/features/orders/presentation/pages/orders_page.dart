@@ -1,13 +1,13 @@
-import 'package:chaski/core/time/clock_provider.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/presentation/order_status_labels.dart';
-import 'package:chaski/features/orders/presentation/pages/order_help_page.dart';
-import 'package:chaski/features/orders/presentation/pages/order_tracking_page.dart';
-import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/store_thumb.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/core/time/clock_provider.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
+import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
+import 'package:apamuy/features/orders/presentation/pages/order_tracking_page.dart';
+import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
+import 'package:apamuy/features/orders/presentation/widgets/store_thumb.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -169,7 +169,7 @@ class _ActiveOrderCard extends ConsumerWidget {
                           duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: i < stage ? context.chaski.thread : scheme.surfaceContainerHighest,
+                            color: i < stage ? context.apamuy.thread : scheme.surfaceContainerHighest,
                             borderRadius: const BorderRadius.all(AppRadius.pill),
                           ),
                         ),
@@ -210,7 +210,7 @@ class _PastOrderRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
         child: Row(
           children: [
-            StoreThumb(url: order.store.logoUrl, background: context.chaski.raised),
+            StoreThumb(url: order.store.logoUrl, background: context.apamuy.raised),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(

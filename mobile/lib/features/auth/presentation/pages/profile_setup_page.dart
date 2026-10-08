@@ -1,8 +1,8 @@
-import 'package:chaski/features/auth/domain/value_objects/person_name.dart';
-import 'package:chaski/features/auth/presentation/providers/phone_auth_flow.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/utils/value_failure_message.dart';
+import 'package:apamuy/features/auth/domain/value_objects/person_name.dart';
+import 'package:apamuy/features/auth/presentation/providers/phone_auth_flow.dart';
+import 'package:apamuy/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

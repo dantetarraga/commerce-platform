@@ -1,4 +1,4 @@
-import 'package:chaski/core/utils/random_id.dart';
+import 'package:apamuy/core/utils/random_id.dart';
 
 /// Clave de idempotencia: la misma request reusa la clave (doble tap, reintento
 /// tras un corte de red) y una distinta recibe otra. [reset] al terminar con éxito.

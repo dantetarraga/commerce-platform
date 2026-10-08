@@ -1,14 +1,14 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/stores/domain/entities/category.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/domain/entities/store_page.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/domain/repositories/stores_repository.dart';
-import 'package:chaski/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
-import 'package:chaski/features/stores/infrastructure/mappers/store_mapper.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/stores/domain/entities/category.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/domain/entities/store_page.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/domain/repositories/stores_repository.dart';
+import 'package:apamuy/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
+import 'package:apamuy/features/stores/infrastructure/mappers/store_mapper.dart';
 
 /// Traduce DTOs a entidades y excepciones a `Failure`.
 class StoresRepositoryImpl implements StoresRepository {

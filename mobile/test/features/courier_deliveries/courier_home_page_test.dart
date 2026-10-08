@@ -1,5 +1,5 @@
-import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/courier_deliveries/courier_deliveries.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,7 +34,7 @@ void main() {
     expect(find.text('Tomar recorrido'), findsWidgets);
     expect(alarm.rings, 1);
     expect(alarm.awake, isTrue);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('toma un pedido, lo recoge y lo entrega registrando el cobro', (tester) async {
@@ -74,6 +74,6 @@ void main() {
     await tester.scrollUntilVisible(find.text('Tu jornada de hoy'), 350, scrollable: find.byType(Scrollable).first);
     await settle(tester);
     expect(find.textContaining('${deliveredBefore + 1} entrega'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

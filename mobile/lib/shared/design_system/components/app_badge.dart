@@ -1,5 +1,5 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 enum AppBadgeStatus { open, closed, fresh }
@@ -16,9 +16,9 @@ class AppBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final (IconData icon, String text, Color color) = switch (status) {
-      AppBadgeStatus.open => (Icons.circle, 'Abierto', chaski.success),
+      AppBadgeStatus.open => (Icons.circle, 'Abierto', apamuy.success),
       AppBadgeStatus.closed => (Icons.nightlight_round, 'Cerrado', theme.colorScheme.onSurfaceVariant),
       AppBadgeStatus.fresh => (Icons.auto_awesome_rounded, 'Nuevo', theme.colorScheme.primary),
     };
@@ -43,17 +43,17 @@ class AppCinta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return Container(
       padding: EdgeInsets.symmetric(horizontal: dense ? 7 : AppSpacing.xs, vertical: dense ? 2 : 4),
       decoration: BoxDecoration(
-        color: chaski.accent,
+        color: apamuy.accent,
         borderRadius: BorderRadius.all(Radius.circular(dense ? 6 : 8)),
       ),
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: chaski.onAccent,
+          color: apamuy.onAccent,
           fontWeight: FontWeight.w800,
           fontSize: dense ? 10 : 11,
         ),

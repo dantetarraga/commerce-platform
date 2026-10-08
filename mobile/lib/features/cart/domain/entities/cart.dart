@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/quantity.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/quantity.dart';
 import 'package:equatable/equatable.dart';
 
 /// Negocio de la bolsa, tal como se vio al agregar el primer producto. El

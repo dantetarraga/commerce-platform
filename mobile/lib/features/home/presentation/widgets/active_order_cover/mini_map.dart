@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Mapa ilustrado del pedido activo: calles, la ruta con la doble curva de la
@@ -15,7 +15,7 @@ class MiniMap extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return CustomPaint(
       painter: _MiniMapPainter(
-        base: context.chaski.card,
+        base: context.apamuy.card,
         street: scheme.primaryContainer,
         route: scheme.primary,
         casing: scheme.outlineVariant,
@@ -98,7 +98,7 @@ class _MiniMapPins extends StatelessWidget {
               at: Offset(size.width * 0.12, size.height * 0.76),
               size: 38,
               child: Container(
-                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: context.chaski.accent, width: 3)),
+                decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: context.apamuy.accent, width: 3)),
                 child: AppNetworkImage(url: logoUrl, borderRadius: const BorderRadius.all(Radius.circular(19)), fallbackIcon: Icons.storefront_rounded),
               ),
             ),

@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -160,7 +160,7 @@ class _OrderMiniCard extends StatelessWidget {
     final count = order.itemCount;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.card),
       child: Row(
         children: [
           AppNetworkImage(

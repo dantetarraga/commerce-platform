@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rive/rive.dart' as rive;
@@ -25,10 +25,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async => expect(await rive.RiveNative.init(), isTrue));
 
-  testWidgets('el archivo Rive de Chaski se reproduce una vez y termina', (tester) async {
+  testWidgets('el archivo Rive de Apamuy se reproduce una vez y termina', (tester) async {
     final file = await tester.runAsync(() => rive.File.asset(AppRiveSuccess.asset, riveFactory: rive.Factory.flutter));
     expect(file, isNotNull);
-    final artboard = file!.artboard('ChaskiSuccess');
+    final artboard = file!.artboard('ApamuySuccess');
     expect(artboard, isNotNull);
     final animation = artboard!.animationNamed('confirm');
     expect(animation, isNotNull);

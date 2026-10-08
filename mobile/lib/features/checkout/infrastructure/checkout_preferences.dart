@@ -1,11 +1,11 @@
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
 
 /// Recuerda el último método de pago para precargarlo (menos toques).
 class CheckoutPreferences {
   const CheckoutPreferences(this._store);
 
-  static const _key = 'chaski.checkout';
+  static const _key = 'apamuy.checkout';
 
   final LocalJsonStore _store;
 

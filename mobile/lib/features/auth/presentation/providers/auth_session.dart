@@ -1,6 +1,6 @@
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/features/auth/domain/entities/auth_user.dart';
-import 'package:chaski/features/auth/presentation/providers/auth_providers.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/features/auth/domain/entities/auth_user.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_session.g.dart';

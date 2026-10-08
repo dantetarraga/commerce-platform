@@ -1,5 +1,5 @@
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/domain/staff_order.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/domain/staff_order.dart';
 import 'package:equatable/equatable.dart';
 
 /// Las tres columnas del tablero del negocio. Qué pedido va en cuál lo

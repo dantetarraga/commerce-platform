@@ -69,7 +69,7 @@ jobs:
           java-version: 17
       - name: APK del cliente
         run: flutter build apk --debug --flavor customer -t lib/main.dart
-      - name: APK de Chaski Socios
+      - name: APK de Apamuy Socios
         run: flutter build apk --debug --flavor partner -t lib/main_partner.dart
 
   web:

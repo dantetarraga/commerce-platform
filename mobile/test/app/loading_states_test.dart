@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/features/stores/stores.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/features/stores/stores.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +24,7 @@ Future<void> _shot(WidgetTester tester, String name) async {
 void main() {
   setUpAll(() async {
     await loadDesignFonts();
-    final cache = Directory.systemTemp.createTempSync('chaski_loading_ui_');
+    final cache = Directory.systemTemp.createTempSync('apamuy_loading_ui_');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
           const MethodChannel('plugins.flutter.io/path_provider'),
@@ -46,13 +46,13 @@ void main() {
   }
 
   testWidgets('cliente: inicio', (tester) async {
-    final c = await pumpChaski(tester, signedIn: true, latency: _latency);
+    final c = await pumpApamuy(tester, signedIn: true, latency: _latency);
     await sequence(tester, 'cliente_inicio');
-    await unmountChaski(tester, c);
+    await unmountApamuy(tester, c);
   });
 
   testWidgets('cliente: pedidos y negocio', (tester) async {
-    final c = await pumpChaski(tester, signedIn: true, latency: _latency);
+    final c = await pumpApamuy(tester, signedIn: true, latency: _latency);
     for (var i = 0; i < 3; i++) {
       await tester.pump(_latency);
       await settle(tester);
@@ -78,7 +78,7 @@ void main() {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 150)));
     await settle(tester);
     await _shot(tester, 'cliente_negocio_listo');
-    await unmountChaski(tester, c);
+    await unmountApamuy(tester, c);
   });
 
   testWidgets('negocio: comandas', (tester) async {
@@ -88,7 +88,7 @@ void main() {
       latency: _latency,
     );
     await sequence(tester, 'negocio');
-    await unmountChaski(tester, c);
+    await unmountApamuy(tester, c);
   });
 
   testWidgets('negocio: riel en tablet', (tester) async {
@@ -100,7 +100,7 @@ void main() {
       brightness: Brightness.dark,
     );
     await sequence(tester, 'negocio_tablet');
-    await unmountChaski(tester, c);
+    await unmountApamuy(tester, c);
   });
 
   testWidgets('repartidor: recorridos', (tester) async {
@@ -110,6 +110,6 @@ void main() {
       latency: _latency,
     );
     await sequence(tester, 'repartidor');
-    await unmountChaski(tester, c);
+    await unmountApamuy(tester, c);
   });
 }

@@ -1,7 +1,7 @@
-import 'package:chaski/shared/design_system/components/app_loader.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/components/app_loader.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 enum AppButtonVariant {
@@ -107,14 +107,14 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final enabled = onPressed != null && !loading;
 
     final (Color bg, Color fg, BorderSide side) = switch (variant) {
       AppButtonVariant.primary => (scheme.primary, scheme.onPrimary, BorderSide.none),
-      AppButtonVariant.secondary => (chaski.raised, scheme.onSurface, BorderSide.none),
+      AppButtonVariant.secondary => (apamuy.raised, scheme.onSurface, BorderSide.none),
       AppButtonVariant.ghost => (Colors.transparent, scheme.primary, BorderSide.none),
-      AppButtonVariant.danger => (Colors.transparent, chaski.danger, BorderSide(color: chaski.danger, width: 1.5)),
+      AppButtonVariant.danger => (Colors.transparent, apamuy.danger, BorderSide(color: apamuy.danger, width: 1.5)),
       AppButtonVariant.ink => Theme.of(context).brightness == Brightness.dark
           ? (scheme.onSurface, scheme.surface, BorderSide.none)
           : (AppColors.tinta, AppColors.blanco, BorderSide.none),

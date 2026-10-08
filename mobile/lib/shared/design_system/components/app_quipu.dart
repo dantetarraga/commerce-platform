@@ -1,6 +1,6 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 enum QuipuKnot {
@@ -71,9 +71,9 @@ class _QuipuRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     // El tramo hacia el siguiente paso va en cobalto si este ya se cumplió.
-    Color cordColor(QuipuStep from) => from.knot == QuipuKnot.done ? chaski.thread : scheme.outlineVariant;
+    Color cordColor(QuipuStep from) => from.knot == QuipuKnot.done ? apamuy.thread : scheme.outlineVariant;
     final lineColor = cordColor(step);
     final todo = step.knot == QuipuKnot.todo;
 
@@ -223,14 +223,14 @@ class _KnotDotState extends State<_KnotDot> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return AnimatedBuilder(
       animation: Listenable.merge([_breath, _tie]),
       builder: (context, _) {
         final tie = AppMotion.knot.transform(_tie.value);
         final (Color fill, double size) = switch (widget.knot) {
-          QuipuKnot.done => (chaski.thread, 12.0 * tie.clamp(0.0, 1.3)),
-          QuipuKnot.current => (chaski.thread, 12.0),
+          QuipuKnot.done => (apamuy.thread, 12.0 * tie.clamp(0.0, 1.3)),
+          QuipuKnot.current => (apamuy.thread, 12.0),
           QuipuKnot.todo => (scheme.surfaceContainerHigh, 10.0),
         };
         return SizedBox.square(
@@ -244,7 +244,7 @@ class _KnotDotState extends State<_KnotDot> with TickerProviderStateMixin {
                   height: 14 + 10 * _breath.value,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: chaski.thread.withValues(alpha: 0.25 * (1 - _breath.value * 0.5)),
+                    color: apamuy.thread.withValues(alpha: 0.25 * (1 - _breath.value * 0.5)),
                   ),
                 ),
               Container(

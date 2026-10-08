@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
 
 /// `?lat=&lng=` para los endpoints que calculan delivery según la ubicación.
 Map<String, Object?>? locationQuery(GeoCoordinates? near) =>

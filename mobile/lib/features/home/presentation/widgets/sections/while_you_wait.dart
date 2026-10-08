@@ -1,6 +1,6 @@
-import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/discovery/discovery.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -65,7 +65,7 @@ class _WaitTile extends StatelessWidget {
     final dark = theme.brightness == Brightness.dark;
     final strong = category.slug == 'encargos';
     final fg = strong ? AppColors.blanco : (dark ? theme.colorScheme.onSurface : AppColors.tinta);
-    final bg = strong ? AppColors.terracota : (dark ? context.chaski.card : (alternate ? AppColors.hierbaSoft : AppColors.terracota50));
+    final bg = strong ? AppColors.terracota : (dark ? context.apamuy.card : (alternate ? AppColors.hierbaSoft : AppColors.terracota50));
     return AppTapSurface(
       semanticLabel: 'Explorar $_label',
       color: bg,

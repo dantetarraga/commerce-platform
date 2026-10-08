@@ -1,10 +1,10 @@
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/stores/presentation/providers/stores_providers.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
+import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

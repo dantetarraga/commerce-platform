@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/features/products/domain/entities/product.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/features/products/domain/entities/product.dart';
 import 'package:equatable/equatable.dart';
 
 /// Lo que se arma en el detalle de producto; inmutable. El precio que calcula

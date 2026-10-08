@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/components/app_price.dart';
-import 'package:chaski/shared/design_system/components/app_ticket.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_typography.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/app_price.dart';
+import 'package:apamuy/shared/design_system/components/app_ticket.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
 enum AmountRowKind {
@@ -67,7 +67,7 @@ class AmountRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final success = context.chaski.success;
+    final success = context.apamuy.success;
     final free = freeLabel != null && amount.isZero;
 
     final base = style ?? theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant);

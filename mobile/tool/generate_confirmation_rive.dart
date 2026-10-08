@@ -1,4 +1,4 @@
-// Genera la ilustración vectorial propia de Chaski; no necesita el editor Rive.
+// Genera la ilustración vectorial propia de Apamuy; no necesita el editor Rive.
 // Formato público: rive-app/rive-runtime/include/rive/runtime_header.hpp y
 // include/rive/generated/{shapes,animation}/*_base.hpp (formato 7.0).
 // El test rive_success_test.dart verifica este archivo con el runtime real.
@@ -9,7 +9,7 @@ import 'dart:typed_data';
 void main() {
   final scene = _RiveScene()
     ..object(23, {}) // Backboard.
-    ..object(1, {4: 'ChaskiSuccess', 7: 240.0, 8: 240.0});
+    ..object(1, {4: 'ApamuySuccess', 7: 240.0, 8: 240.0});
   // Los índices de componentes empiezan en el artboard (0).
   final badge = scene.component(2, {4: 'Badge', 5: 0, 13: 120.0, 14: 120.0});
   final check = scene.polygon('Check', badge, 0, 0, const [
@@ -55,7 +55,7 @@ void main() {
       ..animate(spark.id, 13, [(0, 120 + (spark.x - 120) * 0.6), (48, spark.x), (72, spark.x)])
       ..animate(spark.id, 14, [(0, 120 + (spark.y - 120) * 0.6), (48, spark.y), (72, spark.y + 6)]);
   }
-  final file = File('assets/animations/chaski_success.riv');
+  final file = File('assets/animations/apamuy_success.riv');
   file.parent.createSync(recursive: true);
   file.writeAsBytesSync(scene.bytes.takeBytes());
   stdout.writeln('${file.path}: ${file.lengthSync()} bytes');

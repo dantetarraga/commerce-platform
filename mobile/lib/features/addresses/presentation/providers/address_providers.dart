@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/infrastructure/address_repository_impl.dart';
-import 'package:chaski/features/addresses/infrastructure/synced_address_repository.dart';
-import 'package:chaski/features/auth/auth.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/infrastructure/address_repository_impl.dart';
+import 'package:apamuy/features/addresses/infrastructure/synced_address_repository.dart';
+import 'package:apamuy/features/auth/auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'address_providers.g.dart';

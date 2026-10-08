@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:chaski/shared/design_system/components/app_loader.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/components/app_loader.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -115,7 +115,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
 
     final focused = widget.focusNode?.hasFocus ?? false;
     final decoration = BoxDecoration(
-      color: filled ? scheme.primary : (focused ? scheme.surface : context.chaski.raised),
+      color: filled ? scheme.primary : (focused ? scheme.surface : context.apamuy.raised),
       borderRadius: filled ? AppRadius.tileExit : AppRadius.button,
       border: Border.all(color: focused ? scheme.primary : Colors.transparent, width: 2),
     );

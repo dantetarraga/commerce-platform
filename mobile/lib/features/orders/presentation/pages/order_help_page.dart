@@ -1,10 +1,10 @@
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/presentation/order_status_labels.dart';
-import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/store_thumb.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
+import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
+import 'package:apamuy/features/orders/presentation/widgets/store_thumb.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -146,7 +146,7 @@ class _OrderSummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.card),
       child: Row(
         children: [
           StoreThumb(url: order.store.logoUrl, background: theme.colorScheme.surface),

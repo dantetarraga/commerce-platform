@@ -1,6 +1,6 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/features/cart/presentation/providers/cart_providers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/features/cart/presentation/providers/cart_providers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,24 +47,24 @@ class _CouponRowState extends ConsumerState<CouponRow> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final coupon = ref.watch(cartControllerProvider.select((c) => c.value?.coupon));
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
 
     if (coupon != null) {
       return Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.xs),
         child: Container(
           padding: const EdgeInsets.only(left: AppSpacing.md),
-          decoration: BoxDecoration(color: chaski.accent, borderRadius: AppRadius.tile),
+          decoration: BoxDecoration(color: apamuy.accent, borderRadius: AppRadius.tile),
           child: Row(
             children: [
-              Icon(Icons.local_offer_rounded, color: chaski.onAccent, size: 18),
+              Icon(Icons.local_offer_rounded, color: apamuy.onAccent, size: 18),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text('${coupon.code} · ${coupon.label}', style: theme.textTheme.labelLarge?.copyWith(color: chaski.onAccent)),
+                child: Text('${coupon.code} · ${coupon.label}', style: theme.textTheme.labelLarge?.copyWith(color: apamuy.onAccent)),
               ),
               IconButton(
                 tooltip: 'Quitar cupón',
-                color: chaski.onAccent,
+                color: apamuy.onAccent,
                 icon: const Icon(Icons.close_rounded, size: 18),
                 onPressed: () => ref.read(cartControllerProvider.notifier).removeCoupon(),
               ),

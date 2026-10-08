@@ -1,4 +1,4 @@
-import 'package:chaski/features/discovery/domain/promotion.dart';
+import 'package:apamuy/features/discovery/domain/promotion.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'promotion_dto.g.dart';

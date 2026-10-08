@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Carga del seguimiento: mapa gris y la hoja con bloques que brillan.

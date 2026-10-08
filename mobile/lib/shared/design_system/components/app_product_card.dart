@@ -1,14 +1,14 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/components/app_network_image.dart';
-import 'package:chaski/shared/design_system/components/app_price.dart';
-import 'package:chaski/shared/design_system/components/app_skeleton.dart';
-import 'package:chaski/shared/design_system/components/app_toast.dart';
-import 'package:chaski/shared/design_system/components/fly_to_purchase_bar.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/app_typography.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/app_network_image.dart';
+import 'package:apamuy/shared/design_system/components/app_price.dart';
+import 'package:apamuy/shared/design_system/components/app_skeleton.dart';
+import 'package:apamuy/shared/design_system/components/app_toast.dart';
+import 'package:apamuy/shared/design_system/components/fly_to_purchase_bar.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -171,7 +171,7 @@ class _RowBody extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: 6),
       padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark ? context.chaski.raised : const Color(0xFFEBE7DC),
+        color: Theme.of(context).brightness == Brightness.dark ? context.apamuy.raised : const Color(0xFFEBE7DC),
         borderRadius: AppRadius.card,
       ),
       child: Row(

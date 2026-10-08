@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/checkout/presentation/widgets/knot_celebration.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/knot_celebration.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

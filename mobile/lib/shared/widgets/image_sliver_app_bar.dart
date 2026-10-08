@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// App bar con foto de portada: el título aparece al colapsar y [edge] se monta
@@ -183,7 +183,7 @@ class _PhotoCircleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return IconButton(
       tooltip: action.tooltip,
       onPressed: action.onPressed,
@@ -194,7 +194,7 @@ class _PhotoCircleButton extends StatelessWidget {
         padding: EdgeInsets.zero,
         // Área táctil de 48 aunque el círculo mida 40.
         tapTargetSize: MaterialTapTargetSize.padded,
-        backgroundColor: onPhoto ? chaski.onPhoto.withValues(alpha: 0.94) : Colors.transparent,
+        backgroundColor: onPhoto ? apamuy.onPhoto.withValues(alpha: 0.94) : Colors.transparent,
         foregroundColor: onPhoto ? AppColors.tinta : scheme.onSurface,
       ),
     );

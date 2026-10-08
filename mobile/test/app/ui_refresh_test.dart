@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:chaski/features/courier_deliveries/courier_deliveries.dart';
-import 'package:chaski/features/home/presentation/pages/home_page.dart';
-import 'package:chaski/features/merchant_orders/merchant_orders.dart';
+import 'package:apamuy/features/courier_deliveries/courier_deliveries.dart';
+import 'package:apamuy/features/home/presentation/pages/home_page.dart';
+import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,7 +21,7 @@ Future<void> _capture(WidgetTester tester, Finder page, String name) async {
 
 void main() {
   setUpAll(() async {
-    final cache = Directory.systemTemp.createTempSync('chaski_ui_refresh_');
+    final cache = Directory.systemTemp.createTempSync('apamuy_ui_refresh_');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
       const MethodChannel('plugins.flutter.io/path_provider'),
       (_) async => cache.path,
@@ -50,11 +50,11 @@ void main() {
     ('oscuro', const Size(390, 844), 1.0, Brightness.dark),
   ]) {
     testWidgets('inicio del cliente y cuenta de socios en $name', (tester) async {
-      final customer = await pumpChaski(tester, signedIn: true, size: size, textScale: scale, brightness: brightness);
+      final customer = await pumpApamuy(tester, signedIn: true, size: size, textScale: scale, brightness: brightness);
       expect(find.text('¿Qué te provoca hoy?'), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (name != 'compacto') await _capture(tester, find.byType(HomePage), 'cliente_$name');
-      await unmountChaski(tester, customer);
+      await unmountApamuy(tester, customer);
 
       final partner = await pumpPartner(tester, signedInAs: 'usr_owner_chaski_dorado', size: size, textScale: scale, brightness: brightness);
       if (name != 'compacto') await _capture(tester, find.byType(MerchantHomePage), 'negocio_$name');
@@ -63,7 +63,7 @@ void main() {
       expect(find.text('Negocio'), findsOneWidget);
       expect(find.text('Cerrar sesión'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await unmountChaski(tester, partner);
+      await unmountApamuy(tester, partner);
       // flutter_cache_manager programa la limpieza de su caché a los 10 s.
       await tester.pump(const Duration(seconds: 12));
     });
@@ -77,7 +77,7 @@ void main() {
     expect(find.text('En ruta · conectado'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await _capture(tester, find.byType(CourierHomePage), 'repartidor_movil');
-    await unmountChaski(tester, partner);
+    await unmountApamuy(tester, partner);
     await tester.pump(const Duration(seconds: 12));
   });
 }

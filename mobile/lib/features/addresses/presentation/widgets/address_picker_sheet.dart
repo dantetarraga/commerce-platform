@@ -1,7 +1,7 @@
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/presentation/pages/address_form_page.dart';
-import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/presentation/pages/address_form_page.dart';
+import 'package:apamuy/features/addresses/presentation/providers/address_providers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,7 +57,7 @@ class AddressPicker extends ConsumerWidget {
                   leading: Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(color: context.chaski.raised, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: context.apamuy.raised, shape: BoxShape.circle),
                     child: Icon(addressIcon(address.kind), size: 20),
                   ),
                   title: Text(address.title, style: theme.textTheme.titleSmall),

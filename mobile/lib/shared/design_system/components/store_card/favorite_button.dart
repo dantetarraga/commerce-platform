@@ -1,6 +1,6 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// Corazón de favorito: contorno → rebote → relleno.
@@ -38,8 +38,8 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final chaski = context.chaski;
-    final color = widget.isFavorite ? chaski.danger : (widget.onPhoto ? AppColors.tinta : scheme.onSurface);
+    final apamuy = context.apamuy;
+    final color = widget.isFavorite ? apamuy.danger : (widget.onPhoto ? AppColors.tinta : scheme.onSurface);
     final icon = AnimatedBuilder(
       animation: _bounce,
       builder: (context, child) {
@@ -76,7 +76,7 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
             child: Center(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  color: widget.onPhoto ? chaski.onPhoto.withValues(alpha: 0.94) : Colors.transparent,
+                  color: widget.onPhoto ? apamuy.onPhoto.withValues(alpha: 0.94) : Colors.transparent,
                   shape: BoxShape.circle,
                 ),
                 child: SizedBox.square(

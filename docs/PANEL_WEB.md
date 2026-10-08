@@ -123,8 +123,10 @@ Acordada el 2026-10-08. Las reglas de trabajo están en [`web/CLAUDE.md`](../web
 web/src/
 ├── main.tsx · index.css            # arranque; Tailwind + tokens Terracota
 ├── app/
-│   ├── providers/                  # providers.tsx · query-client.ts
-│   └── router/                     # router.tsx (root, layouts, árbol completo) · guards.ts
+│   ├── providers/                  # providers.tsx · query-client.ts · http-setup.ts
+│   ├── router/                     # router.tsx (root, layouts, árbol completo) · guards.ts
+│   ├── api/                        # http.ts · interceptors.ts · api-error.ts · generated/ (orval)
+│   └── config/                     # env.ts · navigation.ts
 ├── layouts/                        # root · auth · admin · merchant
 ├── features/                       # un dominio por carpeta
 │   └── <feature>/
@@ -137,12 +139,10 @@ web/src/
 │       ├── routes/                 # *.routes.tsx: definiciones (path, componente, loader)
 │       ├── schemas/                # Zod de formularios
 │       └── index.ts                # API pública del feature
-├── api/                            # http.ts · interceptors.ts · api-error.ts · generated/ (orval)
 ├── realtime/                       # socket-client.ts · events.ts · subscriptions.ts
 ├── components/                     # ui/ (shadcn) · layout/ (sidebar, header) · shared/
 ├── hooks/                          # hooks reutilizables (use-countdown, use-disclosure…)
-├── lib/                            # cn · money · datetime
-├── config/                         # env.ts · navigation.ts
+├── lib/                            # cn · money · errors · datetime/ (adapter de fechas)
 └── test/                           # setup.ts · render.tsx · mocks/
 ```
 
@@ -150,7 +150,8 @@ Features previstas: `auth`, `home`, `orders`, `partners`, `catalog`, `marketing`
 
 **Reglas**
 - Las carpetas de un feature tienen siempre esos nombres, pero se crean cuando llega su primer archivo (no hay carpetas vacías). Sin `services/`: su papel lo cumple `api/`.
-- Dependencias en un solo sentido: `app → layouts → features → api / realtime / components / lib / config`. Un feature no importa de otro; desde fuera solo se importa su `index.ts`.
+- Dependencias en un solo sentido: `app/providers, app/router → layouts → features → app/api, app/config, realtime, components, hooks, lib`. Un feature no importa de otro; desde fuera solo se importa su `index.ts`.
+- Librerías encerradas tras un adapter o una instancia única: fechas en `lib/datetime` (`DateTimeAdapter`, hoy con date-fns) y HTTP en `app/api` (axios). Cambiar de librería toca un solo lugar; ESLint impide importarlas en otro sitio.
 - Rutas en código: cada feature exporta **definiciones** de ruta y `app/router/router.tsx` es el único lugar que las crea y las cuelga bajo cada layout (evita importaciones circulares y deja el mapa completo en un archivo).
 - Sufijos: `*.api.ts`, `*.schema(s).ts`, `*.store.ts`, `*.routes.tsx`, `*.page.tsx`. Componentes en kebab-case, hooks con `use-`. Tests junto al archivo (`*.test.ts(x)`), e2e en `web/e2e/`.
 - Lógica repetida → custom hook (`src/hooks/` si es genérica, `features/<x>/hooks/` si es del dominio).

@@ -1,6 +1,6 @@
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/discovery/infrastructure/models/promotion_dto.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/discovery/infrastructure/models/promotion_dto.dart';
 
 abstract interface class PromotionsRemoteDataSource {
   Future<List<PromotionDto>> getPromotions();

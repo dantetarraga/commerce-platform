@@ -917,7 +917,7 @@
     },
     {
       "id": "st_encargos",
-      "name": "Encargos Chaski",
+      "name": "Encargos Apamuy",
       "slug": "encargos-chaski",
       "description": "Te llevamos o recogemos lo que necesites dentro de Yauri.",
       "logoUrl": "",
@@ -977,7 +977,7 @@
       ],
       "tags": [],
       "promoLabel": null,
-      "ownerName": "el equipo Chaski",
+      "ownerName": "el equipo Apamuy",
       "attendingSince": 2026,
       "menuSections": [
         {

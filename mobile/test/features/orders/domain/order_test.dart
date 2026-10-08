@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/infrastructure/models/order_json.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/infrastructure/models/order_json.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

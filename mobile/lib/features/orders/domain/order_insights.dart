@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/orders/domain/order.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
 
 /// Datos derivados de un pedido.
 extension OrderInsights on Order {

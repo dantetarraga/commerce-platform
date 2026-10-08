@@ -1,10 +1,10 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/infrastructure/address_repository_impl.dart';
-import 'package:chaski/features/addresses/infrastructure/synced_address_repository.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/infrastructure/address_repository_impl.dart';
+import 'package:apamuy/features/addresses/infrastructure/synced_address_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

@@ -1,13 +1,13 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/store_switch.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/merchant_orders/presentation/providers/merchant_providers.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/store_switch.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -40,7 +40,7 @@ extension MerchantBoardColumnText on MerchantBoardColumn {
   Color dot(BuildContext context) => switch (this) {
     MerchantBoardColumn.fresh => Theme.of(context).colorScheme.primary,
     MerchantBoardColumn.cooking => Theme.of(context).colorScheme.onSurface,
-    MerchantBoardColumn.ready => context.chaski.accent,
+    MerchantBoardColumn.ready => context.apamuy.accent,
   };
 }
 

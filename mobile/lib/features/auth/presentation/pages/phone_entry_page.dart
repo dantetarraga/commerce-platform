@@ -1,12 +1,12 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/features/auth/presentation/pages/otp_page.dart';
-import 'package:chaski/features/auth/presentation/providers/auth_demo.dart';
-import 'package:chaski/features/auth/presentation/providers/phone_auth_flow.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_fields.dart';
-import 'package:chaski/features/auth/presentation/widgets/auth_scaffold.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/utils/value_failure_message.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/features/auth/presentation/pages/otp_page.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_demo.dart';
+import 'package:apamuy/features/auth/presentation/providers/phone_auth_flow.dart';
+import 'package:apamuy/features/auth/presentation/widgets/auth_fields.dart';
+import 'package:apamuy/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -115,7 +115,7 @@ class _DemoHint extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.card),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.card),
       child: Row(
         children: [
           Icon(Icons.science_outlined, color: theme.colorScheme.onSurfaceVariant),

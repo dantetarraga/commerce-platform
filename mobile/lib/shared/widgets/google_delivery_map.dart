@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:chaski/core/maps/delivery_map_data.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/delivery_map.dart';
+import 'package:apamuy/core/maps/delivery_map_data.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

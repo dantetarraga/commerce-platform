@@ -1,5 +1,5 @@
-import 'package:chaski/features/addresses/presentation/widgets/neighborhood_plan.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/neighborhood_plan.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

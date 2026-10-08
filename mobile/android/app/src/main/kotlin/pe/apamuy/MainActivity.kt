@@ -1,4 +1,4 @@
-package pe.chaski.chaski
+package pe.apamuy
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,14 +1,14 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/domain/repositories/cart_repository.dart';
-import 'package:chaski/features/cart/infrastructure/datasources/coupon_remote_data_source.dart';
-import 'package:chaski/features/cart/infrastructure/repositories/cart_repository_impl.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/domain/repositories/cart_repository.dart';
+import 'package:apamuy/features/cart/infrastructure/datasources/coupon_remote_data_source.dart';
+import 'package:apamuy/features/cart/infrastructure/repositories/cart_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'cart_providers.g.dart';

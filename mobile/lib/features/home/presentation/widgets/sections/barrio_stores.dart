@@ -1,7 +1,7 @@
-import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/home/presentation/widgets/open_store.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/favorites/favorites.dart';
+import 'package:apamuy/features/home/presentation/widgets/open_store.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

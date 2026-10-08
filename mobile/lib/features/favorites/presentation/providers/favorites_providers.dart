@@ -1,8 +1,8 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/favorites/domain/favorites.dart';
-import 'package:chaski/features/favorites/infrastructure/local_favorites_repository.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/favorites/domain/favorites.dart';
+import 'package:apamuy/features/favorites/infrastructure/local_favorites_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

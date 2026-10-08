@@ -1,4 +1,4 @@
-import 'package:chaski/core/result/result.dart';
+import 'package:apamuy/core/result/result.dart';
 import 'package:equatable/equatable.dart';
 
 final class Promotion extends Equatable {

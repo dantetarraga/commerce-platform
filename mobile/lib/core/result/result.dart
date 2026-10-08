@@ -1,4 +1,4 @@
-import 'package:chaski/core/errors/failure.dart';
+import 'package:apamuy/core/errors/failure.dart';
 
 /// Resultado de una operación que puede fallar sin lanzar excepciones.
 sealed class Result<T> {

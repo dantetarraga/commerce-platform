@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
 
 /// Ciudad donde opera Apamuy (Yauri, capital de la provincia de Espinar).
 const cityName = 'Yauri';

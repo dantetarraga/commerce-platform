@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/home/presentation/widgets/open_store.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/home/presentation/widgets/open_store.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,7 +34,7 @@ class _RecommendedRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return AppTapSurface(
       semanticLabel: store.name,
       borderRadius: BorderRadius.zero,
@@ -75,8 +75,8 @@ class _RecommendedRow extends StatelessWidget {
                             alignment: PlaceholderAlignment.middle,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                              decoration: BoxDecoration(color: chaski.accent, borderRadius: AppRadius.button),
-                              child: Text('Envío gratis', style: theme.textTheme.labelMedium?.copyWith(color: chaski.onAccent)),
+                              decoration: BoxDecoration(color: apamuy.accent, borderRadius: AppRadius.button),
+                              child: Text('Envío gratis', style: theme.textTheme.labelMedium?.copyWith(color: apamuy.onAccent)),
                             ),
                           )
                         else

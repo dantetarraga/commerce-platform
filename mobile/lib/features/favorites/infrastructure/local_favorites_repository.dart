@@ -1,11 +1,11 @@
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/favorites/domain/favorites.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/favorites/domain/favorites.dart';
 
 /// Favoritos guardados en el dispositivo como `{stores: [...], products: [...]}`.
 class LocalFavoritesRepository implements FavoritesRepository {
   LocalFavoritesRepository(this._store);
 
-  static const _key = 'chaski.favorites';
+  static const _key = 'apamuy.favorites';
 
   final LocalJsonStore _store;
 

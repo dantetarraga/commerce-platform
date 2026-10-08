@@ -1,11 +1,11 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/features/notifications/infrastructure/api_notifications_repository.dart';
-import 'package:chaski/features/notifications/infrastructure/fake_notifications_repository.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/features/notifications/infrastructure/api_notifications_repository.dart';
+import 'package:apamuy/features/notifications/infrastructure/fake_notifications_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notifications_providers.g.dart';

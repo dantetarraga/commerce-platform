@@ -1,5 +1,5 @@
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Motivo del rechazo (el cliente lo lee). Cierra con el texto final.

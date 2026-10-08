@@ -1,9 +1,9 @@
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/utils/text_utils.dart';
-import 'package:chaski/features/discovery/domain/search.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/utils/text_utils.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
 
 /// `GET /discovery/popular-searches`: `[{term, storeCount}]`.
 class ApiPopularSearchesRepository implements PopularSearchesRepository {

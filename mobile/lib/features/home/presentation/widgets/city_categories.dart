@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/text_scale.dart';
-import 'package:chaski/features/home/presentation/widgets/category_tiles.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
+import 'package:apamuy/features/home/presentation/widgets/category_tiles.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

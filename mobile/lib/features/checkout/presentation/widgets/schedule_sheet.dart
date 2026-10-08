@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -245,7 +245,7 @@ class _SlotCell extends StatelessWidget {
           height: AppSpacing.minTouch,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? scheme.primary : (available ? context.chaski.raised : Colors.transparent),
+            color: selected ? scheme.primary : (available ? context.apamuy.raised : Colors.transparent),
             borderRadius: AppRadius.tile,
             border: available ? null : Border.all(color: scheme.outlineVariant),
           ),

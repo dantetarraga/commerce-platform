@@ -1,4 +1,4 @@
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
 import 'package:equatable/equatable.dart';
 
 /// Una página de `GET /stores` con los filtros ya aplicados por el backend.

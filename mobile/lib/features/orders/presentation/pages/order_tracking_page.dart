@@ -1,16 +1,16 @@
-import 'package:chaski/core/time/clock_provider.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/presentation/order_status_labels.dart';
-import 'package:chaski/features/orders/presentation/pages/order_help_page.dart';
-import 'package:chaski/features/orders/presentation/providers/orders_providers.dart';
-import 'package:chaski/features/orders/presentation/widgets/courier_card.dart';
-import 'package:chaski/features/orders/presentation/widgets/order_receipt_summary.dart';
-import 'package:chaski/features/orders/presentation/widgets/order_timeline.dart';
-import 'package:chaski/features/orders/presentation/widgets/rating_sheet.dart';
-import 'package:chaski/features/orders/presentation/widgets/route_map.dart';
-import 'package:chaski/features/orders/presentation/widgets/tracking_skeleton.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/time/clock_provider.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
+import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
+import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
+import 'package:apamuy/features/orders/presentation/widgets/courier_card.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_receipt_summary.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_timeline.dart';
+import 'package:apamuy/features/orders/presentation/widgets/rating_sheet.dart';
+import 'package:apamuy/features/orders/presentation/widgets/route_map.dart';
+import 'package:apamuy/features/orders/presentation/widgets/tracking_skeleton.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -184,7 +184,7 @@ class _EtaHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final minutes = order.minutesLeft(_liveNow(ref, order));
     final deliveredAt = order.timeOf(OrderStatus.delivered);
     final (String caption, String big) = switch (order.status) {
@@ -228,8 +228,8 @@ class _EtaHeader extends ConsumerWidget {
                     label: order.status.tag,
                     live: !order.status.isFinal,
                     color: switch (order.status) {
-                      OrderStatus.delivered => chaski.success,
-                      OrderStatus.cancelled => chaski.danger,
+                      OrderStatus.delivered => apamuy.success,
+                      OrderStatus.cancelled => apamuy.danger,
                       _ => null,
                     },
                   ),

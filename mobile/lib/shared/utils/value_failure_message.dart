@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/value_failure.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
 
 /// Mensajes en español para los rechazos de value objects (usado en formularios).
 extension ValueFailureMessage on ValueFailure {

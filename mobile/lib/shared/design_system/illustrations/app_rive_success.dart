@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart' as rive;
 
@@ -9,7 +9,7 @@ import 'package:rive/rive.dart' as rive;
 class AppRiveSuccess extends StatelessWidget {
   const AppRiveSuccess({this.size = 168, this.assetPath = asset, super.key});
 
-  static const asset = 'assets/animations/chaski_success.riv';
+  static const asset = 'assets/animations/apamuy_success.riv';
   final double size;
   final String assetPath;
 
@@ -84,7 +84,7 @@ class _AnimatedSuccessState extends State<_AnimatedSuccess> {
         file?.dispose();
         return;
       }
-      artboard = file?.artboard('ChaskiSuccess');
+      artboard = file?.artboard('ApamuySuccess');
       if (artboard == null) throw StateError('No se encontró la ilustración de confirmación.');
       final animation = artboard.animationNamed('confirm');
       if (animation == null) throw StateError('No se encontró la animación de confirmación.');

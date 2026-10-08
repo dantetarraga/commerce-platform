@@ -1,7 +1,7 @@
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/partner_session/domain/partner_mode.dart';
-import 'package:chaski/features/partner_session/presentation/providers/partner_mode_providers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/partner_session/domain/partner_mode.dart';
+import 'package:apamuy/features/partner_session/presentation/providers/partner_mode_providers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

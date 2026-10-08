@@ -1,12 +1,12 @@
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
-import 'package:chaski/features/checkout/presentation/widgets/boleta.dart';
-import 'package:chaski/features/checkout/presentation/widgets/knot_celebration.dart';
-import 'package:chaski/features/checkout/presentation/widgets/payment_sheet.dart';
-import 'package:chaski/features/orders/orders_customer.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/boleta.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/knot_celebration.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/payment_sheet.dart';
+import 'package:apamuy/features/orders/orders_customer.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +44,7 @@ class CheckoutPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final cart = ref.watch(cartControllerProvider).value ?? Cart.empty;
     final address = ref.watch(selectedAddressProvider);
     final state = ref.watch(checkoutControllerProvider);
@@ -78,9 +78,9 @@ class CheckoutPage extends ConsumerWidget {
     };
 
     return Scaffold(
-      backgroundColor: chaski.raised,
+      backgroundColor: apamuy.raised,
       appBar: AppBar(
-        backgroundColor: chaski.raised,
+        backgroundColor: apamuy.raised,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: 0,
         title: const Text('Tu boleta'),
@@ -98,7 +98,7 @@ class CheckoutPage extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: ColoredBox(
-        color: chaski.raised,
+        color: apamuy.raised,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.xs, AppSpacing.gutter, AppSpacing.md),

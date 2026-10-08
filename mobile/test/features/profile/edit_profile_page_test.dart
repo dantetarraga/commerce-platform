@@ -1,6 +1,6 @@
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/profile/profile.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +13,7 @@ void main() {
     FlutterError.onError = (d) => d.toString().contains('overflowed') ? null : original?.call(d);
     addTearDown(() => FlutterError.onError = original);
 
-    final container = await pumpChaski(tester, signedIn: true);
+    final container = await pumpApamuy(tester, signedIn: true);
     container.read(appRouterProvider).goNamed(ProfilePage.name);
     await settle(tester, frames: 30);
 
@@ -40,6 +40,6 @@ void main() {
     expect(find.text('Tus datos'), findsNothing);
     expect(find.text('Alexandra Quispe'), findsOneWidget);
 
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

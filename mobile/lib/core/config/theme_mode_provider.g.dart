@@ -44,7 +44,7 @@ final class AppThemeModeProvider
   }
 }
 
-String _$appThemeModeHash() => r'48db0f9c0d554160b095c4c27ee12af82da1670e';
+String _$appThemeModeHash() => r'c9f666c25680919f0395689aa116c2afc16e8508';
 
 /// Tema elegido por el usuario, guardado en el dispositivo.
 

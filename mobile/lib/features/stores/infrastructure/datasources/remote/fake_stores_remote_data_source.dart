@@ -1,12 +1,12 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/fake/fake_catalog_json.dart';
-import 'package:chaski/core/utils/text_utils.dart';
-import 'package:chaski/features/stores/domain/entities/store_filter.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
-import 'package:chaski/features/stores/infrastructure/models/store_dtos.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_catalog_json.dart';
+import 'package:apamuy/core/utils/text_utils.dart';
+import 'package:apamuy/features/stores/domain/entities/store_filter.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
+import 'package:apamuy/features/stores/infrastructure/models/store_dtos.dart';
 
 /// Simula `GET /categories`, `/stores`, `/stores/:id` y `/stores/:id/products`
 /// a partir de `assets/fixtures/catalog.json`.

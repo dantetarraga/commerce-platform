@@ -1,7 +1,7 @@
-import 'package:chaski/shared/design_system/components/app_navigation_dock.dart';
-import 'package:chaski/shared/design_system/components/app_network_image.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/components/app_navigation_dock.dart';
+import 'package:apamuy/shared/design_system/components/app_network_image.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// La foto del producto viaja desde [from] (rectángulo global) hasta la bolsa,

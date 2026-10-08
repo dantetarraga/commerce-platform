@@ -1,5 +1,5 @@
-import 'package:chaski/app_partner/router/partner_routes.dart';
-import 'package:chaski/features/merchant_orders/merchant_orders.dart';
+import 'package:apamuy/app_partner/router/partner_routes.dart';
+import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -29,7 +29,7 @@ void main() {
     expect(find.text('Nuevos'), findsOneWidget);
     expect(find.text('Preparando (2)'), findsOneWidget);
     expect(alarm.ringing, isFalse);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('rechazar exige un motivo y avisa al cliente', (tester) async {
@@ -51,7 +51,7 @@ void main() {
 
     expect(find.text('Nuevos'), findsOneWidget);
     expect(find.text('Sin pedidos nuevos'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('lista para recoger la pasa a la pestaña de listas', (tester) async {
@@ -63,7 +63,7 @@ void main() {
     await tester.tap(find.text('Listo para recoger'));
     await settle(tester);
     expect(find.text('Listos (2)'), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('marca un producto agotado desde la lista de productos', (tester) async {
@@ -77,6 +77,6 @@ void main() {
     await tester.tap(find.byType(Switch).first);
     await settle(tester);
     expect(find.text('Agotado'), findsNWidgets(soldOutBefore + 1));
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 }

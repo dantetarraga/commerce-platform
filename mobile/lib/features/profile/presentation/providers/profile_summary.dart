@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/favorites/favorites.dart';
+import 'package:apamuy/features/orders/orders.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'profile_summary.g.dart';

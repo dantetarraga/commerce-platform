@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Fila de la boleta: ícono, qué es, el valor y la acción a la derecha.
@@ -32,7 +32,7 @@ class CheckoutInfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final danger = context.chaski.danger;
+    final danger = context.apamuy.danger;
     return Semantics(
       button: true,
       label: '$caption: $title${subtitle == null ? '' : ', $subtitle'}${missing ? ', falta' : ''}',

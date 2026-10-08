@@ -1,4 +1,4 @@
-import 'package:chaski/features/auth/presentation/widgets/splash_motion.dart';
+import 'package:apamuy/features/auth/presentation/widgets/splash_motion.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

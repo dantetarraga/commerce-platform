@@ -1,8 +1,8 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/domain/staff_order.dart';
-import 'package:chaski/features/orders/presentation/order_status_labels.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/domain/staff_order.dart';
+import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// "recién" · "hace 3 min" · "hace 1 h" · "7:02 am" (si pasó más de un día).
@@ -48,7 +48,7 @@ class StaffOrderHeader extends StatelessWidget {
                 vertical: AppSpacing.xxs,
               ),
               decoration: BoxDecoration(
-                color: fresh ? theme.colorScheme.primaryContainer : context.chaski.raised,
+                color: fresh ? theme.colorScheme.primaryContainer : context.apamuy.raised,
                 borderRadius: AppRadius.tile,
               ),
               child: Text(

@@ -1,10 +1,10 @@
-import 'package:chaski/core/domain/email_address.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/utils/value_failure_message.dart';
+import 'package:apamuy/core/domain/email_address.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

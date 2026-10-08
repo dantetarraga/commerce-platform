@@ -1,13 +1,13 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/core/utils/idempotency_keys.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/infrastructure/checkout_preferences.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/core/utils/idempotency_keys.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/infrastructure/checkout_preferences.dart';
+import 'package:apamuy/features/orders/orders.dart';
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

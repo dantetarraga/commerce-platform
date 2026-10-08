@@ -1,16 +1,16 @@
-import 'package:chaski/app/router/app_router.dart';
-import 'package:chaski/app_partner/router/partner_router.dart';
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/config/env.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/core/storage/preferences_storage.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/core/storage/token_storage.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/alarm/order_alarm.dart';
+import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/app_partner/router/partner_router.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/config/env.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/core/storage/preferences_storage.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/core/storage/token_storage.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/alarm/order_alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -65,7 +65,7 @@ class MemoryTokens implements TokenStorage {
 
 /// Monta la app completa con el backend fake y almacenamiento en memoria; la
 /// desmonta al terminar para no dejar temporizadores vivos.
-Future<ProviderContainer> pumpChaski(
+Future<ProviderContainer> pumpApamuy(
   WidgetTester tester, {
   bool onboardingSeen = true,
   bool signedIn = false,
@@ -189,8 +189,8 @@ Future<ProviderContainer> _pumpApp(
 }
 
 /// Desmonta la app y libera providers (cancela temporizadores periódicos).
-/// Llamar al final de cada test que use [pumpChaski].
-Future<void> unmountChaski(
+/// Llamar al final de cada test que use [pumpApamuy].
+Future<void> unmountApamuy(
   WidgetTester tester,
   ProviderContainer container,
 ) async {

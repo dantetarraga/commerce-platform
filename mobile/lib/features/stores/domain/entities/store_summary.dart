@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/stores/domain/entities/weekly_schedule.dart';
 import 'package:equatable/equatable.dart';
 
 final class StoreRating extends Equatable {

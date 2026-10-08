@@ -1,11 +1,11 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/stores/domain/entities/category.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/domain/entities/store_page.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/domain/repositories/stores_repository.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/stores/domain/entities/category.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/domain/entities/store_page.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/domain/repositories/stores_repository.dart';
 
 class GetCategories {
   const GetCategories(this._repository);

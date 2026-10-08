@@ -1,6 +1,6 @@
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
 
 Failure mapExceptionToFailure(Object error) {
   return switch (error) {

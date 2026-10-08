@@ -1,12 +1,12 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/shared/design_system/components/app_skeleton.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_data.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_editorial.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_feature.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_repeat.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_row.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/shared/design_system/components/app_skeleton.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_data.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_editorial.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_feature.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_repeat.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_row.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 export 'favorite_button.dart';

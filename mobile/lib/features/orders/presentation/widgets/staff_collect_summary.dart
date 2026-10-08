@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Lo que cobra el repartidor al entregar: la sección de cobro del ticket (usa
@@ -76,7 +76,7 @@ class _CompactCollect extends StatelessWidget {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 10),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
       child: Row(
         children: [
           Expanded(

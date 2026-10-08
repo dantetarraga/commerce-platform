@@ -1,11 +1,11 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/courier_deliveries/domain/courier.dart';
-import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/orders/orders_infrastructure.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/courier_deliveries/domain/courier.dart';
+import 'package:apamuy/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/orders/orders_infrastructure.dart';
 
 class CourierRepositoryImpl implements CourierRepository {
   const CourierRepositoryImpl(this._remote);

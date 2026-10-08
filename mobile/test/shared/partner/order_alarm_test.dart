@@ -1,5 +1,5 @@
-import 'package:chaski/shared/partner/alarm/order_alarm.dart';
-import 'package:chaski/shared/partner/alarm/order_alarm_controller.dart';
+import 'package:apamuy/shared/partner/alarm/order_alarm.dart';
+import 'package:apamuy/shared/partner/alarm/order_alarm_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class _Alarm implements OrderAlarm {

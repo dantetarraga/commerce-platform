@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/orders/orders.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

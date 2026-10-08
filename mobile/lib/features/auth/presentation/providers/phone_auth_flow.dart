@@ -1,10 +1,10 @@
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/features/auth/domain/entities/otp.dart';
-import 'package:chaski/features/auth/domain/value_objects/otp_code.dart';
-import 'package:chaski/features/auth/domain/value_objects/person_name.dart';
-import 'package:chaski/features/auth/presentation/providers/auth_providers.dart';
-import 'package:chaski/features/auth/presentation/providers/auth_session.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/features/auth/domain/entities/otp.dart';
+import 'package:apamuy/features/auth/domain/value_objects/otp_code.dart';
+import 'package:apamuy/features/auth/domain/value_objects/person_name.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_providers.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_session.dart';
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

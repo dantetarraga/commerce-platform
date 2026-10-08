@@ -1,11 +1,11 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/home/domain/repeat_order.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/products/domain/repositories/products_repository.dart';
-import 'package:chaski/features/products/products.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/home/domain/repeat_order.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/products/domain/repositories/products_repository.dart';
+import 'package:apamuy/features/products/products.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

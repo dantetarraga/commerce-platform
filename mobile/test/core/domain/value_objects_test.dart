@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/email_address.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/domain/value_failure.dart';
-import 'package:chaski/features/auth/domain/value_objects/otp_code.dart';
+import 'package:apamuy/core/domain/email_address.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
+import 'package:apamuy/features/auth/domain/value_objects/otp_code.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -21,12 +21,12 @@ void main() {
 
   group('EmailAddress', () {
     test('normaliza espacios y mayúsculas', () {
-      expect(EmailAddress.create('  Cliente@Chaski.PE ').valueOrNull?.value, 'cliente@chaski.pe');
+      expect(EmailAddress.create('  Cliente@Apamuy.PE ').valueOrNull?.value, 'cliente@apamuy.pe');
     });
 
     test('rechaza vacío y formato inválido', () {
       expect(EmailAddress.create('').failureOrNull, const EmptyValue());
-      expect(EmailAddress.create('cliente@chaski').failureOrNull, const InvalidEmail());
+      expect(EmailAddress.create('cliente@apamuy').failureOrNull, const InvalidEmail());
     });
   });
 

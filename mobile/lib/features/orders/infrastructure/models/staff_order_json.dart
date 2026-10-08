@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/features/orders/domain/staff_order.dart';
-import 'package:chaski/features/orders/infrastructure/models/order_json.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/features/orders/domain/staff_order.dart';
+import 'package:apamuy/features/orders/infrastructure/models/order_json.dart';
 
 /// Contrato JSON del pedido para socios (`merchant/*` y `courier/*`): el
 /// `OrderJson` más los campos de `docs/OPERACION.md` §7.

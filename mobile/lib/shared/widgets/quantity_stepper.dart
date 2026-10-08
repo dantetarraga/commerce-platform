@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,7 +41,7 @@ class _QuantityStepperState extends State<QuantityStepper> {
     final direction = _increasing ? 1.0 : -1.0;
     return Container(
       height: widget.height,
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.button),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.button),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

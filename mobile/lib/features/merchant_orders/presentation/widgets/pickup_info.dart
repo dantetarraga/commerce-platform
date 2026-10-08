@@ -1,8 +1,8 @@
-import 'package:chaski/core/config/city.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 
 /// Comanda lista: quién viene por ella, el trazo de su llegada y el código de entrega.
@@ -91,7 +91,7 @@ class _CourierRoute extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 3,
-                child: Container(width: 12, height: 12, decoration: BoxDecoration(color: context.chaski.accent, shape: BoxShape.circle)),
+                child: Container(width: 12, height: 12, decoration: BoxDecoration(color: context.apamuy.accent, shape: BoxShape.circle)),
               ),
               Positioned(
                 left: x,

@@ -1,13 +1,13 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/fake_staff_orders.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
-import 'package:chaski/features/orders/infrastructure/orders_repository_impl.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/fake_staff_orders.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
+import 'package:apamuy/features/orders/infrastructure/orders_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'orders_providers.g.dart';

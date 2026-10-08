@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/email_address.dart';
-import 'package:chaski/core/domain/phone_number.dart';
+import 'package:apamuy/core/domain/email_address.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
 import 'package:equatable/equatable.dart';
 
 enum UserRole { customer, merchant, courier, admin }

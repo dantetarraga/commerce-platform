@@ -1,6 +1,6 @@
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/features/notifications/infrastructure/api_notifications_repository.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/features/notifications/infrastructure/api_notifications_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

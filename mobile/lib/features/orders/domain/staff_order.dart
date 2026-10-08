@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/orders/domain/order.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
 import 'package:equatable/equatable.dart';
 
 /// Pedido visto por un socio (negocio o repartidor): el pedido del cliente más

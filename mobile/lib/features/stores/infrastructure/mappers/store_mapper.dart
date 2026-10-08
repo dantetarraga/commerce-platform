@@ -1,10 +1,10 @@
-import 'package:chaski/features/stores/domain/entities/category.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/domain/entities/store_page.dart';
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
-import 'package:chaski/features/stores/infrastructure/models/store_dtos.dart';
+import 'package:apamuy/features/stores/domain/entities/category.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/domain/entities/store_page.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/features/stores/domain/entities/weekly_schedule.dart';
+import 'package:apamuy/features/stores/infrastructure/models/store_dtos.dart';
 
 extension CategoryDtoMapper on CategoryDto {
   Category toDomain() => Category(id: id, name: name, slug: slug, iconUrl: iconUrl, openStoreCount: openStoreCount);

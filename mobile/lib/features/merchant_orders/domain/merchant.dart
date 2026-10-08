@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/orders/domain/staff_order.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/orders/domain/staff_order.dart';
 import 'package:equatable/equatable.dart';
 
 /// Un negocio del socio, con su interruptor de "recibiendo pedidos".

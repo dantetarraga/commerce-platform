@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/location_service.dart';
-import 'package:chaski/features/addresses/presentation/widgets/door_pin.dart';
-import 'package:chaski/features/addresses/presentation/widgets/neighborhood_plan.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/location_service.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/door_pin.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/neighborhood_plan.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 

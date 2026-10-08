@@ -1,4 +1,4 @@
-import 'package:chaski/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
 
 /// Etiquetas de estado de un pedido para la UI, en un solo lugar.
 extension OrderStatusLabels on OrderStatus {

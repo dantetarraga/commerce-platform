@@ -1,12 +1,12 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/home/domain/repeat_order.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/products/presentation/providers/products_providers.dart';
-import 'package:chaski/features/stores/presentation/providers/stores_providers.dart';
-import 'package:chaski/features/stores/stores.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/home/domain/repeat_order.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/products/presentation/providers/products_providers.dart';
+import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
+import 'package:apamuy/features/stores/stores.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_providers.g.dart';

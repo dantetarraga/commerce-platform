@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// Etiqueta viva: punto con halo que late y texto en mayúsculas ("EN CAMINO").

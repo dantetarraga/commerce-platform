@@ -1,8 +1,8 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/network/location_query.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/infrastructure/models/store_dtos.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/network/location_query.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/infrastructure/models/store_dtos.dart';
 
 abstract interface class StoresRemoteDataSource {
   Future<List<CategoryDto>> getCategories(GeoCoordinates location);

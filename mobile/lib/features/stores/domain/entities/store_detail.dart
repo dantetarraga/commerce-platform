@@ -1,5 +1,5 @@
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/features/stores/domain/entities/weekly_schedule.dart';
 import 'package:equatable/equatable.dart';
 
 final class StoreDetail extends Equatable {

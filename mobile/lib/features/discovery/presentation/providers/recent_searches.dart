@@ -1,4 +1,4 @@
-import 'package:chaski/core/storage/storage_providers.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'recent_searches.g.dart';
@@ -7,7 +7,7 @@ part 'recent_searches.g.dart';
 @Riverpod(keepAlive: true)
 class RecentSearches extends _$RecentSearches {
   static const max = 6;
-  static const _key = 'chaski.recentSearches';
+  static const _key = 'apamuy.recentSearches';
 
   @override
   Future<List<String>> build() async {

@@ -1,9 +1,9 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/features/notifications/presentation/providers/notifications_providers.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

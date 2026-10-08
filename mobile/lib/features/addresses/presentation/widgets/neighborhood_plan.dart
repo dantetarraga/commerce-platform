@@ -1,5 +1,5 @@
-import 'package:chaski/features/addresses/presentation/widgets/door_pin.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/door_pin.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Plano del barrio que se arrastra bajo un pin fijo, mientras no haya mapa real.
@@ -67,7 +67,7 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with SingleTickerPr
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final motion = reduceMotionOf(context) ? Duration.zero : AppMotion.quick;
 
     return Semantics(
@@ -88,7 +88,7 @@ class _NeighborhoodPlanState extends State<NeighborhoodPlan> with SingleTickerPr
             fit: StackFit.expand,
             children: [
               CustomPaint(
-                painter: _PlanPainter(offset: _offset, ground: chaski.raised, block: scheme.surfaceContainerHigh),
+                painter: _PlanPainter(offset: _offset, ground: apamuy.raised, block: scheme.surfaceContainerHigh),
               ),
               // Pin al centro: se levanta al arrastrar y cae al soltar.
               Center(child: LiftingDoorPin(lifted: _dragging)),

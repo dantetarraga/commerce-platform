@@ -1,5 +1,5 @@
-import 'package:chaski/app/purchase_bar/purchase_bar.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/app/purchase_bar/purchase_bar.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Pone la barra de compra al pie de una pantalla fuera del shell (p. ej. el detalle de

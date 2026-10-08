@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/presentation/providers/stores_providers.dart';
-import 'package:chaski/features/stores/presentation/widgets/store_mappers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
+import 'package:apamuy/features/stores/presentation/widgets/store_mappers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

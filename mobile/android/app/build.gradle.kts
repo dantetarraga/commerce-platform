@@ -12,7 +12,7 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "pe.chaski.chaski"
+    namespace = "pe.apamuy"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

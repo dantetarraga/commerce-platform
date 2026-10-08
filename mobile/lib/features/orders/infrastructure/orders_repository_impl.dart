@@ -1,8 +1,8 @@
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
-import 'package:chaski/features/orders/infrastructure/models/order_json.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
+import 'package:apamuy/features/orders/infrastructure/models/order_json.dart';
 
 class OrdersRepositoryImpl implements OrdersRepository {
   const OrdersRepositoryImpl(this._remote);

@@ -1,5 +1,5 @@
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 
 /// El recorrido mientras carga: cabecera, paradas y boleta en su lugar.

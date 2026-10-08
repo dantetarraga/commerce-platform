@@ -1,4 +1,4 @@
-import 'package:chaski/features/partner_session/domain/partner_mode.dart';
+import 'package:apamuy/features/partner_session/domain/partner_mode.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

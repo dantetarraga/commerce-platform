@@ -1,6 +1,6 @@
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/partner_session/domain/partner_mode.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/partner_session/domain/partner_mode.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'partner_mode_providers.g.dart';
@@ -8,7 +8,7 @@ part 'partner_mode_providers.g.dart';
 /// Modo que el socio eligió la última vez, guardado en el dispositivo.
 @Riverpod(keepAlive: true)
 class PartnerModePreference extends _$PartnerModePreference {
-  static const _key = 'chaski.partnerMode';
+  static const _key = 'apamuy.partnerMode';
 
   /// Ya eligió en esta sesión: lo guardado (que llega después) no lo pisa.
   var _chosen = false;

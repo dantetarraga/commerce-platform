@@ -1,6 +1,6 @@
-import 'package:chaski/core/config/city.dart';
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/location_service.dart';
+import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/location_service.dart';
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

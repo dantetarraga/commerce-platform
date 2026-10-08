@@ -1,5 +1,5 @@
-import 'package:chaski/features/orders/orders_staff.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/orders/orders_staff.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Boleta de lo que lleva y lo que cobra al entregar.

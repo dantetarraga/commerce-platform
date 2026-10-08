@@ -1,7 +1,7 @@
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
 
 /// `GET /notifications/feed` y `POST /notifications/read-all`.
 class ApiNotificationsRepository implements NotificationsRepository {

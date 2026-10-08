@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/utils/external_links.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/utils/external_links.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 
 /// Las tres paradas del recorrido sobre el trazo: tú, el negocio y el cliente.
@@ -24,7 +24,7 @@ class DeliveryRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final accent = context.chaski.accent;
+    final accent = context.apamuy.accent;
     final o = order.order;
     final pickingUp = order.status == OrderStatus.courierAssigned;
     final distance = Formatters.meters(order.distanceMeters);
@@ -228,7 +228,7 @@ class DeliveryFooter extends StatelessWidget {
                 hint: 'Desliza al entregar',
                 detail: 'Cobras ${Formatters.money(order.order.total)}',
                 icon: Icons.two_wheeler_rounded,
-                color: context.chaski.accent,
+                color: context.apamuy.accent,
                 busy: busy,
                 onConfirm: onDeliver,
               ),

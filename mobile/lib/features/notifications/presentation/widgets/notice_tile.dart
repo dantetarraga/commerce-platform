@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// "7:03 pm" si es de hoy; "Ayer, 7:03 pm" o la fecha si no.
@@ -32,7 +32,7 @@ class NoticeTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final order = notice.kind.isOrder;
     final time = noticeTime(notice.at);
     final unread = !notice.read;
@@ -64,10 +64,10 @@ class NoticeTile extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: order ? scheme.primaryContainer : chaski.accentSoft,
+                        color: order ? scheme.primaryContainer : apamuy.accentSoft,
                         borderRadius: AppRadius.button,
                       ),
-                      child: Icon(_icon, size: 22, color: order ? scheme.primary : chaski.accent),
+                      child: Icon(_icon, size: 22, color: order ? scheme.primary : apamuy.accent),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
@@ -97,7 +97,7 @@ class NoticeTile extends StatelessWidget {
                           Text(notice.body, style: theme.textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
                           if (!order) ...[
                             const SizedBox(height: AppSpacing.xxs),
-                            Text('Ver negocio', style: theme.textTheme.labelMedium?.copyWith(color: chaski.accent)),
+                            Text('Ver negocio', style: theme.textTheme.labelMedium?.copyWith(color: apamuy.accent)),
                           ],
                         ],
                       ),
@@ -126,6 +126,6 @@ class NoticeUnreadDot extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: 9,
     height: 9,
-    decoration: BoxDecoration(color: context.chaski.accent, shape: BoxShape.circle),
+    decoration: BoxDecoration(color: context.apamuy.accent, shape: BoxShape.circle),
   );
 }

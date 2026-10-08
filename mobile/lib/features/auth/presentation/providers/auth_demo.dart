@@ -1,4 +1,4 @@
-import 'package:chaski/features/auth/infrastructure/datasources/remote/fake_auth_remote_data_source.dart';
+import 'package:apamuy/features/auth/infrastructure/datasources/remote/fake_auth_remote_data_source.dart';
 
 /// Cuenta que el modo demo ofrece para entrar con un toque.
 typedef DemoAccount = ({String label, String phone});

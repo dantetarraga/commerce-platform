@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/orders/domain/order.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class DeliveryTime extends Equatable {

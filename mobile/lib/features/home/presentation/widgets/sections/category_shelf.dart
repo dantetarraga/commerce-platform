@@ -1,8 +1,8 @@
-import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/features/home/presentation/widgets/city_categories.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/features/discovery/discovery.dart';
+import 'package:apamuy/features/home/presentation/widgets/city_categories.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

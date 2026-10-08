@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Colores de marca de Yape y Plin: son parte de su logo y no cambian con el
@@ -58,11 +58,11 @@ class PaymentLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final (Color bg, Color fg) = switch (kind) {
-      PaymentKind.yape => (_BrandColors.yape, chaski.onPhoto),
-      PaymentKind.plin => (_BrandColors.plin, chaski.onPhoto),
-      PaymentKind.cash => (chaski.success, scheme.surface),
+      PaymentKind.yape => (_BrandColors.yape, apamuy.onPhoto),
+      PaymentKind.plin => (_BrandColors.plin, apamuy.onPhoto),
+      PaymentKind.cash => (apamuy.success, scheme.surface),
       PaymentKind.card => (scheme.inverseSurface, scheme.onInverseSurface),
     };
     final text = AppTypography.displayStyle(context, size: size * 0.3, weight: FontWeight.w800, color: fg, height: 1);

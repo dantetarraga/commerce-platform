@@ -1,10 +1,10 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/discovery/presentation/providers/search_providers.dart';
-import 'package:chaski/features/discovery/presentation/quick_add_product.dart';
-import 'package:chaski/features/products/products.dart';
-import 'package:chaski/features/stores/stores.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
+import 'package:apamuy/features/discovery/presentation/providers/search_providers.dart';
+import 'package:apamuy/features/discovery/presentation/quick_add_product.dart';
+import 'package:apamuy/features/products/products.dart';
+import 'package:apamuy/features/stores/stores.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

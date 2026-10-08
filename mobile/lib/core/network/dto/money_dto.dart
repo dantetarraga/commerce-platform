@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/money.dart';
+import 'package:apamuy/core/domain/money.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'money_dto.g.dart';

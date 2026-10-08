@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/text_scale.dart';
-import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
+import 'package:apamuy/features/discovery/discovery.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Carril de promociones con tres formatos que se alternan: foto, titular
@@ -33,7 +33,7 @@ class EditorialPromos extends StatelessWidget {
           return AppTapSurface(
             semanticLabel: [promo.title, ?promo.subtitle, if (promo.couponCode != null) 'Código ${promo.couponCode}'].join('. '),
             color: switch (kind) {
-              0 => context.chaski.card,
+              0 => context.apamuy.card,
               1 => AppColors.terracota50,
               _ => AppColors.hierba,
             },
@@ -84,7 +84,7 @@ class _PhotoPromo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -104,8 +104,8 @@ class _PhotoPromo extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(color: chaski.accent, borderRadius: AppRadius.button),
-                  child: Text('Promo', style: theme.textTheme.labelSmall?.copyWith(color: chaski.onAccent)),
+                  decoration: BoxDecoration(color: apamuy.accent, borderRadius: AppRadius.button),
+                  child: Text('Promo', style: theme.textTheme.labelSmall?.copyWith(color: apamuy.onAccent)),
                 ),
                 const SizedBox(height: 8),
                 Text(promo.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleMedium),
@@ -212,7 +212,7 @@ class _CodePromo extends StatelessWidget {
               promo.subtitle!,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(color: context.chaski.onPhotoMuted),
+              style: theme.textTheme.bodySmall?.copyWith(color: context.apamuy.onPhotoMuted),
             ),
           ],
           const Spacer(),

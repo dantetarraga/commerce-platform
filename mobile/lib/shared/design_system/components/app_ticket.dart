@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 extension TicketColors on BuildContext {
@@ -13,7 +13,7 @@ extension TicketColors on BuildContext {
     final scheme = Theme.of(this).colorScheme;
     return Theme.of(this).brightness == Brightness.dark
         ? scheme.surfaceContainerHighest
-        : chaski.raised;
+        : apamuy.raised;
   }
 }
 

@@ -1,4 +1,4 @@
-import 'package:chaski/core/utils/random_id.dart';
+import 'package:apamuy/core/utils/random_id.dart';
 import 'package:dio/dio.dart';
 
 /// Agrega `X-Request-Id` para correlacionar logs de la app con los del backend.

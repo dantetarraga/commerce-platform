@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/value_failure.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
 
 /// Resultado de construir un value object: el valor válido o el motivo del rechazo.
 sealed class Validated<T> {

@@ -1,6 +1,6 @@
-import 'package:chaski/app/purchase_bar/open_bag.dart';
-import 'package:chaski/app/purchase_bar/purchase_bar_controller.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/app/purchase_bar/open_bag.dart';
+import 'package:apamuy/app/purchase_bar/purchase_bar_controller.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

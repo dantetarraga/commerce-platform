@@ -1,16 +1,16 @@
-import 'package:chaski/core/config/theme_mode_provider.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/notifications/notifications.dart';
-import 'package:chaski/features/orders/orders_customer.dart';
-import 'package:chaski/features/profile/presentation/pages/edit_profile_page.dart';
-import 'package:chaski/features/profile/presentation/providers/profile_summary.dart';
-import 'package:chaski/features/profile/presentation/widgets/theme_mode_sheet.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/legal/legal_page.dart';
+import 'package:apamuy/core/config/theme_mode_provider.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/favorites/favorites.dart';
+import 'package:apamuy/features/notifications/notifications.dart';
+import 'package:apamuy/features/orders/orders_customer.dart';
+import 'package:apamuy/features/profile/presentation/pages/edit_profile_page.dart';
+import 'package:apamuy/features/profile/presentation/providers/profile_summary.dart';
+import 'package:apamuy/features/profile/presentation/widgets/theme_mode_sheet.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/legal/legal_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -77,7 +77,7 @@ class ProfilePage extends ConsumerWidget {
                   ),
                   IconButton(
                     tooltip: 'Editar tus datos',
-                    style: IconButton.styleFrom(backgroundColor: context.chaski.raised),
+                    style: IconButton.styleFrom(backgroundColor: context.apamuy.raised),
                     icon: const Icon(Icons.edit_outlined),
                     onPressed: () => context.pushNamed(EditProfilePage.name),
                   ),
@@ -203,7 +203,7 @@ class _Stat extends StatelessWidget {
       excludeSemantics: true,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
-        decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+        decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
         child: Column(
           children: [
             Text(value, style: AppTypography.price(context)),

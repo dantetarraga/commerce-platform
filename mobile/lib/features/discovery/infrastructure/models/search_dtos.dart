@@ -1,5 +1,5 @@
-import 'package:chaski/core/network/dto/money_dto.dart';
-import 'package:chaski/features/discovery/domain/search.dart';
+import 'package:apamuy/core/network/dto/money_dto.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'search_dtos.g.dart';

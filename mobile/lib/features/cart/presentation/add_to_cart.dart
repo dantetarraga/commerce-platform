@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/presentation/providers/cart_providers.dart';
-import 'package:chaski/features/cart/presentation/widgets/cart_sheet.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/presentation/providers/cart_providers.dart';
+import 'package:apamuy/features/cart/presentation/widgets/cart_sheet.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

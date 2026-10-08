@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_typography.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
 enum AppPriceVariant {
@@ -51,7 +51,7 @@ class AppPrice extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         runSpacing: 2,
         children: [
-          Text(text, style: isFree ? style.copyWith(color: context.chaski.success) : style),
+          Text(text, style: isFree ? style.copyWith(color: context.apamuy.success) : style),
           if (variant == AppPriceVariant.discount && previous != null) ...[
             const SizedBox(width: 6),
             Text(

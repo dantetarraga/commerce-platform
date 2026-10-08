@@ -1,6 +1,6 @@
-import 'package:chaski/features/discovery/domain/moment.dart';
-import 'package:chaski/features/home/presentation/widgets/home_sections.dart';
-import 'package:chaski/features/stores/domain/entities/category.dart';
+import 'package:apamuy/features/discovery/domain/moment.dart';
+import 'package:apamuy/features/home/presentation/widgets/home_sections.dart';
+import 'package:apamuy/features/stores/domain/entities/category.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

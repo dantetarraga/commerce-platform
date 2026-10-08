@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/validated.dart';
-import 'package:chaski/core/domain/value_failure.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/validated.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
 import 'package:equatable/equatable.dart';
 
 enum AddressKind { home, work, other }

@@ -1,5 +1,5 @@
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

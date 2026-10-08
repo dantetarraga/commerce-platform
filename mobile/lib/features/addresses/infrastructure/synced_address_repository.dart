@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
 
 /// Local primero, sincronizado con `/users/me/addresses`: se guarda en el dispositivo
 /// y se sube la libreta entera. Al cargar manda el servidor, salvo que esté vacío.
@@ -17,7 +17,7 @@ class SyncedAddressRepository implements AddressRepository {
        _api = api,
        _userId = userId;
 
-  static const _ownerKey = 'chaski.addresses.owner';
+  static const _ownerKey = 'apamuy.addresses.owner';
   static const _path = '/users/me/addresses';
 
   final AddressRepository _local;

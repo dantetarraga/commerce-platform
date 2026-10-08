@@ -1,8 +1,8 @@
-# Confirmación Rive de Chaski
+# Confirmación Rive de Apamuy
 
-`chaski_success.riv` es una ilustración vectorial propia: círculo cobalto, check blanco, halo y seis destellos lima/azules. No incorpora ilustraciones, fuentes ni imágenes de terceros.
+`apamuy_success.riv` es una ilustración vectorial propia: círculo cobalto, check blanco, halo y seis destellos lima/azules. No incorpora ilustraciones, fuentes ni imágenes de terceros.
 
-- Artboard: `ChaskiSuccess` (240 × 240).
+- Artboard: `ApamuySuccess` (240 × 240).
 - Animación: `confirm`, una reproducción de 72 fotogramas a 60 fps (1,2 s).
 - Peso: **2795 bytes** del archivo; no incluye el peso del runtime nativo.
 - Runtime comprobado: `rive 0.14.11` / `rive_native 0.1.11`, renderer de Flutter.

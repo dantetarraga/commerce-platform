@@ -1,9 +1,9 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/components/app_badge.dart';
-import 'package:chaski/shared/design_system/components/app_network_image.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_data.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_parts.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/app_badge.dart';
+import 'package:apamuy/shared/design_system/components/app_network_image.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_data.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_parts.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Variante fila de `AppStoreCard`: foto compacta y datos al lado ("De tu

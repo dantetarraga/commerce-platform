@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Mosaico grande con foto, cuántos negocios hay abiertos y una flecha.
@@ -81,7 +81,7 @@ class CategoryPhotoTile extends StatelessWidget {
                       caption!,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(color: context.chaski.onPhotoMuted),
+                      style: theme.textTheme.bodySmall?.copyWith(color: context.apamuy.onPhotoMuted),
                     ),
                 ],
               ),
@@ -150,7 +150,7 @@ class CategorySoftTile extends StatelessWidget {
     final fg = dark ? theme.colorScheme.onSurface : AppColors.tinta;
     return AppTapSurface(
       semanticLabel: 'Explorar $label',
-      color: dark ? context.chaski.card : color,
+      color: dark ? context.apamuy.card : color,
       borderRadius: AppRadius.tileExit,
       onTap: onTap,
       child: SizedBox(
@@ -219,7 +219,7 @@ class CategoryStripTile extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(label, style: theme.textTheme.titleMedium?.copyWith(color: AppColors.blanco)),
-                    if (caption != null) Text(caption!, style: theme.textTheme.bodySmall?.copyWith(color: context.chaski.onPhotoMuted)),
+                    if (caption != null) Text(caption!, style: theme.textTheme.bodySmall?.copyWith(color: context.apamuy.onPhotoMuted)),
                   ],
                 ),
               ),
@@ -252,7 +252,7 @@ class CategoryCompactTile extends StatelessWidget {
     final scheme = theme.colorScheme;
     return AppTapSurface(
       semanticLabel: 'Explorar $label',
-      color: highlighted ? scheme.primaryContainer : context.chaski.card,
+      color: highlighted ? scheme.primaryContainer : context.apamuy.card,
       borderRadius: AppRadius.button,
       clip: false,
       onTap: onTap,

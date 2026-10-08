@@ -1,6 +1,6 @@
-import 'package:chaski/shared/design_system/components/app_network_image.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_data.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/components/app_network_image.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_data.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Variante "Volver a pedir" de `AppStoreCard`: solo logo y nombre. Interna

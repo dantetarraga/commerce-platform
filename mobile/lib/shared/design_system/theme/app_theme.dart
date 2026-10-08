@@ -1,7 +1,7 @@
-import 'package:chaski/shared/design_system/theme/page_transitions.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/app_typography.dart';
+import 'package:apamuy/shared/design_system/theme/page_transitions.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +38,7 @@ abstract final class AppTheme {
       inversePrimary: AppColors.terracota300,
     ),
     scaffoldBackground: AppColors.papel,
-    chaski: ChaskiColors.light,
+    apamuy: ApamuyColors.light,
   );
 
   static ThemeData dark() => _build(
@@ -71,17 +71,17 @@ abstract final class AppTheme {
       inversePrimary: AppColors.terracota,
     ),
     scaffoldBackground: AppColors.noche,
-    chaski: ChaskiColors.dark,
+    apamuy: ApamuyColors.dark,
   );
 
-  static ThemeData _build(ColorScheme scheme, {required Color scaffoldBackground, required ChaskiColors chaski}) {
+  static ThemeData _build(ColorScheme scheme, {required Color scaffoldBackground, required ApamuyColors apamuy}) {
     final base = ThemeData(colorScheme: scheme, useMaterial3: true, fontFamily: AppTypography.ui);
     final textTheme = AppTypography.textTheme(scheme.onSurface, scheme.onSurfaceVariant);
 
     return base.copyWith(
       scaffoldBackgroundColor: scaffoldBackground,
       textTheme: textTheme,
-      extensions: [chaski],
+      extensions: [apamuy],
       appBarTheme: AppBarTheme(
         backgroundColor: scaffoldBackground,
         foregroundColor: scheme.onSurface,
@@ -121,7 +121,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: chaski.raised,
+        fillColor: apamuy.raised,
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 16),
         border: const OutlineInputBorder(borderRadius: AppRadius.button, borderSide: BorderSide.none),
         enabledBorder: const OutlineInputBorder(borderRadius: AppRadius.button, borderSide: BorderSide.none),
@@ -142,7 +142,7 @@ abstract final class AppTheme {
       chipTheme: base.chipTheme.copyWith(
         shape: const StadiumBorder(),
         side: BorderSide.none,
-        backgroundColor: chaski.raised,
+        backgroundColor: apamuy.raised,
         selectedColor: scheme.primaryContainer,
         labelStyle: textTheme.labelLarge,
         secondaryLabelStyle: textTheme.labelLarge?.copyWith(color: scheme.onPrimaryContainer),
@@ -164,7 +164,7 @@ abstract final class AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: scheme.surface,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: chaski.raised,
+        indicatorColor: apamuy.raised,
         indicatorShape: const RoundedRectangleBorder(borderRadius: AppRadius.tile),
         height: 64,
         labelTextStyle: WidgetStateProperty.resolveWith(
@@ -180,7 +180,7 @@ abstract final class AppTheme {
           ),
         ),
       ),
-      progressIndicatorTheme: ProgressIndicatorThemeData(color: scheme.primary, linearTrackColor: chaski.raised),
+      progressIndicatorTheme: ProgressIndicatorThemeData(color: scheme.primary, linearTrackColor: apamuy.raised),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.inverseSurface,

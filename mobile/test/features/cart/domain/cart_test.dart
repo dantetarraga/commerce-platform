@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/infrastructure/models/cart_json.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/infrastructure/models/cart_json.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

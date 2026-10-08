@@ -1,4 +1,4 @@
-import 'package:chaski/core/network/dto/money_dto.dart';
+import 'package:apamuy/core/network/dto/money_dto.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'store_dtos.g.dart';

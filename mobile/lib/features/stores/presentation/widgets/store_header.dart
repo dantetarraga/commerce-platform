@@ -1,9 +1,9 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
-import 'package:chaski/features/stores/presentation/widgets/store_mappers.dart';
-import 'package:chaski/features/stores/presentation/widgets/store_stat_blocks.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/weekly_schedule.dart';
+import 'package:apamuy/features/stores/presentation/widgets/store_mappers.dart';
+import 'package:apamuy/features/stores/presentation/widgets/store_stat_blocks.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Nombre, estado, quién atiende, los tres datos, la oferta y, si está
@@ -19,7 +19,7 @@ class StoreHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final summary = store.summary;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final now = DateTime.now();
     final open = summary.isOpenNow;
     final details = [
@@ -51,7 +51,7 @@ class StoreHeader extends StatelessWidget {
                             children: [
                               TextSpan(
                                 text: open ? '● Abierto' : '● Cerrado',
-                                style: TextStyle(color: open ? chaski.success : chaski.danger, fontWeight: FontWeight.w700),
+                                style: TextStyle(color: open ? apamuy.success : apamuy.danger, fontWeight: FontWeight.w700),
                               ),
                               for (final d in details) TextSpan(text: '  ·  $d'),
                             ],
@@ -169,21 +169,21 @@ class _DealStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return Semantics(
       label: 'Oferta: $label',
       excludeSemantics: true,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.sm),
-        decoration: BoxDecoration(color: chaski.accentSoft, borderRadius: AppRadius.tile),
+        decoration: BoxDecoration(color: apamuy.accentSoft, borderRadius: AppRadius.tile),
         child: Row(
           children: [
             Container(
               width: 22,
               height: 22,
-              decoration: BoxDecoration(color: chaski.accent, shape: BoxShape.circle),
-              child: Icon(Icons.local_offer_rounded, size: 13, color: chaski.onAccent),
+              decoration: BoxDecoration(color: apamuy.accent, shape: BoxShape.circle),
+              child: Icon(Icons.local_offer_rounded, size: 13, color: apamuy.onAccent),
             ),
             const SizedBox(width: AppSpacing.xs),
             Expanded(
@@ -260,7 +260,7 @@ class _Note extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
       child: Row(
         children: [
           Icon(icon, color: theme.colorScheme.onSurfaceVariant, size: 20),

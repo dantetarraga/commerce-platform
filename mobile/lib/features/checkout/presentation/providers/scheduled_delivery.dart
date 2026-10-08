@@ -1,5 +1,5 @@
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Hora programada del checkout (null = lo antes posible; una pasada también).

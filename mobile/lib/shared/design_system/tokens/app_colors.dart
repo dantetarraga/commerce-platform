@@ -42,8 +42,8 @@ abstract final class AppColors {
 
 /// Colores semánticos que `ColorScheme` no cubre, resueltos por tema.
 @immutable
-class ChaskiColors extends ThemeExtension<ChaskiColors> {
-  const ChaskiColors({
+class ApamuyColors extends ThemeExtension<ApamuyColors> {
+  const ApamuyColors({
     required this.accent,
     required this.onAccent,
     required this.accentSoft,
@@ -60,7 +60,7 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     required this.onPhotoMuted,
   });
 
-  static const light = ChaskiColors(
+  static const light = ApamuyColors(
     accent: AppColors.hierba,
     onAccent: AppColors.blanco,
     accentSoft: AppColors.hierbaSoft,
@@ -77,7 +77,7 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     onPhotoMuted: AppColors.onPhotoMuted,
   );
 
-  static const dark = ChaskiColors(
+  static const dark = ApamuyColors(
     accent: AppColors.hierba300,
     onAccent: AppColors.noche,
     accentSoft: Color(0xFF22301D),
@@ -125,7 +125,7 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   final Color onPhotoMuted;
 
   @override
-  ChaskiColors copyWith({
+  ApamuyColors copyWith({
     Color? accent,
     Color? onAccent,
     Color? accentSoft,
@@ -140,7 +140,7 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
     Color? rating,
     Color? card,
     Color? onPhotoMuted,
-  }) => ChaskiColors(
+  }) => ApamuyColors(
     accent: accent ?? this.accent,
     onAccent: onAccent ?? this.onAccent,
     accentSoft: accentSoft ?? this.accentSoft,
@@ -158,9 +158,9 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   );
 
   @override
-  ChaskiColors lerp(ChaskiColors? other, double t) {
+  ApamuyColors lerp(ApamuyColors? other, double t) {
     if (other == null) return this;
-    return ChaskiColors(
+    return ApamuyColors(
       accent: Color.lerp(accent, other.accent, t)!,
       onAccent: Color.lerp(onAccent, other.onAccent, t)!,
       accentSoft: Color.lerp(accentSoft, other.accentSoft, t)!,
@@ -179,6 +179,6 @@ class ChaskiColors extends ThemeExtension<ChaskiColors> {
   }
 }
 
-extension ChaskiColorsContext on BuildContext {
-  ChaskiColors get chaski => Theme.of(this).extension<ChaskiColors>() ?? ChaskiColors.light;
+extension ApamuyColorsContext on BuildContext {
+  ApamuyColors get apamuy => Theme.of(this).extension<ApamuyColors>() ?? ApamuyColors.light;
 }

@@ -1,5 +1,5 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/result/result.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/result/result.dart';
 
 /// El `Failure` de un resultado que se espera fallido.
 Failure failureOf<T>(Result<T> result) =>

@@ -1,8 +1,8 @@
-import 'package:chaski/core/domain/email_address.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/features/auth/domain/entities/auth_user.dart';
-import 'package:chaski/features/auth/domain/entities/otp.dart';
-import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
+import 'package:apamuy/core/domain/email_address.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/features/auth/domain/entities/auth_user.dart';
+import 'package:apamuy/features/auth/domain/entities/otp.dart';
+import 'package:apamuy/features/auth/infrastructure/models/auth_dtos.dart';
 
 extension UserDtoMapper on UserDto {
   AuthUser toDomain() => AuthUser(

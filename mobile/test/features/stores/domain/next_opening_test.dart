@@ -1,4 +1,4 @@
-import 'package:chaski/features/stores/domain/entities/weekly_schedule.dart';
+import 'package:apamuy/features/stores/domain/entities/weekly_schedule.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

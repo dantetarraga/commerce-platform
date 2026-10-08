@@ -1,8 +1,8 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/realtime/realtime_client.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/auth/presentation/providers/auth_session.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/realtime/realtime_client.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'realtime_session.g.dart';

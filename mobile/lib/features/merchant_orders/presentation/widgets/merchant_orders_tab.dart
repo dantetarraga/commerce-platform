@@ -1,11 +1,11 @@
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/merchant_rail.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/merchant_orders/presentation/providers/merchant_providers.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/merchant_order_card.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/merchant_rail.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/order_card_skeleton.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

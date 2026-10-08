@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:chaski/features/auth/presentation/providers/auth_session.dart';
-import 'package:chaski/features/auth/presentation/providers/splash_gate.dart';
-import 'package:chaski/features/auth/presentation/widgets/splash_motion.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/auth/presentation/providers/auth_session.dart';
+import 'package:apamuy/features/auth/presentation/providers/splash_gate.dart';
+import 'package:apamuy/features/auth/presentation/widgets/splash_motion.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';

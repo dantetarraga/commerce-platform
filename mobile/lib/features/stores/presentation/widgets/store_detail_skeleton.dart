@@ -1,7 +1,7 @@
-import 'package:chaski/features/stores/presentation/widgets/store_logo.dart';
-import 'package:chaski/features/stores/presentation/widgets/store_stat_blocks.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/image_sliver_app_bar.dart';
+import 'package:apamuy/features/stores/presentation/widgets/store_logo.dart';
+import 'package:apamuy/features/stores/presentation/widgets/store_stat_blocks.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/image_sliver_app_bar.dart';
 import 'package:flutter/material.dart';
 
 /// Misma geometría que la pantalla real para que el crossfade no salte. Si la

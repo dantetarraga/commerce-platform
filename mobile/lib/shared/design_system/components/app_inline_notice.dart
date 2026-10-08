@@ -1,7 +1,7 @@
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/shared/design_system/components/app_button.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/shared/design_system/components/app_button.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 enum AppNoticeKind {
@@ -57,7 +57,7 @@ class AppInlineNotice extends StatelessWidget {
     final (IconData icon, Color color) = switch (kind) {
       AppNoticeKind.info => (Icons.info_outline_rounded, scheme.onSurface),
       AppNoticeKind.warning => (Icons.schedule_rounded, scheme.primary),
-      AppNoticeKind.error => (Icons.error_outline_rounded, context.chaski.danger),
+      AppNoticeKind.error => (Icons.error_outline_rounded, context.apamuy.danger),
     };
     final text = Text(
       message,
@@ -90,7 +90,7 @@ class AppInlineNotice extends StatelessWidget {
           ? Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: kind == AppNoticeKind.info ? context.chaski.raised : color.withValues(alpha: 0.08),
+                color: kind == AppNoticeKind.info ? context.apamuy.raised : color.withValues(alpha: 0.08),
                 borderRadius: AppRadius.tile,
               ),
               child: content,

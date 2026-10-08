@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/orders/orders_staff.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/orders/orders_staff.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 
 /// Un recorrido para tomar: sale del negocio y llega a la casa por el trazo.
@@ -19,7 +19,7 @@ class RouteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final accent = context.chaski.accent;
+    final accent = context.apamuy.accent;
     final label = AppTypography.eyebrow(context).copyWith(letterSpacing: 1);
     final place = AppTypography.displayStyle(context, size: 18);
     return Container(
@@ -132,7 +132,7 @@ class RouteCardSkeleton extends StatelessWidget {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: TrackLine(vertical: true, color: context.chaski.shimmerBase),
+                            child: TrackLine(vertical: true, color: context.apamuy.shimmerBase),
                           ),
                         ),
                         const SkeletonBox.circle(size: 28),

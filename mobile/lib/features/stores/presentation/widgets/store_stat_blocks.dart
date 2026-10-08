@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Tres bloques: calificación, tiempo y envío (con el pedido mínimo).
@@ -23,7 +23,7 @@ class StoreStatBlocks extends StatelessWidget {
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.star_rounded, size: 17, color: context.chaski.rating),
+                    Icon(Icons.star_rounded, size: 17, color: context.apamuy.rating),
                     const SizedBox(width: 2),
                     Text(Formatters.rating(rating.average), style: valueStyle),
                   ],
@@ -71,7 +71,7 @@ class _StatBlock extends StatelessWidget {
         // Misma altura para los tres aunque el de envío use dos líneas.
         constraints: const BoxConstraints(minHeight: 80),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.sm),
-        decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+        decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -102,7 +102,7 @@ class StoreStatBlocksSkeleton extends StatelessWidget {
         Expanded(
           child: Container(
             height: 80,
-            decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+            decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
             child: const Skeleton(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

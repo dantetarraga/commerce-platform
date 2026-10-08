@@ -1,8 +1,8 @@
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 
 /// Argumentos opcionales al abrir un negocio: la portada ya conocida (se
 /// muestra al instante) y el tag del elemento compartido.

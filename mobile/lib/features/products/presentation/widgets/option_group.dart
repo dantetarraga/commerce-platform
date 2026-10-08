@@ -1,8 +1,8 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/products/domain/entities/product.dart';
-import 'package:chaski/features/products/domain/entities/product_selection.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/products/domain/entities/product.dart';
+import 'package:apamuy/features/products/domain/entities/product_selection.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,14 +21,14 @@ class _GroupHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final Widget label;
     if (required && fulfilled) {
       label = Row(
         key: const ValueKey('done'),
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.check_circle_rounded, size: 16, color: chaski.success),
+          Icon(Icons.check_circle_rounded, size: 16, color: apamuy.success),
           const SizedBox(width: 4),
           Text('Listo', style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w700)),
         ],
@@ -37,7 +37,7 @@ class _GroupHeader extends StatelessWidget {
       label = Container(
         key: const ValueKey('pending'),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 3),
-        decoration: BoxDecoration(color: chaski.raised, borderRadius: const BorderRadius.all(AppRadius.sm)),
+        decoration: BoxDecoration(color: apamuy.raised, borderRadius: const BorderRadius.all(AppRadius.sm)),
         child: Text(tag, style: AppTypography.eyebrow(context).copyWith(color: scheme.onSurfaceVariant)),
       );
     } else {

@@ -1,7 +1,7 @@
-import 'package:chaski/core/errors/failure_mapper.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
+import 'package:apamuy/core/errors/failure_mapper.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
 
 /// Avisos de prueba en memoria (aún no hay endpoint `/notifications`). Las
 /// fechas son relativas a "ahora" para que siempre haya HOY, AYER y ANTES.

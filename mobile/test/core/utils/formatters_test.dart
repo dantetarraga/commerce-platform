@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/core/utils/text_utils.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/core/utils/text_utils.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:chaski/core/config/city.dart';
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/core/maps/geocoding_service.dart';
-import 'package:chaski/core/maps/location_service.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
-import 'package:chaski/features/addresses/presentation/providers/address_providers.dart';
-import 'package:chaski/features/addresses/presentation/widgets/door_map.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/utils/value_failure_message.dart';
+import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/core/maps/geocoding_service.dart';
+import 'package:apamuy/core/maps/location_service.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
+import 'package:apamuy/features/addresses/presentation/providers/address_providers.dart';
+import 'package:apamuy/features/addresses/presentation/widgets/door_map.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/utils/value_failure_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

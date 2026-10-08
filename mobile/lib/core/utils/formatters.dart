@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/money.dart';
+import 'package:apamuy/core/domain/money.dart';
 import 'package:intl/intl.dart';
 
 /// Único lugar para los formatos que ve la persona. En Perú se usa "S/ 1,250.50"

@@ -1,4 +1,4 @@
-import 'package:chaski/core/fake/fake_backend.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
 
 /// Proyecciones del catálogo de prueba al JSON que devolverá la API.
 extension FakeCatalogJson on FakeBackend {

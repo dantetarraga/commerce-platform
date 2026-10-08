@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/features/stores/domain/entities/store_filter.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/features/stores/domain/entities/store_filter.dart';
 import 'package:equatable/equatable.dart';
 
 enum StoreSort { distance, popular, rating }

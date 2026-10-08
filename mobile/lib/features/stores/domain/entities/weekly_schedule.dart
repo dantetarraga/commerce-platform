@@ -1,4 +1,4 @@
-import 'package:chaski/core/utils/formatters.dart';
+import 'package:apamuy/core/utils/formatters.dart';
 import 'package:equatable/equatable.dart';
 
 /// Horario de un día. Minutos desde medianoche en hora local de la ciudad;

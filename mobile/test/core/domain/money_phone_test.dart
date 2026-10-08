@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/domain/phone_number.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,13 +1,13 @@
-import 'package:chaski/core/time/clock_provider.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/merchant_orders/presentation/providers/merchant_providers.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/pickup_info.dart';
-import 'package:chaski/features/merchant_orders/presentation/widgets/reject_sheet.dart';
-import 'package:chaski/features/orders/orders_staff.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
+import 'package:apamuy/core/time/clock_provider.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/merchant_orders/presentation/providers/merchant_providers.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/pickup_info.dart';
+import 'package:apamuy/features/merchant_orders/presentation/widgets/reject_sheet.dart';
+import 'package:apamuy/features/orders/orders_staff.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -92,7 +92,7 @@ class _MerchantOrderCardState extends ConsumerState<MerchantOrderCard> with Part
               padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.sm),
               child: Text(
                 'Cancelado: ${order.cancelReason}',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.chaski.danger),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.apamuy.danger),
               ),
             ),
           const TicketEdge(top: false),
@@ -130,9 +130,9 @@ class _ComandaHeader extends StatelessWidget {
     ].join(' · ');
     final trailing = switch (status) {
       OrderStatus.received => CountdownRing(deadline: order.order.placedAt.add(merchantResponseWindow), total: merchantResponseWindow),
-      OrderStatus.ready || OrderStatus.courierAssigned => PartnerStamp('LISTO', color: context.chaski.accent),
+      OrderStatus.ready || OrderStatus.courierAssigned => PartnerStamp('LISTO', color: context.apamuy.accent),
       OrderStatus.delivered => PartnerStamp('ENTREGADA', color: scheme.onSurfaceVariant, size: 11),
-      OrderStatus.cancelled => PartnerStamp('CANCELADA', color: context.chaski.danger, size: 11),
+      OrderStatus.cancelled => PartnerStamp('CANCELADA', color: context.apamuy.danger, size: 11),
       _ => null,
     };
     return Row(
@@ -227,7 +227,7 @@ class _CookingActions extends ConsumerWidget {
     final scheme = theme.colorScheme;
     final prep = PrepProgress.of(order, ref.watch(clockProvider).value ?? DateTime.now());
     final fraction = prep.fraction;
-    final color = prep.isLate ? context.chaski.danger : scheme.onSurface;
+    final color = prep.isLate ? context.apamuy.danger : scheme.onSurface;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/realtime/realtime_client.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
-import 'package:chaski/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/realtime/realtime_client.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/fake_orders_remote_data_source.dart';
+import 'package:apamuy/features/orders/infrastructure/datasources/orders_remote_data_source.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

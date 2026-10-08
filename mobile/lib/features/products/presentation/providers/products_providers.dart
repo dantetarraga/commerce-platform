@@ -1,14 +1,14 @@
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/fake/fake_providers.dart';
-import 'package:chaski/core/maps/delivery_location.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/features/products/domain/entities/product.dart';
-import 'package:chaski/features/products/domain/entities/product_selection.dart';
-import 'package:chaski/features/products/domain/repositories/products_repository.dart';
-import 'package:chaski/features/products/domain/usecases/get_product_detail.dart';
-import 'package:chaski/features/products/infrastructure/datasources/remote/products_remote_data_source.dart';
-import 'package:chaski/features/products/infrastructure/repositories/products_repository_impl.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/core/fake/fake_providers.dart';
+import 'package:apamuy/core/maps/delivery_location.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/features/products/domain/entities/product.dart';
+import 'package:apamuy/features/products/domain/entities/product_selection.dart';
+import 'package:apamuy/features/products/domain/repositories/products_repository.dart';
+import 'package:apamuy/features/products/domain/usecases/get_product_detail.dart';
+import 'package:apamuy/features/products/infrastructure/datasources/remote/products_remote_data_source.dart';
+import 'package:apamuy/features/products/infrastructure/repositories/products_repository_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'products_providers.g.dart';

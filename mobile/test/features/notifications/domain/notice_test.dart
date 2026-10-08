@@ -1,6 +1,6 @@
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/features/notifications/infrastructure/fake_notifications_repository.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/features/notifications/infrastructure/fake_notifications_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

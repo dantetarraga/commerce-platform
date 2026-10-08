@@ -1,21 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/courier_deliveries/domain/courier.dart';
-import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
-import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
-import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/orders/orders_infrastructure.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/courier_deliveries/domain/courier.dart';
+import 'package:apamuy/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
+import 'package:apamuy/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
+import 'package:apamuy/features/merchant_orders/infrastructure/models/merchant_json.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/orders/orders_infrastructure.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Respuestas reales de la API (grabadas recorriendo un pedido completo contra
-/// el backend local). Si el backend cambia el contrato de Chaski Socios, este
+/// el backend local). Si el backend cambia el contrato de Apamuy Socios, este
 /// test lo detecta: hay que regrabarlas y ajustar la app.
 Object? _fixture(String name) =>
     jsonDecode(File('test/fixtures/partner_api/$name.json').readAsStringSync());

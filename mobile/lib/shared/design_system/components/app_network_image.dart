@@ -1,6 +1,6 @@
+import 'package:apamuy/shared/design_system/components/app_skeleton.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chaski/shared/design_system/components/app_skeleton.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart' show Skeletonizer;
 

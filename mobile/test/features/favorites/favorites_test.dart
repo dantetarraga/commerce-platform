@@ -1,10 +1,10 @@
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/core/storage/storage_providers.dart';
-import 'package:chaski/features/favorites/domain/favorites.dart';
-import 'package:chaski/features/favorites/favorites.dart';
-import 'package:chaski/features/favorites/infrastructure/local_favorites_repository.dart';
-import 'package:chaski/features/favorites/presentation/providers/favorites_providers.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
+import 'package:apamuy/features/favorites/domain/favorites.dart';
+import 'package:apamuy/features/favorites/favorites.dart';
+import 'package:apamuy/features/favorites/infrastructure/local_favorites_repository.dart';
+import 'package:apamuy/features/favorites/presentation/providers/favorites_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -38,7 +38,7 @@ void main() {
     test('sin datos o con datos raros devuelve vacío', () async {
       final store = MemoryJsonStore();
       expect(await LocalFavoritesRepository(store).load(), Favorites.empty);
-      await store.write('chaski.favorites', 'basura');
+      await store.write('apamuy.favorites', 'basura');
       expect(await LocalFavoritesRepository(store).load(), Favorites.empty);
     });
   });

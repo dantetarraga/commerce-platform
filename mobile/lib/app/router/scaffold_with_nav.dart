@@ -1,9 +1,9 @@
-import 'package:chaski/app/purchase_bar/open_bag.dart';
-import 'package:chaski/app/purchase_bar/purchase_bar_controller.dart';
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/app/purchase_bar/open_bag.dart';
+import 'package:apamuy/app/purchase_bar/purchase_bar_controller.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

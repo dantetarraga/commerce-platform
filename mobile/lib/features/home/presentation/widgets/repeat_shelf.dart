@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/core/utils/text_scale.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// "Volver a pedir": tarjetas con foto, cuántas veces lo pediste y "Repetir".
@@ -58,7 +58,7 @@ class _RepeatCard extends StatelessWidget {
     return AppTapSurface(
       semanticLabel: '$eyebrow. ${order.store.name}. $items. $total',
       explicitChildNodes: true,
-      color: context.chaski.card,
+      color: context.apamuy.card,
       onTap: onTap,
       child: SizedBox(
         width: 296,

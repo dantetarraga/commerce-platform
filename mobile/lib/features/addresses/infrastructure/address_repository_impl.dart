@@ -1,12 +1,12 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/storage/local_json_store.dart';
-import 'package:chaski/features/addresses/domain/address.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/storage/local_json_store.dart';
+import 'package:apamuy/features/addresses/domain/address.dart';
 
 /// Direcciones guardadas solo en el dispositivo (la base de `SyncedAddressRepository`).
 class AddressRepositoryImpl implements AddressRepository {
   const AddressRepositoryImpl(this._store);
 
-  static const _key = 'chaski.addresses';
+  static const _key = 'apamuy.addresses';
   static const _version = 1;
 
   final LocalJsonStore _store;

@@ -1,7 +1,7 @@
-import 'package:chaski/core/maps/delivery_map_data.dart';
-import 'package:chaski/core/maps/location_service.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/google_delivery_map.dart';
+import 'package:apamuy/core/maps/delivery_map_data.dart';
+import 'package:apamuy/core/maps/location_service.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/google_delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

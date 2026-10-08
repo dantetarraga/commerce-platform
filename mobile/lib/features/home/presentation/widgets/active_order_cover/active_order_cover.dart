@@ -1,10 +1,10 @@
-import 'package:chaski/core/time/clock_provider.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/home/presentation/widgets/active_order_cover/live_dot.dart';
-import 'package:chaski/features/home/presentation/widgets/active_order_cover/mini_map.dart';
-import 'package:chaski/features/home/presentation/widgets/active_order_cover/step_trail.dart';
-import 'package:chaski/features/orders/orders_customer.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/time/clock_provider.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/home/presentation/widgets/active_order_cover/live_dot.dart';
+import 'package:apamuy/features/home/presentation/widgets/active_order_cover/mini_map.dart';
+import 'package:apamuy/features/home/presentation/widgets/active_order_cover/step_trail.dart';
+import 'package:apamuy/features/orders/orders_customer.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -178,7 +178,7 @@ class _CourierStrip extends StatelessWidget {
     final courier = this.courier;
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: context.chaski.card, borderRadius: AppRadius.tileExit),
+      decoration: BoxDecoration(color: context.apamuy.card, borderRadius: AppRadius.tileExit),
       child: Row(
         children: [
           if (courier != null)

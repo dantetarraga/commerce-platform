@@ -1,6 +1,6 @@
-import 'package:chaski/features/notifications/domain/notice.dart';
-import 'package:chaski/features/notifications/presentation/widgets/notice_tile.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/notifications/domain/notice.dart';
+import 'package:apamuy/features/notifications/presentation/widgets/notice_tile.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// El pedido en curso: sus avisos anudados en un hilo, el último latiendo.

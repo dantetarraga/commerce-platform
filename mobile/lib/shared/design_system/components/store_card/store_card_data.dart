@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
 import 'package:flutter/foundation.dart';
 
 /// Datos que una card de negocio necesita. El design system no conoce las

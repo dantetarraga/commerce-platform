@@ -1,9 +1,9 @@
-import 'package:chaski/core/config/city.dart';
-import 'package:chaski/features/discovery/discovery.dart';
-import 'package:chaski/features/home/presentation/widgets/editorial_promos.dart';
-import 'package:chaski/features/home/presentation/widgets/open_store.dart';
-import 'package:chaski/features/products/products.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/features/discovery/discovery.dart';
+import 'package:apamuy/features/home/presentation/widgets/editorial_promos.dart';
+import 'package:apamuy/features/home/presentation/widgets/open_store.dart';
+import 'package:apamuy/features/products/products.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,7 +56,7 @@ class _LeadProduct extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => Container(
     width: 212,
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: context.chaski.card, borderRadius: AppRadius.card),
+    decoration: BoxDecoration(color: context.apamuy.card, borderRadius: AppRadius.card),
     child: AppProductCard(
       width: 188,
       variant: AppProductCardVariant.featured,

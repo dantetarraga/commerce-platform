@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/result/result.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/result/result.dart';
 import 'package:equatable/equatable.dart';
 
 final class StoreHit extends Equatable {

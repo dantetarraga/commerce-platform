@@ -1,6 +1,6 @@
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/shared/design_system/components/app_purchase_bar.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/shared/design_system/components/app_purchase_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

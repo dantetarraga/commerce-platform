@@ -1,10 +1,10 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/components/app_badge.dart';
-import 'package:chaski/shared/design_system/components/app_network_image.dart';
-import 'package:chaski/shared/design_system/components/store_card/favorite_button.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_data.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/app_badge.dart';
+import 'package:apamuy/shared/design_system/components/app_network_image.dart';
+import 'package:apamuy/shared/design_system/components/store_card/favorite_button.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_data.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Variante destacada de `AppStoreCard`: foto grande con logo, oferta y
@@ -110,7 +110,7 @@ class StoreCardFeature extends StatelessWidget {
                           data.meta,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodySmall?.copyWith(color: context.chaski.onPhotoMuted),
+                          style: theme.textTheme.bodySmall?.copyWith(color: context.apamuy.onPhotoMuted),
                         ),
                       ],
                     ),

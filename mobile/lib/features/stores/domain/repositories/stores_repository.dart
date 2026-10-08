@@ -1,10 +1,10 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/stores/domain/entities/category.dart';
-import 'package:chaski/features/stores/domain/entities/store_detail.dart';
-import 'package:chaski/features/stores/domain/entities/store_menu.dart';
-import 'package:chaski/features/stores/domain/entities/store_page.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/stores/domain/entities/category.dart';
+import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
+import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
+import 'package:apamuy/features/stores/domain/entities/store_page.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
 
 abstract interface class StoresRepository {
   /// Con cuántos negocios abiertos llegan a [location] en cada una.

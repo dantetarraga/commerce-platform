@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,7 +21,7 @@ class CartLineTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return Dismissible(
       key: ValueKey('dismiss-${line.id}'),
       direction: DismissDirection.endToStart,
@@ -32,13 +32,13 @@ class CartLineTile extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSpacing.lg),
-        color: chaski.danger.withValues(alpha: 0.12),
+        color: apamuy.danger.withValues(alpha: 0.12),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Quitar', style: theme.textTheme.labelLarge?.copyWith(color: chaski.danger)),
+            Text('Quitar', style: theme.textTheme.labelLarge?.copyWith(color: apamuy.danger)),
             const SizedBox(width: AppSpacing.xs),
-            Icon(Icons.delete_outline_rounded, color: chaski.danger),
+            Icon(Icons.delete_outline_rounded, color: apamuy.danger),
           ],
         ),
       ),
@@ -109,7 +109,7 @@ class _LineStepper extends StatelessWidget {
       icon: Icon(icon, size: 18),
     );
     return DecoratedBox(
-      decoration: BoxDecoration(color: context.chaski.raised, borderRadius: const BorderRadius.all(AppRadius.pill)),
+      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: const BorderRadius.all(AppRadius.pill)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

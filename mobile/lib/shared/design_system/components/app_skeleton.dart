@@ -1,12 +1,12 @@
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart' as sk;
 
 /// Barrido gris muy suave de la marca; quieto si el usuario reduce el movimiento.
 sk.PaintingEffect appSkeletonEffect(BuildContext context) {
-  final colors = context.chaski;
+  final colors = context.apamuy;
   if (reduceMotionOf(context)) return sk.SolidColorEffect(color: colors.shimmerBase);
   return sk.ShimmerEffect(
     baseColor: colors.shimmerBase,
@@ -87,7 +87,7 @@ class SkeletonBox extends StatelessWidget {
     return Container(
       width: width,
       height: height,
-      decoration: BoxDecoration(color: context.chaski.shimmerBase, borderRadius: borderRadius),
+      decoration: BoxDecoration(color: context.apamuy.shimmerBase, borderRadius: borderRadius),
     );
   }
 }

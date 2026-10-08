@@ -1,7 +1,7 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/orders/domain/payment_method.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/orders/domain/payment_method.dart';
 import 'package:equatable/equatable.dart';
 
 export 'order_insights.dart';

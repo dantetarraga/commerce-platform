@@ -1,13 +1,13 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/features/stores/domain/entities/store_filter.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/domain/entities/store_summary.dart';
-import 'package:chaski/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
-import 'package:chaski/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
-import 'package:chaski/features/stores/presentation/providers/stores_providers.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/features/stores/domain/entities/store_filter.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
+import 'package:apamuy/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
+import 'package:apamuy/features/stores/infrastructure/datasources/remote/stores_remote_data_source.dart';
+import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

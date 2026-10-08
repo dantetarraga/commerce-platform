@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant.dart';
-import 'package:chaski/features/merchant_orders/domain/merchant_board.dart';
-import 'package:chaski/features/merchant_orders/infrastructure/models/merchant_json.dart';
-import 'package:chaski/features/orders/orders.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
+import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
+import 'package:apamuy/features/merchant_orders/infrastructure/models/merchant_json.dart';
+import 'package:apamuy/features/orders/orders.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

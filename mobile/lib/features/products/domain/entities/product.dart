@@ -1,4 +1,4 @@
-import 'package:chaski/core/domain/money.dart';
+import 'package:apamuy/core/domain/money.dart';
 import 'package:equatable/equatable.dart';
 
 final class ProductVariant extends Equatable {

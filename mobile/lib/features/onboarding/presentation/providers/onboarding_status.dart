@@ -1,4 +1,4 @@
-import 'package:chaski/core/storage/storage_providers.dart';
+import 'package:apamuy/core/storage/storage_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'onboarding_status.g.dart';

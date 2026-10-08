@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/legal/legal_page.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/legal/legal_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

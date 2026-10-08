@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chaski/core/network/api_client.dart';
-import 'package:chaski/core/realtime/realtime_client.dart';
+import 'package:apamuy/core/network/api_client.dart';
+import 'package:apamuy/core/realtime/realtime_client.dart';
 
 /// Fuente remota de `/orders`. Devuelve JSON crudo (ver `OrderJson`).
 abstract interface class OrdersRemoteDataSource {

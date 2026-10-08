@@ -1,5 +1,5 @@
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/home/home.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -17,7 +17,7 @@ void main() {
   setUpAll(loadDesignFonts);
 
   testWidgets('el arranque muestra la entrada completa y luego entra al inicio', (tester) async {
-    final container = await pumpChaski(tester, signedIn: true, playSplash: true, latency: const Duration(milliseconds: 50));
+    final container = await pumpApamuy(tester, signedIn: true, playSplash: true, latency: const Duration(milliseconds: 50));
     // _pumpApp ya avanzó 1 s: seguimos en la entrada.
     expect(find.byType(SplashPage), findsOneWidget);
     expect(container.read(splashGateProvider), isFalse);
@@ -30,11 +30,11 @@ void main() {
     await settle(tester, frames: 30);
     expect(container.read(splashGateProvider), isTrue);
     expect(find.byType(HomePage), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
   });
 
   testWidgets('si la sesión tarda, el arranque espera con el relevo del pedido', (tester) async {
-    final container = await pumpChaski(tester, signedIn: true, playSplash: true, latency: const Duration(seconds: 4));
+    final container = await pumpApamuy(tester, signedIn: true, playSplash: true, latency: const Duration(seconds: 4));
     await tester.pump(const Duration(seconds: 1));
     expect(find.byType(SplashPage), findsOneWidget);
     expect(container.read(splashGateProvider), isFalse);
@@ -44,7 +44,7 @@ void main() {
     await settle(tester, frames: 30);
     expect(container.read(splashGateProvider), isTrue);
     expect(find.byType(HomePage), findsOneWidget);
-    await unmountChaski(tester, container);
+    await unmountApamuy(tester, container);
     // Deja terminar las consultas lentas del backend de prueba.
     await tester.pump(const Duration(seconds: 5));
   });

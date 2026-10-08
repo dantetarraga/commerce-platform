@@ -1,5 +1,5 @@
-import 'package:chaski/features/products/domain/entities/product.dart';
-import 'package:chaski/features/products/infrastructure/models/product_dtos.dart';
+import 'package:apamuy/features/products/domain/entities/product.dart';
+import 'package:apamuy/features/products/infrastructure/models/product_dtos.dart';
 
 extension ProductDetailDtoMapper on ProductDetailDto {
   Product toDomain() => Product(

@@ -1,6 +1,6 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/core/utils/text_scale.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Portada a todo el ancho de Apamuy Socios: etiqueta, saludo, titular con su

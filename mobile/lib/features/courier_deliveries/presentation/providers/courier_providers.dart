@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:chaski/core/config/app_config_provider.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/maps/location_service.dart';
-import 'package:chaski/core/network/network_providers.dart';
-import 'package:chaski/core/realtime/realtime_client.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/courier_deliveries/domain/courier.dart';
-import 'package:chaski/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
-import 'package:chaski/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
-import 'package:chaski/features/orders/orders.dart';
-import 'package:chaski/features/partner_session/partner_session.dart';
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/maps/location_service.dart';
+import 'package:apamuy/core/network/network_providers.dart';
+import 'package:apamuy/core/realtime/realtime_client.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/courier_deliveries/domain/courier.dart';
+import 'package:apamuy/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
+import 'package:apamuy/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
+import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/partner_session/partner_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'courier_providers.g.dart';

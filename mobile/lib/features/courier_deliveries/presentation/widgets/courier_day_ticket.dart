@@ -1,8 +1,8 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/courier_deliveries/presentation/providers/courier_providers.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/partner/partner.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/courier_deliveries/presentation/providers/courier_providers.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/partner/partner.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

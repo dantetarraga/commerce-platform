@@ -1,6 +1,6 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/features/orders/domain/order.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
 
 /// Contrato JSON de `/orders` (igual en la API real y en el backend fake).
 abstract final class OrderJson {

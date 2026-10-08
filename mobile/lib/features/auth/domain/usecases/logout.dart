@@ -1,4 +1,4 @@
-import 'package:chaski/features/auth/domain/repositories/auth_repository.dart';
+import 'package:apamuy/features/auth/domain/repositories/auth_repository.dart';
 
 class Logout {
   const Logout(this._repository);

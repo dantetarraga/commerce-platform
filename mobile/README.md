@@ -9,6 +9,14 @@ Un solo proyecto con dos apps que comparten componentes, tokens y datos:
 
 En Socios, el **modo** (Negocio o Repartidor) lo decide la cuenta con la que entras: el dueño de un negocio ve sus pedidos y el repartidor, sus entregas. Si una cuenta tiene los dos roles, elige el modo al entrar.
 
+## Identidad y datos guardados
+
+El paquete Dart es `apamuy` y los imports internos usan `package:apamuy/...`. Las raíces son `ApamuyApp` y `PartnerApp`; Android usa el namespace `pe.apamuy`. Los identificadores instalables siguen siendo `pe.apamuy.app` y `pe.apamuy.socios`.
+
+Al actualizar una instalación con esos mismos identificadores, el almacenamiento migra las claves antiguas `chaski.*` a `apamuy.*` cuando se leen. Conserva sesión, bolsa, direcciones, favoritos, búsquedas, checkout, tema, onboarding y modo de Socios. Los valores nuevos tienen prioridad; escribir o borrar también retira la clave antigua. Cerrar sesión limpia ambas versiones de los tokens. Esta compatibilidad y sus pruebas son referencias históricas intencionales a Chaski.
+
+Los nombres e identificadores de la tienda demo «El Chaski Dorado» siguen siendo datos del catálogo compartido con el backend. La URL de origen de los avatares conserva la semilla con la que se generaron.
+
 ## Antes de empezar
 
 ```sh

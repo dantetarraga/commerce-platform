@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/cart/presentation/widgets/coupon_row.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/presentation/widgets/coupon_row.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
 /// Pie de la bolsa: nota para el negocio, franja del mínimo, cupón y subtotal.
@@ -43,7 +43,7 @@ class CartSummary extends StatelessWidget {
           AmountRow.discount(
             label: 'Cupón ${coupon.code}',
             amount: cart.discount,
-            style: theme.textTheme.bodyMedium?.copyWith(color: context.chaski.success, fontWeight: FontWeight.w700),
+            style: theme.textTheme.bodyMedium?.copyWith(color: context.apamuy.success, fontWeight: FontWeight.w700),
           ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
@@ -69,7 +69,7 @@ class StoreNoteRow extends StatelessWidget {
     final empty = note.isEmpty;
     return AppTapSurface(
       semanticLabel: empty ? 'Agregar nota para el negocio, opcional' : 'Nota para el negocio: $note. Editar',
-      color: context.chaski.raised,
+      color: context.apamuy.raised,
       borderRadius: AppRadius.tile,
       pressScale: 1,
       onTap: onTap,
@@ -116,13 +116,13 @@ class MinimumStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     return Semantics(
       label: 'Te faltan ${spokenMoney(cart.missingForMinimum)} para el pedido mínimo',
       excludeSemantics: true,
       child: Container(
         padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
-        decoration: BoxDecoration(color: chaski.accentSoft, borderRadius: AppRadius.tile),
+        decoration: BoxDecoration(color: apamuy.accentSoft, borderRadius: AppRadius.tile),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,9 +132,9 @@ class MinimumStrip extends StatelessWidget {
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
-                    color: chaski.accent,
+                    color: apamuy.accent,
                     shape: BoxShape.circle,
-                    border: Border.all(color: chaski.onAccent, width: 1.5),
+                    border: Border.all(color: apamuy.onAccent, width: 1.5),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.xs),
@@ -165,8 +165,8 @@ class MinimumStrip extends StatelessWidget {
                 builder: (context, p, _) => LinearProgressIndicator(
                   value: p,
                   minHeight: 5,
-                  color: chaski.accent,
-                  backgroundColor: chaski.accent.withValues(alpha: 0.2),
+                  color: apamuy.accent,
+                  backgroundColor: apamuy.accent.withValues(alpha: 0.2),
                 ),
               ),
             ),

@@ -1,11 +1,11 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/domain/validated.dart';
-import 'package:chaski/core/result/result.dart';
-import 'package:chaski/features/cart/domain/entities/cart.dart';
-import 'package:chaski/features/orders/domain/order.dart';
-import 'package:chaski/features/products/domain/entities/product.dart';
-import 'package:chaski/features/products/domain/repositories/products_repository.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/core/domain/validated.dart';
+import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/products/domain/entities/product.dart';
+import 'package:apamuy/features/products/domain/repositories/products_repository.dart';
 
 /// Líneas de bolsa armadas a partir de un pedido anterior y cuántas no se
 /// pudieron rearmar (producto agotado, borrado o sin id).

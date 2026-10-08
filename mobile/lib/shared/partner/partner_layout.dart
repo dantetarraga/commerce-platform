@@ -1,4 +1,4 @@
-import 'package:chaski/core/utils/text_scale.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
 import 'package:flutter/widgets.dart';
 
 /// Puntos de quiebre de Apamuy Socios (tablet en el mostrador vs. celular).

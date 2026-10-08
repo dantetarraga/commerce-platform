@@ -1,7 +1,7 @@
-import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/discovery/presentation/providers/popular_searches_providers.dart';
-import 'package:chaski/features/discovery/presentation/providers/recent_searches.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
+import 'package:apamuy/features/discovery/presentation/providers/popular_searches_providers.dart';
+import 'package:apamuy/features/discovery/presentation/providers/recent_searches.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -93,7 +93,7 @@ class _PopularRow extends StatelessWidget {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(color: context.chaski.raised, borderRadius: AppRadius.tile),
+              decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.tile),
               child: Icon(Icons.trending_up_rounded, color: theme.colorScheme.onSurface),
             ),
             const SizedBox(width: AppSpacing.sm),

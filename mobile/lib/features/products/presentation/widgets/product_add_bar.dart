@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/quantity.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/core/utils/text_scale.dart';
-import 'package:chaski/features/products/domain/entities/product_selection.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/quantity_stepper.dart';
+import 'package:apamuy/core/domain/quantity.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/core/utils/text_scale.dart';
+import 'package:apamuy/features/products/domain/entities/product_selection.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/quantity_stepper.dart';
 import 'package:flutter/material.dart';
 
 /// Barra fija del detalle: por qué no se puede agregar (si aplica), cantidad y
@@ -123,7 +123,7 @@ class _AddButton extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     // Incompleto: se ve más suave pero responde (lleva al grupo que falta).
-    final bg = enabled ? (valid ? scheme.primary : scheme.primary.withValues(alpha: 0.55)) : context.chaski.raised;
+    final bg = enabled ? (valid ? scheme.primary : scheme.primary.withValues(alpha: 0.55)) : context.apamuy.raised;
     final fg = enabled ? scheme.onPrimary : scheme.onSurfaceVariant;
     final reduce = reduceMotionOf(context);
     final style = theme.textTheme.labelLarge?.copyWith(color: fg, fontSize: 16, fontWeight: FontWeight.w800);

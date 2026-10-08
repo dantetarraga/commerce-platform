@@ -1,14 +1,14 @@
-import 'package:chaski/core/domain/email_address.dart';
-import 'package:chaski/core/domain/phone_number.dart';
-import 'package:chaski/core/errors/app_exception.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/storage/token_storage.dart';
-import 'package:chaski/features/auth/domain/entities/otp.dart';
-import 'package:chaski/features/auth/domain/value_objects/otp_code.dart';
-import 'package:chaski/features/auth/domain/value_objects/person_name.dart';
-import 'package:chaski/features/auth/infrastructure/datasources/remote/auth_remote_data_source.dart';
-import 'package:chaski/features/auth/infrastructure/models/auth_dtos.dart';
-import 'package:chaski/features/auth/infrastructure/repositories/auth_repository_impl.dart';
+import 'package:apamuy/core/domain/email_address.dart';
+import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/errors/app_exception.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/storage/token_storage.dart';
+import 'package:apamuy/features/auth/domain/entities/otp.dart';
+import 'package:apamuy/features/auth/domain/value_objects/otp_code.dart';
+import 'package:apamuy/features/auth/domain/value_objects/person_name.dart';
+import 'package:apamuy/features/auth/infrastructure/datasources/remote/auth_remote_data_source.dart';
+import 'package:apamuy/features/auth/infrastructure/models/auth_dtos.dart';
+import 'package:apamuy/features/auth/infrastructure/repositories/auth_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

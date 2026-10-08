@@ -1,15 +1,15 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/features/addresses/addresses.dart';
-import 'package:chaski/features/cart/cart.dart';
-import 'package:chaski/features/checkout/domain/checkout.dart';
-import 'package:chaski/features/checkout/presentation/providers/checkout_controller.dart';
-import 'package:chaski/features/checkout/presentation/widgets/checkout_info_row.dart';
-import 'package:chaski/features/checkout/presentation/widgets/payment_brand.dart';
-import 'package:chaski/features/checkout/presentation/widgets/payment_sheet.dart';
-import 'package:chaski/features/checkout/presentation/widgets/schedule_sheet.dart';
-import 'package:chaski/features/checkout/presentation/widgets/tip_selector.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/features/addresses/addresses.dart';
+import 'package:apamuy/features/cart/cart.dart';
+import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/checkout_info_row.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/payment_brand.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/payment_sheet.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/schedule_sheet.dart';
+import 'package:apamuy/features/checkout/presentation/widgets/tip_selector.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,8 +1,8 @@
-import 'package:chaski/core/domain/money.dart';
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
-import 'package:chaski/shared/design_system/tokens/motion.dart';
+import 'package:apamuy/core/domain/money.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 /// Qué muestra la barra de compra. El design system no conoce carrito ni pedidos: la app
@@ -79,13 +79,13 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final state = widget.state;
     final visible = state is! PurchaseBarHidden;
     final delivered = state is PurchaseBarOrder && state.delivered;
     const bg = AppColors.terracota;
     const fg = AppColors.blanco;
-    final actionBg = delivered ? chaski.success : AppColors.blanco;
+    final actionBg = delivered ? apamuy.success : AppColors.blanco;
     final actionFg = delivered ? scheme.onTertiary : AppColors.terracota;
     final (title, subtitle, action) = _texts(state);
     final reduce = reduceMotionOf(context);
@@ -225,7 +225,7 @@ class _Knot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = context.chaski.accent;
+    final accent = context.apamuy.accent;
     return SizedBox.square(
       dimension: 22,
       child: AnimatedBuilder(

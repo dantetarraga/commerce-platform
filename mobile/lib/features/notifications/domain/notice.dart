@@ -1,4 +1,4 @@
-import 'package:chaski/core/result/result.dart';
+import 'package:apamuy/core/result/result.dart';
 import 'package:equatable/equatable.dart';
 
 /// Tipo de aviso: los del pedido siguen su recorrido; la promo va aparte.

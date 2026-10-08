@@ -1,5 +1,5 @@
-import 'package:chaski/core/domain/validated.dart';
-import 'package:chaski/core/domain/value_failure.dart';
+import 'package:apamuy/core/domain/validated.dart';
+import 'package:apamuy/core/domain/value_failure.dart';
 import 'package:equatable/equatable.dart';
 
 /// Celular peruano: 9 dígitos que empiezan con 9.

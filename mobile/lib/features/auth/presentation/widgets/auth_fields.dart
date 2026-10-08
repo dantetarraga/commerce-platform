@@ -1,4 +1,4 @@
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -112,7 +112,7 @@ class AuthOtpFieldState extends State<AuthOtpField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final code = _controller.text;
     final reduced = reduceMotionOf(context);
 
@@ -161,12 +161,12 @@ class AuthOtpFieldState extends State<AuthOtpField> {
                             height: 58,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: chaski.raised,
+                              color: apamuy.raised,
                               borderRadius: AppRadius.button,
                               border: Border.all(
                                 width: 2,
                                 color: widget.hasError
-                                    ? chaski.danger
+                                    ? apamuy.danger
                                     : (_focus.hasFocus && i == code.length.clamp(0, widget.length - 1))
                                     ? scheme.primary
                                     : scheme.primary.withValues(alpha: 0),

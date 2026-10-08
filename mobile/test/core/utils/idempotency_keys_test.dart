@@ -1,4 +1,4 @@
-import 'package:chaski/core/utils/idempotency_keys.dart';
+import 'package:apamuy/core/utils/idempotency_keys.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

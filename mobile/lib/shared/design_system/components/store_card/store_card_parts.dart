@@ -1,7 +1,7 @@
-import 'package:chaski/core/utils/formatters.dart';
-import 'package:chaski/shared/design_system/components/store_card/store_card_data.dart';
-import 'package:chaski/shared/design_system/tokens/app_colors.dart';
-import 'package:chaski/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/store_card/store_card_data.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Píldora de calificación: estrella y nota con un decimal sobre el
@@ -21,7 +21,7 @@ class AppRatingPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star_rounded, size: 15, color: context.chaski.rating),
+          Icon(Icons.star_rounded, size: 15, color: context.apamuy.rating),
           const SizedBox(width: 3),
           Text(rating.toStringAsFixed(1), style: theme.textTheme.labelLarge?.copyWith(color: scheme.onPrimaryContainer)),
         ],
@@ -90,7 +90,7 @@ class StoreEtaLine extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(text: '${Formatters.eta(data.etaMinutes)} · '),
-                if (fee != null) TextSpan(text: fee) else TextSpan(text: 'Envío gratis', style: TextStyle(color: context.chaski.success)),
+                if (fee != null) TextSpan(text: fee) else TextSpan(text: 'Envío gratis', style: TextStyle(color: context.apamuy.success)),
               ],
             ),
             style: theme.textTheme.titleSmall,
@@ -110,7 +110,7 @@ class StoreMetaLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final chaski = context.chaski;
+    final apamuy = context.apamuy;
     final muted = theme.textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600);
     final free = data.deliveryFee.isZero;
     Widget dot() => Padding(
@@ -125,7 +125,7 @@ class StoreMetaLine extends StatelessWidget {
       child: Row(
         children: [
           if (data.rating != null) ...[
-            Icon(Icons.star_rounded, size: 15, color: chaski.rating),
+            Icon(Icons.star_rounded, size: 15, color: apamuy.rating),
             const SizedBox(width: 2),
             Text(data.rating!.toStringAsFixed(1), style: muted.copyWith(color: theme.colorScheme.onSurface)),
             dot(),
@@ -137,7 +137,7 @@ class StoreMetaLine extends StatelessWidget {
           Flexible(
             child: Text(
               free ? 'Envío gratis' : 'Envío ${Formatters.money(data.deliveryFee)}',
-              style: free ? muted.copyWith(color: chaski.success) : muted,
+              style: free ? muted.copyWith(color: apamuy.success) : muted,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

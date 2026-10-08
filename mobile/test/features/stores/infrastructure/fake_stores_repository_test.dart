@@ -1,9 +1,9 @@
-import 'package:chaski/core/domain/geo_coordinates.dart';
-import 'package:chaski/core/errors/failure.dart';
-import 'package:chaski/core/fake/fake_backend.dart';
-import 'package:chaski/features/stores/domain/entities/store_query.dart';
-import 'package:chaski/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
-import 'package:chaski/features/stores/infrastructure/repositories/stores_repository_impl.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/errors/failure.dart';
+import 'package:apamuy/core/fake/fake_backend.dart';
+import 'package:apamuy/features/stores/domain/entities/store_query.dart';
+import 'package:apamuy/features/stores/infrastructure/datasources/remote/fake_stores_remote_data_source.dart';
+import 'package:apamuy/features/stores/infrastructure/repositories/stores_repository_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../helpers/result_helpers.dart';

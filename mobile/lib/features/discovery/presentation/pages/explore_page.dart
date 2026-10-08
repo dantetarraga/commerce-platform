@@ -1,12 +1,12 @@
-import 'package:chaski/core/utils/debouncer.dart';
-import 'package:chaski/features/discovery/domain/search.dart';
-import 'package:chaski/features/discovery/presentation/providers/discovery_providers.dart';
-import 'package:chaski/features/discovery/presentation/providers/recent_searches.dart';
-import 'package:chaski/features/discovery/presentation/providers/search_providers.dart';
-import 'package:chaski/features/discovery/presentation/widgets/explore_idle.dart';
-import 'package:chaski/features/discovery/presentation/widgets/search_results_view.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
-import 'package:chaski/shared/widgets/async_value_view.dart';
+import 'package:apamuy/core/utils/debouncer.dart';
+import 'package:apamuy/features/discovery/domain/search.dart';
+import 'package:apamuy/features/discovery/presentation/providers/discovery_providers.dart';
+import 'package:apamuy/features/discovery/presentation/providers/recent_searches.dart';
+import 'package:apamuy/features/discovery/presentation/providers/search_providers.dart';
+import 'package:apamuy/features/discovery/presentation/widgets/explore_idle.dart';
+import 'package:apamuy/features/discovery/presentation/widgets/search_results_view.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/widgets/async_value_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

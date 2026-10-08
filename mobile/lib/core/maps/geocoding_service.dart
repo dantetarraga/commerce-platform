@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:chaski/core/config/city.dart';
-import 'package:chaski/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:geocoding/geocoding.dart';

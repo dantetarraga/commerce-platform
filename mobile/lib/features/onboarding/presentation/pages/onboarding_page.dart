@@ -1,8 +1,8 @@
-import 'package:chaski/features/auth/auth.dart';
-import 'package:chaski/features/onboarding/presentation/providers/onboarding_status.dart';
-import 'package:chaski/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
-import 'package:chaski/features/onboarding/presentation/widgets/onboarding_content.dart';
-import 'package:chaski/shared/design_system/design_system.dart';
+import 'package:apamuy/features/auth/auth.dart';
+import 'package:apamuy/features/onboarding/presentation/providers/onboarding_status.dart';
+import 'package:apamuy/features/onboarding/presentation/widgets/city_onboarding_scene.dart';
+import 'package:apamuy/features/onboarding/presentation/widgets/onboarding_content.dart';
+import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
