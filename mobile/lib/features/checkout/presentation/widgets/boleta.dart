@@ -71,7 +71,9 @@ class Boleta extends ConsumerWidget {
                   DeliverAt() => 'Te avisamos cuando salga',
                 },
                 action: draft.deliveryTime is DeliverAsap ? 'Programar' : 'Cambiar',
-                onTap: () => showScheduleSheet(context, storeName: store?.name),
+                onTap: () {
+                  if (store != null) showScheduleSheet(context, storeId: store.id, storeName: store.name).ignore();
+                },
               ),
               CheckoutInfoRow(
                 icon: Icons.account_balance_wallet_outlined,

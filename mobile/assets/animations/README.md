@@ -1,6 +1,6 @@
 # Confirmación Rive de Apamuy
 
-`apamuy_success.riv` es una ilustración vectorial propia: círculo cobalto, check blanco, halo y seis destellos lima/azules. No incorpora ilustraciones, fuentes ni imágenes de terceros.
+`apamuy_success.riv` es una ilustración vectorial propia: círculo terracota, check blanco, halo y seis destellos ocre y hierba. No incorpora ilustraciones, fuentes ni imágenes de terceros.
 
 - Artboard: `ApamuySuccess` (240 × 240).
 - Animación: `confirm`, una reproducción de 72 fotogramas a 60 fps (1,2 s).

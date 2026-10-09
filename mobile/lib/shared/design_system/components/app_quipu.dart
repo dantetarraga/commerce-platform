@@ -4,7 +4,7 @@ import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 enum QuipuKnot {
-  /// Cumplido: punto cobalto.
+  /// Cumplido: punto terracota.
   done,
 
   /// En curso: el punto late con un halo.
@@ -72,7 +72,7 @@ class _QuipuRow extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final apamuy = context.apamuy;
-    // El tramo hacia el siguiente paso va en cobalto si este ya se cumplió.
+    // El tramo hacia el siguiente paso va en terracota si este ya se cumplió.
     Color cordColor(QuipuStep from) => from.knot == QuipuKnot.done ? apamuy.thread : scheme.outlineVariant;
     final lineColor = cordColor(step);
     final todo = step.knot == QuipuKnot.todo;

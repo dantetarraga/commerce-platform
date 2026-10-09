@@ -22,6 +22,12 @@ export class StoresController {
     return this.stores.detail(id, pointOf(location));
   }
 
+  /** `{ days: [{ date, slots }] }`: las horas en que se puede programar un pedido. */
+  @Get(':id/delivery-slots')
+  deliverySlots(@Param('id') id: string) {
+    return this.stores.deliverySlots(id);
+  }
+
   @Get(':id/products')
   menu(@Param('id') id: string) {
     return this.stores.menu(id);

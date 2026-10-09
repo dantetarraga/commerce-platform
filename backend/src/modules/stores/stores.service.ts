@@ -5,6 +5,7 @@ import { PrismaService } from '../../database/prisma.service';
 import type { Prisma } from '../../generated/prisma/client';
 import { storeProductIds } from '../search/search.queries';
 import { CitiesService, CityContext } from '../cities/cities.service';
+import { deliverySlots } from './delivery-slots';
 import { matchesFilters, openFirst } from './store-filters';
 import type { StoreSort, StoresQueryDto } from './dto/stores-query.dto';
 import {
@@ -88,7 +89,13 @@ export class StoresService {
     return toStoreDetail(store, city, point ?? city.center, now);
   }
 
-  /** Menú agrupado por secciones; los productos sin sección van al final en "Otros". */
+  /** Horas para programar los próximos 3 días; con el negocio en pausa, ninguna. */
+  async deliverySlots(storeId: string, now = new Date()) {
+    const { store, city } = await this.load(storeId);
+    const days = deliverySlots(store.isAcceptingOrders ? store.schedules : [], now, city.timezone);
+    return { days: days.map((day) => ({ date: day.date, slots: day.slots.map((at) => at.toISOString()) })) };
+  }
+
   /**
    * Busca en la carta del negocio (nombre y descripción, sin tildes), en el
    * orden de la carta y sin repetir. Sin texto: toda la carta.

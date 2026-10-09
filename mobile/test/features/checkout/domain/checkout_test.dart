@@ -108,43 +108,4 @@ void main() {
     final request = const CheckoutDraft(paymentKind: PaymentKind.yape).toRequest(cart.setNote(' tocar el timbre '), address);
     expect(request.notes, 'tocar el timbre');
   });
-
-  group('horarios programables', () {
-    final now = DateTime(2026, 9, 23, 12, 10);
-
-    test('la primera hora es 45 min después, redondeada a 15', () {
-      expect(firstSchedulable(now), DateTime(2026, 9, 23, 13));
-      expect(firstSchedulable(DateTime(2026, 9, 23, 12, 15)), DateTime(2026, 9, 23, 13));
-      expect(firstSchedulable(DateTime(2026, 9, 23, 12, 16)), DateTime(2026, 9, 23, 13, 15));
-    });
-
-    test('respeta la apertura del negocio (notBefore)', () {
-      final opens = DateTime(2026, 9, 23, 18);
-      expect(firstSchedulable(now, notBefore: opens), opens);
-      final slots = scheduleSlots(now, notBefore: opens);
-      expect(slots.first, ScheduleSlot(DateTime(2026, 9, 23, 17, 30), available: false));
-      expect(slots[2], ScheduleSlot(opens, available: true));
-    });
-
-    test('cada 15 min, con las anteriores tachadas', () {
-      final slots = scheduleSlots(now, count: 6);
-      expect(slots.map((s) => s.at), [
-        for (var i = 0; i < 6; i++) DateTime(2026, 9, 23, 12, 30).add(Duration(minutes: 15 * i)),
-      ]);
-      expect(slots.where((s) => !s.available).length, 2);
-    });
-
-    test('no pasa de medianoche y mañana empieza temprano', () {
-      final late = DateTime(2026, 9, 23, 23, 40);
-      expect(scheduleSlots(late).where((s) => s.available), isEmpty);
-      final tomorrow = scheduleSlots(late, day: DateTime(2026, 9, 24));
-      expect(tomorrow.first, ScheduleSlot(DateTime(2026, 9, 24, 7), available: true));
-    });
-
-    test('un día antes de la apertura queda todo tachado', () {
-      final slots = scheduleSlots(now, notBefore: DateTime(2026, 9, 24, 9));
-      expect(slots, isNotEmpty);
-      expect(slots.every((s) => !s.available), isTrue);
-    });
-  });
 }

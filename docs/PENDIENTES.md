@@ -5,7 +5,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 **En corto:** el ciclo completo de un pedido funciona en las tres piezas: app del cliente, app Apamuy Socios (negocio y repartidor) y panel web (Admin y Portal Socios). Hay push, tiempo real por WebSocket, ubicación del repartidor, zona de reparto por ciudad y cancelación automática a los 8 minutos si el negocio no responde. Para lanzar el piloto faltan:
 
 1. **Cuentas y llaves**: Railway, Twilio, dominio, la llave de subida a Google Play y la cuenta de servicio de Firebase en Railway. El código para todo eso ya está.
-2. **Programar pedidos**: la app no conoce el horario del negocio al ofrecer las horas (ver §1).
+2. **Usuarios y métricas del admin** (ver §2).
 3. **Google Play**: declarar `https://<dominio>/privacy` y `https://<dominio>/account-deletion`.
 4. Fuera del código: **revisión legal** de términos y privacidad, y definir la **comisión** de Apamuy (OPERACION §4).
 
@@ -13,7 +13,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 
 | Parte | Listo | Falta |
 |---|---|---|
-| App (`mobile/`) | Flujo completo del cliente contra la API o en modo demo. Dirección con mapa, GPS y pin; zona de reparto; seguimiento en vivo con la moto en el mapa; push; eliminar la cuenta. Solo contraentrega. **Apamuy Socios** (flavor `partner`): negocio y repartidor en vivo, alarma con la app cerrada, ruta en Google Maps. Versión release probada (firma configurable, reglas de R8) | Horarios del negocio al programar, cobertura desde `GET /cities`, mapa en iOS, ubicación del repartidor con la app cerrada |
+| App (`mobile/`) | Flujo completo del cliente contra la API o en modo demo. Dirección con mapa, GPS y pin; zona de reparto; seguimiento en vivo con la moto en el mapa; push; eliminar la cuenta. Solo contraentrega. **Apamuy Socios** (flavor `partner`): negocio y repartidor en vivo, alarma con la app cerrada, ruta en Google Maps. Versión release probada (firma configurable, reglas de R8) | Cobertura desde `GET /cities`, mapa en iOS, ubicación del repartidor con la app cerrada |
 | Backend (`backend/`) | Auth OTP, catálogo, pedidos, operación de negocio y repartidor, cancelación (manual y automática), avisos in-app y push (FCM), direcciones, eliminar la cuenta, WebSocket en `/ws`. Admin: socios, catálogo, marketing, ciudades, pedidos en vivo, caja. Portal Socios: catálogo propio, reportes y rendición | Usuarios y métricas del admin, imágenes, cookie httpOnly para la web |
 | Web (`web/`) | Landing con `/privacy`, `/terms` y `/account-deletion`. Admin: pedidos en vivo, socios, catálogo, marketing, ciudades, caja. Portal Socios: inicio del día, mi tienda, menú, reportes, rendición | Usuarios y métricas del admin, subida de fotos, editor de variantes, mapa de repartidores |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend, web, imagen Docker, APK release de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; secretos de Firebase y de la llave en el CI; imagen más liviana (~800 MB); Redis con más de una instancia |
@@ -22,7 +22,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 
 | Pendiente | Detalle |
 |---|---|
-| Programar pedidos | La hoja "¿Para cuándo?" no conoce el horario del negocio: ofrece solo 16 horas seguidas (4 h) desde la primera posible y, para mañana o pasado, desde las 7:00. Una pollería que abre a mediodía no se puede programar para mañana, y una hora en que el negocio está cerrado se ve disponible; el backend la rechaza al final ("no atiende a esa hora"). Arreglo: armar las horas desde el horario semanal del negocio (todo el día, solo cuando atiende) y desactivar los días en que cierra |
+| Programar pedidos | ✅ El backend calcula las horas (`GET /stores/:id/delivery-slots`) con el horario del negocio y la hora de la ciudad, con la misma regla que valida el pedido: el día completo en que atiende y los días cerrados desactivados |
 | Firma y publicación | ✅ Firma con `android/key.properties`, reglas de R8 y el sonido de la alarma conservado (`res/raw/keep.xml`; sin él la alarma fallaba en release). Falta crear la llave de subida, `env/prod.json` con la URL HTTPS y la ficha en Play Console (ver `mobile/README.md`) |
 | Firebase | ✅ Push hecho y probado en debug y release. Falta `FCM_SERVICE_ACCOUNT_BASE64` en Railway y el secreto `GOOGLE_SERVICES_JSON_BASE64` en el CI |
 | Privacidad y eliminación | ✅ `/privacy`, `/terms` y `/account-deletion` en la web, con el mismo texto que las apps (un test avisa si se separan). Falta declararlas en Google Play |
@@ -65,7 +65,7 @@ Esfuerzos aproximados, para una persona.
 | 1–12 | ✅ Base, pedidos, SMS, deploy preparado, avisos, direcciones, ubicación, Apamuy Socios, tiempo real, panel web (Admin y Portal Socios), cancelación automática | — | Piloto operando |
 | 13 | ✅ Push con alarma del negocio, eliminar la cuenta, logo nuevo | — | Que ningún pedido quede sin atender |
 | 14 | ✅ Privacidad y términos en la web, firma y versión release probada | — | Publicar en Google Play |
-| 15 | Programar pedidos con el horario del negocio | 1 día | Pedidos programados que no fallen |
+| 15 | ✅ Programar pedidos con el horario del negocio | — | Pedidos programados que no fallen |
 | 16 | Usuarios y métricas del admin | 4–5 días | Gestionar socios y clientes, y decidir con datos |
 | 17 | Fotos reales y sesión web en cookie | 3–4 días | Abrir el Portal Socios a negocios |
 | 18 | Cobertura desde `GET /cities`, editor de variantes, mapa de repartidores | 2–3 días | Operación sin parches |

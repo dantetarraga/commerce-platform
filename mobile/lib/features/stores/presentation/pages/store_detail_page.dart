@@ -144,8 +144,9 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
 
   void _schedule() => showScheduleSheet(
     context,
+    storeId: widget.store.id,
     storeName: widget.store.name,
-    notBefore: widget.store.schedule.nextOpeningAt(DateTime.now()),
+    canOrderNow: widget.store.summary.isOpenNow,
   ).ignore();
 
   void _openSearch(StoreMenu menu) => showAppBottomSheet<void>(

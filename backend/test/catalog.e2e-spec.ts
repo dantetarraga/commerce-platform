@@ -187,6 +187,17 @@ describe('Catálogo (e2e)', () => {
     expect(res.body).toMatchObject({ code: 'NOT_FOUND', message: 'Este negocio ya no está disponible.' });
   });
 
+  it('GET /stores/:id/delivery-slots: horas para programar, cada 15 min y dentro del horario', async () => {
+    const res = await http().get(`${API}/stores/st_chaski_dorado/delivery-slots`).expect(200);
+    expect(res.body.days).toHaveLength(3);
+    const slots: string[] = res.body.days.flatMap((day: { slots: string[] }) => day.slots);
+    expect(slots.length).toBeGreaterThan(0);
+    for (const at of slots) {
+      expect(new Date(at).getUTCMinutes() % 15).toBe(0);
+      expect(new Date(at).getTime()).toBeGreaterThan(Date.now() + 40 * 60_000);
+    }
+  });
+
   it('GET /stores/:id/products agrupa por sección con precio "desde"', async () => {
     const res = await http().get(`${API}/stores/st_chaski_dorado/products`).expect(200);
     expect(res.body.sections.map((s: { id: string }) => s.id)).toEqual([

@@ -9,7 +9,7 @@ enum AppAvatarVariant {
   /// Usuario: círculo.
   user,
 
-  /// Repartidor: círculo con un aro cobalto (es "alguien de aquí" en camino).
+  /// Repartidor: círculo con un aro terracota (es "alguien de aquí" en camino).
   courier,
 
   /// Negocio: logo en mosaico redondeado.

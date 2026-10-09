@@ -21,8 +21,8 @@ void main() {
     (-9.0, 26.0),
   ], 0xFFFFFFFF);
   // Rive apila las formas de delante hacia atrás.
-  scene.circle('Cobalto', badge, 0, 0, 120, 0xFF1D5BFF);
-  final halo = scene.circle('Halo', 0, 120, 120, 172, 0x201D5BFF);
+  scene.circle('Terracota', badge, 0, 0, 120, 0xFFB84A2B);
+  final halo = scene.circle('Halo', 0, 120, 120, 172, 0x20B84A2B);
   final sparks = <({int id, double x, double y})>[];
   for (var i = 0; i < 6; i++) {
     final angle = (i * 60 - 20) * math.pi / 180;
@@ -37,7 +37,7 @@ void main() {
       (-3.0, 2.0),
       (-7.0, 0.0),
       (-3.0, -2.0),
-    ], i.isEven ? 0xFFC5F25A : 0xFF7C9DFF);
+    ], i.isEven ? 0xFFE0A15A : 0xFF4E7A40);
     sparks.add((id: id, x: x, y: y));
   }
   // Una sola reproducción, 72 fotogramas a 60 fps (1,2 s).

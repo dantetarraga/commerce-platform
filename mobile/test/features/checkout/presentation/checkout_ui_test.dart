@@ -9,7 +9,9 @@ import 'package:apamuy/features/cart/presentation/providers/cart_providers.dart'
 import 'package:apamuy/features/cart/presentation/widgets/cart_sheet.dart';
 import 'package:apamuy/features/checkout/checkout.dart';
 import 'package:apamuy/features/checkout/domain/checkout.dart';
+import 'package:apamuy/features/checkout/domain/delivery_slots.dart';
 import 'package:apamuy/features/checkout/presentation/providers/checkout_controller.dart';
+import 'package:apamuy/features/checkout/presentation/providers/delivery_slots_provider.dart';
 import 'package:apamuy/features/checkout/presentation/widgets/payment_sheet.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +39,22 @@ const _store = CartStore(id: 's1', name: 'Picantería Doña Rosa', deliveryFee: 
 CartLine _line(String id, String name, int price) =>
     CartLine(id: id, productId: 'p_$id', name: name, unitPrice: Money(price), quantity: Quantity.one);
 
-Future<ProviderContainer> _pump(WidgetTester tester, Widget Function(BuildContext) builder, {Cart? cart, ThemeData? theme}) async {
+class _FixedSlots implements DeliverySlotsRepository {
+  const _FixedSlots(this.days);
+
+  final List<DeliveryDay> days;
+
+  @override
+  Future<Result<List<DeliveryDay>>> forStore(String storeId) async => Ok(days);
+}
+
+Future<ProviderContainer> _pump(
+  WidgetTester tester,
+  Widget Function(BuildContext) builder, {
+  Cart? cart,
+  ThemeData? theme,
+  List<DeliveryDay> slots = const [],
+}) async {
   // La fuente de prueba (cuadrados) desborda textos: se ignoran solo esos.
   final original = FlutterError.onError;
   FlutterError.onError = (d) => d.toString().contains('overflowed') ? null : original?.call(d);
@@ -50,6 +67,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, Widget Function(BuildContex
     overrides: [
       localJsonStoreProvider.overrideWithValue(MemoryJsonStore()),
       cartRepositoryProvider.overrideWithValue(_MemoryCartRepository(cart ?? Cart.empty)),
+      deliverySlotsRepositoryProvider.overrideWithValue(_FixedSlots(slots)),
     ],
   );
   addTearDown(container.dispose);
@@ -67,25 +85,34 @@ Future<ProviderContainer> _pump(WidgetTester tester, Widget Function(BuildContex
 }
 
 void main() {
-  testWidgets('Programar guarda la hora en el checkout y la refleja', (tester) async {
-    final opens = DateTime.now().add(const Duration(hours: 3));
+  testWidgets('Programar ofrece solo las horas del negocio y guarda la elegida', (tester) async {
+    final today = DateTime.now();
+    final day = DateTime(today.year, today.month, today.day);
+    final tomorrow = day.add(const Duration(days: 1));
+    final dinner = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 19);
     final container = await _pump(
       tester,
       (context) => TextButton(
-        onPressed: () => showScheduleSheet(context, storeName: 'Pizzería Qori', notBefore: opens),
+        onPressed: () => showScheduleSheet(context, storeId: 's1', storeName: 'Pizzería Qori'),
         child: const Text('abrir'),
       ),
+      slots: [
+        DeliveryDay(date: day, slots: const []),
+        DeliveryDay(date: tomorrow, slots: [dinner, dinner.add(const Duration(minutes: 15))]),
+      ],
     );
     await tester.tap(find.text('abrir'));
     await tester.pumpAndSettle();
     expect(find.text('¿Para cuándo?'), findsOneWidget);
-    final confirm = find.textContaining('Programar para');
-    expect(confirm, findsOneWidget);
-    await tester.tap(confirm);
+    // Hoy no atiende: arranca en mañana, con sus horas.
+    expect(find.text('Hoy · Cerrado'), findsOneWidget);
+    expect(find.text('7:00 pm', findRichText: true), findsOneWidget);
+    expect(find.text('7:15 pm', findRichText: true), findsOneWidget);
+    await tester.tap(find.text('7:15 pm', findRichText: true));
     await tester.pumpAndSettle();
-    final at = container.read(scheduledDeliveryProvider);
-    expect(at, isNotNull);
-    expect(at!.isBefore(opens.subtract(const Duration(minutes: 1))), isFalse);
+    await tester.tap(find.textContaining('Programar para mañana'));
+    await tester.pumpAndSettle();
+    expect(container.read(scheduledDeliveryProvider), dinner.add(const Duration(minutes: 15)));
   });
 
   testWidgets('La hoja de pago elige efectivo con vuelto', (tester) async {
