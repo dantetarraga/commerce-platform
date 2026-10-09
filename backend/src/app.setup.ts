@@ -28,7 +28,7 @@ export function configureApp(app: INestApplication): void {
   if (config.get('NODE_ENV', { infer: true }) !== 'production') {
     const document = SwaggerModule.createDocument(
       app,
-      new DocumentBuilder().setTitle('Chaski API').setVersion('0.1.0').addBearerAuth().build(),
+      new DocumentBuilder().setTitle('Apamuy API').setVersion('0.1.0').addBearerAuth().build(),
     );
     SwaggerModule.setup('docs', app, document);
   }

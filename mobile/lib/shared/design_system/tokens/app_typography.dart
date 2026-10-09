@@ -6,6 +6,9 @@ abstract final class AppTypography {
   static const display = 'Outfit';
   static const ui = 'Jakarta';
 
+  /// Solo para el logo (letra de afiche chicha); nunca en textos de la app.
+  static const brand = 'Bungee';
+
   static const List<FontFeature> _tabular = [FontFeature.tabularFigures()];
 
   /// Escala de texto de la app sobre la base de Material 3.

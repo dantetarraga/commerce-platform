@@ -44,7 +44,7 @@ type Summary = {
 };
 type Money = { amount: number; currency: string };
 
-describe('Chaski Socios: negocio (e2e)', () => {
+describe('Apamuy Socios: negocio (e2e)', () => {
   let app: INestApplication<App>;
   let prisma: PrismaService;
   let customer: TestSession;

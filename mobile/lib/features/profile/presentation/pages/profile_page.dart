@@ -207,7 +207,7 @@ class ProfilePage extends ConsumerWidget {
             Center(
               child: Column(
                 children: [
-                  const BrandLogo(size: 24),
+                  const BrandLogo(size: 22),
                   const SizedBox(height: AppSpacing.xs),
                   Text('Hecho en Espinar · v$appVersion', style: theme.textTheme.bodySmall),
                 ],

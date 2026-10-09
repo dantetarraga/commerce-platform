@@ -3,13 +3,13 @@ import 'package:apamuy/core/utils/text_scale.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// Portada a todo el ancho de Apamuy Socios: etiqueta, saludo, titular con su
-/// remate en terracota y la foto. [pill] monta el borde inferior.
+/// Portada a todo el ancho de Apamuy Socios: la marca con el modo ([role]), saludo,
+/// titular con su remate en terracota y la foto. [pill] monta el borde inferior.
 class PartnerHero extends StatelessWidget {
   /// [subtitle] se prepara una sola vez aquí (el "S/" no se separa del monto
   /// al partir la línea), no en cada `build`.
   PartnerHero({
-    required this.eyebrow,
+    required this.role,
     required this.title,
     required this.accent,
     this.greeting,
@@ -22,7 +22,8 @@ class PartnerHero extends StatelessWidget {
     super.key,
   }) : subtitle = subtitle == null ? null : Formatters.keepCurrencyTogether(subtitle);
 
-  final String eyebrow;
+  /// "TU NEGOCIO" · "REPARTO".
+  final String role;
   final String? greeting;
 
   /// "Tu cocina," · "Yauri te"
@@ -62,7 +63,7 @@ class PartnerHero extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(child: _HeroEyebrow(eyebrow)),
+                    Expanded(child: Align(alignment: Alignment.centerLeft, child: PartnerBrand(role: role))),
                     ...actions,
                   ],
                 ),
@@ -85,32 +86,6 @@ class PartnerHero extends StatelessWidget {
     );
     final pill = this.pill;
     return pill == null ? hero : _PillOverlap(hero: hero, pill: pill);
-  }
-}
-
-/// La etiqueta en cápsula clara arriba a la izquierda ("APAMUY SOCIOS · COCINA").
-class _HeroEyebrow extends StatelessWidget {
-  const _HeroEyebrow(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.button),
-        child: Text(
-          text,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.labelSmall?.copyWith(color: scheme.onPrimaryContainer, letterSpacing: 1.2, fontWeight: FontWeight.w800),
-        ),
-      ),
-    );
   }
 }
 

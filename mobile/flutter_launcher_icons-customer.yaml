@@ -1,12 +1,12 @@
 # Ícono de Apamuy (cliente). Regenerar: dart run flutter_launcher_icons
-# Los PNG salen de assets/brand (la "a" con el pedido verde sobre terracota).
+# Los PNG salen de assets/brand (la "A" chicha sobre terracota, de tool/brand/brand_assets_test.dart).
 flutter_launcher_icons:
   android: "ic_launcher"
   ios: false # iOS no tiene flavors: ver tool/brand/ios_icons.yaml
   image_path: "assets/brand/icon_customer.png"
   adaptive_icon_background: "#B84A2B"
   adaptive_icon_foreground: "assets/brand/icon_customer_foreground.png"
-  adaptive_icon_monochrome: "assets/brand/icon_customer_foreground.png"
+  adaptive_icon_monochrome: "assets/brand/icon_monochrome.png"
   web:
     generate: true
     image_path: "assets/brand/icon_customer.png"

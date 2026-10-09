@@ -1,13 +1,12 @@
 import { Link } from '@tanstack/react-router'
-import { BrandMark } from '@/components/layout/brand-mark'
+import { BrandLogo } from '@/components/layout/brand-mark'
 
 export function SiteFooter() {
   return (
     <footer className='border-t'>
       <div className='mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6'>
         <div className='flex items-center gap-2.5'>
-          <BrandMark className='size-8 text-lg' />
-          <span className='font-display text-lg font-bold'>apamuy</span>
+          <BrandLogo className='text-xl' />
           <span className='text-muted-foreground text-sm'>· Hecho en Espinar</span>
         </div>
         <nav aria-label='Pie de página' className='text-muted-foreground flex gap-6 text-sm'>

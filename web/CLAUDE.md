@@ -40,6 +40,7 @@ React 19 + Vite + TypeScript. Alcance y decisiones en [`docs/PANEL_WEB.md`](../d
 - Un componente hace una sola cosa. Si un formulario tiene pasos, cada paso es su propio componente (ver `features/auth/components`).
 - La lógica que se repite va en un custom hook: en `src/hooks/` si es genérica (`use-countdown`, `use-disclosure`) o en `features/<x>/hooks/` si es del dominio (`use-sign-out`).
 - Las props de eventos se llaman `onX` y los handlers `handleX` (regla de Standard).
+- El logo es `BrandLogo` ("APAMUY" en Bungee con sombra ocre) y `BrandMark` (la "A" en su baldosa), en `components/layout/brand-mark.tsx`. `font-brand` es solo para el logo.
 - Los componentes base van en `components/ui`, al estilo shadcn: `Button`, `Input`, `Label` y `Field`. Para agregar uno nuevo: `pnpm dlx shadcn@latest add <componente>` y adaptarlo a los tokens.
 
 ## Tailwind (v4)

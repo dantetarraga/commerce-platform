@@ -15,7 +15,7 @@ import { CourierLocationDto } from './dto/courier-location.dto';
 import { UpdateCourierStatusDto } from './dto/update-courier-status.dto';
 
 /**
- * Operación del repartidor (app Chaski Socios): conectarse, ver los pedidos
+ * Operación del repartidor (app Apamuy Socios): conectarse, ver los pedidos
  * listos de su ciudad, tomar uno, salir a entregarlo, registrar el cobro al
  * entregar y ver el resumen del día.
  */

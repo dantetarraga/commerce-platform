@@ -24,7 +24,7 @@ import { actorOf, ownerOf } from './merchant-actor';
 import { MerchantService } from './merchant.service';
 
 /**
- * Operación del negocio (app Chaski Socios): ver sus pedidos, aceptarlos con
+ * Operación del negocio (app Apamuy Socios): ver sus pedidos, aceptarlos con
  * tiempo de preparación, marcarlos listos, cancelarlos, pausar la recepción,
  * marcar productos agotados y ver el resumen del día.
  */

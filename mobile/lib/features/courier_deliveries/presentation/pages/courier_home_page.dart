@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-final _eyebrow = '${brandName.toUpperCase()} SOCIOS · REPARTO';
 
 String _orderId(StaffOrder order) => order.id;
 
@@ -133,7 +132,7 @@ class _CourierHero extends ConsumerWidget {
     final summary = ref.watch(courierSummaryProvider).value;
     final scheme = Theme.of(context).colorScheme;
     return PartnerHero(
-      eyebrow: _eyebrow,
+      role: 'REPARTO',
       greeting: '${partnerGreeting()}, ${profile.name.split(' ').first}',
       title: '$cityName te',
       accent: 'espera.',
@@ -332,7 +331,7 @@ class _CourierHomeSkeleton extends ConsumerWidget {
       padding: EdgeInsets.zero,
       children: [
         PartnerHero(
-          eyebrow: _eyebrow,
+          role: 'REPARTO',
           greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
           title: '$cityName te',
           accent: 'espera.',

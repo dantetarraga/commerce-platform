@@ -77,7 +77,7 @@ export class OtpService {
       select: { id: true },
     });
     try {
-      await this.sms.send(phone, `Tu código de Chaski es ${code}. No lo compartas con nadie.`);
+      await this.sms.send(phone, `Tu código de Apamuy es ${code}. No lo compartas con nadie.`);
     } catch (error) {
       // Si no salió el SMS, el código no cuenta: se puede reintentar sin esperar.
       await this.prisma.otpChallenge.delete({ where: { id: challenge.id } });

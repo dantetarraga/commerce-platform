@@ -9,6 +9,7 @@ abstract final class AppColors {
   static const terracotaNight = Color(0xFF3A1E16); // contenedor terracota en oscuro
   static const hierba = Color(0xFF4E7A40); // ofertas, en vivo, envío gratis. Texto blanco encima
   static const hierbaSoft = Color(0xFFE6EFE0);
+  static const ocre = Color(0xFFE0A15A); // sombra del logo y pedido de Socios
   static const hierba300 = Color(0xFF8CC07A); // hierba sobre fondos oscuros
 
   static const papel = Color(0xFFFBF7F2); // fondo crema

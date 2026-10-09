@@ -26,7 +26,7 @@ class HomeHeader extends StatelessWidget {
     final top = MediaQuery.paddingOf(context).top;
     final extra = textScaleExtra(context);
     final min = top + (compactOnly ? 78 + extra * 3.5 : 68 + extra);
-    final max = compactOnly ? min : top + 314 + extra * 11;
+    final max = compactOnly ? min : top + 314 + _HeaderDelegate.brandRow + extra * 11;
     return SliverPersistentHeader(
       pinned: true,
       delegate: _HeaderDelegate(minHeight: min, maxHeight: max, top: top, compactOnly: compactOnly, onHelp: onHelp),
@@ -44,6 +44,9 @@ class _HeaderDelegate extends SliverPersistentHeaderDelegate {
   final VoidCallback? onHelp;
 
   static const _searchOverlap = 27.0;
+
+  /// La fila del logo y la campana, encima de la dirección.
+  static const brandRow = 54.0;
 
   @override
   double get minExtent => minHeight;
@@ -148,7 +151,7 @@ class _ExpandedContent extends ConsumerWidget {
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            if (showArt) HomeCoverArt(width: w),
+            if (showArt) HomeCoverArt(width: w, top: _HeaderDelegate.brandRow),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 14, AppSpacing.gutter, 0),
               child: Column(
@@ -157,11 +160,13 @@ class _ExpandedContent extends ConsumerWidget {
                 children: [
                   const Row(
                     children: [
-                      Expanded(child: Align(alignment: Alignment.centerLeft, child: HomeAddressPill())),
+                      Expanded(child: Align(alignment: Alignment.centerLeft, child: BrandLogo(size: 24))),
                       SizedBox(width: 12),
                       HomeBell(),
                     ],
                   ),
+                  const SizedBox(height: _HeaderDelegate.brandRow - AppSpacing.minTouch),
+                  const HomeAddressPill(),
                   const SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.only(right: showArt ? 150 : 0),

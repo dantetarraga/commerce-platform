@@ -6,6 +6,7 @@ Future<void> loadDesignFonts() async {
   for (final (family, asset) in [
     ('Jakarta', 'assets/fonts/PlusJakartaSans-Variable.ttf'),
     ('Outfit', 'assets/fonts/Outfit-Variable.ttf'),
+    ('Bungee', 'assets/fonts/Bungee-Regular.ttf'),
     ('MaterialIcons', 'fonts/MaterialIcons-Regular.otf'),
   ]) {
     await (FontLoader(family)..addFont(rootBundle.load(asset))).load();

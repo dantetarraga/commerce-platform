@@ -22,7 +22,7 @@ const ownedStores = (ownerId?: string): Prisma.StoreWhereInput => ({
 });
 
 /**
- * Lo que el negocio administra desde Chaski Socios además de sus pedidos:
+ * Lo que el negocio administra desde Apamuy Socios además de sus pedidos:
  * sus locales, la disponibilidad de productos y el resumen del día.
  */
 @Injectable()

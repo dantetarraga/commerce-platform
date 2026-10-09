@@ -27,15 +27,22 @@ class AuthScaffold extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(AppSpacing.xxs, AppSpacing.xxs, AppSpacing.gutter, 0),
                   child: SizedBox(
                     height: AppSpacing.minTouch,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: showBack
-                          ? const BackButton()
-                          : const Padding(
+                    // Con "atrás", el logo pasa al centro: la marca no desaparece al avanzar.
+                    child: showBack
+                        ? const Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Align(alignment: Alignment.centerLeft, child: BackButton()),
+                              BrandLogo(size: 21),
+                            ],
+                          )
+                        : const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
                               padding: EdgeInsets.only(left: AppSpacing.md),
-                              child: BrandLogo(size: 28),
+                              child: BrandLogo(),
                             ),
-                    ),
+                          ),
                   ),
                 ),
                 Expanded(

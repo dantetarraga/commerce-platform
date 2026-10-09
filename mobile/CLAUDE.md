@@ -15,6 +15,7 @@
 - Textos de UI en español.
 - Paquete Dart `apamuy` (`package:apamuy/...`); raíces `ApamuyApp` y `PartnerApp`. Las claves `chaski.*` solo se conservan para migrar almacenamiento antiguo y en sus pruebas.
 - **Push** detrás de `PushMessaging` (`core/push`): Firebase en el dispositivo, `NoopPushMessaging` en tests, en el modo demo y sin `google-services.json`. El `main` de cada app lo inyecta por `overrides`. El registro del teléfono vive en `auth/presentation/providers/push_registration.dart`; lo que debe correr antes de cerrar sesión se anota en `core/session/logout_hooks.dart` (así la sesión no depende del push).
+- **Logo** en `shared/design_system/brand/brand_logo.dart`: "APAMUY" en Bungee (letra de afiche chicha) con sombra ocre, y en 32 px o más una segunda en hierba (`BrandLogo`). La "A" sola (`BrandGlyph`, `BrandMark`) es el ícono, el arranque y el sello de Socios (`PartnerBrand`). Bungee es solo para el logo.
 - Términos y privacidad en `assets/legal/*.md` (Markdown); los muestra `shared/legal/legal_page.dart` en las dos apps, y un enlace `apamuy:<slug>` abre el otro texto.
 
 ## Dos apps, un proyecto
@@ -37,7 +38,8 @@ flutter run --dart-define-from-file=env/dev-device.json               # simulado
 flutter run --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/fake.json
 flutter build apk --flavor partner -t lib/main_partner.dart          # APK para pasar a los socios
 dart run build_runner build --delete-conflicting-outputs
-# Marca (PNG en assets/brand, generados desde la "a" de BrandMarkPainter)
+# Marca: los PNG de assets/brand salen de BrandGlyph (la "A" en Bungee)
+flutter test tool/brand/brand_assets_test.dart --update-goldens
 dart run flutter_launcher_icons                                     # íconos Android por flavor
 dart run flutter_native_splash:create --flavor customer             # arranque nativo (y --flavor partner)
 dart run flutter_launcher_icons -f tool/brand/ios_icons.yaml        # iOS (sin flavor): mover antes los flutter_launcher_icons-*.yaml

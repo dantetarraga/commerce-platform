@@ -1,5 +1,6 @@
 import '@fontsource-variable/outfit'
 import '@fontsource-variable/plus-jakarta-sans'
+import '@fontsource/bungee'
 import './index.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

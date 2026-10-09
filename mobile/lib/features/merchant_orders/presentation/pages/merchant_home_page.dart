@@ -125,7 +125,7 @@ class _KitchenHero extends ConsumerWidget {
       if (waiting > 0) '$waiting por responder' else if (summary != null) 'todo al día',
     ];
     return PartnerHero(
-      eyebrow: '$_brand · TU NEGOCIO',
+      role: 'TU NEGOCIO',
       greeting: user == null ? null : '${partnerGreeting()}, ${user.firstName}',
       title: 'Tu negocio,',
       accent: 'al toque.',

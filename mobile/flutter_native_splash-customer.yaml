@@ -1,4 +1,4 @@
-# Arranque nativo: terracota con la "a" sin el pedido, en el mismo tamaño y lugar
+# Arranque nativo: terracota con la "A" del logo, en el mismo tamaño y lugar
 # que el primer cuadro de SplashPage. Regenerar: dart run flutter_native_splash:create --flavor customer
 flutter_native_splash:
   color: "#B84A2B"

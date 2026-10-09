@@ -5,9 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Composición de la portada, medida sobre 390 px y anclada al borde derecho.
 class HomeCoverArt extends ConsumerWidget {
-  const HomeCoverArt({required this.width, super.key});
+  const HomeCoverArt({required this.width, this.top = 0, super.key});
 
   final double width;
+
+  /// Lo que ocupa encima la fila del logo.
+  final double top;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,7 +25,7 @@ class HomeCoverArt extends ConsumerWidget {
     );
     return Positioned(
       left: 0,
-      top: 0,
+      top: top,
       width: width,
       height: 300,
       child: ExcludeSemantics(

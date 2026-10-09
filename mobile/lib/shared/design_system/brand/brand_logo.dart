@@ -1,136 +1,181 @@
+import 'dart:math' as math;
+
 import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
 import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
 import 'package:flutter/material.dart';
 
 const brandName = 'Apamuy';
 
-/// Logo de Apamuy: la "a" de una sola panza con el pedido (punto verde) adentro,
-/// + la palabra "apamuy" en Outfit.
+/// Sombras del logo, como en un afiche chicha: ocre y, debajo, hierba.
+/// En tamaños chicos (o con [layered] en falso, como en Socios) queda solo la ocre.
+List<Shadow> brandShadows(double fontSize, {bool layered = true, double ratio = 0.055}) {
+  final step = math.max(1.5, fontSize * ratio);
+  return [
+    Shadow(color: AppColors.ocre, offset: Offset(step, step)),
+    if (layered && fontSize >= 32) Shadow(color: AppColors.hierba, offset: Offset(step * 2, step * 2)),
+  ];
+}
+
+/// Cuánto ocupan [shadows] a la derecha y abajo de la letra.
+double _depth(List<Shadow> shadows) => shadows.isEmpty ? 0 : shadows.last.offset.dx;
+
+/// Logo de Apamuy: "APAMUY" en Bungee con sombras desplazadas.
 class BrandLogo extends StatelessWidget {
-  const BrandLogo({this.size = 40, this.showWordmark = true, this.onDark = false, super.key});
+  const BrandLogo({this.size = 26, this.onDark = false, super.key});
 
-  /// Alto del símbolo; la palabra se ajusta a él.
+  /// Tamaño de la letra.
   final double size;
-  final bool showWordmark;
 
-  /// Sobre terracota u otros fondos oscuros: símbolo y palabra en papel.
+  /// Sobre terracota u otros fondos oscuros: letras en papel.
   final bool onDark;
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    // Es arte de marca: no escala con el tamaño de texto del sistema.
+    final color = onDark ? AppColors.papel : Theme.of(context).colorScheme.primary;
+    final shadows = brandShadows(size);
     return Semantics(
       label: brandName,
       excludeSemantics: true,
+      // Es arte de marca: no escala con el tamaño de texto del sistema.
       child: MediaQuery.withNoTextScaling(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            BrandMark(size: size, color: onDark ? AppColors.papel : scheme.primary),
-            if (showWordmark) ...[
-              SizedBox(width: size * 0.18),
-              Text(
-                'apamuy',
-                style: TextStyle(
-                  fontFamily: AppTypography.display,
-                  fontSize: size * 0.8,
-                  height: 1,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -size * 0.012,
-                  color: onDark ? AppColors.papel : scheme.onSurface,
-                ),
-              ),
-            ],
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(right: _depth(shadows), bottom: _depth(shadows)),
+          child: Text(
+            'APAMUY',
+            maxLines: 1,
+            style: TextStyle(fontFamily: AppTypography.brand, fontSize: size, height: 1, color: color, shadows: shadows),
+          ),
         ),
       ),
     );
   }
 }
 
-/// Solo el símbolo: la "a" y el pedido. [dot] cambia el color del pedido (ocre en Socios).
-class BrandMark extends StatelessWidget {
-  const BrandMark({this.size = 40, this.color, this.dot = AppColors.hierba, super.key});
+/// La "A" de la marca centrada en un cuadrado de [size]: ícono, arranque y sello.
+class BrandGlyph extends StatelessWidget {
+  const BrandGlyph({required this.size, this.color = AppColors.papel, this.shadows = true, this.layered = true, super.key});
 
   final double size;
-  final Color? color;
-  final Color dot;
+  final Color color;
+
+  /// Sin sombras para el ícono monocromo de Android.
+  final bool shadows;
+
+  /// Las dos sombras (cliente) o solo la ocre (Socios).
+  final bool layered;
+
+  /// Letra respecto del cuadrado; el ícono y el arranque nativo usan la misma proporción.
+  static const scale = 0.62;
 
   @override
-  Widget build(BuildContext context) => SizedBox.square(
-    dimension: size,
-    child: CustomPaint(
-      painter: BrandMarkPainter(body: color ?? Theme.of(context).colorScheme.primary, dot: dot),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final fontSize = size * scale;
+    // Más finas que en la palabra: en una sola letra grande pesan más.
+    final shadows = this.shadows ? brandShadows(fontSize, layered: layered, ratio: 0.045) : const <Shadow>[];
+    final depth = _depth(shadows);
+    return SizedBox.square(
+      dimension: size,
+      child: Center(
+        // Corre la letra la mitad de la sombra para que el conjunto quede centrado.
+        child: Transform.translate(
+          offset: Offset(-depth / 2, -depth / 2),
+          child: Text(
+            'A',
+            textHeightBehavior: const TextHeightBehavior(applyHeightToFirstAscent: false, applyHeightToLastDescent: false),
+            style: TextStyle(
+              fontFamily: AppTypography.brand,
+              fontSize: fontSize,
+              height: 1,
+              color: color,
+              shadows: shadows,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-/// Dibuja la "a" sobre una grilla de 100 × 100. [dotOffset] y [dotScale] mueven
-/// el pedido (lo usa la animación de arranque).
-class BrandMarkPainter extends CustomPainter {
-  const BrandMarkPainter({
-    required this.body,
-    required this.dot,
-    this.dotOffset = Offset.zero,
-    this.dotScale = 1,
-    this.dotOpacity = 1,
-    this.drawDot = true,
-    this.angle = 0,
-  });
+/// La "A" en una baldosa, como el ícono de la app. En Socios es tinta (papel en oscuro).
+class BrandMark extends StatelessWidget {
+  const BrandMark({this.size = 44, this.background, this.foreground, this.layered = true, super.key});
 
-  final Color body;
-  final Color dot;
-  final Offset dotOffset;
-  final double dotScale;
-  final double dotOpacity;
-  final bool drawDot;
-
-  /// Giro de la "a" (radianes) alrededor del centro de su panza.
-  final double angle;
-
-  /// Centro del pedido en la grilla de 100.
-  static const dotCenter = Offset(46, 54);
+  final double size;
+  final Color? background;
+  final Color? foreground;
+  final bool layered;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final k = size.width / 100;
-    canvas
-      ..save()
-      ..scale(k);
-    if (angle != 0) {
-      canvas
-        ..translate(dotCenter.dx, dotCenter.dy)
-        ..rotate(angle)
-        ..translate(-dotCenter.dx, -dotCenter.dy);
-    }
-    final bowl = Path()
-      ..fillType = PathFillType.evenOdd
-      ..addOval(Rect.fromCircle(center: dotCenter, radius: 26))
-      ..addOval(Rect.fromCircle(center: dotCenter, radius: 13));
-    final paint = Paint()
-      ..color = body
-      ..isAntiAlias = true;
-    canvas
-      ..drawPath(bowl, paint)
-      ..drawRRect(RRect.fromLTRBR(60, 28, 75, 80, const Radius.circular(7.5)), paint);
-    if (drawDot && dotOpacity > 0) {
-      canvas.drawCircle(
-        dotCenter + dotOffset / k,
-        7 * dotScale,
-        Paint()..color = dot.withValues(alpha: dot.a * dotOpacity),
-      );
-    }
-    canvas.restore();
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ExcludeSemantics(
+      child: MediaQuery.withNoTextScaling(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: background ?? scheme.primary,
+            borderRadius: BorderRadius.circular(size * 0.27),
+          ),
+          child: BrandGlyph(size: size, color: foreground ?? AppColors.papel, layered: layered),
+        ),
+      ),
+    );
   }
+}
+
+/// Marca de Apamuy Socios: la baldosa, "APAMUY SOCIOS" y el modo ([role]: "TU NEGOCIO", "REPARTO").
+class PartnerBrand extends StatelessWidget {
+  const PartnerBrand({required this.role, super.key});
+
+  final String role;
 
   @override
-  bool shouldRepaint(BrandMarkPainter old) =>
-      old.body != body ||
-      old.dot != dot ||
-      old.dotOffset != dotOffset ||
-      old.dotScale != dotScale ||
-      old.dotOpacity != dotOpacity ||
-      old.drawDot != drawDot ||
-      old.angle != angle;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Semantics(
+      label: '$brandName Socios · $role',
+      excludeSemantics: true,
+      child: MediaQuery.withNoTextScaling(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            BrandMark(background: scheme.onSurface, foreground: scheme.surface, layered: false),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'APAMUY SOCIOS',
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontFamily: AppTypography.brand,
+                      fontSize: 18,
+                      height: 1,
+                      color: scheme.onSurface,
+                      shadows: brandShadows(18),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    role,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      letterSpacing: 1.6,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

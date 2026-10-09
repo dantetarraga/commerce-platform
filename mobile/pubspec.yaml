@@ -69,3 +69,6 @@ flutter:
     - family: Outfit
       fonts:
         - asset: assets/fonts/Outfit-Variable.ttf
+    - family: Bungee
+      fonts:
+        - asset: assets/fonts/Bungee-Regular.ttf

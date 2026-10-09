@@ -32,7 +32,7 @@ type CourierSummary = {
   collected: { total: Money; CASH: Money; YAPE: Money; PLIN: Money };
 };
 
-describe('Chaski Socios: repartidor (e2e)', () => {
+describe('Apamuy Socios: repartidor (e2e)', () => {
   let app: INestApplication<App>;
   let prisma: PrismaService;
   let customer: TestSession;

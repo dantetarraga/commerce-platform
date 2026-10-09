@@ -1,6 +1,6 @@
 import { Link, Outlet } from '@tanstack/react-router'
 import { ArrowLeft, Bike, ShieldCheck, Store, type LucideIcon } from 'lucide-react'
-import { BrandMark } from '@/components/layout/brand-mark'
+import { BrandLogo } from '@/components/layout/brand-mark'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 
 const audiences: { icon: LucideIcon; title: string; text: string }[] = [
@@ -13,13 +13,10 @@ const audiences: { icon: LucideIcon; title: string; text: string }[] = [
   },
 ]
 
-function Brand({ className }: { className?: string }) {
+function Brand({ className, onPhoto = false }: { className?: string; onPhoto?: boolean }) {
   return (
     <Link to='/' className={className} aria-label='Apamuy, ir a la portada'>
-      <span className='flex items-center gap-2.5'>
-        <BrandMark className='size-9 text-xl' />
-        <span className='font-display text-xl font-bold'>apamuy</span>
-      </span>
+      <BrandLogo className={onPhoto ? 'text-ink-foreground' : undefined} />
     </Link>
   )
 }
@@ -34,7 +31,7 @@ export function AuthLayout() {
           className='from-ink/90 via-ink/60 to-ink/25 absolute inset-0 bg-linear-to-t'
         />
         <div className='text-ink-foreground relative flex h-full flex-col justify-between p-12'>
-          <Brand />
+          <Brand onPhoto />
           <div className='space-y-8'>
             <div className='space-y-4'>
               <p className='text-sm font-semibold tracking-wider uppercase opacity-80'>

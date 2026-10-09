@@ -17,7 +17,7 @@ export function Sidebar({ portal, onNavigate, className }: SidebarProps) {
       <div className='flex items-center gap-3 px-5 py-6'>
         <BrandMark />
         <div className='leading-tight'>
-          <p className='font-display text-xl font-bold'>Apamuy</p>
+          <p className='font-brand brand-shadow-sm text-lg'>APAMUY</p>
           <p className='text-muted-foreground text-xs font-semibold tracking-wide'>
             {portal.label}
           </p>

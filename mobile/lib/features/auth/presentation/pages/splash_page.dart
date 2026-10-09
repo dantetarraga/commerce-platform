@@ -25,7 +25,7 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
   var _started = false;
   var _leaving = false;
 
-  /// Igual que la "a" del arranque nativo (assets/brand/splash_mark.png).
+  /// Igual que la "A" del arranque nativo (assets/brand/splash_mark.png).
   static const _markSize = 112.0;
   static const _disc = 188.0;
 
@@ -78,10 +78,8 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
         child: MediaQuery.withNoTextScaling(
           child: LayoutBuilder(
             builder: (context, constraints) {
+              // El disco nace del centro de la "A".
               final center = constraints.biggest.center(Offset.zero);
-              const k = _markSize / 100;
-              // El disco nace de la panza de la "a".
-              final bowl = center + (BrandMarkPainter.dotCenter - const Offset(50, 50)) * k;
               return AnimatedBuilder(
                 animation: Listenable.merge([_intro, _exit]),
                 builder: (context, _) {
@@ -95,16 +93,13 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                           top: center.dy - _markSize / 2,
                           child: Opacity(
                             opacity: f.markOpacity,
-                            child: const CustomPaint(
-                              size: Size.square(_markSize),
-                              painter: BrandMarkPainter(body: AppColors.papel, dot: AppColors.papel, drawDot: false),
-                            ),
+                            child: const BrandGlyph(size: _markSize),
                           ),
                         ),
                       Positioned.fill(
                         child: CustomPaint(
                           painter: _DiscPainter(
-                            center: bowl,
+                            center: center,
                             radius: _disc / 2 * f.discScale,
                             reveal: f.reveal,
                             color: discColor,
@@ -112,8 +107,8 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                         ),
                       ),
                       Positioned(
-                        left: bowl.dx - _disc / 2,
-                        top: bowl.dy - _disc / 2,
+                        left: center.dx - _disc / 2,
+                        top: center.dy - _disc / 2,
                         child: ClipOval(
                           child: SizedBox.square(
                             dimension: _disc,
@@ -127,20 +122,10 @@ class _SplashPageState extends ConsumerState<SplashPage> with TickerProviderStat
                       Positioned(
                         left: 0,
                         right: 0,
-                        top: bowl.dy + _disc / 2 + 22 + f.wordY,
+                        top: center.dy + _disc / 2 + 22 + f.wordY,
                         child: Opacity(
                           opacity: f.wordOpacity,
-                          child: Text(
-                            'apamuy',
-                            textAlign: TextAlign.center,
-                            style: AppTypography.displayStyle(
-                              context,
-                              size: 44,
-                              height: 1,
-                              weight: FontWeight.w800,
-                              color: AppColors.papel,
-                            ),
-                          ),
+                          child: const Center(child: BrandLogo(size: 40, onDark: true)),
                         ),
                       ),
                     ],
