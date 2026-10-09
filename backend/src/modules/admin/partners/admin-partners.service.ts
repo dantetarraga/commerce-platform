@@ -5,6 +5,7 @@ import { Prisma } from '../../../generated/prisma/client';
 import { CourierStatus, Role } from '../../../generated/prisma/enums';
 import { TokensService } from '../../auth/tokens/tokens.service';
 import { FINAL_STATUSES } from '../../orders/order-list-scope';
+import { recordAdminAction } from '../users/admin-actions';
 import { CreateCourierDto, CreateMerchantDto, PARTNER_ROLES, PartnerRole } from './partners.dto';
 
 const partnerInclude = {
@@ -28,7 +29,7 @@ function toPartner(user: PartnerUser) {
   };
 }
 
-/** Alta y suspensión de socios (OPERACION.md §5); el equipo lo usa desde Swagger. */
+/** Alta y suspensión de socios (OPERACION.md §5). Cada cambio queda en el historial de la cuenta. */
 @Injectable()
 export class AdminPartnersService {
   constructor(
@@ -42,7 +43,7 @@ export class AdminPartnersService {
     return toPartner(user);
   }
 
-  createMerchant(dto: CreateMerchantDto) {
+  createMerchant(dto: CreateMerchantDto, adminId?: string) {
     const storeIds = dto.storeIds ?? [];
     return this.prisma.$transaction(async (tx) => {
       const { userId, created } = await this.upsertUser(tx, dto);
@@ -52,11 +53,12 @@ export class AdminPartnersService {
         await tx.store.updateMany({ where: { id: { in: storeIds } }, data: { ownerId: userId } });
       }
       await this.grant(tx, userId, Role.MERCHANT);
+      await recordAdminAction(tx, adminId, userId, 'PARTNER_CREATED', { role: Role.MERCHANT, storeIds });
       return { created, user: await this.load(tx, userId) };
     });
   }
 
-  createCourier(dto: CreateCourierDto) {
+  createCourier(dto: CreateCourierDto, adminId?: string) {
     return this.prisma.$transaction(async (tx) => {
       const city = await tx.city.findUnique({ where: { id: dto.cityId }, select: { id: true } });
       if (!city) throw AppException.notFound('Esa ciudad no existe.');
@@ -71,6 +73,10 @@ export class AdminPartnersService {
       };
       await tx.courier.upsert({ where: { userId }, create: { userId, ...vehicle }, update: vehicle });
       await this.grant(tx, userId, Role.COURIER);
+      await recordAdminAction(tx, adminId, userId, 'PARTNER_CREATED', {
+        role: Role.COURIER,
+        vehicle: dto.vehicleLabel,
+      });
       return { created, user: await this.load(tx, userId) };
     });
   }
@@ -79,7 +85,7 @@ export class AdminPartnersService {
    * Quita los roles de socio y cierra sus sesiones. Un repartidor con un pedido
    * en curso no se suspende; los negocios del dueño dejan de recibir pedidos.
    */
-  async suspendPartner(userId: string, roles: readonly PartnerRole[] = PARTNER_ROLES) {
+  async suspendPartner(userId: string, roles: readonly PartnerRole[] = PARTNER_ROLES, adminId?: string) {
     const user = await this.prisma.$transaction(async (tx) => {
       const current = await tx.user.findUnique({ where: { id: userId }, include: partnerInclude });
       if (!current) throw AppException.notFound('No encontramos ese usuario.');
@@ -101,6 +107,7 @@ export class AdminPartnersService {
         await tx.store.updateMany({ where: { ownerId: userId }, data: { isAcceptingOrders: false } });
       }
       await tx.userRole.deleteMany({ where: { userId, role: { in: removing } } });
+      if (removing.length) await recordAdminAction(tx, adminId, userId, 'PARTNER_SUSPENDED', { roles: removing });
       return this.load(tx, userId);
     });
     await this.tokens.revokeAllForUser(userId);

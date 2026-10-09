@@ -13,7 +13,8 @@ export async function getAdminStores(signal?: AbortSignal) {
 /** `null` si no hay cuenta con ese celular: es un resultado, no un error. */
 export async function findPartnerByPhone(phone: string, signal?: AbortSignal) {
   try {
-    return (await http.get<PartnerAccount>('/admin/users', { params: { phone }, signal })).data
+    return (await http.get<PartnerAccount>('/admin/partners/lookup', { params: { phone }, signal }))
+      .data
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null
     throw error

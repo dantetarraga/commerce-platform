@@ -5,7 +5,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 **En corto:** el ciclo completo de un pedido funciona en las tres piezas: app del cliente, app Apamuy Socios (negocio y repartidor) y panel web (Admin y Portal Socios). Hay push, tiempo real por WebSocket, ubicación del repartidor, zona de reparto por ciudad y cancelación automática a los 8 minutos si el negocio no responde. Para lanzar el piloto faltan:
 
 1. **Cuentas y llaves**: Railway, Twilio, dominio, la llave de subida a Google Play y la cuenta de servicio de Firebase en Railway. El código para todo eso ya está.
-2. **Usuarios y métricas del admin** (ver §2).
+2. **Fotos reales y sesión web en cookie** (ver §2), antes de abrir el Portal Socios a negocios reales.
 3. **Google Play**: declarar `https://<dominio>/privacy` y `https://<dominio>/account-deletion`.
 4. Fuera del código: **revisión legal** de términos y privacidad, y definir la **comisión** de Apamuy (OPERACION §4).
 
@@ -14,8 +14,8 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 | Parte | Listo | Falta |
 |---|---|---|
 | App (`mobile/`) | Flujo completo del cliente contra la API o en modo demo. Dirección con mapa, GPS y pin; zona de reparto; seguimiento en vivo con la moto en el mapa; push; eliminar la cuenta. Solo contraentrega. **Apamuy Socios** (flavor `partner`): negocio y repartidor en vivo, alarma con la app cerrada, ruta en Google Maps. Versión release probada (firma configurable, reglas de R8) | Cobertura desde `GET /cities`, mapa en iOS, ubicación del repartidor con la app cerrada |
-| Backend (`backend/`) | Auth OTP, catálogo, pedidos, operación de negocio y repartidor, cancelación (manual y automática), avisos in-app y push (FCM), direcciones, eliminar la cuenta, WebSocket en `/ws`. Admin: socios, catálogo, marketing, ciudades, pedidos en vivo, caja. Portal Socios: catálogo propio, reportes y rendición | Usuarios y métricas del admin, imágenes, cookie httpOnly para la web |
-| Web (`web/`) | Landing con `/privacy`, `/terms` y `/account-deletion`. Admin: pedidos en vivo, socios, catálogo, marketing, ciudades, caja. Portal Socios: inicio del día, mi tienda, menú, reportes, rendición | Usuarios y métricas del admin, subida de fotos, editor de variantes, mapa de repartidores |
+| Backend (`backend/`) | Auth OTP, catálogo, pedidos, operación de negocio y repartidor, cancelación (manual y automática), avisos in-app y push (FCM), direcciones, eliminar la cuenta, WebSocket en `/ws`. Admin: socios, catálogo, marketing, ciudades, pedidos en vivo, caja. Portal Socios: catálogo propio, reportes y rendición | Imágenes, cookie httpOnly para la web |
+| Web (`web/`) | Landing con `/privacy`, `/terms` y `/account-deletion`. Admin: métricas, usuarios, pedidos en vivo, socios, catálogo, marketing, ciudades, caja. Portal Socios: inicio del día, mi tienda, menú, reportes, rendición | Subida de fotos, editor de variantes, mapa de repartidores |
 | Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend, web, imagen Docker, APK release de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; secretos de Firebase y de la llave en el CI; imagen más liviana (~800 MB); Redis con más de una instancia |
 
 ## 1. Bloquea el lanzamiento
@@ -33,8 +33,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 
 | Pendiente | Detalle |
 |---|---|
-| Usuarios en el admin | Hoy **Socios** solo busca una cuenta por celular, da de alta negocios y repartidores y los suspende. Falta: lista de usuarios con búsqueda y filtros (rol, estado, ciudad); ficha con sus pedidos, gasto y últimas sesiones; **reactivar** a un socio suspendido; bloquear y desbloquear a un cliente; cerrar sus sesiones; listas separadas de negocios y repartidores con su desempeño; dar o quitar el rol de admin; y un registro de quién hizo cada cambio |
-| Métricas del admin | El inicio del admin es un menú sin datos. Falta un tablero con las cifras calculadas en el backend (`admin/analytics?from&to&cityId`): pedidos, ventas, ticket promedio y clientes nuevos y recurrentes, comparados con el periodo anterior; pedidos por día y por hora; cancelaciones por motivo y por quién; tiempos de respuesta, preparación y entrega; negocios, productos y repartidores principales; métodos de pago y cupones |
+| Usuarios y métricas del admin | ✅ **Usuarios** (`/admin/users`): lista con búsqueda y filtros, ficha con pedidos, gasto, sesiones y desempeño de socio (30 días); bloquear y desbloquear, reactivar a un socio suspendido, cerrar sesiones, dar o quitar el acceso de admin, con historial de quién hizo cada cambio. **Inicio**: tablero calculado en el backend (`admin/analytics`) con pedidos, ventas, clientes nuevos, horas pico, tiempos, cancelaciones, negocios, productos, repartidores, pagos y cupones |
 | Fotos reales | Todo usa placeholders de loremflickr. Falta storage (S3/R2) con URLs prefirmadas, CDN y la subida en el panel y el Portal Socios |
 | Sesión web en cookie | El refresh token del panel vive en `localStorage`. Pasarlo a cookie httpOnly + CORS del dominio antes de abrir el Portal Socios a negocios reales |
 | Cobertura desde `GET /cities` | La app decide si una dirección está en la zona con un centro y 6 km fijos (`core/config/city.dart`), pero el backend usa los de la ciudad, que se editan en el panel. Si el admin cambia la zona, la app y el backend no coinciden: o la app rechaza direcciones que sí se atienden, o deja armar el pedido y el backend lo rechaza al final. Arreglo: la app lee la ciudad de `GET /cities` al abrir y la guarda |
@@ -66,6 +65,6 @@ Esfuerzos aproximados, para una persona.
 | 13 | ✅ Push con alarma del negocio, eliminar la cuenta, logo nuevo | — | Que ningún pedido quede sin atender |
 | 14 | ✅ Privacidad y términos en la web, firma y versión release probada | — | Publicar en Google Play |
 | 15 | ✅ Programar pedidos con el horario del negocio | — | Pedidos programados que no fallen |
-| 16 | Usuarios y métricas del admin | 4–5 días | Gestionar socios y clientes, y decidir con datos |
+| 16 | ✅ Usuarios y métricas del admin | — | Gestionar socios y clientes, y decidir con datos |
 | 17 | Fotos reales y sesión web en cookie | 3–4 días | Abrir el Portal Socios a negocios |
 | 18 | Cobertura desde `GET /cities`, editor de variantes, mapa de repartidores | 2–3 días | Operación sin parches |

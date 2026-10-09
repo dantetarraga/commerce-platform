@@ -14,8 +14,12 @@ import { AdminOrdersController } from './orders/admin-orders.controller';
 import { AdminOrdersService } from './orders/admin-orders.service';
 import { AdminPartnersController } from './partners/admin-partners.controller';
 import { AdminPartnersService } from './partners/admin-partners.service';
+import { AdminAnalyticsController } from './analytics/admin-analytics.controller';
+import { AdminAnalyticsService } from './analytics/admin-analytics.service';
+import { AdminUsersController } from './users/admin-users.controller';
+import { AdminUsersService } from './users/admin-users.service';
 
-/** Herramientas del equipo (rol ADMIN): alta de socios, catálogo, cupones, promociones, ciudades, pedidos en vivo y caja. */
+/** Herramientas del equipo (rol ADMIN): usuarios y socios, métricas, catálogo, cupones, promociones, ciudades, pedidos en vivo y caja. */
 @Module({
   imports: [AuthModule, OrdersModule],
   controllers: [
@@ -25,6 +29,8 @@ import { AdminPartnersService } from './partners/admin-partners.service';
     AdminCitiesController,
     AdminOrdersController,
     AdminCashController,
+    AdminUsersController,
+    AdminAnalyticsController,
   ],
   providers: [
     AdminPartnersService,
@@ -34,6 +40,8 @@ import { AdminPartnersService } from './partners/admin-partners.service';
     AdminCitiesService,
     AdminOrdersService,
     AdminCashService,
+    AdminUsersService,
+    AdminAnalyticsService,
   ],
   // El Portal Socios edita su propio catálogo con los mismos servicios.
   exports: [AdminStoresService, AdminProductsService],

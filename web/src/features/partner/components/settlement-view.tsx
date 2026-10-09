@@ -3,7 +3,7 @@ import { Info } from 'lucide-react'
 import { StatTile } from '@/components/shared/stat-tile'
 import { dateTime } from '@/lib/datetime'
 import { formatMoney } from '@/lib/money'
-import type { DateRange } from '../model/partner'
+import type { DateRange } from '@/lib/date-range'
 import { settlementQuery } from '../queries/partner.queries'
 
 /** Lo vendido y lo cobrado por día de entrega. Suspende mientras carga. */

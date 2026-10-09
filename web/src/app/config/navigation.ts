@@ -8,6 +8,7 @@ import {
   Megaphone,
   Store,
   UtensilsCrossed,
+  UserRound,
   Users,
   type LucideIcon,
 } from 'lucide-react'
@@ -30,6 +31,7 @@ export const navigation = {
     items: [
       { label: 'Inicio', icon: LayoutDashboard, to: '/admin' },
       { label: 'Pedidos', icon: ClipboardList, to: '/admin/orders' },
+      { label: 'Usuarios', icon: UserRound, to: '/admin/users' },
       { label: 'Socios', icon: Users, to: '/admin/partners' },
       { label: 'Catálogo', icon: UtensilsCrossed, to: '/admin/catalog' },
       { label: 'Marketing', icon: Megaphone, to: '/admin/marketing' },

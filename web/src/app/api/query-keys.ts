@@ -31,4 +31,10 @@ export const queryKeys = {
     all: () => ['admin', 'partners'] as const,
     byPhone: (phone: string) => ['admin', 'partners', phone] as const,
   },
+  users: {
+    all: () => ['admin', 'users'] as const,
+    list: (filters: object) => ['admin', 'users', 'list', filters] as const,
+    detail: (id: string) => ['admin', 'users', 'detail', id] as const,
+  },
+  analytics: (filters: object) => ['admin', 'analytics', filters] as const,
 }

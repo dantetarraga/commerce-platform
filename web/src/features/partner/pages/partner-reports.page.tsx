@@ -1,13 +1,13 @@
 import { useDeferredValue, useState } from 'react'
 import { PageHeader } from '@/components/shared/page-header'
+import { RangePicker } from '@/components/shared/range-picker'
 import { PartnerStorePicker } from '@/components/shared/partner-store-picker'
 import { QueryBoundary } from '@/components/shared/query-boundary'
 import { usePartnerStore } from '@/hooks/use-partner-store'
 import { cn } from '@/lib/cn'
 import { DashboardSkeleton } from '../components/partner-skeletons'
-import { RangePicker } from '../components/range-picker'
 import { SalesOverview } from '../components/sales-overview'
-import { lastDays, type DateRange } from '../model/partner'
+import { lastDays, type DateRange } from '@/lib/date-range'
 
 export function PartnerReportsPage() {
   const [range, setRange] = useState(() => lastDays(7))

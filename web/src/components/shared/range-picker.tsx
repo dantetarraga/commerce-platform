@@ -1,6 +1,6 @@
 import { TextField } from '@/components/shared/form-controls'
 import { Button } from '@/components/ui/button'
-import { lastDays, type DateRange } from '../model/partner'
+import { lastDays, type DateRange } from '@/lib/date-range'
 
 const PRESETS = [
   { days: 7, label: '7 días' },

@@ -1,63 +1,67 @@
-import { Link } from '@tanstack/react-router'
-import { ArrowUpRight, Users, UtensilsCrossed } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { useDeferredValue, useState } from 'react'
+import { citiesQuery } from '@/app/api/lookups'
+import { SelectField } from '@/components/shared/form-controls'
 import { PageHeader } from '@/components/shared/page-header'
-
-const MODULES = [
-  {
-    title: 'Socios',
-    detail: 'Da de alta negocios y repartidores, asigna tiendas y administra sus accesos.',
-    to: '/admin/partners',
-    icon: Users,
-  },
-  {
-    title: 'Catálogo',
-    detail: 'Publica negocios, organiza sus cartas y actualiza productos y horarios.',
-    to: '/admin/catalog',
-    icon: UtensilsCrossed,
-  },
-] as const
+import { QueryBoundary } from '@/components/shared/query-boundary'
+import { RangePicker } from '@/components/shared/range-picker'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/cn'
+import { lastDays } from '@/lib/date-range'
+import type { AnalyticsFilters } from '../actions/analytics.actions'
+import { AnalyticsDashboard } from '../components/analytics-dashboard'
 
 export function AdminHomePage() {
+  const [filters, setFilters] = useState<AnalyticsFilters>(() => ({ ...lastDays(7), cityId: '' }))
+  const cities = useQuery(citiesQuery)
+  // Al cambiar el periodo o la ciudad se quedan las cifras anteriores hasta tener las nuevas.
+  const deferred = useDeferredValue(filters)
   return (
     <div className='space-y-8'>
       <PageHeader
         eyebrow='Administración'
         title='Inicio'
-        description='La operación de Apamuy en un solo lugar.'
+        description='Cómo va Apamuy: pedidos, ventas, tiempos y cancelaciones, comparados con el periodo anterior.'
+        actions={
+          <div className='w-52'>
+            <SelectField
+              label='Ciudad'
+              value={filters.cityId}
+              onChange={(event) => setFilters({ ...filters, cityId: event.target.value })}
+            >
+              <option value=''>Todas las ciudades</option>
+              {cities.data?.map((city) => (
+                <option key={city.id} value={city.id}>
+                  {city.name}
+                </option>
+              ))}
+            </SelectField>
+          </div>
+        }
       />
-      <div className='grid gap-5 md:grid-cols-2'>
-        {MODULES.map(({ title, detail, to, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className='corner-exit-m bg-card hover:border-primary focus-visible:ring-ring group space-y-5 border p-6 transition-colors focus-visible:ring-2'
-          >
-            <div className='flex justify-between'>
-              <span className='corner-exit-s bg-primary-soft text-primary inline-flex size-12 items-center justify-center'>
-                <Icon aria-hidden />
-              </span>
-              <ArrowUpRight
-                className='text-muted-foreground group-hover:text-primary size-5'
-                aria-hidden
-              />
-            </div>
-            <div>
-              <h2 className='text-2xl font-semibold'>{title}</h2>
-              <p className='text-muted-foreground mt-2 text-sm'>{detail}</p>
-            </div>
-            <p className='text-primary text-sm font-semibold'>
-              Abrir {title.toLocaleLowerCase('es-PE')}
-            </p>
-          </Link>
+      <RangePicker value={filters} onChange={(range) => setFilters({ ...filters, ...range })} />
+      <QueryBoundary fallback={<DashboardSkeleton />}>
+        <div className={cn(deferred !== filters && 'opacity-60 transition-opacity')}>
+          <AnalyticsDashboard filters={deferred} />
+        </div>
+      </QueryBoundary>
+    </div>
+  )
+}
+
+function DashboardSkeleton() {
+  return (
+    <div role='status' aria-label='Cargando cifras' className='space-y-6'>
+      <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>
+        {Array.from({ length: 8 }, (_, index) => (
+          <Skeleton key={index} className='h-20 w-full' />
         ))}
       </div>
-      <section className='corner-exit-m bg-secondary space-y-2 p-6'>
-        <h2 className='text-lg font-semibold'>La operación diaria sigue en Apamuy Socios</h2>
-        <p className='text-muted-foreground text-sm'>
-          Los negocios y repartidores reciben, preparan y entregan sus pedidos desde la app. Los
-          próximos módulos del panel son Marketing y Pedidos en vivo.
-        </p>
-      </section>
+      <Skeleton className='h-64 w-full' />
+      <div className='grid gap-5 lg:grid-cols-2'>
+        <Skeleton className='h-56 w-full' />
+        <Skeleton className='h-56 w-full' />
+      </div>
     </div>
   )
 }

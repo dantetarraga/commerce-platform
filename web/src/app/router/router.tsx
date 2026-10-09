@@ -13,6 +13,7 @@ import {
 } from '@/features/catalog'
 import { citiesRoute } from '@/features/cities'
 import { adminHomeRoute } from '@/features/home'
+import { userDetailRoute, usersRoute } from '@/features/users'
 import { accountDeletionRoute, landingRoute, privacyRoute, termsRoute } from '@/features/landing'
 import { marketingRoute } from '@/features/marketing'
 import { ordersRoute } from '@/features/orders'
@@ -62,6 +63,8 @@ const marketing = createRoute({ getParentRoute: () => adminLayoutRoute, ...marke
 const cities = createRoute({ getParentRoute: () => adminLayoutRoute, ...citiesRoute })
 const orders = createRoute({ getParentRoute: () => adminLayoutRoute, ...ordersRoute })
 const cash = createRoute({ getParentRoute: () => adminLayoutRoute, ...cashRoute })
+const users = createRoute({ getParentRoute: () => adminLayoutRoute, ...usersRoute })
+const userDetail = createRoute({ getParentRoute: () => adminLayoutRoute, ...userDetailRoute })
 
 const merchantLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -99,6 +102,8 @@ const routeTree = rootRoute.addChildren([
     cities,
     orders,
     cash,
+    users,
+    userDetail,
   ]),
   merchantLayoutRoute.addChildren([
     partnerHome,

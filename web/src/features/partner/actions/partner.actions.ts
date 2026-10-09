@@ -1,5 +1,6 @@
 import { http } from '@/app/api'
-import type { DateRange, DaySummary, SalesReport, Settlement } from '../model/partner'
+import type { DateRange } from '@/lib/date-range'
+import type { DaySummary, SalesReport, Settlement } from '../model/partner'
 
 export async function getDaySummary(date: string, signal?: AbortSignal) {
   return (await http.get<DaySummary>('/merchant/summary', { params: { date }, signal })).data

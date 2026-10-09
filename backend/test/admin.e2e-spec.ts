@@ -66,16 +66,20 @@ describe('Admin: alta y suspensión de socios (e2e)', () => {
 
   it('solo el admin entra', async () => {
     const merchant = await logIn(app, CHASKI_OWNER);
-    await http().get(`${API}/admin/users`).query({ phone: ADMIN }).set(merchant.auth).expect(403);
-    await http().get(`${API}/admin/users`).query({ phone: ADMIN }).expect(401);
+    await http().get(`${API}/admin/partners/lookup`).query({ phone: ADMIN }).set(merchant.auth).expect(403);
+    await http().get(`${API}/admin/partners/lookup`).query({ phone: ADMIN }).expect(401);
   });
 
   it('busca una cuenta por celular', async () => {
-    const res = await http().get(`${API}/admin/users`).query({ phone: CHASKI_OWNER }).set(admin.auth).expect(200);
+    const res = await http()
+      .get(`${API}/admin/partners/lookup`)
+      .query({ phone: CHASKI_OWNER })
+      .set(admin.auth)
+      .expect(200);
     expect(res.body.roles).toContain('MERCHANT');
     expect(res.body.stores.map((s: { id: string }) => s.id)).toContain(ORDER_STORE);
-    await http().get(`${API}/admin/users`).query({ phone: '999999999' }).set(admin.auth).expect(404);
-    await http().get(`${API}/admin/users`).query({ phone: '123' }).set(admin.auth).expect(400);
+    await http().get(`${API}/admin/partners/lookup`).query({ phone: '999999999' }).set(admin.auth).expect(404);
+    await http().get(`${API}/admin/partners/lookup`).query({ phone: '123' }).set(admin.auth).expect(400);
   });
 
   it('da de alta un negocio nuevo con su local y puede entrar a Socios', async () => {

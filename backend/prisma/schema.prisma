@@ -120,6 +120,8 @@ model User {
   notifications Notification[]
   devices       Device[]
   redemptions   CouponRedemption[]
+  adminActions  AdminAction[]      @relation("AdminActionBy")
+  adminHistory  AdminAction[]      @relation("AdminActionTarget")
 }
 
 model UserRole {
@@ -589,4 +591,18 @@ model Device {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, app])
+}
+
+// Quién del equipo hizo qué con una cuenta (alta de socio, suspensión, bloqueo…).
+model AdminAction {
+  id        String   @id @default(cuid())
+  adminId   String?
+  userId    String
+  action    String // PARTNER_CREATED, PARTNER_SUSPENDED, PARTNER_RESTORED, BLOCKED, UNBLOCKED, SESSIONS_REVOKED, ADMIN_GRANTED, ADMIN_REVOKED
+  details   Json?
+  createdAt DateTime @default(now())
+  admin     User?    @relation("AdminActionBy", fields: [adminId], references: [id], onDelete: SetNull)
+  user      User     @relation("AdminActionTarget", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

@@ -45,7 +45,9 @@ Fuentes: [Rappi Portal Partners](https://merchants.rappi.com/es-pe/que-ofrecemos
 | Módulo | Qué hace | Backend hoy |
 |---|---|---|
 | Pedidos en vivo | Tablero por ciudad: estado, tiempos, mapa de repartidores. Alertas de pedidos sin respuesta (3 min avisa, 8 min cancela, ver OPERACION §2). Cancelar, llamar al negocio o al cliente | ✅ `admin/orders/board` (columnas y alertas calculadas), `admin/orders` (historial por día), detalle y `cancel`. Sala `admin` en `/ws` (`admin.orders.changed`). Cancelación automática a los 8 min (`UnansweredOrdersJob`). Falta el mapa de repartidores |
-| Socios | Buscar por celular, alta de negocio y repartidor, suspensión | ✅ `admin/users`, `admin/merchants`, `admin/couriers`, `suspend-partner` |
+| Inicio | Métricas del periodo comparadas con el anterior: pedidos, ventas, clientes, horas pico, tiempos, cancelaciones y rankings | ✅ `admin/analytics?from&to&cityId` (calculado en el backend). Web: `/admin` |
+| Usuarios | Todas las cuentas: búsqueda, ficha con actividad y desempeño de socio, bloquear, reactivar socio, cerrar sesiones, acceso de admin, historial | ✅ `admin/users` y `admin/users/:id/*`, tabla `AdminAction`. Web: `/admin/users` |
+| Socios | Buscar por celular, alta de negocio y repartidor, suspensión | ✅ `admin/partners/lookup`, `admin/merchants`, `admin/couriers`, `suspend-partner` |
 | Catálogo | Negocios (borrador → publicado), horarios, secciones, productos con variantes y opciones, categorías | ✅ `admin/stores`, `admin/products`, `admin/categories`. ❌ Subida de fotos |
 | Marketing | Cupones y banners del inicio | ✅ `admin/coupons`, `admin/promotions`. Web: `/admin/marketing` |
 | Ciudades | Cobertura (`coverageKm`), tarifas, `routeFactor`. Base para escalar fuera de Espinar | ✅ `admin/cities` (listar, crear inactiva, editar, pausar si no hay pedidos en curso), con ejemplos de tarifa calculados por el backend. Web: `/admin/cities` |

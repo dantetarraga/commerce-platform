@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 import { queryKeys } from '@/app/api'
 import { getDaySummary, getSalesReport, getSettlement } from '../actions/partner.actions'
-import type { DateRange } from '../model/partner'
+import type { DateRange } from '@/lib/date-range'
 
 export const daySummaryQuery = (date: string) =>
   queryOptions({
