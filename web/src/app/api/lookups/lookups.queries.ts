@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { queryKeys } from '../query-keys'
-import { findPartnerByPhone, getAdminStores, getCities } from './lookups.actions'
+import { findPartnerByPhone, getAdminStores, getCities, getOwnStores } from './lookups.actions'
 
 export const isNationalPhone = (phone: string) => /^9\d{8}$/.test(phone)
 
@@ -21,3 +21,8 @@ export const partnerQuery = (phone: string) =>
     queryKey: queryKeys.partners.byPhone(phone),
     queryFn: ({ signal }) => findPartnerByPhone(phone, signal),
   })
+
+export const ownStoresQuery = queryOptions({
+  queryKey: queryKeys.ownStores(),
+  queryFn: ({ signal }) => getOwnStores(signal),
+})

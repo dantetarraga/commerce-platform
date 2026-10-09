@@ -35,7 +35,7 @@ PREPARING ─► "Listo para recoger" (READY) ─► lo toma un repartidor
 - **Aceptar** hace RECEIVED → CONFIRMED → PREPARING de una vez y recalcula la hora estimada. El cliente recibe un solo aviso.
 - **Rechazar** exige un motivo ("Sin stock: Pollo a la brasa", "Cerrado", otro). Restaura el stock y el cupón.
 - **Pedidos programados:** el plazo de aceptación empieza 60 min antes de la hora programada, no al crearlo.
-- **Cancelación automática:** se registra sin rol (`cancelledBy = null`). El cliente ve "Cancelado por Apamuy: el negocio no respondió a tiempo".
+- **Cancelación automática:** se registra sin rol (`cancelledBy = null`). El cliente ve "Cancelado por Apamuy: el negocio no respondió a tiempo". La hace `UnansweredOrdersJob` cada 30 s; las reglas de tiempo están en `backend/src/modules/orders/response-deadline.ts`. El aviso de los 3 minutos sale en el tablero de Pedidos del panel.
 - **Pausa:** el negocio puede dejar de recibir pedidos con un interruptor. Mientras está pausado, la app del cliente lo muestra cerrado.
 - **Productos agotados:** el negocio los marca como no disponibles desde su app.
 

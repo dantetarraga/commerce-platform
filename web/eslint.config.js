@@ -13,7 +13,10 @@ const dateLibrary = rule(
   ['date-fns', 'date-fns/*', '@date-fns/*'],
   'Usa dateTime de @/lib/datetime: la librería de fechas solo se usa dentro de su adapter.',
 )
-const httpLibrary = rule(['axios'], 'Usa http de @/app/api: axios solo se usa dentro de app/api.')
+const httpLibrary = rule(
+  ['axios', 'socket.io-client'],
+  'Usa http y realtime de @/app/api: axios y socket.io-client solo se usan dentro de app/api.',
+)
 const upperLayers = (message) =>
   rule(['@/features/*', '@/app/providers/*', '@/app/router/*', '@/layouts/*'], message)
 

@@ -75,3 +75,25 @@ function after(now: Date, minutes: number): Date {
   const rounded = Math.max(5, Math.ceil(minutes / 5) * 5);
   return new Date(now.getTime() + rounded * 60_000);
 }
+
+export interface TariffExample {
+  /** Distancia en línea recta, la que se ve en el mapa. */
+  straightKm: number;
+  /** Distancia estimada por calle (× routeFactor), redondeada a 0.1 km. */
+  streetKm: number;
+  fee: number;
+  travelMinutes: number;
+}
+
+/** Lo que cobra y tarda la tarifa a algunas distancias: vista previa para el admin. */
+export function tariffExamples(tariff: DeliveryTariff, straightKms: number[] = [1, 2, 4]): TariffExample[] {
+  return straightKms.map((straightKm) => {
+    const km = straightKm * tariff.routeFactor;
+    return {
+      straightKm,
+      streetKm: Math.round(km * 10) / 10,
+      fee: tariff.baseDeliveryFee + Math.ceil(km) * tariff.feePerKm,
+      travelMinutes: Math.ceil(travelMinutes(km * 1000, tariff.avgSpeedKmh)),
+    };
+  });
+}

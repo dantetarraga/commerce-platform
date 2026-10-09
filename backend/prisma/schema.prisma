@@ -421,6 +421,8 @@ model Order {
   @@index([storeId, status])
   @@index([storeId, createdAt]) // resumen y pedidos del día del negocio
   @@index([courierId, status])
+  @@index([cityId, status]) // tablero en vivo del admin
+  @@index([cityId, createdAt]) // historial del admin
 }
 
 model OrderItem {

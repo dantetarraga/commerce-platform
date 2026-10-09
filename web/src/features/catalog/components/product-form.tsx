@@ -7,6 +7,7 @@ import { CheckField, SelectField, TextField } from '@/components/shared/form-con
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
 import { formatMoney } from '@/lib/money'
+import { useCatalogScope } from '../hooks/use-catalog-scope'
 import type { Product, StoreDetail } from '../model/catalog'
 import { saveProductMutation } from '../mutations/products.mutations'
 import { productPayload, productSchema, type ProductForm } from '../schemas/catalog.schemas'
@@ -35,7 +36,8 @@ export function ProductFormDialog({
       isLocal: product?.isLocal ?? false,
     },
   })
-  const mutation = useMutation(saveProductMutation(store.id, product?.id))
+  const scope = useCatalogScope()
+  const mutation = useMutation(saveProductMutation(store.id, product?.id, scope))
   const { errors, isSubmitting } = form.formState
   const submit = form.handleSubmit(async (values) => {
     try {

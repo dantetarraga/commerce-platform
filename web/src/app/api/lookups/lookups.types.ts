@@ -33,3 +33,12 @@ export interface PartnerAccount {
     status: string
   } | null
 }
+
+/** Negocio de `GET merchant/stores`: los del socio (todos, si es admin). */
+export interface OwnStore {
+  id: string
+  name: string
+  logoUrl: string | null
+  isAcceptingOrders: boolean
+  isOpenNow: boolean
+}

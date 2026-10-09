@@ -1,5 +1,5 @@
 import { haversineKm } from '../../common/utils/geo';
-import { DeliveryTariff, estimateAfterAccept, estimateDelivery, estimateOnTheWay } from './delivery';
+import { DeliveryTariff, estimateAfterAccept, estimateDelivery, estimateOnTheWay, tariffExamples } from './delivery';
 
 const tariff: DeliveryTariff = {
   baseDeliveryFee: 250,
@@ -81,5 +81,12 @@ describe('estimateOnTheWay', () => {
   it('un viaje corto se estima en al menos 5 minutos', () => {
     const at = estimateOnTheWay({ now, distanceMeters: 300, avgSpeedKmh: 20 });
     expect(at.toISOString()).toBe('2026-09-25T17:05:00.000Z');
+  });
+});
+
+describe('tariffExamples', () => {
+  it('usa la misma fórmula que el cobro real, desde la distancia en línea recta', () => {
+    // 2 km recta × 1.3 = 2.6 km por calle → 3 km cobrados; 2.6 km a 20 km/h = 7.8 min.
+    expect(tariffExamples(tariff, [2])).toEqual([{ straightKm: 2, streetKm: 2.6, fee: 550, travelMinutes: 8 }]);
   });
 });

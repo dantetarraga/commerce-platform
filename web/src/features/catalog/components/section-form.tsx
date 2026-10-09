@@ -6,6 +6,7 @@ import { EditorDialog } from '@/components/shared/editor-dialog'
 import { TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
+import { useCatalogScope } from '../hooks/use-catalog-scope'
 import { saveSectionMutation } from '../mutations/sections.mutations'
 import type { MenuSection } from '../model/catalog'
 import { sectionSchema, type SectionForm } from '../schemas/catalog.schemas'
@@ -23,7 +24,8 @@ export function SectionFormDialog({
     resolver: zodResolver(sectionSchema),
     defaultValues: { name: section?.name ?? '', sortOrder: section?.sortOrder ?? 0 },
   })
-  const mutation = useMutation(saveSectionMutation(storeId, section?.id))
+  const scope = useCatalogScope()
+  const mutation = useMutation(saveSectionMutation(storeId, section?.id, scope))
   const submit = form.handleSubmit(async (values) => {
     try {
       await mutation.mutateAsync(values)

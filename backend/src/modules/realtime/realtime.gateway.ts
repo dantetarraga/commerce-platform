@@ -24,6 +24,8 @@ export const rooms = {
   order: (id: string) => `order:${id}`,
   store: (id: string) => `store:${id}`,
   couriers: (cityId: string) => `couriers:${cityId}`,
+  /** Todos los ADMIN conectados: el tablero de pedidos en vivo. */
+  admin: 'admin',
 };
 
 type Ack = { ok: true } | { ok: false; code: string };
@@ -79,7 +81,11 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection {
         ? this.prisma.courier.findUnique({ where: { userId: user.id }, select: { cityId: true } })
         : null,
     ]);
-    await socket.join([...stores.map((s) => rooms.store(s.id)), ...(courier ? [rooms.couriers(courier.cityId)] : [])]);
+    await socket.join([
+      ...stores.map((s) => rooms.store(s.id)),
+      ...(courier ? [rooms.couriers(courier.cityId)] : []),
+      ...(user.roles.includes(Role.ADMIN) ? [rooms.admin] : []),
+    ]);
   }
 
   @SubscribeMessage('order.subscribe')
@@ -111,6 +117,8 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection {
     const payload = { orderId: event.orderId, status: event.status };
     this.server.to(rooms.order(event.orderId)).emit('order.updated', payload);
     this.server.to(rooms.store(event.storeId)).emit('store.orders.changed', payload);
+    // El tablero del admin filtra por ciudad en el cliente.
+    this.server.to(rooms.admin).emit('admin.orders.changed', { ...payload, cityId: event.cityId });
     if (COURIER_BOARD_STATUSES.includes(event.status)) {
       this.server.to(rooms.couriers(event.cityId)).emit('courier.orders.changed', payload);
     }

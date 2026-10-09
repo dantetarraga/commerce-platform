@@ -1,1 +1,6 @@
-export { catalogRoute, storeDetailRoute } from './routes/catalog.routes'
+export {
+  catalogRoute,
+  partnerMenuRoute,
+  partnerStoreRoute,
+  storeDetailRoute,
+} from './routes/catalog.routes'

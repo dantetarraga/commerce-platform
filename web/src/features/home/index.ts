@@ -1,1 +1,1 @@
-export { adminHomeRoute, merchantHomeRoute } from './routes/home.routes'
+export { adminHomeRoute } from './routes/home.routes'

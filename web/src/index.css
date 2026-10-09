@@ -98,6 +98,9 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+
+  /* Banner del carrusel del inicio en la app. */
+  --aspect-banner: 12 / 5;
 }
 
 /* Esquina de salida (docs/DIRECCION_VISUAL.md): abajo a la izquierda queda corta. */

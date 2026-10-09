@@ -44,21 +44,21 @@ Fuentes: [Rappi Portal Partners](https://merchants.rappi.com/es-pe/que-ofrecemos
 
 | Módulo | Qué hace | Backend hoy |
 |---|---|---|
-| Pedidos en vivo | Tablero por ciudad: estado, tiempos, mapa de repartidores. Alertas de pedidos sin respuesta (3 min avisa, 8 min cancela, ver OPERACION §2). Cancelar, llamar al negocio o al cliente | ❌ Falta `GET admin/orders` y acciones del admin. ✅ Room por ciudad en `/ws` |
+| Pedidos en vivo | Tablero por ciudad: estado, tiempos, mapa de repartidores. Alertas de pedidos sin respuesta (3 min avisa, 8 min cancela, ver OPERACION §2). Cancelar, llamar al negocio o al cliente | ✅ `admin/orders/board` (columnas y alertas calculadas), `admin/orders` (historial por día), detalle y `cancel`. Sala `admin` en `/ws` (`admin.orders.changed`). Cancelación automática a los 8 min (`UnansweredOrdersJob`). Falta el mapa de repartidores |
 | Socios | Buscar por celular, alta de negocio y repartidor, suspensión | ✅ `admin/users`, `admin/merchants`, `admin/couriers`, `suspend-partner` |
 | Catálogo | Negocios (borrador → publicado), horarios, secciones, productos con variantes y opciones, categorías | ✅ `admin/stores`, `admin/products`, `admin/categories`. ❌ Subida de fotos |
-| Marketing | Cupones y banners del inicio | ✅ `admin/coupons`, `admin/promotions` |
-| Ciudades | Cobertura (`coverageKm`), tarifas, `routeFactor`. Base para escalar fuera de Espinar | ❌ Sin endpoints de edición |
-| Caja | Rendición diaria por repartidor y por negocio (efectivo, Yape, Plin) | 🟡 Resúmenes por socio (`merchant/summary`, `courier/me/summary`); falta la vista global |
+| Marketing | Cupones y banners del inicio | ✅ `admin/coupons`, `admin/promotions`. Web: `/admin/marketing` |
+| Ciudades | Cobertura (`coverageKm`), tarifas, `routeFactor`. Base para escalar fuera de Espinar | ✅ `admin/cities` (listar, crear inactiva, editar, pausar si no hay pedidos en curso), con ejemplos de tarifa calculados por el backend. Web: `/admin/cities` |
+| Caja | Rendición diaria por repartidor y por negocio (efectivo, Yape, Plin) | ✅ `admin/cash?date&cityId`: por repartidor (cobrado vs. esperado, diferencia) y por negocio. Web: `/admin/cash` |
 
 ### Portal Socios (`MERCHANT`)
 
 | Módulo | Qué hace | Backend hoy |
 |---|---|---|
-| Mi tienda | Datos, logo, portada, horarios | ❌ El merchant solo cambia `isAcceptingOrders` |
-| Menú | Secciones, productos, precios, fotos, disponibilidad | 🟡 Solo `isAvailable`; editar es de `admin/*` |
-| Reportes | Ventas por día y semana, pedidos entregados y cancelados | 🟡 `merchant/summary` por día |
-| Rendición | Lo cobrado y lo que corresponde al negocio | ❌ Comisión y liquidación sin modelar |
+| Mi tienda | Datos, logo, portada, horarios | ✅ `merchant/catalog/stores/:id` (descripción, teléfono, logo, portada, preparación, pedido mínimo), horarios y pausa. Nombre, dirección y publicación los decide Apamuy. Web: `/partner/store` |
+| Menú | Secciones, productos, precios, fotos, disponibilidad | ✅ `merchant/catalog/*` (secciones y productos) con los servicios del admin y control de dueño. Web: `/partner/menu`. ❌ Fotos (W2) |
+| Reportes | Ventas por día y semana, pedidos entregados y cancelados | ✅ `merchant/reports?from&to` (hasta 92 días, por día y por hora, comparado con el periodo anterior). Web: `/partner/reports` |
+| Rendición | Lo cobrado y lo que corresponde al negocio | 🟡 `merchant/settlement`: vendido y cobrado por día de entrega. `commission: null` hasta definir la comisión (OPERACION §4). Web: `/partner/settlement` |
 | Después | Promociones propias, reseñas, solicitud de afiliación con documentos | ❌ |
 
 ## 5. Cambios necesarios en el backend
@@ -111,11 +111,11 @@ El panel hereda [DIRECCION_VISUAL.md](DIRECCION_VISUAL.md): crema `#FBF7F2`, ter
 | # | Trabajo | Desbloquea |
 |---|---|---|
 | W0 | ✅ Proyecto, estructura, tokens, ingreso por OTP, portales con guardas, lint de límites, tests y CI. Falta: generar el cliente con orval y la cookie httpOnly en el backend | Empezar |
-| W1 | ✅ Socios y catálogo básico (negocios, categorías, horarios, secciones, productos). Pendiente: editor de variantes/opciones y Marketing (cupones, banners) | Dejar Swagger |
+| W1 | ✅ Socios, catálogo básico (negocios, categorías, horarios, secciones, productos) y Marketing (cupones, banners). Pendiente: editor de variantes/opciones | Dejar Swagger |
 | W2 | Backend: imágenes + Admin: fotos del catálogo | Catálogo real |
-| W3 | Backend: `admin/orders` + Admin: pedidos en vivo y alertas | Vigilar la operación |
-| W4 | Portal Socios: menú, horarios, reportes | Autogestión de negocios |
-| W5 | Caja y liquidaciones (después de definir la comisión), ciudades | Escalar |
+| W3 | ✅ Backend: `admin/orders` + Admin: pedidos en vivo y alertas. Falta el mapa de repartidores | Vigilar la operación |
+| W4 | ✅ Portal Socios: inicio del día, Mi tienda, menú, horarios, reportes y rendición (sin comisión) | Autogestión de negocios |
+| W5 | ✅ Caja y ciudades. Pendiente: liquidaciones, después de definir la comisión | Escalar |
 
 ## 9. Estructura de `web/`
 

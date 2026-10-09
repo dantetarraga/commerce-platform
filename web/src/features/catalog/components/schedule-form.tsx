@@ -6,6 +6,7 @@ import { EditorDialog } from '@/components/shared/editor-dialog'
 import { SelectField, TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
+import { useCatalogScope } from '../hooks/use-catalog-scope'
 import { minutesToTime, WEEK_DAYS, type StoreDetail } from '../model/catalog'
 import { saveSchedulesMutation } from '../mutations/stores.mutations'
 import { scheduleSchema, schedulesPayload, type ScheduleForm } from '../schemas/catalog.schemas'
@@ -28,7 +29,8 @@ export function ScheduleFormDialog({
     },
   })
   const { fields, append, remove } = useFieldArray({ control: form.control, name: 'schedules' })
-  const mutation = useMutation(saveSchedulesMutation(store.id))
+  const scope = useCatalogScope()
+  const mutation = useMutation(saveSchedulesMutation(store.id, scope))
   const submit = form.handleSubmit(async (values) => {
     try {
       await mutation.mutateAsync(schedulesPayload(values))

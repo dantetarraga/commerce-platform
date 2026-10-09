@@ -46,6 +46,27 @@ export function storePayload(values: StoreForm, currency: string) {
   }
 }
 
+/** Lo que el dueño edita desde el Portal Socios. */
+export const storeProfileSchema = storeSchema.pick({
+  description: true,
+  phone: true,
+  logoUrl: true,
+  coverUrl: true,
+  minOrderAmount: true,
+  avgPrepMinutes: true,
+})
+export type StoreProfileForm = z.infer<typeof storeProfileSchema>
+
+export function storeProfilePayload(values: StoreProfileForm, currency: string) {
+  return {
+    ...values,
+    phone: values.phone || null,
+    logoUrl: values.logoUrl || null,
+    coverUrl: values.coverUrl || null,
+    minOrderAmount: { amount: parseSoles(values.minOrderAmount)!, currency },
+  }
+}
+
 export const productSchema = z.object({
   name: z
     .string()

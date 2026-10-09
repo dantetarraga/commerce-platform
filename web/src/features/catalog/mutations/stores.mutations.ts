@@ -6,8 +6,12 @@ import {
   replaceSchedules,
   setStorePublished,
   updateStore,
+  updateStoreProfile,
+  type StoreProfile,
   type StorePayload,
 } from '../actions/stores.actions'
+import { setAcceptingOrders } from '@/app/api/lookups'
+import type { CatalogScope } from '../model/catalog-scope'
 import type { Schedule } from '../model/catalog'
 
 // La ficha de un socio lista sus negocios: cambia con cualquier alta, baja o edición.
@@ -45,9 +49,27 @@ export const deleteStoreMutation = (storeId: string) =>
     },
   })
 
-export const saveSchedulesMutation = (storeId: string) =>
+export const saveStoreProfileMutation = (storeId: string) =>
   mutationOptions({
-    mutationFn: (schedules: Schedule[]) => replaceSchedules(storeId, schedules),
+    mutationFn: (profile: StoreProfile) => updateStoreProfile(storeId, profile),
+    onSuccess: (_data, _profile, _result, { client }) =>
+      client.invalidateQueries({ queryKey: queryKeys.stores.detail(storeId) }),
+  })
+
+/** El interruptor de la app Socios: el negocio deja de recibir pedidos sin despublicarse. */
+export const toggleAcceptingOrdersMutation = (storeId: string, isAcceptingOrders: boolean) =>
+  mutationOptions({
+    mutationFn: () => setAcceptingOrders(storeId, !isAcceptingOrders),
+    onSuccess: (_data, _vars, _result, { client }) =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: queryKeys.stores.detail(storeId) }),
+        client.invalidateQueries({ queryKey: queryKeys.ownStores() }),
+      ]),
+  })
+
+export const saveSchedulesMutation = (storeId: string, scope: CatalogScope) =>
+  mutationOptions({
+    mutationFn: (schedules: Schedule[]) => replaceSchedules(storeId, schedules, scope),
     onSuccess: (_data, _vars, _result, { client }) =>
       client.invalidateQueries({ queryKey: queryKeys.stores.detail(storeId) }),
   })

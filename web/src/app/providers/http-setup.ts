@@ -1,8 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { http, setupAuthInterceptors } from '@/app/api'
+import { http, realtime, setupAuthInterceptors } from '@/app/api'
 import { getAccessToken, hasRefreshToken, refreshAccessToken } from '@/features/auth'
 
 export function setupHttp(queryClient: QueryClient) {
+  realtime.configure({ getAccessToken })
   return setupAuthInterceptors(http, {
     getAccessToken,
     canRefresh: hasRefreshToken,

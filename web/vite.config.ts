@@ -16,7 +16,8 @@ export default defineConfig({
     // origen que el panel: así la cookie del refresh token funciona sin CORS.
     proxy: {
       '/api': 'http://localhost:3000',
-      '/ws': { target: 'http://localhost:3000', ws: true },
+      // Socket.IO: namespace /ws sobre la ruta /socket.io del servidor.
+      '/socket.io': { target: 'http://localhost:3000', ws: true },
     },
   },
   test: {

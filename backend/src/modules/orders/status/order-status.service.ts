@@ -252,10 +252,32 @@ export class OrderStatusService {
       );
     }
 
+    await this.cancelLoaded(order, actor, reason);
+    return this.find(actor, orderId);
+  }
+
+  /**
+   * El negocio no respondió a tiempo (OPERACION §2): Apamuy cancela el pedido y queda
+   * sin autor (`cancelledBy = null`). `false` si mientras tanto el negocio lo aceptó.
+   */
+  async expireUnanswered(orderId: string, reason: string): Promise<boolean> {
+    const order = await this.prisma.order.findUnique({ where: { id: orderId }, include: orderInclude });
+    if (order?.status !== OrderStatus.RECEIVED) return false;
+    try {
+      await this.cancelLoaded(order, null, reason);
+      return true;
+    } catch (error) {
+      if (error instanceof AppException && error.code === ErrorCode.INVALID_STATUS_TRANSITION) return false;
+      throw error;
+    }
+  }
+
+  /** Cancela con sus efectos. `actor` nulo: lo hizo Apamuy, no una persona. */
+  private async cancelLoaded(order: OrderWithDetails, actor: OrderActor | null, reason?: string) {
     await this.prisma.$transaction(async (tx) => {
       await this.move(tx, actor, order.id, order.status, OrderStatus.CANCELLED, reason, {
         cancelReason: reason || null,
-        cancelledBy: actor.role,
+        cancelledBy: actor?.role ?? null,
       });
       // Devuelve el stock reservado (solo productos con stock controlado).
       for (const item of order.items) {
@@ -278,12 +300,11 @@ export class OrderStatusService {
       await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: PaymentStatus.CANCELLED } });
       if (order.courierId) await this.releaseCourier(tx, order.courierId);
       // Si canceló el propio cliente, ya lo sabe.
-      if (actor.role !== Role.CUSTOMER) {
+      if (actor?.role !== Role.CUSTOMER) {
         await this.notifyCustomer(tx, order, OrderStatus.CANCELLED, { cancelReason: reason });
       }
     });
     this.changed(order, OrderStatus.CANCELLED);
-    return this.find(actor, orderId);
   }
 
   /** Avisa por WebSocket (después del commit). */
@@ -322,7 +343,7 @@ export class OrderStatusService {
 
   private async move(
     tx: Prisma.TransactionClient,
-    actor: OrderActor,
+    actor: OrderActor | null,
     orderId: string,
     from: OrderStatus,
     to: OrderStatus,
@@ -347,8 +368,8 @@ export class OrderStatusService {
         orderId,
         fromStatus: from,
         toStatus: to,
-        changedById: actor.userId,
-        changedByRole: actor.role,
+        changedById: actor?.userId ?? null,
+        changedByRole: actor?.role ?? null,
         note: note || null,
       },
     });

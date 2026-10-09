@@ -1,25 +1,26 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { EditorDialog } from '@/components/shared/editor-dialog'
-import { ErrorNotice } from '@/components/shared/query-feedback'
+import { EditorDialog } from './editor-dialog'
+import { ErrorNotice } from './query-feedback'
 import { Button } from '@/components/ui/button'
 
-export interface CatalogAction {
+/** Acción que pide confirmación: quitar, publicar, desactivar. */
+export interface ConfirmAction {
   title: string
   description: string
   label: string
   success: string
   destructive?: boolean
-  /** De `mutations/`: hace el cambio e invalida lo que corresponde. */
+  /** De `mutations/` del feature: hace el cambio e invalida lo que corresponde. */
   mutation: UseMutationOptions<void, Error, void>
   onSuccess?: () => void
 }
 
-export function CatalogActionDialog({
+export function ConfirmActionDialog({
   action,
   onClose,
 }: {
-  action: CatalogAction
+  action: ConfirmAction
   onClose: () => void
 }) {
   const mutation = useMutation(action.mutation)

@@ -13,22 +13,15 @@ import {
 import { listScopeWhere } from '../orders/order-list-scope';
 import { toStaffOrderResponse } from '../orders/order-presenter';
 import { OrdersService } from '../orders/orders.service';
-import { OrderActor, OrderStatusService, scopeFor } from '../orders/status/order-status.service';
+import { OrderStatusService, scopeFor } from '../orders/status/order-status.service';
 import { StoresService } from '../stores/stores.service';
 import { MerchantProductsQueryDto } from './dto/merchant-products-query.dto';
+import { MerchantReportQueryDto } from './dto/merchant-report-query.dto';
 import { UpdateProductAvailabilityDto } from './dto/update-product-availability.dto';
 import { UpdateStoreStatusDto } from './dto/update-store-status.dto';
 import { BOARD_LIMIT, groupBoard } from './merchant-board';
+import { actorOf, ownerOf } from './merchant-actor';
 import { MerchantService } from './merchant.service';
-
-/** El admin opera cualquier negocio; el merchant, solo los suyos. */
-const actorOf = (user: AuthUser): OrderActor => ({
-  userId: user.id,
-  role: user.roles.includes(Role.ADMIN) ? Role.ADMIN : Role.MERCHANT,
-});
-
-/** Filtro por dueño: el merchant solo toca lo suyo; el admin (undefined), todo. */
-const ownerOf = (user: AuthUser) => (actorOf(user).role === Role.MERCHANT ? user.id : undefined);
 
 /**
  * Operación del negocio (app Chaski Socios): ver sus pedidos, aceptarlos con
@@ -122,5 +115,17 @@ export class MerchantController {
   @Get('summary')
   summary(@CurrentUser() user: AuthUser, @Query() query: DayQueryDto) {
     return this.merchant.summary(query.date, ownerOf(user));
+  }
+
+  /** Ventas de un rango de días, por día y comparadas con el periodo anterior. */
+  @Get('reports')
+  report(@CurrentUser() user: AuthUser, @Query() query: MerchantReportQueryDto) {
+    return this.merchant.report(query.from, query.to, ownerOf(user), query.storeId);
+  }
+
+  /** Lo vendido y cobrado por día de entrega. Sin comisión hasta definirla. */
+  @Get('settlement')
+  settlement(@CurrentUser() user: AuthUser, @Query() query: MerchantReportQueryDto) {
+    return this.merchant.settlement(query.from, query.to, ownerOf(user), query.storeId);
   }
 }

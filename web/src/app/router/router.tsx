@@ -4,9 +4,19 @@ import { NotFound } from '@/components/shared/not-found'
 import { LoadingState } from '@/components/shared/query-feedback'
 import { RouteError } from '@/components/shared/route-error'
 import { loginRoute } from '@/features/auth'
-import { catalogRoute, storeDetailRoute } from '@/features/catalog'
-import { adminHomeRoute, merchantHomeRoute } from '@/features/home'
+import { cashRoute } from '@/features/cash'
+import {
+  catalogRoute,
+  partnerMenuRoute,
+  partnerStoreRoute,
+  storeDetailRoute,
+} from '@/features/catalog'
+import { citiesRoute } from '@/features/cities'
+import { adminHomeRoute } from '@/features/home'
 import { landingRoute } from '@/features/landing'
+import { marketingRoute } from '@/features/marketing'
+import { ordersRoute } from '@/features/orders'
+import { partnerHomeRoute, partnerReportsRoute, partnerSettlementRoute } from '@/features/partner'
 import { partnersRoute } from '@/features/partners'
 import { AdminLayout } from '@/layouts/admin-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
@@ -45,6 +55,10 @@ const adminHome = createRoute({ getParentRoute: () => adminLayoutRoute, ...admin
 const partners = createRoute({ getParentRoute: () => adminLayoutRoute, ...partnersRoute })
 const catalog = createRoute({ getParentRoute: () => adminLayoutRoute, ...catalogRoute })
 const storeDetail = createRoute({ getParentRoute: () => adminLayoutRoute, ...storeDetailRoute })
+const marketing = createRoute({ getParentRoute: () => adminLayoutRoute, ...marketingRoute })
+const cities = createRoute({ getParentRoute: () => adminLayoutRoute, ...citiesRoute })
+const orders = createRoute({ getParentRoute: () => adminLayoutRoute, ...ordersRoute })
+const cash = createRoute({ getParentRoute: () => adminLayoutRoute, ...cashRoute })
 
 const merchantLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -52,16 +66,41 @@ const merchantLayoutRoute = createRoute({
   component: MerchantLayout,
   beforeLoad: requireRole('MERCHANT'),
 })
-const merchantHome = createRoute({
+const partnerHome = createRoute({ getParentRoute: () => merchantLayoutRoute, ...partnerHomeRoute })
+const partnerStore = createRoute({
   getParentRoute: () => merchantLayoutRoute,
-  ...merchantHomeRoute,
+  ...partnerStoreRoute,
+})
+const partnerMenu = createRoute({ getParentRoute: () => merchantLayoutRoute, ...partnerMenuRoute })
+const partnerReports = createRoute({
+  getParentRoute: () => merchantLayoutRoute,
+  ...partnerReportsRoute,
+})
+const partnerSettlement = createRoute({
+  getParentRoute: () => merchantLayoutRoute,
+  ...partnerSettlementRoute,
 })
 
 const routeTree = rootRoute.addChildren([
   landing,
   authLayoutRoute.addChildren([login]),
-  adminLayoutRoute.addChildren([adminHome, partners, catalog, storeDetail]),
-  merchantLayoutRoute.addChildren([merchantHome]),
+  adminLayoutRoute.addChildren([
+    adminHome,
+    partners,
+    catalog,
+    storeDetail,
+    marketing,
+    cities,
+    orders,
+    cash,
+  ]),
+  merchantLayoutRoute.addChildren([
+    partnerHome,
+    partnerStore,
+    partnerMenu,
+    partnerReports,
+    partnerSettlement,
+  ]),
 ])
 
 export function createAppRouter(queryClient: QueryClient) {
