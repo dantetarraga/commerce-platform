@@ -1,1 +1,6 @@
-export { accountDeletionRoute, landingRoute } from './routes/landing.routes'
+export {
+  accountDeletionRoute,
+  landingRoute,
+  privacyRoute,
+  termsRoute,
+} from './routes/landing.routes'

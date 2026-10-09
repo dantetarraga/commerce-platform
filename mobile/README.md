@@ -157,7 +157,28 @@ flutter build apk --flavor customer --dart-define-from-file=env/dev.json
 flutter build apk --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/dev.json
 ```
 
-Los APK quedan en `build/app/outputs/flutter-apk/`.
+Los APK quedan en `build/app/outputs/flutter-apk/`. La versión release solo habla con un backend por **HTTPS**: Android bloquea `http://` fuera de las versiones de prueba, así que con `env/dev.json` instala y abre pero no conecta.
+
+### Firma para Google Play
+
+Sin `android/key.properties`, la versión release se firma con la llave de pruebas: sirve para instalarla en un celular, no para publicarla.
+
+1. Crea la llave de subida **una sola vez**, fuera del repo, y guárdala con respaldo junto a sus claves. Si se pierde, hay que pedirle a Google que la reemplace.
+   ```sh
+   keytool -genkey -v -keystore ../../apamuy-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
+2. Copia `android/key.properties.example` como `android/key.properties` (git lo ignora) y completa las claves. `storeFile` es relativo a `android/`.
+3. Para Play se sube un App Bundle, uno por app:
+   ```sh
+   flutter build appbundle --flavor customer --dart-define-from-file=env/prod.json
+   flutter build appbundle --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/prod.json
+   ```
+   `env/prod.json` lleva `"USE_FAKE_DATA": false` y la URL HTTPS del backend en Railway.
+4. En Play Console activa **Play App Signing**: Google guarda la llave final y tú subes con la de subida.
+
+El CI arma los APK release. Si el repositorio tiene los secretos `GOOGLE_SERVICES_JSON_BASE64`, `UPLOAD_KEYSTORE_BASE64`, `UPLOAD_KEYSTORE_PASSWORD` y `UPLOAD_KEY_PASSWORD`, salen con push y firmados con la llave de subida.
+
+La reducción de código de la versión release borra los recursos que solo se nombran desde Dart; por eso `res/raw/keep.xml` conserva el sonido `new_order`. Un sonido nuevo para avisos también va ahí.
 
 ## Calidad
 

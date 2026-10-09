@@ -1,0 +1,7 @@
+# Copia este archivo como android/key.properties (ignorado por git) y completa los datos.
+# storeFile es relativo a android/. Guarda la llave y las claves fuera del repo y con respaldo:
+# si se pierden, no se pueden publicar actualizaciones con la misma llave de subida.
+storeFile=../../../apamuy-upload.jks
+storePassword=
+keyAlias=upload
+keyPassword=

@@ -67,10 +67,31 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      # Opcionales: sin estos secretos los APK salen sin push y firmados con la llave de pruebas.
+      - name: Firebase y llave de subida
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+          UPLOAD_KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json
+          fi
+          if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then
+            echo "$UPLOAD_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            {
+              echo "storeFile=$RUNNER_TEMP/upload.jks"
+              echo "storePassword=$UPLOAD_KEYSTORE_PASSWORD"
+              echo "keyAlias=upload"
+              echo "keyPassword=$UPLOAD_KEY_PASSWORD"
+            } > android/key.properties
+          fi
+      # Release: así el CI detecta lo que la reducción de código rompe (p. ej. el sonido de la alarma).
       - name: APK del cliente
-        run: flutter build apk --debug --flavor customer -t lib/main.dart
+        run: flutter build apk --release --flavor customer -t lib/main.dart
       - name: APK de Apamuy Socios
-        run: flutter build apk --debug --flavor partner -t lib/main_partner.dart
+        run: flutter build apk --release --flavor partner -t lib/main_partner.dart
 
   web:
     name: Web (lint, typecheck, test, build)

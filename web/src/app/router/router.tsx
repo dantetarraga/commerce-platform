@@ -13,7 +13,7 @@ import {
 } from '@/features/catalog'
 import { citiesRoute } from '@/features/cities'
 import { adminHomeRoute } from '@/features/home'
-import { accountDeletionRoute, landingRoute } from '@/features/landing'
+import { accountDeletionRoute, landingRoute, privacyRoute, termsRoute } from '@/features/landing'
 import { marketingRoute } from '@/features/marketing'
 import { ordersRoute } from '@/features/orders'
 import { partnerHomeRoute, partnerReportsRoute, partnerSettlementRoute } from '@/features/partner'
@@ -37,6 +37,8 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
 // La portada es pública: quien ya inició sesión entra a su panel desde "Ingresar".
 const landing = createRoute({ getParentRoute: () => rootRoute, ...landingRoute })
 const accountDeletion = createRoute({ getParentRoute: () => rootRoute, ...accountDeletionRoute })
+const privacy = createRoute({ getParentRoute: () => rootRoute, ...privacyRoute })
+const terms = createRoute({ getParentRoute: () => rootRoute, ...termsRoute })
 
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -85,6 +87,8 @@ const partnerSettlement = createRoute({
 const routeTree = rootRoute.addChildren([
   landing,
   accountDeletion,
+  privacy,
+  terms,
   authLayoutRoute.addChildren([login]),
   adminLayoutRoute.addChildren([
     adminHome,

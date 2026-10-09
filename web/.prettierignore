@@ -1,2 +1,4 @@
 pnpm-lock.yaml
 dist
+# Copias exactas de mobile/assets/legal
+src/features/landing/content/*.md

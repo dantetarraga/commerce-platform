@@ -18,6 +18,14 @@ val localProperties = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
+// Firma de publicación: android/key.properties (ignorado por git) apunta a la llave
+// de subida a Google Play. Sin ese archivo, la versión release se firma con la llave
+// de pruebas: sirve para probarla en un celular, no para publicarla.
+val keyProperties = Properties().apply {
+    rootProject.file("key.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+val hasUploadKey = keyProperties.getProperty("storeFile") != null
+
 android {
     namespace = "pe.apamuy"
     compileSdk = flutter.compileSdkVersion
@@ -61,11 +69,21 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasUploadKey) {
+            create("upload") {
+                storeFile = rootProject.file(keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (hasUploadKey) "upload" else "debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

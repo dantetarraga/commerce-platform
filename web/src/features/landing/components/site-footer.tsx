@@ -9,13 +9,22 @@ export function SiteFooter() {
           <BrandLogo className='text-xl' />
           <span className='text-muted-foreground text-sm'>· Hecho en Espinar</span>
         </div>
-        <nav aria-label='Pie de página' className='text-muted-foreground flex gap-6 text-sm'>
+        <nav
+          aria-label='Pie de página'
+          className='text-muted-foreground flex flex-wrap gap-x-6 gap-y-3 text-sm'
+        >
           <a href='/#negocios' className='hover:text-foreground'>
             Negocios
           </a>
           <a href='/#repartidores' className='hover:text-foreground'>
             Repartidores
           </a>
+          <Link to='/privacy' className='hover:text-foreground'>
+            Privacidad
+          </Link>
+          <Link to='/terms' className='hover:text-foreground'>
+            Términos
+          </Link>
           <Link to='/account-deletion' className='hover:text-foreground'>
             Eliminar cuenta
           </Link>
