@@ -1,6 +1,7 @@
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useCountdown } from '@/hooks/use-countdown'
-import { useRequestOtp, useVerifyOtp } from '../api/auth.api'
+import { requestOtpMutation, verifyOtpMutation } from '../mutations/auth.mutations'
 import { signIn } from '../model/session'
 import type { SessionUser } from '../model/user'
 import { CodeStep } from './code-step'
@@ -17,8 +18,8 @@ interface LoginFormProps {
 export function LoginForm({ onAuthenticated }: LoginFormProps) {
   const [step, setStep] = useState<Step>({ name: 'phone' })
   const resend = useCountdown()
-  const requestOtp = useRequestOtp()
-  const verifyOtp = useVerifyOtp()
+  const requestOtp = useMutation(requestOtpMutation())
+  const verifyOtp = useMutation(verifyOtpMutation())
 
   async function sendCode(phone: string) {
     const result = await requestOtp.mutateAsync(phone)

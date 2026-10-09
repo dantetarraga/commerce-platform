@@ -1,12 +1,13 @@
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import type { PartnerAccount } from '@/app/api/admin-lookups'
+import type { PartnerAccount } from '@/app/api/lookups'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
-import { useSuspendPartner } from '../api/partners.api'
+import { suspendPartnerMutation } from '../mutations/partners.mutations'
 import type { PartnerRole } from '../schemas/partners.schemas'
 
 const ROLE_NAMES: Record<string, string> = {
@@ -21,10 +22,10 @@ function SuspendDialog({ account, onClose }: { account: PartnerAccount; onClose:
     (role): role is PartnerRole => role === 'MERCHANT' || role === 'COURIER',
   )
   const [roles, setRoles] = useState(heldRoles)
-  const mutation = useSuspendPartner()
+  const mutation = useMutation(suspendPartnerMutation(account.id))
   async function handleSuspend() {
     try {
-      await mutation.mutateAsync({ id: account.id, roles })
+      await mutation.mutateAsync(roles)
       toast.success('Acceso de socio suspendido.')
       onClose()
     } catch {

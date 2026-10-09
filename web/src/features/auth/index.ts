@@ -1,6 +1,17 @@
 export { loginRoute } from './routes/auth.routes'
-export { restoreSession, getCurrentUser, refreshAccessToken } from './model/session'
-export { useSessionStore } from './model/session.store'
+export {
+  restoreSession,
+  getCurrentUser,
+  getAccessToken,
+  hasRefreshToken,
+  refreshAccessToken,
+} from './model/session'
+export {
+  sessionStore,
+  syncSessionAcrossTabs,
+  useSessionStatus,
+  type SessionStatus,
+} from './stores/session.store'
 export { useCurrentUser } from './hooks/use-current-user'
 export { useSignOut } from './hooks/use-sign-out'
 export {

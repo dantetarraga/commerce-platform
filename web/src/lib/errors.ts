@@ -27,13 +27,26 @@ export function describeError(error: unknown): ErrorDescription {
   }
   const { status, requestId } = error
   if (status === 0) {
+    if (error.code === 'NETWORK_ERROR') {
+      return {
+        kind: 'network',
+        title: 'Sin conexión con Apamuy',
+        description: 'Revisa tu internet. Cuando vuelva la conexión, reintenta.',
+        retriable: true,
+      }
+    }
+    if (error.code === 'TIMEOUT') {
+      return {
+        kind: 'network',
+        title: 'La respuesta está tardando',
+        description: error.message,
+        retriable: true,
+      }
+    }
     return {
-      kind: error.code === 'NETWORK_ERROR' ? 'network' : 'unknown',
-      title: error.code === 'NETWORK_ERROR' ? 'Sin conexión con Apamuy' : 'Algo salió mal',
-      description:
-        error.code === 'NETWORK_ERROR'
-          ? 'Revisa tu internet. Cuando vuelva la conexión, reintenta.'
-          : 'Inténtalo de nuevo. Si sigue pasando, recarga la página.',
+      kind: 'unknown',
+      title: 'Algo salió mal',
+      description: 'Inténtalo de nuevo. Si sigue pasando, recarga la página.',
       retriable: true,
     }
   }

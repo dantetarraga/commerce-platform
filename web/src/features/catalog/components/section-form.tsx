@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { http } from '@/app/api'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { useCatalogMutation } from '../api/catalog.api'
+import { saveSectionMutation } from '../mutations/sections.mutations'
 import type { MenuSection } from '../model/catalog'
 import { sectionSchema, type SectionForm } from '../schemas/catalog.schemas'
 
@@ -23,11 +23,7 @@ export function SectionFormDialog({
     resolver: zodResolver(sectionSchema),
     defaultValues: { name: section?.name ?? '', sortOrder: section?.sortOrder ?? 0 },
   })
-  const mutation = useCatalogMutation((values: SectionForm) =>
-    section
-      ? http.patch(`/admin/sections/${section.id}`, values)
-      : http.post(`/admin/stores/${storeId}/sections`, values),
-  )
+  const mutation = useMutation(saveSectionMutation(storeId, section?.id))
   const submit = form.handleSubmit(async (values) => {
     try {
       await mutation.mutateAsync(values)

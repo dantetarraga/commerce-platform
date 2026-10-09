@@ -4,11 +4,13 @@ import { RouterProvider } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
 import { createAppRouter } from '../router/router'
 import { setupHttp } from './http-setup'
+import { setupSessionSync } from './session-sync'
 import { createQueryClient } from './query-client'
 
 const queryClient = createQueryClient()
 const router = createAppRouter(queryClient)
-setupHttp(queryClient, router)
+setupHttp(queryClient)
+setupSessionSync(router)
 
 export function AppProviders() {
   return (

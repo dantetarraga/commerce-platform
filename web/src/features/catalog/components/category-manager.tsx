@@ -1,31 +1,28 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { http } from '@/app/api'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { TextField } from '@/components/shared/form-controls'
-import { ErrorNotice, LoadingState } from '@/components/shared/query-feedback'
+import { QueryBoundary } from '@/components/shared/query-boundary'
+import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { categoriesQuery, useCatalogMutation } from '../api/catalog.api'
 import type { Category } from '../model/catalog'
+import { saveCategoryMutation } from '../mutations/categories.mutations'
+import { categoriesQuery } from '../queries/catalog.queries'
 import { categorySchema, type CategoryForm } from '../schemas/catalog.schemas'
+import { CategoriesSkeleton } from './catalog-skeletons'
 
 function CategoryEditor({ category, onClose }: { category?: Category; onClose: () => void }) {
   const form = useForm<CategoryForm>({
     resolver: zodResolver(categorySchema),
     defaultValues: { name: category?.name ?? '', iconUrl: category?.iconUrl ?? '' },
   })
-  const mutation = useCatalogMutation((values: CategoryForm) => {
-    const payload = { ...values, iconUrl: values.iconUrl || null }
-    return category
-      ? http.patch(`/admin/categories/${category.id}`, payload)
-      : http.post('/admin/categories', payload)
-  })
+  const mutation = useMutation(saveCategoryMutation(category?.id))
   const submit = form.handleSubmit(async (values) => {
     try {
-      await mutation.mutateAsync(values)
+      await mutation.mutateAsync({ ...values, iconUrl: values.iconUrl || null })
       toast.success('Categoría guardada.')
       onClose()
     } catch {
@@ -68,7 +65,6 @@ function CategoryEditor({ category, onClose }: { category?: Category; onClose: (
 }
 
 export function CategoryManager() {
-  const query = useQuery(categoriesQuery)
   const [editing, setEditing] = useState<Category | 'new' | null>(null)
   return (
     <section className='corner-exit-m bg-card space-y-5 border p-5 md:p-6'>
@@ -81,34 +77,9 @@ export function CategoryManager() {
           Nueva categoría
         </Button>
       </div>
-      {query.isPending && <LoadingState />}
-      <ErrorNotice
-        error={query.error}
-        onRetry={() => {
-          void query.refetch()
-        }}
-      />
-      <ul className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
-        {query.data?.map((category) => (
-          <li
-            key={category.id}
-            className='flex items-center justify-between gap-2 rounded-lg border p-3'
-          >
-            <span className='text-sm font-semibold'>{category.name}</span>
-            <Button
-              size='sm'
-              variant='ghost'
-              aria-label={`Editar categoría ${category.name}`}
-              onClick={() => setEditing(category)}
-            >
-              Editar
-            </Button>
-          </li>
-        ))}
-      </ul>
-      {query.data?.length === 0 && (
-        <p className='text-muted-foreground text-sm'>Todavía no hay categorías.</p>
-      )}
+      <QueryBoundary fallback={<CategoriesSkeleton />}>
+        <CategoryList onEdit={setEditing} />
+      </QueryBoundary>
       {editing && (
         <CategoryEditor
           category={editing === 'new' ? undefined : editing}
@@ -116,5 +87,32 @@ export function CategoryManager() {
         />
       )}
     </section>
+  )
+}
+
+function CategoryList({ onEdit }: { onEdit: (category: Category) => void }) {
+  const { data: categories } = useSuspenseQuery(categoriesQuery)
+  if (categories.length === 0) {
+    return <p className='text-muted-foreground text-sm'>Todavía no hay categorías.</p>
+  }
+  return (
+    <ul className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+      {categories.map((category) => (
+        <li
+          key={category.id}
+          className='flex items-center justify-between gap-2 rounded-lg border p-3'
+        >
+          <span className='text-sm font-semibold'>{category.name}</span>
+          <Button
+            size='sm'
+            variant='ghost'
+            aria-label={`Editar categoría ${category.name}`}
+            onClick={() => onEdit(category)}
+          >
+            Editar
+          </Button>
+        </li>
+      ))}
+    </ul>
   )
 }

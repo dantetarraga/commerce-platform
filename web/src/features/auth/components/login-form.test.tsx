@@ -2,26 +2,16 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/app/api'
 import { renderWithProviders } from '@/test/render'
-import * as authApi from '../api/auth.api'
-import { useSessionStore } from '../model/session.store'
+import * as authApi from '../actions/auth.actions'
+import { sessionStore } from '../stores/session.store'
 import type { SessionUser } from '../model/user'
 import { LoginForm } from './login-form'
 
-vi.mock('../api/auth.api', async () => {
-  const { useMutation } = await import('@tanstack/react-query')
-  const requestOtp = vi.fn()
-  const verifyOtp = vi.fn()
-  return {
-    requestOtp,
-    verifyOtp,
-    logout: vi.fn().mockResolvedValue(undefined),
-    useRequestOtp: () => useMutation({ mutationFn: (phone: string) => requestOtp(phone) }),
-    useVerifyOtp: () =>
-      useMutation({
-        mutationFn: ({ phone, code }: { phone: string; code: string }) => verifyOtp(phone, code),
-      }),
-  }
-})
+vi.mock('../actions/auth.actions', () => ({
+  requestOtp: vi.fn(),
+  verifyOtp: vi.fn(),
+  logout: vi.fn().mockResolvedValue(undefined),
+}))
 
 const user = (roles: SessionUser['roles']): SessionUser => ({
   id: 'u1',
@@ -35,7 +25,7 @@ const user = (roles: SessionUser['roles']): SessionUser => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  useSessionStore.setState({
+  sessionStore.setState({
     status: 'anonymous',
     accessToken: null,
     refreshToken: null,
@@ -80,7 +70,7 @@ describe('LoginForm', () => {
 
     expect(authApi.requestOtp).toHaveBeenCalledWith('987654321')
     expect(onAuthenticated).toHaveBeenCalledWith(expect.objectContaining({ id: 'u1' }))
-    expect(useSessionStore.getState().status).toBe('authenticated')
+    expect(sessionStore.getState().status).toBe('authenticated')
     expect(screen.getByText(/Reenviar en \d+ s/)).toBeInTheDocument()
   })
 
@@ -99,7 +89,7 @@ describe('LoginForm', () => {
 
     expect(await screen.findByText('Aún no eres socio de Apamuy')).toBeInTheDocument()
     expect(onAuthenticated).not.toHaveBeenCalled()
-    expect(useSessionStore.getState().user).toBeNull()
+    expect(sessionStore.getState().user).toBeNull()
   })
 
   it('un repartidor ve que su trabajo está en la app Socios', async () => {
@@ -115,7 +105,7 @@ describe('LoginForm', () => {
     await view.user.click(screen.getByRole('button', { name: 'Ingresar' }))
 
     expect(await screen.findByText('Tus entregas están en la app')).toBeInTheDocument()
-    expect(useSessionStore.getState().user).toBeNull()
+    expect(sessionStore.getState().user).toBeNull()
   })
 
   it('muestra el mensaje del backend cuando el código es incorrecto', async () => {

@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { adminStoresQuery, citiesQuery, type PartnerAccount } from '@/app/api/admin-lookups'
+import { adminStoresQuery, citiesQuery, type PartnerAccount } from '@/app/api/lookups'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
 import { ErrorNotice, LoadingState } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { useSavePartner } from '../api/partners.api'
+import { savePartnerMutation } from '../mutations/partners.mutations'
 import { partnerFormSchema, type PartnerForm, type PartnerRole } from '../schemas/partners.schemas'
 
 export function PartnerFormDialog({
@@ -23,7 +23,7 @@ export function PartnerFormDialog({
   onClose: () => void
   onSaved: (phone: string) => void
 }) {
-  const mutation = useSavePartner()
+  const mutation = useMutation(savePartnerMutation())
   const cities = useQuery(citiesQuery)
   const stores = useQuery({ ...adminStoresQuery, enabled: role === 'MERCHANT' })
   const form = useForm<PartnerForm>({

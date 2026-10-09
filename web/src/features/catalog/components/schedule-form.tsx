@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { http } from '@/app/api'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { SelectField, TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { useCatalogMutation } from '../api/catalog.api'
-import { minutesToTime, timeToMinutes, WEEK_DAYS, type StoreDetail } from '../model/catalog'
-import { scheduleSchema, type ScheduleForm } from '../schemas/catalog.schemas'
+import { minutesToTime, WEEK_DAYS, type StoreDetail } from '../model/catalog'
+import { saveSchedulesMutation } from '../mutations/stores.mutations'
+import { scheduleSchema, schedulesPayload, type ScheduleForm } from '../schemas/catalog.schemas'
 
 export function ScheduleFormDialog({
   store,
@@ -28,18 +28,10 @@ export function ScheduleFormDialog({
     },
   })
   const { fields, append, remove } = useFieldArray({ control: form.control, name: 'schedules' })
-  const mutation = useCatalogMutation((values: ScheduleForm) =>
-    http.put(`/admin/stores/${store.id}/schedules`, {
-      schedules: values.schedules.map((value) => ({
-        dayOfWeek: value.dayOfWeek,
-        opensAt: timeToMinutes(value.opensAt),
-        closesAt: value.closesAt === '00:00' ? 1440 : timeToMinutes(value.closesAt),
-      })),
-    }),
-  )
+  const mutation = useMutation(saveSchedulesMutation(store.id))
   const submit = form.handleSubmit(async (values) => {
     try {
-      await mutation.mutateAsync(values)
+      await mutation.mutateAsync(schedulesPayload(values))
       toast.success('Horarios guardados.')
       onClose()
     } catch {

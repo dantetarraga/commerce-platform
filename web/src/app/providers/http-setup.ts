@@ -1,16 +1,13 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { http, setupAuthInterceptors } from '@/app/api'
-import { refreshAccessToken, useSessionStore } from '@/features/auth'
-import type { AppRouter } from '../router/router'
+import { getAccessToken, hasRefreshToken, refreshAccessToken } from '@/features/auth'
 
-export function setupHttp(queryClient: QueryClient, router: AppRouter) {
+export function setupHttp(queryClient: QueryClient) {
   return setupAuthInterceptors(http, {
-    getAccessToken: () => useSessionStore.getState().accessToken,
-    canRefresh: () => useSessionStore.getState().refreshToken !== null,
+    getAccessToken,
+    canRefresh: hasRefreshToken,
     refreshAccessToken,
-    onAuthFailure: () => {
-      queryClient.clear()
-      void router.navigate({ to: '/login', search: { redirect: router.state.location.href } })
-    },
+    // La sesión ya quedó anónima: `setupSessionSync` hace que las guardas redirijan.
+    onAuthFailure: () => queryClient.clear(),
   })
 }

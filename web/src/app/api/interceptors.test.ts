@@ -103,4 +103,24 @@ describe('setupAuthInterceptors', () => {
 
     await expect(client.get('/a')).rejects.toMatchObject({ status: 0, code: 'NETWORK_ERROR' })
   })
+
+  it('distingue un timeout y una petición cancelada de la falta de conexión', async () => {
+    const timeout = createClient(() => {
+      throw new AxiosError('timeout of 15000ms exceeded', 'ECONNABORTED')
+    })
+    const canceled = createClient(() => {
+      throw new axios.Cancel('aborted')
+    })
+    for (const client of [timeout, canceled]) {
+      setupAuthInterceptors(client, {
+        getAccessToken: () => null,
+        canRefresh: () => false,
+        refreshAccessToken: vi.fn(),
+        onAuthFailure: vi.fn(),
+      })
+    }
+
+    await expect(timeout.get('/a')).rejects.toMatchObject({ code: 'TIMEOUT' })
+    await expect(canceled.get('/a')).rejects.toMatchObject({ code: 'CANCELED', isRetriable: false })
+  })
 })

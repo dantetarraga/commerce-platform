@@ -4,9 +4,15 @@ React 19 + Vite + TypeScript. Alcance y decisiones en [`docs/PANEL_WEB.md`](../d
 
 ## Estructura
 
-- `app/`: `providers/` (QueryClient, router, interceptores), `router/` (todas las rutas y las guardas), `api/` (`http.ts`, `interceptors.ts`, `api-error.ts`, `generated/` de orval, que no se edita) y `config/` (`env.ts`, `navigation.ts`).
+- `app/`: `providers/` (QueryClient, router, interceptores), `router/` (todas las rutas y las guardas), `api/` (`http.ts`, `interceptors.ts`, `api-error.ts`, `query-keys.ts`, `lookups/` con las consultas que comparten varios features, `generated/` de orval, que no se edita) y `config/` (`env.ts`, `navigation.ts`).
 - `layouts/`: armazón de cada portal.
-- `features/<dominio>/{api,components,hooks,layouts,model,pages,routes,schemas}` + `index.ts`. Una carpeta se crea cuando llega su primer archivo.
+- `features/<dominio>/` + `index.ts`. Una carpeta se crea cuando llega su primer archivo:
+  - `actions/`: funciones `async` que llaman al backend con `http` (`getStore`, `createProduct`). Sin React ni caché.
+  - `queries/`: `queryOptions` (clave de `queryKeys` + `queryFn` que llama a una action).
+  - `mutations/`: `mutationOptions` (la action y qué invalida en `onSuccess`, con el `client` del contexto). El componente hace `useMutation(saveStoreMutation(id))`.
+  - `stores/`: estado de cliente del módulo con Zustand (`<nombre>.store.ts`).
+  - `components/`, `pages/`, `routes/`, `model/` (tipos y funciones puras), `schemas/` (Zod y payloads), `hooks/`, `layouts/`.
+- `stores/`: estado de cliente global con Zustand (`theme.store.ts`).
 - `components/{ui,layout,shared}`, `hooks/` (hooks reutilizables), `lib/` (`cn`, `money`, `errors`, `datetime/`).
 
 ## Reglas
@@ -14,8 +20,12 @@ React 19 + Vite + TypeScript. Alcance y decisiones en [`docs/PANEL_WEB.md`](../d
 - Textos para el usuario en **español**; código, archivos y carpetas en inglés. Las URLs van en inglés (`/login`, `/partner`, `/admin/partners`). `/` es la landing pública (`features/landing`).
 - Un feature **no importa de otro feature**, ni de `app/providers`, `app/router` o `layouts/`. Sí puede usar `@/app/api` y `@/app/config`. Lo compartido baja a `components`, `hooks` o `lib`. Desde fuera solo se importa `@/features/<x>`. ESLint lo hace cumplir.
 - Rutas en código: los features exportan definiciones (`{ path, component, loader } as const`); solo `app/router/router.tsx` llama a `createRoute`.
-- **Sesión con Zustand** (`features/auth/model/session.store.ts`): el access token vive en memoria y el refresh token se persiste. La lógica (`signIn`, `restoreSession`, `refreshAccessToken`) está en `session.ts`. Es el único estado global.
-- **Datos del servidor con TanStack Query**. Las query keys y los hooks de cada feature van en su `api/`.
+- **Zustand para estado de cliente** (los datos del servidor van en React Query, nunca en un store): store vanilla con `createStore`, acciones en `state.actions`, y hooks que seleccionan solo lo necesario (`useShallow` si devuelven un objeto). Lo que solo usa un componente sigue en `useState`. Las actualizaciones de Zustand son síncronas: lo que debe cambiar dentro de un `startTransition` va en estado de React.
+- **Sesión** (`features/auth/stores/session.store.ts`): store vanilla (`createStore`) porque también lo leen las guardas y los interceptores; los componentes usan hooks con selector (`useCurrentUser`, `useSessionStatus`), nunca el store entero. Las acciones van en `state.actions`. El access token vive en memoria y solo se persiste el refresh token. La lógica (`signIn`, `restoreSession`, `refreshAccessToken`) está en `model/session.ts`; la renovación usa Web Locks y relee el token guardado, porque el backend cierra la sesión si un refresh token se reutiliza.
+- **Rutas protegidas**: `beforeLoad` con `requireRole` (`app/router/guards.ts`). Si la sesión pasa a anónima (cerrar sesión, refresh rechazado u otra pestaña), `app/providers/session-sync.ts` invalida el router y las guardas redirigen.
+- **Datos de página con Suspense**: el loader de la ruta llama a `queryClient.prefetchQuery` sin esperar, la página pinta su cabecera al instante y cada bloque con datos va en `<QueryBoundary fallback={<…Skeleton />}>` (`Suspense` + error boundary), con un componente hijo que lee con `useSuspenseQuery`. Los fallbacks son skeletons con la forma real (`components/ui/skeleton.tsx`). `useQuery` queda para consultas opcionales o con `enabled` dentro de formularios. Una búsqueda que cambia la clave se envuelve en `startTransition`.
+- **Errores**: `describeError` (`lib/errors.ts`) decide título y texto. `ErrorState` para una página o sección que no cargó y `ErrorNotice` para formularios. Un 5xx nunca muestra el mensaje del backend, sino el estado y el `requestId` para soporte.
+- **Datos del servidor con TanStack Query**. Todas las claves salen de `queryKeys` (`app/api/query-keys.ts`): una mutación de un feature puede invalidar datos de otro.
 - **HTTP solo con `http` de `@/app/api`**. Los interceptores (Bearer, una renovación ante un 401, errores como `ApiError`) se conectan en `app/providers/http-setup.ts`.
 - El backend es la fuente de verdad. Los permisos del cliente solo sirven para ocultar botones.
 - Dinero en céntimos `{ amount, currency }` con `lib/money.ts`.

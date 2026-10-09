@@ -1,4 +1,4 @@
-import { useSessionStore } from '../model/session.store'
+import { useSessionStore } from '../stores/session.store'
 
 export function useCurrentUser() {
   return useSessionStore((state) => state.user)

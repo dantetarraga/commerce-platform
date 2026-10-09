@@ -1,33 +1,53 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Search, Users } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useForm } from 'react-hook-form'
-import { ApiError } from '@/app/api'
-import { partnerQuery } from '@/app/api/admin-lookups'
+import { partnerQuery, type PartnerAccount } from '@/app/api/lookups'
 import { EmptyState } from '@/components/shared/empty-state'
 import { TextField } from '@/components/shared/form-controls'
 import { PageHeader } from '@/components/shared/page-header'
-import { ErrorState } from '@/components/shared/error-state'
-import { LoadingState } from '@/components/shared/query-feedback'
+import { QueryBoundary } from '@/components/shared/query-boundary'
 import { Button } from '@/components/ui/button'
 import { PartnerCard } from '../components/partner-card'
+import { PartnerCardSkeleton } from '../components/partner-card-skeleton'
 import { PartnerFormDialog } from '../components/partner-form'
 import { partnerSearchSchema, type PartnerRole } from '../schemas/partners.schemas'
+import { useLastPartnerPhone, usePartnerSearchActions } from '../stores/partner-search.store'
+
+interface Editor {
+  role: PartnerRole
+  account?: PartnerAccount
+  phone: string
+}
 
 export function PartnersPage() {
-  const [phone, setPhone] = useState('')
-  const [editor, setEditor] = useState<{ role: PartnerRole; existing: boolean } | null>(null)
-  const account = useQuery(partnerQuery(phone))
+  // El store recuerda la búsqueda entre visitas; el estado local permite cambiarla dentro de
+  // una transición (las actualizaciones de Zustand son síncronas y mostrarían el fallback).
+  const lastPhone = useLastPartnerPhone()
+  const { remember } = usePartnerSearchActions()
+  const [phone, setPhone] = useState(lastPhone)
+  const [editor, setEditor] = useState<Editor | null>(null)
+  const [isSearching, startSearch] = useTransition()
+  const queryClient = useQueryClient()
   const form = useForm<{ phone: string }>({
     resolver: zodResolver(partnerSearchSchema),
-    defaultValues: { phone: '' },
+    defaultValues: { phone: lastPhone },
   })
-  const notFound = account.error instanceof ApiError && account.error.status === 404
+  function search(value: string) {
+    remember(value)
+    startSearch(() => setPhone(value))
+  }
   const submit = form.handleSubmit(({ phone: value }) => {
-    if (phone === value) void account.refetch()
-    else setPhone(value)
+    if (phone === value) void queryClient.refetchQueries({ queryKey: partnerQuery(value).queryKey })
+    // Mientras busca otro celular, se queda el resultado anterior en vez del indicador.
+    else search(value)
   })
+  function openCreate(role: PartnerRole) {
+    // Si la última búsqueda no encontró a nadie, ese celular es el que se quiere dar de alta.
+    const lastResult = phone ? queryClient.getQueryData(partnerQuery(phone).queryKey) : undefined
+    setEditor({ role, phone: lastResult === null ? phone : '' })
+  }
   return (
     <div className='space-y-8'>
       <PageHeader
@@ -36,15 +56,10 @@ export function PartnersPage() {
         description='Personas y negocios que hacen posible cada entrega.'
         actions={
           <>
-            <Button
-              variant='outline'
-              onClick={() => setEditor({ role: 'COURIER', existing: false })}
-            >
+            <Button variant='outline' onClick={() => openCreate('COURIER')}>
               Nuevo repartidor
             </Button>
-            <Button onClick={() => setEditor({ role: 'MERCHANT', existing: false })}>
-              Nuevo socio de negocio
-            </Button>
+            <Button onClick={() => openCreate('MERCHANT')}>Nuevo socio de negocio</Button>
           </>
         }
       />
@@ -63,47 +78,33 @@ export function PartnersPage() {
             {...form.register('phone')}
           />
         </div>
-        <Button type='submit' className='mt-6' disabled={account.isFetching}>
+        <Button type='submit' className='mt-6' disabled={isSearching}>
           <Search aria-hidden />
-          Buscar
+          {isSearching ? 'Buscando…' : 'Buscar'}
         </Button>
       </form>
-      {!phone ? (
+      {phone ? (
+        <QueryBoundary fallback={<PartnerCardSkeleton />}>
+          <PartnerResult
+            phone={phone}
+            onEdit={(role, account) => setEditor({ role, account, phone: account.phone })}
+          />
+        </QueryBoundary>
+      ) : (
         <EmptyState
           icon={Users}
           title='Encuentra a un socio'
           description='Busca su celular para consultar sus roles, asignar negocios o actualizar su vehículo.'
         />
-      ) : account.isPending ? (
-        <LoadingState label='Buscando cuenta…' />
-      ) : notFound ? (
-        <EmptyState
-          icon={Users}
-          title='No encontramos ese celular'
-          description='Puedes darlo de alta como socio de negocio o repartidor desde los botones de arriba.'
-        />
-      ) : account.isError ? (
-        <ErrorState
-          error={account.error}
-          isRetrying={account.isFetching}
-          onRetry={() => {
-            void account.refetch()
-          }}
-        />
-      ) : (
-        <PartnerCard
-          account={account.data}
-          onEdit={(role) => setEditor({ role, existing: true })}
-        />
       )}
       {editor && (
         <PartnerFormDialog
           role={editor.role}
-          account={editor.existing ? account.data : undefined}
-          phone={editor.existing || notFound ? phone : ''}
+          account={editor.account}
+          phone={editor.phone}
           onClose={() => setEditor(null)}
           onSaved={(savedPhone) => {
-            setPhone(savedPhone)
+            search(savedPhone)
             form.setValue('phone', savedPhone)
             setEditor(null)
           }}
@@ -111,4 +112,23 @@ export function PartnersPage() {
       )}
     </div>
   )
+}
+
+interface PartnerResultProps {
+  phone: string
+  onEdit: (role: PartnerRole, account: PartnerAccount) => void
+}
+
+function PartnerResult({ phone, onEdit }: PartnerResultProps) {
+  const { data: account } = useSuspenseQuery(partnerQuery(phone))
+  if (!account) {
+    return (
+      <EmptyState
+        icon={Users}
+        title='No encontramos ese celular'
+        description='Puedes darlo de alta como socio de negocio o repartidor desde los botones de arriba.'
+      />
+    )
+  }
+  return <PartnerCard account={account} onEdit={(role) => onEdit(role, account)} />
 }

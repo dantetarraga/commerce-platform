@@ -1,8 +1,8 @@
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { useCatalogMutation } from '../api/catalog.api'
 
 export interface CatalogAction {
   title: string
@@ -10,7 +10,8 @@ export interface CatalogAction {
   label: string
   success: string
   destructive?: boolean
-  run: () => Promise<unknown>
+  /** De `mutations/`: hace el cambio e invalida lo que corresponde. */
+  mutation: UseMutationOptions<void, Error, void>
   onSuccess?: () => void
 }
 
@@ -21,7 +22,7 @@ export function CatalogActionDialog({
   action: CatalogAction
   onClose: () => void
 }) {
-  const mutation = useCatalogMutation(action.run)
+  const mutation = useMutation(action.mutation)
   async function handleConfirm() {
     try {
       await mutation.mutateAsync()

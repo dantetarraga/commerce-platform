@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { httpsUrl, soles, sortOrderSchema } from '@/lib/form-schemas'
 import { parseSoles } from '@/lib/money'
+import { timeToMinutes, type Schedule } from '../model/catalog'
 
 export const storeSchema = z.object({
   cityId: z.string().min(1, 'Elige una ciudad.'),
@@ -110,3 +111,11 @@ export const scheduleSchema = z.object({
     .max(28, 'Puedes registrar hasta 28 turnos.'),
 })
 export type ScheduleForm = z.infer<typeof scheduleSchema>
+
+export function schedulesPayload(values: ScheduleForm): Schedule[] {
+  return values.schedules.map((value) => ({
+    dayOfWeek: value.dayOfWeek,
+    opensAt: timeToMinutes(value.opensAt),
+    closesAt: value.closesAt === '00:00' ? 1440 : timeToMinutes(value.closesAt),
+  }))
+}

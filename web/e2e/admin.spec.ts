@@ -162,7 +162,9 @@ test('muestra errores de red con reintento y distingue un celular no registrado'
   await page.goto('/admin/partners')
   await page.getByLabel('Buscar por celular').fill('900000000')
   await page.getByRole('button', { name: 'Buscar', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('Servicio temporalmente no disponible.')
+  // Un 5xx no muestra el mensaje técnico del backend, solo el estado y el código de soporte.
+  await expect(page.getByRole('alert')).toContainText('Tuvimos un problema de nuestro lado')
+  await expect(page.getByRole('alert')).toContainText('Error 503')
   await page.unroute('**/api/v1/admin/users?**')
   await page.getByRole('button', { name: 'Reintentar' }).click()
   await expect(page.getByRole('heading', { name: 'No encontramos ese celular' })).toBeVisible()

@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { http } from '@/app/api'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
 import { formatMoney } from '@/lib/money'
-import { useCatalogMutation } from '../api/catalog.api'
 import type { Product, StoreDetail } from '../model/catalog'
+import { saveProductMutation } from '../mutations/products.mutations'
 import { productPayload, productSchema, type ProductForm } from '../schemas/catalog.schemas'
 
 export function ProductFormDialog({
@@ -35,16 +35,11 @@ export function ProductFormDialog({
       isLocal: product?.isLocal ?? false,
     },
   })
-  const mutation = useCatalogMutation(async (values: ProductForm) => {
-    const payload = productPayload(values, store.minOrderAmount.currency)
-    return product
-      ? http.patch(`/admin/products/${product.id}`, payload)
-      : http.post(`/admin/stores/${store.id}/products`, payload)
-  })
+  const mutation = useMutation(saveProductMutation(store.id, product?.id))
   const { errors, isSubmitting } = form.formState
   const submit = form.handleSubmit(async (values) => {
     try {
-      await mutation.mutateAsync(values)
+      await mutation.mutateAsync(productPayload(values, store.minOrderAmount.currency))
       toast.success('Producto guardado.')
       onClose()
     } catch {

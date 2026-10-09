@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, createRoute, createRouter } from '@tanstack/react-router'
 import { NotFound } from '@/components/shared/not-found'
+import { LoadingState } from '@/components/shared/query-feedback'
 import { RouteError } from '@/components/shared/route-error'
 import { loginRoute } from '@/features/auth'
 import { catalogRoute, storeDetailRoute } from '@/features/catalog'
@@ -68,7 +69,11 @@ export function createAppRouter(queryClient: QueryClient) {
     routeTree,
     context: { queryClient },
     defaultPreload: 'intent',
+    // La frescura la decide React Query; el router siempre le pregunta.
     defaultPreloadStaleTime: 0,
+    // Error y carga de una página se muestran dentro de su layout, con el menú a mano.
+    defaultErrorComponent: RouteError,
+    defaultPendingComponent: () => <LoadingState />,
     scrollRestoration: true,
   })
 }

@@ -121,6 +121,15 @@
   html.dark {
     color-scheme: dark;
   }
+  html:has([data-page='landing']) {
+    /* Deja espacio para el navbar fijo y un margen al llegar a cada sección. */
+    scroll-padding-top: 5rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html:has([data-page='landing']) {
+      scroll-behavior: smooth;
+    }
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }

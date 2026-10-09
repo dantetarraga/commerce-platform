@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { http } from '@/app/api'
-import { citiesQuery } from '@/app/api/admin-lookups'
+import { citiesQuery } from '@/app/api/lookups'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { categoriesQuery, useCatalogMutation } from '../api/catalog.api'
 import type { StoreDetail } from '../model/catalog'
+import { saveStoreMutation } from '../mutations/stores.mutations'
+import { categoriesQuery } from '../queries/catalog.queries'
 import { storePayload, storeSchema, type StoreForm } from '../schemas/catalog.schemas'
 import { OwnerPicker } from './owner-picker'
 
@@ -44,22 +44,15 @@ export function StoreFormDialog({
   })
   const ownerId = useWatch({ control: form.control, name: 'ownerId' })
   const categoryIds = useWatch({ control: form.control, name: 'categoryIds' })
-  const mutation = useCatalogMutation(async (values: StoreForm) => {
-    const currency =
-      store?.minOrderAmount.currency ??
-      cities.data?.find((city) => city.id === values.cityId)?.currency ??
-      'PEN'
-    const payload = storePayload(values, currency)
-    if (store) {
-      const { cityId: _cityId, ...update } = payload
-      return (await http.patch<StoreDetail>(`/admin/stores/${store.id}`, update)).data
-    }
-    return (await http.post<StoreDetail>('/admin/stores', { ...payload, isActive: false })).data
-  })
+  const mutation = useMutation(saveStoreMutation(store?.id))
   const { errors, isSubmitting } = form.formState
   const submit = form.handleSubmit(async (values) => {
     try {
-      const saved = await mutation.mutateAsync(values)
+      const currency =
+        store?.minOrderAmount.currency ??
+        cities.data?.find((city) => city.id === values.cityId)?.currency ??
+        'PEN'
+      const saved = await mutation.mutateAsync(storePayload(values, currency))
       toast.success(store ? 'Negocio actualizado.' : 'Negocio creado como borrador.')
       onSaved(saved.id)
     } catch {
