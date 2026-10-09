@@ -53,6 +53,8 @@ void main() {
     expect(order(OrderStatus.onTheWay, eta: now.add(const Duration(minutes: 8))).minutesLeft(now), 8);
     expect(order(OrderStatus.onTheWay, eta: now.subtract(const Duration(minutes: 2))).minutesLeft(now), 1);
     expect(order(OrderStatus.delivered, eta: now).minutesLeft(now), isNull);
+    // Un programado para la noche no se cuenta en minutos: se muestra la hora.
+    expect(order(OrderStatus.received, eta: now.add(const Duration(hours: 5))).minutesLeft(now), isNull);
   });
 
   test('OrderJson traduce estados, pagos y el pedido completo', () {

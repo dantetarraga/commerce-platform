@@ -20,6 +20,7 @@ class DeliveryMapData {
     this.courier,
     this.destination,
     this.route = const [],
+    this.compact = false,
   });
 
   final double estimatedProgress;
@@ -30,4 +31,7 @@ class DeliveryMapData {
   final MapCoordinate? courier;
   final MapCoordinate? destination;
   final List<MapCoordinate> route;
+
+  /// Vista previa en una tarjeta: una imagen fija del mapa, sin gestos.
+  final bool compact;
 }

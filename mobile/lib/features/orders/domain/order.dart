@@ -194,12 +194,17 @@ final class Order extends Equatable {
       status != OrderStatus.cancelled && OrderStatus.timeline.indexOf(status) >= OrderStatus.timeline.indexOf(s);
 
   /// Minutos que faltan para la llegada estimada (mínimo 1 mientras esté activo).
+  /// `null` si falta más de [countdownMinutes] (un programado): ahí se muestra la hora.
   int? minutesLeft(DateTime now) {
     final eta = estimatedArrival;
     if (eta == null || !isActive) return null;
     final m = eta.difference(now).inMinutes;
+    if (m > countdownMinutes) return null;
     return m < 1 ? 1 : m;
   }
+
+  /// Hasta cuánto se cuenta en minutos; más lejos, "Llega a las 7:25 pm".
+  static const countdownMinutes = 90;
 
   /// Mensaje humano del estado, con nombres propios.
   String get headline {

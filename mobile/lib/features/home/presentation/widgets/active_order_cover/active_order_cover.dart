@@ -1,3 +1,6 @@
+import 'package:apamuy/core/domain/geo_coordinates.dart';
+import 'package:apamuy/core/maps/delivery_map_data.dart';
+import 'package:apamuy/core/maps/location_service.dart';
 import 'package:apamuy/core/time/clock_provider.dart';
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/home/presentation/widgets/active_order_cover/live_dot.dart';
@@ -5,6 +8,7 @@ import 'package:apamuy/features/home/presentation/widgets/active_order_cover/min
 import 'package:apamuy/features/home/presentation/widgets/active_order_cover/step_trail.dart';
 import 'package:apamuy/features/orders/orders_customer.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/maps/delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -106,16 +110,13 @@ class ActiveOrderCover extends ConsumerWidget {
               onTap: () => _open(context),
               excludeSemantics: true,
               child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => _open(context),
                 child: ClipRRect(
                   borderRadius: AppRadius.tileExit,
                   child: SizedBox(
                     height: 148,
-                    child: MiniMap(
-                      progress: _progress(step),
-                      showRider: order.courier != null && step >= 2,
-                      logoUrl: order.store.logoUrl,
-                    ),
+                    child: _CoverMap(order: order, step: step, progress: _progress(step)),
                   ),
                 ),
               ),
@@ -237,6 +238,43 @@ class _SquareAction extends StatelessWidget {
         tooltip: tooltip,
         onPressed: onTap,
         icon: Icon(icon, color: filled ? scheme.onPrimary : scheme.primary),
+      ),
+    );
+  }
+}
+
+/// Vista previa del recorrido: Google Maps (imagen fija, sin gestos) con el negocio,
+/// tu puerta y la moto en camino; sin coordenadas o sin Google Maps, el plano dibujado.
+class _CoverMap extends StatelessWidget {
+  const _CoverMap({required this.order, required this.step, required this.progress});
+
+  final Order order;
+  final int step;
+  final double progress;
+
+  static MapCoordinate? _map(GeoCoordinates? at) => at == null ? null : MapCoordinate(at.latitude, at.longitude);
+
+  @override
+  Widget build(BuildContext context) {
+    final store = _map(order.store.location);
+    final destination = _map(order.destination);
+    final showRider = order.courier != null && step >= 2;
+    if (!googleMapsSupported || store == null || destination == null) {
+      return MiniMap(progress: progress, showRider: showRider, logoUrl: order.store.logoUrl);
+    }
+    // El toque lo recibe la tarjeta (abre el seguimiento), no el mapa.
+    return IgnorePointer(
+      child: DeliveryMap(
+        data: DeliveryMapData(
+          estimatedProgress: progress,
+          showCourier: showRider,
+          storeLabel: order.store.name,
+          destinationLabel: order.addressTitle,
+          store: store,
+          destination: destination,
+          courier: order.status == OrderStatus.onTheWay ? _map(order.courier?.position?.coordinates) : null,
+          compact: true,
+        ),
       ),
     );
   }

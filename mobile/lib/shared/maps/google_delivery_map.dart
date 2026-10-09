@@ -83,11 +83,11 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
     final east = points.map((p) => p.longitude).reduce((a, b) => a > b ? a : b);
     // Negocio y puerta casi en el mismo punto: un zoom de calle.
     if ((north - south).abs() < 0.0005 && (east - west).abs() < 0.0005) {
-      await controller.animateCamera(CameraUpdate.newLatLngZoom(_latLng(widget.destination), 17));
+      await _move(controller, CameraUpdate.newLatLngZoom(_latLng(widget.destination), 17));
       return;
     }
     final bounds = LatLngBounds(southwest: LatLng(south, west), northeast: LatLng(north, east));
-    await controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 56));
+    await _move(controller, CameraUpdate.newLatLngBounds(bounds, widget.data.compact ? 32 : 56));
   }
 
   Set<Marker> _markers(_MarkerIcons icons, LatLng? courier) => {
@@ -115,26 +115,33 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
       ),
   };
 
+  /// El modo lite no anima: la cámara salta al encuadre.
+  Future<void> _move(GoogleMapController controller, CameraUpdate update) =>
+      widget.data.compact ? controller.moveCamera(update) : controller.animateCamera(update);
+
   @override
   Widget build(BuildContext context) {
     final icons = _icons;
+    final compact = widget.data.compact;
     final courier = widget.data.courier;
-    final top = MediaQuery.paddingOf(context).top;
+    final top = compact ? 0.0 : MediaQuery.paddingOf(context).top;
     return Semantics(
       label:
           'Mapa del pedido: ${widget.data.storeLabel} y ${widget.data.destinationLabel}'
           '${courier != null ? ', con tu repartidor en camino' : ''}.',
       child: ExcludeSemantics(
-        child: TweenAnimationBuilder<LatLng?>(
-          // La moto se desliza entre una posición y la siguiente.
-          tween: _LatLngTween(end: courier == null ? null : _latLng(courier)),
+        child: TweenAnimationBuilder<LatLng>(
+          // La moto se desliza entre una posición y la siguiente. Sin moto, el tween
+          // apunta al negocio: cuando aparece, sale desde ahí.
+          tween: _LatLngTween(end: _latLng(courier ?? widget.store)),
           duration: reduceMotionOf(context) ? Duration.zero : const Duration(milliseconds: 1200),
           curve: Curves.easeInOut,
           builder: (context, position, _) => GoogleMap(
             initialCameraPosition: CameraPosition(target: _latLng(widget.destination), zoom: 15),
             style: _style,
-            padding: EdgeInsets.fromLTRB(24, top + 64, 24, 24),
-            markers: icons == null ? const {} : _markers(icons, position),
+            padding: compact ? const EdgeInsets.fromLTRB(12, 40, 40, 8) : EdgeInsets.fromLTRB(24, top + 64, 24, 24),
+            liteModeEnabled: compact,
+            markers: icons == null ? const {} : _markers(icons, courier == null ? null : position),
             zoomControlsEnabled: false,
             myLocationButtonEnabled: false,
             mapToolbarEnabled: false,
@@ -152,14 +159,13 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
   }
 }
 
-class _LatLngTween extends Tween<LatLng?> {
-  _LatLngTween({super.end});
+class _LatLngTween extends Tween<LatLng> {
+  _LatLngTween({required LatLng super.end});
 
   @override
-  LatLng? lerp(double t) {
-    final from = begin;
-    final to = end;
-    if (from == null || to == null) return to;
+  LatLng lerp(double t) {
+    final from = begin ?? end!;
+    final to = end!;
     return LatLng(from.latitude + (to.latitude - from.latitude) * t, from.longitude + (to.longitude - from.longitude) * t);
   }
 }

@@ -192,6 +192,7 @@ class _EtaHeader extends ConsumerWidget {
       OrderStatus.delivered => ('Llegó a las', deliveredAt == null ? '¡Listo!' : Formatters.clock(deliveredAt)),
       OrderStatus.cancelled => ('Tu pedido', 'Cancelado'),
       _ when minutes != null => ('Llega en', '$minutes min'),
+      _ when order.estimatedArrival != null => ('Llega a las', Formatters.clock(order.estimatedArrival!)),
       _ => ('Llega en', 'Calculando…'),
     };
 
