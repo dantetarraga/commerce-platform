@@ -11,7 +11,7 @@ Los avatares son assets locales de DiceBear. Las fotos remotas no se descargan e
 Regeneración desde `mobile/`:
 
 ```sh
-flutter test --update-goldens --dart-define=CAPTURE_UI_REFRESH=true test/app/ui_refresh_test.dart
+flutter test --update-goldens --dart-define=CAPTURE_UI_REFRESH=true test/apps/ui_refresh_test.dart
 ```
 
 La misma prueba comprueba 320 × 720 con texto al 140 %, acceso a la cuenta de Socios y cambio de disponibilidad del repartidor. El detalle de hallazgos y decisiones está en [UI_UX.md](../../UI_UX.md).

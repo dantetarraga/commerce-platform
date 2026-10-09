@@ -1,7 +1,7 @@
 // Local visual review: flutter run -d chrome -t tool/onboarding_preview.dart
 // Add ?theme=dark before #/onboarding to preview the dark palette.
 // Reloading resets only these in-memory preview preferences.
-import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/apps/customer/router/app_router.dart';
 import 'package:apamuy/core/config/app_config_provider.dart';
 import 'package:apamuy/core/config/env.dart';
 import 'package:apamuy/core/storage/preferences_storage.dart';

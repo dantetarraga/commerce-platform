@@ -41,6 +41,17 @@ Ver `CLAUDE.md` (reglas) y `docs/PANEL_WEB.md` §9.
 
 ## Pendiente
 
-- `pnpm run api:generate` con el backend levantado (crea `src/api/generated/`) y pasar `features/auth/api` al cliente generado.
+- `pnpm run api:generate` con el backend levantado (crea `src/app/api/generated/`) y pasar los contratos manuales al cliente generado.
 - Backend: refresh token en cookie httpOnly (hoy queda en `localStorage`, ver `docs/PANEL_WEB.md` §9).
-- W1: Socios, Catálogo y Marketing sobre los endpoints `admin/*`.
+- Completar W1: edición de variantes y opciones de productos, cupones y banners (Marketing).
+
+## Primera entrega de W1: Socios y Catálogo
+
+- `/admin/partners`: búsqueda exacta por celular, alta de negocio/repartidor, asignación de negocios, edición de vehículo y suspensión por rol con confirmación. El backend todavía no ofrece un listado general de socios.
+- `/admin/catalog`: búsqueda y filtros de negocios, creación en borrador y gestión de categorías.
+- `/admin/catalog/:storeId`: datos y dueño del negocio (búsqueda por celular), publicación, retiro, horarios con múltiples turnos y cruce de medianoche, secciones, alta/edición/retiro de productos, precio, stock y disponibilidad.
+- Variantes y opciones existentes se muestran en consulta y se conservan al editar; su editor completo queda pendiente. Las imágenes se ingresan por URL https; falta subida de archivos en el backend.
+- Datos con TanStack Query y rutas cargadas bajo demanda; validación en español y estados de carga, vacío, error y reintento. El servidor mantiene las validaciones y los permisos definitivos.
+- Ajuste del backend: `POST admin/couriers` conserva `activeSince` al editar el vehículo si no se envía ese campo; no requiere migración.
+
+Validación: 40 pruebas unitarias de web y 10 pruebas de navegador en Chromium con API simulada, además del build y lint. Las pruebas de navegador cubren guardas, alta, suspensión selectiva y bloqueada, publicación, edición sin perder opciones, horarios, reintento y móvil/modo oscuro. No equivalen a una prueba contra la base de datos real. El ajuste del backend tiene 2 pruebas de regresión.

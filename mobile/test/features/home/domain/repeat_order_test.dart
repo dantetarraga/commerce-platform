@@ -117,7 +117,7 @@ void main() {
       OrderLine(productId: 'pr_caldo', name: 'Caldo', quantity: 1, total: Money(1200)),
     ]);
 
-    final result = await RepeatOrder(products).call(order, near: GeoCoordinates.trusted(-14.79, -71.41));
+    final result = await RepeatOrder(GetProductDetail(products)).call(order, near: GeoCoordinates.trusted(-14.79, -71.41));
 
     expect(result.lines, hasLength(2));
     expect(result.missing, 1);

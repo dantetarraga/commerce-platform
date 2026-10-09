@@ -1,7 +1,12 @@
 import 'package:apamuy/features/discovery/discovery.dart';
-import 'package:apamuy/features/home/presentation/widgets/home_editorial.dart';
-import 'package:apamuy/features/home/presentation/widgets/home_header.dart';
-import 'package:apamuy/features/home/presentation/widgets/home_sections.dart';
+import 'package:apamuy/features/home/presentation/widgets/active_order_cover/active_order_cover.dart';
+import 'package:apamuy/features/home/presentation/widgets/header/home_header.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/barrio_stores.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/category_shelf.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/promo_section.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/recommended_stores.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/repeat_row.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/while_you_wait.dart';
 import 'package:apamuy/features/notifications/notifications.dart';
 import 'package:apamuy/features/orders/orders_customer.dart';
 import 'package:apamuy/features/stores/stores.dart';
@@ -60,7 +65,7 @@ class HomePage extends ConsumerWidget {
                     child: Padding(padding: EdgeInsets.only(top: 6), child: CategoryShelf()),
                   ),
                 const SliverToBoxAdapter(child: PromoCarouselSection()),
-                const SliverToBoxAdapter(child: RepeatRow()),
+                SliverToBoxAdapter(child: RepeatRow(onExplore: () => context.goNamed(HomePage.name))),
                 const SliverToBoxAdapter(child: RecommendedStores()),
                 const BarrioStores(),
                 const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),

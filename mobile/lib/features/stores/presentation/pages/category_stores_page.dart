@@ -1,4 +1,4 @@
-import 'package:apamuy/features/discovery/discovery.dart';
+
 import 'package:apamuy/features/stores/domain/entities/store_filter.dart';
 import 'package:apamuy/features/stores/domain/entities/store_query.dart';
 import 'package:apamuy/features/stores/domain/entities/store_summary.dart';
@@ -14,11 +14,14 @@ import 'package:go_router/go_router.dart';
 /// Negocios de una categoría. Los filtros, el conteo y "Ordenar" se quedan
 /// pegados arriba al bajar.
 class CategoryStoresPage extends ConsumerStatefulWidget {
-  const CategoryStoresPage({required this.categoryId, super.key});
+  const CategoryStoresPage({required this.categoryId, required this.onSearch, super.key});
 
   static const name = 'category-stores';
 
   final String categoryId;
+
+  /// Abre la búsqueda general.
+  final VoidCallback onSearch;
 
   @override
   ConsumerState<CategoryStoresPage> createState() => _CategoryStoresPageState();
@@ -85,6 +88,7 @@ class _CategoryStoresPageState extends ConsumerState<CategoryStoresPage> {
                   sort: _sort,
                   onToggle: _toggle,
                   onSort: _chooseSort,
+                  onSearch: widget.onSearch,
                 ),
               ),
               switch (stores) {
@@ -157,6 +161,7 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
     required this.sort,
     required this.onToggle,
     required this.onSort,
+    required this.onSearch,
   });
 
   static const _barHeight = 56.0;
@@ -169,6 +174,7 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
   final StoreSort sort;
   final ValueChanged<StoreFilter> onToggle;
   final VoidCallback onSort;
+  final VoidCallback onSearch;
 
   @override
   double get minExtent => _barHeight + _chipsHeight + _sortHeight;
@@ -207,7 +213,7 @@ class _PinnedFilters extends SliverPersistentHeaderDelegate {
                 IconButton(
                   tooltip: 'Buscar',
                   icon: const Icon(Icons.search_rounded),
-                  onPressed: () => context.goNamed(ExplorePage.name),
+                  onPressed: onSearch,
                 ),
                 const SizedBox(width: AppSpacing.xxs),
               ],

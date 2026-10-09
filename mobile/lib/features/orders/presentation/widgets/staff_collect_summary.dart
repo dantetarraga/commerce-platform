@@ -1,5 +1,6 @@
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/domain/order_insights.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 

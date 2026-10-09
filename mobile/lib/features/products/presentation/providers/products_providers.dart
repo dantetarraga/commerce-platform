@@ -22,10 +22,13 @@ ProductsRemoteDataSource productsRemoteDataSource(Ref ref) => ref.watch(appEnvPr
 ProductsRepository productsRepository(Ref ref) => ProductsRepositoryImpl(ref.watch(productsRemoteDataSourceProvider));
 
 /// El delivery del negocio depende de la ubicación de entrega actual.
+/// Consulta puntual de un producto para otros features (repetir pedido).
+@Riverpod(keepAlive: true)
+GetProductDetail getProductDetail(Ref ref) => GetProductDetail(ref.watch(productsRepositoryProvider));
 @riverpod
 Future<Product> productDetail(Ref ref, String productId) {
   final near = ref.watch(currentDeliveryLocationProvider).coordinates;
-  return GetProductDetail(ref.watch(productsRepositoryProvider)).call(productId, near: near).then((r) => r.getOrThrow());
+  return ref.watch(getProductDetailProvider).call(productId, near: near).then((r) => r.getOrThrow());
 }
 
 /// Selección en curso del detalle de producto. La lógica vive en la entidad;

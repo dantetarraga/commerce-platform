@@ -106,16 +106,65 @@ String _$productsRepositoryHash() =>
     r'd89f42f09c1c38adf183c4f12d406b2d50e0b70d';
 
 /// El delivery del negocio depende de la ubicación de entrega actual.
+/// Consulta puntual de un producto para otros features (repetir pedido).
+
+@ProviderFor(getProductDetail)
+final getProductDetailProvider = GetProductDetailProvider._();
+
+/// El delivery del negocio depende de la ubicación de entrega actual.
+/// Consulta puntual de un producto para otros features (repetir pedido).
+
+final class GetProductDetailProvider
+    extends
+        $FunctionalProvider<
+          GetProductDetail,
+          GetProductDetail,
+          GetProductDetail
+        >
+    with $Provider<GetProductDetail> {
+  /// El delivery del negocio depende de la ubicación de entrega actual.
+  /// Consulta puntual de un producto para otros features (repetir pedido).
+  GetProductDetailProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getProductDetailProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getProductDetailHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetProductDetail> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GetProductDetail create(Ref ref) {
+    return getProductDetail(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetProductDetail value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetProductDetail>(value),
+    );
+  }
+}
+
+String _$getProductDetailHash() => r'eea8747bd8a8957f752b1490b49b4373cd2ba4ff';
 
 @ProviderFor(productDetail)
 final productDetailProvider = ProductDetailFamily._();
 
-/// El delivery del negocio depende de la ubicación de entrega actual.
-
 final class ProductDetailProvider
     extends $FunctionalProvider<AsyncValue<Product>, Product, FutureOr<Product>>
     with $FutureModifier<Product>, $FutureProvider<Product> {
-  /// El delivery del negocio depende de la ubicación de entrega actual.
   ProductDetailProvider._({
     required ProductDetailFamily super.from,
     required String super.argument,
@@ -159,9 +208,7 @@ final class ProductDetailProvider
   }
 }
 
-String _$productDetailHash() => r'be25875624dd7e6b24a0477801be9d5fd76a6325';
-
-/// El delivery del negocio depende de la ubicación de entrega actual.
+String _$productDetailHash() => r'2b49f55db89547d00c2073cd4d223b80e3913a1f';
 
 final class ProductDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Product>, String> {
@@ -173,8 +220,6 @@ final class ProductDetailFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
-
-  /// El delivery del negocio depende de la ubicación de entrega actual.
 
   ProductDetailProvider call(String productId) =>
       ProductDetailProvider._(argument: productId, from: this);

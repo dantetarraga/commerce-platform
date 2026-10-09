@@ -3,8 +3,10 @@ import { createRootRouteWithContext, createRoute, createRouter } from '@tanstack
 import { NotFound } from '@/components/shared/not-found'
 import { RouteError } from '@/components/shared/route-error'
 import { loginRoute } from '@/features/auth'
+import { catalogRoute, storeDetailRoute } from '@/features/catalog'
 import { adminHomeRoute, merchantHomeRoute } from '@/features/home'
 import { landingRoute } from '@/features/landing'
+import { partnersRoute } from '@/features/partners'
 import { AdminLayout } from '@/layouts/admin-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
 import { MerchantLayout } from '@/layouts/merchant-layout'
@@ -39,6 +41,9 @@ const adminLayoutRoute = createRoute({
   beforeLoad: requireRole('ADMIN'),
 })
 const adminHome = createRoute({ getParentRoute: () => adminLayoutRoute, ...adminHomeRoute })
+const partners = createRoute({ getParentRoute: () => adminLayoutRoute, ...partnersRoute })
+const catalog = createRoute({ getParentRoute: () => adminLayoutRoute, ...catalogRoute })
+const storeDetail = createRoute({ getParentRoute: () => adminLayoutRoute, ...storeDetailRoute })
 
 const merchantLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -54,7 +59,7 @@ const merchantHome = createRoute({
 const routeTree = rootRoute.addChildren([
   landing,
   authLayoutRoute.addChildren([login]),
-  adminLayoutRoute.addChildren([adminHome]),
+  adminLayoutRoute.addChildren([adminHome, partners, catalog, storeDetail]),
   merchantLayoutRoute.addChildren([merchantHome]),
 ])
 

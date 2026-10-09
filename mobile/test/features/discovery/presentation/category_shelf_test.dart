@@ -1,5 +1,5 @@
 import 'package:apamuy/features/discovery/domain/moment.dart';
-import 'package:apamuy/features/home/presentation/widgets/home_sections.dart';
+import 'package:apamuy/features/home/presentation/widgets/sections/category_shelf.dart';
 import 'package:apamuy/features/stores/domain/entities/category.dart';
 import 'package:flutter_test/flutter_test.dart';
 

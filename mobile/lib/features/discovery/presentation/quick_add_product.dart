@@ -2,7 +2,6 @@ import 'package:apamuy/core/maps/delivery_location.dart';
 import 'package:apamuy/core/result/result.dart';
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/discovery/domain/search.dart';
-import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
 import 'package:apamuy/features/stores/stores.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,7 @@ Future<bool> quickAddProduct(BuildContext context, WidgetRef ref, ProductHit pro
   var store = known;
   if (store == null) {
     final near = ref.read(currentDeliveryLocationProvider).coordinates;
-    final result = await ref.read(storesRepositoryProvider).getStoreDetail(product.storeId, near: near);
+    final result = await ref.read(getStoreDetailProvider).call(product.storeId, near: near);
     if (!context.mounted) return false;
     switch (result) {
       case Ok(:final value):

@@ -1,4 +1,4 @@
-import 'package:apamuy/app_partner/router/partner_routes.dart';
+import 'package:apamuy/apps/partner/router/partner_routes.dart';
 import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

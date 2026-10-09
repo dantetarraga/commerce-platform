@@ -1,4 +1,6 @@
-import 'package:apamuy/shared/design_system/design_system.dart';
+import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
+import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
+import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:flutter/material.dart';
 
 extension TicketColors on BuildContext {

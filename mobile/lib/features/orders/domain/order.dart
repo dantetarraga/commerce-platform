@@ -3,8 +3,6 @@ import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/result/result.dart';
 import 'package:apamuy/features/orders/domain/payment_method.dart';
 import 'package:equatable/equatable.dart';
-
-export 'order_insights.dart';
 export 'payment_method.dart';
 
 /// Estados del pedido en orden. `cancelled` puede ocurrir antes de `onTheWay`.

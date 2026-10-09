@@ -1,4 +1,4 @@
-import 'package:apamuy/app/router/routes.dart';
+import 'package:apamuy/apps/customer/router/routes.dart';
 import 'package:apamuy/features/auth/auth.dart';
 import 'package:apamuy/features/auth/presentation/widgets/auth_fields.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';

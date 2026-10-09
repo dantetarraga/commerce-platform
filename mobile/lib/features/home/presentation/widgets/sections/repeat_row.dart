@@ -1,6 +1,5 @@
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/checkout/checkout.dart';
-import 'package:apamuy/features/home/presentation/pages/home_page.dart';
 import 'package:apamuy/features/home/presentation/providers/home_providers.dart';
 import 'package:apamuy/features/home/presentation/widgets/open_store.dart';
 import 'package:apamuy/features/home/presentation/widgets/repeat_shelf.dart';
@@ -12,9 +11,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// "Volver a pedir": oculta si no hay historial.
+/// "Volver a pedir": oculta si no hay historial. [onExplore] vuelve al inicio desde la bolsa.
 class RepeatRow extends ConsumerWidget {
-  const RepeatRow({super.key});
+  const RepeatRow({required this.onExplore, super.key});
+
+  final VoidCallback onExplore;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,7 +29,7 @@ class RepeatRow extends ConsumerWidget {
           orders: [for (final r in repeat) r.order],
           timesByStore: {for (final r in repeat) r.order.store.id: r.deliveredCount},
           onOpen: (order) => openStore(context, order.store.id),
-          onRepeat: (order) => repeatOrder(context, ref, order),
+          onRepeat: (order) => repeatOrder(context, ref, order, onExplore: onExplore),
         ),
       ],
     );
@@ -36,7 +37,7 @@ class RepeatRow extends ConsumerWidget {
 }
 
 /// "Repetir": pone el pedido en la bolsa y la abre; cualquier otro final es un aviso.
-Future<void> repeatOrder(BuildContext context, WidgetRef ref, Order order) async {
+Future<void> repeatOrder(BuildContext context, WidgetRef ref, Order order, {required VoidCallback onExplore}) async {
   final router = GoRouter.of(context);
   final outcome = await ref
       .read(repeatOrderControllerProvider.notifier)
@@ -69,7 +70,7 @@ Future<void> repeatOrder(BuildContext context, WidgetRef ref, Order order) async
       showCartSheet(
         context,
         onCheckout: () => router.pushNamed(CheckoutPage.name).ignore(),
-        onExplore: () => router.goNamed(HomePage.name),
+        onExplore: onExplore,
       ).ignore();
   }
 }

@@ -53,10 +53,13 @@ Future<StorePage> stores(
 }
 
 /// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
+/// Consulta puntual de un negocio para otros features (repetir pedido, agregar rápido).
+@Riverpod(keepAlive: true)
+GetStoreDetail getStoreDetail(Ref ref) => GetStoreDetail(ref.watch(storesRepositoryProvider));
 @riverpod
 Future<StoreDetail> storeDetail(Ref ref, String storeId) {
   final near = ref.watch(currentDeliveryLocationProvider).coordinates;
-  return GetStoreDetail(ref.watch(storesRepositoryProvider)).call(storeId, near: near).then((r) => r.getOrThrow());
+  return ref.watch(getStoreDetailProvider).call(storeId, near: near).then((r) => r.getOrThrow());
 }
 
 @riverpod

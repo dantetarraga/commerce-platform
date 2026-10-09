@@ -1,5 +1,5 @@
 import 'package:apamuy/core/utils/formatters.dart';
-import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/checkout/domain/checkout.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';

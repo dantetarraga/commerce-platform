@@ -66,7 +66,8 @@ export class AdminPartnersService {
         vehicleType: dto.vehicleType,
         vehicleLabel: dto.vehicleLabel,
         plate: dto.plate ?? null,
-        activeSince: dto.activeSince ?? null,
+        // Editar el vehículo no debe borrar la antigüedad que el formulario no envía.
+        ...(dto.activeSince !== undefined && { activeSince: dto.activeSince }),
       };
       await tx.courier.upsert({ where: { userId }, create: { userId, ...vehicle }, update: vehicle });
       await this.grant(tx, userId, Role.COURIER);

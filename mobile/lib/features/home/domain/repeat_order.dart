@@ -2,10 +2,9 @@ import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/domain/quantity.dart';
 import 'package:apamuy/core/domain/validated.dart';
 import 'package:apamuy/core/result/result.dart';
-import 'package:apamuy/features/cart/domain/entities/cart.dart';
-import 'package:apamuy/features/orders/domain/order.dart';
-import 'package:apamuy/features/products/domain/entities/product.dart';
-import 'package:apamuy/features/products/domain/repositories/products_repository.dart';
+import 'package:apamuy/features/cart/cart_domain.dart';
+import 'package:apamuy/features/orders/orders_domain.dart';
+import 'package:apamuy/features/products/products_domain.dart';
 
 /// Líneas de bolsa armadas a partir de un pedido anterior y cuántas no se
 /// pudieron rearmar (producto agotado, borrado o sin id).
@@ -14,13 +13,13 @@ typedef RepeatedOrder = ({List<CartLine> lines, int missing});
 /// "Repetir": vuelve a armar las líneas de un pedido con los precios y la
 /// disponibilidad de hoy.
 class RepeatOrder {
-  const RepeatOrder(this._products);
+  const RepeatOrder(this._getProduct);
 
-  final ProductsRepository _products;
+  final GetProductDetail _getProduct;
 
   Future<RepeatedOrder> call(Order order, {GeoCoordinates? near}) async {
     final ids = {for (final line in order.lines) ?line.productId};
-    final fetched = await Future.wait([for (final id in ids) _products.getProduct(id, near: near)]);
+    final fetched = await Future.wait([for (final id in ids) _getProduct(id, near: near)]);
     final products = {
       for (final result in fetched)
         if (result case Ok(:final value)) value.id: value,

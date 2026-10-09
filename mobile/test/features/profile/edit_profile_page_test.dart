@@ -1,4 +1,4 @@
-import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/apps/customer/router/app_router.dart';
 import 'package:apamuy/features/auth/auth.dart';
 import 'package:apamuy/features/profile/profile.dart';
 import 'package:flutter/material.dart';

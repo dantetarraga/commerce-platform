@@ -3,6 +3,8 @@
 ## Convenciones (prevalecen sobre las skills del plugin `dart-flutter`)
 
 - **Por feature con DDD**: `features/<feature>/{domain,infrastructure,presentation}` y un barrel `<feature>.dart`. No reorganizar en capas globales, aunque `flutter-apply-architecture-best-practices` lo proponga.
+- **Entre features solo se importan barrels** de la raíz del feature. El `domain/` de otro feature importa `<feature>_domain.dart` (solo Dart puro); hay entradas extra por consumidor (`orders_customer`, `orders_staff`, `orders_infrastructure`). Se usan providers públicos, nunca el repositorio de otro feature.
+- **Sin ciclos entre features**: si dos pantallas se necesitan, las conecta el router de `apps/` con un widget o un callback (p. ej. `FavoriteToggle` en el detalle de un negocio). `test/architecture/architecture_test.dart` verifica estas reglas.
 - `domain/` es Dart puro: sin Flutter, Dio ni anotaciones de JSON. Value objects en `core/domain` (`Money`, `PhoneNumber`, `GeoCoordinates`…).
 - **Red con Dio** a través de `core/network/api_client.dart` (convierte errores a `AppException`). No usar el paquete `http` (`flutter-use-http-package` no aplica).
 - **Repositorios devuelven `Result<T>`** usando `guard()`; la UI nunca ve excepciones ni Dio.
@@ -16,8 +18,9 @@
 
 ## Dos apps, un proyecto
 
-- **Cliente**: `lib/main.dart` + `lib/app/`, flavor Android `customer` (`pe.apamuy.app`).
-- **Apamuy Socios** (negocio y repartidor): `lib/main_partner.dart` + `lib/app_partner/`, flavor `partner` (`pe.apamuy.socios`). Features propias: `partner_session`, `merchant_orders`, `courier_deliveries`.
+- **Cliente**: `lib/main.dart` + `lib/apps/customer/`, flavor Android `customer` (`pe.apamuy.app`).
+- **Apamuy Socios** (negocio y repartidor): `lib/main_partner.dart` + `lib/apps/partner/`, flavor `partner` (`pe.apamuy.socios`). Features propias: `partner_session`, `merchant_orders`, `courier_deliveries`.
+- `apps/` solo compone: raíz, router y shell de cada app (la barra de compra conectada vive en `apps/customer/shell/`). Features, `core` y `shared` no la importan.
 - Comparten `core/`, `shared/`, `auth` y el dominio de `orders`. **La app del cliente no importa features de socios ni al revés.**
 - En Android el flavor es obligatorio. iOS solo tiene la app del cliente (se corre sin `--flavor`).
 

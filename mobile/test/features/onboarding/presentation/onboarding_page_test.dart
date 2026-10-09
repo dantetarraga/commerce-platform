@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:apamuy/app/router/app_router.dart';
-import 'package:apamuy/app/router/routes.dart';
+import 'package:apamuy/apps/customer/router/app_router.dart';
+import 'package:apamuy/apps/customer/router/routes.dart';
 import 'package:apamuy/core/config/app_config_provider.dart';
 import 'package:apamuy/core/config/env.dart';
 import 'package:apamuy/core/result/result.dart';

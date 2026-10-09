@@ -1,12 +1,14 @@
 # Apamuy — Panel web (Admin y Portal Socios)
 
-Versión 0.1 · 2026-10-08 · Estado: **en implementación** · Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION.md](OPERACION.md) y [PENDIENTES.md](PENDIENTES.md).
+Versión 0.2 · 2026-10-08 · Estado: **en implementación** · Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION.md](OPERACION.md) y [PENDIENTES.md](PENDIENTES.md).
 
 Este documento define el frontend web de Apamuy: para qué sirve, quién lo usa, qué pantallas tiene, qué le falta al backend y con qué tecnología se puede construir. El código va en `web/`.
 
 ## 1. Por qué un panel web
 
-Hoy el equipo opera el catálogo, los cupones, los banners y el alta de socios desde Swagger (`/docs`). Sirve para el piloto, pero no para sumar negocios con fotos, vigilar pedidos en vivo ni rendir caja. El panel web reemplaza a Swagger y además le da al negocio una herramienta de autogestión.
+El panel ya permite dar de alta socios y gestionar negocios, horarios, categorías, secciones y productos básicos. Los cupones, banners y la edición de variantes/opciones siguen en Swagger (`/docs`). Las siguientes entregas añadirán imágenes, pedidos en vivo y autogestión de negocios.
+
+**Primera entrega de W1:** `/admin/partners`, `/admin/catalog` y `/admin/catalog/:storeId` conectados a la API existente, con validación, confirmaciones y estados de consulta. Las variantes y opciones se conservan al editar un producto y, por ahora, solo se consultan. El backend recibió un ajuste para conservar la antigüedad del repartidor cuando se edita su vehículo sin enviar `activeSince`; no requiere migración.
 
 ## 2. Referencia: Rappi y PedidosYa
 
@@ -109,7 +111,7 @@ El panel hereda [DIRECCION_VISUAL.md](DIRECCION_VISUAL.md): crema `#FBF7F2`, ter
 | # | Trabajo | Desbloquea |
 |---|---|---|
 | W0 | ✅ Proyecto, estructura, tokens, ingreso por OTP, portales con guardas, lint de límites, tests y CI. Falta: generar el cliente con orval y la cookie httpOnly en el backend | Empezar |
-| W1 | Admin: socios, catálogo, cupones y banners sobre los endpoints que ya existen | Dejar Swagger |
+| W1 | ✅ Socios y catálogo básico (negocios, categorías, horarios, secciones, productos). Pendiente: editor de variantes/opciones y Marketing (cupones, banners) | Dejar Swagger |
 | W2 | Backend: imágenes + Admin: fotos del catálogo | Catálogo real |
 | W3 | Backend: `admin/orders` + Admin: pedidos en vivo y alertas | Vigilar la operación |
 | W4 | Portal Socios: menú, horarios, reportes | Autogestión de negocios |

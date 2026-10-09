@@ -51,7 +51,7 @@ export function Sidebar({ portal, onNavigate, className }: SidebarProps) {
               key={item.label}
               to={item.to}
               onClick={onNavigate}
-              activeOptions={{ exact: true }}
+              activeOptions={{ exact: item.to === '/admin' || item.to === '/partner' }}
               className={cn(
                 base,
                 'text-muted-foreground hover:bg-accent hover:text-foreground transition-colors',

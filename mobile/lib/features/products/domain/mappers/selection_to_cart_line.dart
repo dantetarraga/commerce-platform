@@ -1,4 +1,4 @@
-import 'package:apamuy/features/cart/domain/entities/cart.dart';
+import 'package:apamuy/features/cart/cart_domain.dart';
 import 'package:apamuy/features/products/domain/entities/product_selection.dart';
 
 extension ProductSelectionToCart on ProductSelection {

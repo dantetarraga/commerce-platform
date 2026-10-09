@@ -1,4 +1,4 @@
-import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/apps/customer/router/app_router.dart';
 import 'package:apamuy/shared/legal/legal_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

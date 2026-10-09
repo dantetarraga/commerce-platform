@@ -1,20 +1,37 @@
-import type { ErrorComponentProps } from '@tanstack/react-router'
-import { WifiOff } from 'lucide-react'
+import { type ErrorComponentProps, Link, useRouter } from '@tanstack/react-router'
+import { House } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { EmptyState } from './empty-state'
+import { ErrorState } from './error-state'
 
 export function RouteError({ error, reset }: ErrorComponentProps) {
-  const message =
-    error instanceof Error && error.name === 'ApiError'
-      ? error.message
-      : 'Algo salió mal al cargar esta sección.'
+  const router = useRouter()
+  const [isRetrying, setIsRetrying] = useState(false)
+
+  async function handleRetry() {
+    setIsRetrying(true)
+    // Sin invalidar, el router reusaría el loader que falló.
+    await router.invalidate()
+    reset()
+    setIsRetrying(false)
+  }
+
   return (
-    <div className='mx-auto max-w-xl px-5 py-16'>
-      <EmptyState
-        icon={WifiOff}
-        title='No pudimos cargar esta sección'
-        description={message}
-        action={<Button onClick={reset}>Reintentar</Button>}
+    <div className='mx-auto max-w-2xl px-5 py-16'>
+      <ErrorState
+        error={error}
+        isRetrying={isRetrying}
+        onRetry={() => {
+          void handleRetry()
+        }}
+        action={
+          <Button asChild variant='outline'>
+            <Link to='/'>
+              <House aria-hidden />
+              Volver al inicio
+            </Link>
+          </Button>
+        }
       />
     </div>
   )

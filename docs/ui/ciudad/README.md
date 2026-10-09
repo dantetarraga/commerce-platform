@@ -59,7 +59,7 @@ Los tokens y componentes viven en `mobile/lib/shared/design_system/`. Las compos
 Desde `mobile/`, con [Rive preparado para la plataforma anfitriona](../../../mobile/assets/animations/README.md):
 
 ```sh
-flutter test --dart-define=CAPTURE_CITY=true --update-goldens test/app/city_design_test.dart test/app/purchase_flow_test.dart test/app/ui_refresh_test.dart
+flutter test --dart-define=CAPTURE_CITY=true --update-goldens test/apps/city_design_test.dart test/apps/purchase_flow_test.dart test/apps/ui_refresh_test.dart
 flutter analyze
 flutter test
 ```

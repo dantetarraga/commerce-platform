@@ -1,7 +1,7 @@
 import 'package:apamuy/core/domain/money.dart';
-import 'package:apamuy/features/addresses/domain/address.dart';
-import 'package:apamuy/features/cart/domain/entities/cart.dart';
-import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/addresses/addresses_domain.dart';
+import 'package:apamuy/features/cart/cart_domain.dart';
+import 'package:apamuy/features/orders/orders_domain.dart';
 import 'package:equatable/equatable.dart';
 
 sealed class DeliveryTime extends Equatable {

@@ -4,8 +4,7 @@ import 'package:apamuy/core/result/result.dart';
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/home/domain/repeat_order.dart';
 import 'package:apamuy/features/orders/orders.dart';
-import 'package:apamuy/features/products/presentation/providers/products_providers.dart';
-import 'package:apamuy/features/stores/presentation/providers/stores_providers.dart';
+import 'package:apamuy/features/products/products.dart';
 import 'package:apamuy/features/stores/stores.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -66,7 +65,7 @@ class RepeatOrderController extends _$RepeatOrderController {
 
   Future<RepeatOutcome> _run(Order order, Future<bool> Function(CartStore, CartStore) confirmReplace) async {
     final near = ref.read(currentDeliveryLocationProvider).coordinates;
-    final detail = await ref.read(storesRepositoryProvider).getStoreDetail(order.store.id, near: near);
+    final detail = await ref.read(getStoreDetailProvider).call(order.store.id, near: near);
     final StoreSummary store;
     switch (detail) {
       case Ok(:final value):
@@ -76,7 +75,7 @@ class RepeatOrderController extends _$RepeatOrderController {
     }
     if (!store.canOrder) return RepeatUnavailable(store);
 
-    final repeated = await RepeatOrder(ref.read(productsRepositoryProvider)).call(order, near: near);
+    final repeated = await RepeatOrder(ref.read(getProductDetailProvider)).call(order, near: near);
     if (repeated.lines.isEmpty) return RepeatNothingLeft(store);
 
     final cart = ref.read(cartControllerProvider.notifier);

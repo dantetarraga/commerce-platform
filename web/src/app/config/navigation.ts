@@ -30,8 +30,8 @@ export const navigation = {
     items: [
       { label: 'Inicio', icon: LayoutDashboard, to: '/admin' },
       { label: 'Pedidos', icon: ClipboardList },
-      { label: 'Socios', icon: Users },
-      { label: 'Catálogo', icon: UtensilsCrossed },
+      { label: 'Socios', icon: Users, to: '/admin/partners' },
+      { label: 'Catálogo', icon: UtensilsCrossed, to: '/admin/catalog' },
       { label: 'Marketing', icon: Megaphone },
       { label: 'Ciudades', icon: MapPinned },
       { label: 'Caja', icon: Banknote },

@@ -4,7 +4,7 @@ Monorepo de una app de delivery para Espinar (Cusco): `backend/` (NestJS + Prism
 
 - Diseño y decisiones: `docs/ARQUITECTURA.md`. Qué falta: `docs/PENDIENTES.md`.
 - Textos para el usuario, mensajes de error y docs en **español**. Identificadores y código en inglés.
-- Reglas de cada parte en `backend/AGENTS.md` y `mobile/AGENTS.md`.
+- Reglas de cada parte en `backend/CLAUDE.md`, `mobile/CLAUDE.md` y `web/CLAUDE.md`.
 
 ## Skills instaladas y precedencia
 

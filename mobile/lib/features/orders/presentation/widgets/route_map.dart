@@ -1,6 +1,6 @@
 import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/maps/delivery_map_data.dart';
-import 'package:apamuy/shared/widgets/delivery_map.dart';
+import 'package:apamuy/shared/maps/delivery_map.dart';
 import 'package:flutter/material.dart';
 
 /// Puente del seguimiento al proveedor de mapas intercambiable.

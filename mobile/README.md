@@ -19,6 +19,8 @@ Los nombres e identificadores de la tienda demo «El Chaski Dorado» siguen sien
 
 ## Antes de empezar
 
+La [reorganización de carpetas](REORGANIZACION_README.md) explica la estructura de `lib/` (dos apps en `lib/apps/`, fronteras entre features) y por qué se eligió.
+
 ```sh
 cd mobile
 flutter pub get

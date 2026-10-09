@@ -1,6 +1,6 @@
 # Apamuy — Arquitectura y diseño inicial
 
-Versión 0.5 · 2026-09-24 · Estado: **en implementación** · [Cambios v0.4 → v0.5](#cambios-v04--v05) · [Cambios v0.3 → v0.4](#cambios-v03--v04) · [Cambios v0.2 → v0.3](#cambios-v02--v03) · [Cambios v0.1 → v0.2](#cambios-v01--v02)
+Versión 0.6 · 2026-10-08 · Estado: **en implementación** · [Cambios v0.5 → v0.6](#cambios-v05--v06) · [Cambios v0.4 → v0.5](#cambios-v04--v05) · [Cambios v0.3 → v0.4](#cambios-v03--v04) · [Cambios v0.2 → v0.3](#cambios-v02--v03) · [Cambios v0.1 → v0.2](#cambios-v01--v02)
 
 ---
 
@@ -47,21 +47,21 @@ mobile/
 │   ├── core/…
 │   └── helpers/ (mocks con mocktail, fixtures, pump_app.dart, provider_container.dart)
 └── lib/
-    ├── main.dart                    # bootstrap: ProviderScope + env
-    ├── app/
-    │   ├── app.dart                 # MaterialApp.router
-    │   ├── config/
-    │   │   ├── env.dart             # AppEnv (baseUrl, wsUrl, mapsKey) desde dart-define
-    │   │   └── app_config_provider.dart
-    │   ├── router/
-    │   │   ├── app_router.dart      # GoRouter + redirect según AuthState
-    │   │   ├── routes.dart          # paths; cada página expone además `static const name` para goNamed
-    │   │   └── scaffold_with_nav.dart  # StatefulShellRoute (Home, Buscar, Pedidos, Perfil)
-    │   └── theme/
-    │       ├── app_theme.dart
-    │       ├── app_colors.dart
-    │       ├── app_typography.dart
-    │       └── app_spacing.dart
+    ├── main.dart                    # cliente: ProviderScope + ApamuyApp
+    ├── main_partner.dart            # Apamuy Socios: ProviderScope + PartnerApp (flavor partner)
+    ├── apps/                        # composición de cada app; ninguna feature la importa
+    │   ├── routing/route_helpers.dart   # materialRoute y routerRefresh, comunes a los dos routers
+    │   ├── customer/
+    │   │   ├── app.dart             # ApamuyApp (MaterialApp.router)
+    │   │   ├── router/
+    │   │   │   ├── app_router.dart  # GoRouter + redirect según AuthState
+    │   │   │   └── routes.dart      # paths; cada página expone además `static const name` para goNamed
+    │   │   └── shell/
+    │   │       ├── scaffold_with_nav.dart   # StatefulShellRoute (Inicio, Buscar, Pedidos, Bolsa, Tú)
+    │   │       └── purchase_bar/            # barra de compra conectada (carrito + pedido activo)
+    │   └── partner/
+    │       ├── partner_app.dart     # PartnerApp
+    │       └── router/ (partner_router.dart, partner_routes.dart)
     │
     ├── core/
     │   ├── network/
@@ -121,8 +121,8 @@ mobile/
     │   │       ├── providers/ (auth_controller.dart, auth_providers.dart)
     │   │       └── state/ (auth_state.dart, login_form_state.dart)
     │   │
-    │   ├── home/            # SOLO presentation: compone los providers públicos de stores,
-    │   │   │                # orders, addresses y promotions. No tiene domain ni infrastructure propios.
+    │   ├── home/            # compone los providers públicos de stores, orders, addresses y promotions.
+    │   │   │                # domain/repeat_order.dart: "Volver a pedir" (usa cart_domain, orders_domain, products_domain).
     │   │   └── presentation/
     │   │       ├── pages/home_page.dart
     │   │       └── widgets/ (home_app_bar.dart, search_entry.dart, categories_carousel.dart,
@@ -161,15 +161,17 @@ mobile/
 
 **Reglas que se hacen cumplir**
 
-- `domain/` no importa `package:flutter`, `dio`, `json_annotation` ni nada de `infrastructure/`. Se valida con un lint de imports (`custom_lint`) o con un test de arquitectura.
+- `domain/` no importa `package:flutter`, `dio`, `json_annotation` ni nada de `infrastructure/`. Lo valida `mobile/test/architecture/architecture_test.dart`.
 - Los Widgets solo leen estado y llaman métodos del controller. La lógica, como "¿esta selección de opciones es válida?" o "¿puedo agregar este producto?", vive en entidades o use cases.
 - Los repositorios devuelven `Result<T>`, nunca lanzan excepciones hacia presentation.
-- Un feature nunca importa el `domain/` ni el `infrastructure/` de otro. Si necesita datos de otro feature, consume sus **providers públicos** desde presentation (por eso `home` no tiene dominio propio).
+- Un feature nunca importa archivos internos de otro: solo sus barrels. Si necesita datos de otro feature, consume sus **providers públicos** (p. ej. `getStoreDetailProvider`), nunca su repositorio.
+- El `domain/` de un feature que usa el dominio de otro (el checkout es un carrito con dirección que produce un pedido) importa **`<feature>_domain.dart`**, que solo exporta Dart puro. Hoy existen `cart_domain`, `orders_domain`, `products_domain` y `addresses_domain`.
+- Sin ciclos entre features. Cuando dos pantallas de features distintos se necesitan (el corazón de favoritos en el detalle de un negocio, el botón de búsqueda en una categoría), las conecta el router de `apps/` con un widget o un callback.
 - **Las entidades de dominio no llevan anotaciones** de persistencia ni de serialización (Isar, Hive, `@JsonSerializable`, Drift). Si se agrega caché local, se usa un modelo propio en `infrastructure/models` con su mapper.
 - **Value objects (DDD)**: los conceptos con reglas propias (`Money`, `EmailAddress`, `Password`, `PhoneNumber`, `GeoCoordinates`, `Quantity`) son value objects inmutables. Se validan al construirse (`EmailAddress.create(raw)` devuelve `Validated<EmailAddress>`: `Valid(valor)` o `Invalid(ValueFailure)`; `Result<T>` queda para operaciones que pueden fallar por red o negocio), se comparan por valor y las entidades los usan en lugar de `String`/`int` sueltos. Los formularios validan con esos mismos value objects, así las reglas no se duplican en los Widgets. Solo se crean cuando tienen una regla real; un `name` sin restricciones sigue siendo `String`.
 - **Entidades con comportamiento**: la lógica que pertenece a una entidad vive en ella, no en un servicio aparte (p. ej. `ProductSelection.isValid`, `ProductSelection.unitPrice`, `Cart.canAdd(product)`, `Order.canBeCancelled`). Los use cases orquestan (repositorio + entidades); no reimplementan reglas.
 - **Los contratos de datasource viven en `infrastructure/`**, no en `domain/`: el dominio solo conoce el repositorio. Un repositorio existe porque agrega algo (convierte errores a `Result`, combina fuentes remota y local, maneja caché); si solo reenviaría llamadas, se replantea.
-- **Un solo barrel por feature** (`features/<feature>/<feature>.dart`) que exporta su API pública. Otros features y el router importan solo ese archivo. No se crean barrels por carpeta interna, porque esconden dependencias y facilitan imports circulares.
+- **Barrels solo en la raíz del feature**: `<feature>.dart` con su API pública, `<feature>_domain.dart` si otros dominios lo usan y, cuando hay consumidores muy distintos, entradas `<feature>_<consumidor>.dart` (`orders_customer`, `orders_staff`, `orders_infrastructure`). No se crean barrels por carpeta interna, porque esconden dependencias y facilitan imports circulares.
 - **Cada página declara `static const name`** y la navegación usa `context.goNamed(StoreDetailPage.name, pathParameters: …)`, nunca strings sueltos.
 
 ---
@@ -1130,6 +1132,14 @@ Cada paso termina con código compilando, tests verdes y un commit.
 Panel web de merchant/admin · app Apamuy Socios para negocios y repartidores (mismo proyecto Flutter, flavor `partner`; ver [OPERACION.md](OPERACION.md)) · PostGIS y zonas de cobertura · Redis (caché del catálogo, adapter de Socket.IO para varias instancias) · colas para notificaciones · Sentry/OpenTelemetry/Prometheus/Grafana/Loki · segunda ciudad.
 
 ---
+
+## Cambios v0.5 → v0.6
+
+Reorganización de `mobile/` (detalle en [mobile/REORGANIZACION_README.md](../mobile/REORGANIZACION_README.md)):
+- Las raíces de las dos apps pasan a `lib/apps/customer` y `lib/apps/partner`; la barra de navegación y la barra de compra conectada forman el `shell/` del cliente.
+- `<feature>_domain.dart` para compartir dominio entre features; ningún feature entra a archivos internos de otro.
+- `home` tiene `domain/repeat_order.dart`: la regla "home solo presentación" ya no aplicaba.
+- Las reglas de §2 las verifica `test/architecture/architecture_test.dart`.
 
 ## Cambios v0.4 → v0.5
 

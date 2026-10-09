@@ -1,6 +1,7 @@
 import 'package:apamuy/core/time/clock_provider.dart';
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/orders/domain/order.dart';
+import 'package:apamuy/features/orders/domain/order_insights.dart';
 import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
 import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
 import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';

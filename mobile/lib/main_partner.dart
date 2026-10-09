@@ -1,4 +1,4 @@
-import 'package:apamuy/app_partner/partner_app.dart';
+import 'package:apamuy/apps/partner/partner_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

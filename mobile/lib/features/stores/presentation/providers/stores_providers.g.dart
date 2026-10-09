@@ -271,11 +271,56 @@ final class StoresFamily extends $Family
 }
 
 /// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
+/// Consulta puntual de un negocio para otros features (repetir pedido, agregar rápido).
+
+@ProviderFor(getStoreDetail)
+final getStoreDetailProvider = GetStoreDetailProvider._();
+
+/// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
+/// Consulta puntual de un negocio para otros features (repetir pedido, agregar rápido).
+
+final class GetStoreDetailProvider
+    extends $FunctionalProvider<GetStoreDetail, GetStoreDetail, GetStoreDetail>
+    with $Provider<GetStoreDetail> {
+  /// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
+  /// Consulta puntual de un negocio para otros features (repetir pedido, agregar rápido).
+  GetStoreDetailProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getStoreDetailProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getStoreDetailHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetStoreDetail> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GetStoreDetail create(Ref ref) {
+    return getStoreDetail(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetStoreDetail value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetStoreDetail>(value),
+    );
+  }
+}
+
+String _$getStoreDetailHash() => r'1bf4d9708c0995f5a1ce34ee436efb695cbbc79b';
 
 @ProviderFor(storeDetail)
 final storeDetailProvider = StoreDetailFamily._();
-
-/// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
 
 final class StoreDetailProvider
     extends
@@ -285,7 +330,6 @@ final class StoreDetailProvider
           FutureOr<StoreDetail>
         >
     with $FutureModifier<StoreDetail>, $FutureProvider<StoreDetail> {
-  /// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
   StoreDetailProvider._({
     required StoreDetailFamily super.from,
     required String super.argument,
@@ -330,9 +374,7 @@ final class StoreDetailProvider
   }
 }
 
-String _$storeDetailHash() => r'5916b317057a2aae76dd6c0f13b56d11c0892eb6';
-
-/// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
+String _$storeDetailHash() => r'342e76536319b816d07c2e2f37154317dc66db9a';
 
 final class StoreDetailFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<StoreDetail>, String> {
@@ -344,8 +386,6 @@ final class StoreDetailFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
-
-  /// Distancia, delivery y ETA dependen de la ubicación de entrega actual.
 
   StoreDetailProvider call(String storeId) =>
       StoreDetailProvider._(argument: storeId, from: this);

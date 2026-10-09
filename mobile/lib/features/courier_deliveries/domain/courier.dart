@@ -1,7 +1,7 @@
 import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/result/result.dart';
-import 'package:apamuy/features/orders/domain/staff_order.dart';
+import 'package:apamuy/features/orders/orders_domain.dart';
 import 'package:equatable/equatable.dart';
 
 /// Disponibilidad del repartidor. Con un pedido en curso está [busy].

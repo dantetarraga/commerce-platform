@@ -48,7 +48,7 @@ final class RepeatOrderControllerProvider
 }
 
 String _$repeatOrderControllerHash() =>
-    r'50ba5581ff856f306b45c60845f1bcf7beb20fa8';
+    r'e33d8cce8759154bc85707e1c46f3f3c3990bfd5';
 
 /// Ejecuta "Repetir" de punta a punta: carga el negocio, rearma las líneas con
 /// [RepeatOrder] y las pone en la bolsa. El estado dice si hay uno en curso.

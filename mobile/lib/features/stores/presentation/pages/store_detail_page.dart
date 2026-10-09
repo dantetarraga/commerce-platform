@@ -1,6 +1,5 @@
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/checkout/checkout.dart';
-import 'package:apamuy/features/favorites/favorites.dart';
 import 'package:apamuy/features/products/products.dart';
 import 'package:apamuy/features/stores/domain/entities/store_detail.dart';
 import 'package:apamuy/features/stores/domain/entities/store_menu.dart';
@@ -21,12 +20,15 @@ import 'package:go_router/go_router.dart';
 
 /// El negocio tiene cara y nombre: portada, quién atiende y su menú.
 class StoreDetailPage extends ConsumerWidget {
-  const StoreDetailPage({required this.storeId, this.args = const StoreRouteArgs(), super.key});
+  const StoreDetailPage({required this.storeId, this.args = const StoreRouteArgs(), this.favorite, super.key});
 
   static const name = 'store-detail';
 
   final String storeId;
   final StoreRouteArgs args;
+
+  /// Acción de favorito sobre la foto, si la app la ofrece.
+  final Widget? favorite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,17 +40,18 @@ class StoreDetailPage extends ConsumerWidget {
         value: store,
         onRetry: () => ref.invalidate(storeDetailProvider(storeId)),
         loading: StoreDetailSkeleton(coverUrl: args.coverUrl, heroTag: args.heroTag),
-        data: (value) => _StoreContent(store: value, heroTag: args.heroTag),
+        data: (value) => _StoreContent(store: value, heroTag: args.heroTag, favorite: favorite),
       ),
     );
   }
 }
 
 class _StoreContent extends ConsumerStatefulWidget {
-  const _StoreContent({required this.store, this.heroTag});
+  const _StoreContent({required this.store, this.heroTag, this.favorite});
 
   final StoreDetail store;
   final Object? heroTag;
+  final Widget? favorite;
 
   @override
   ConsumerState<_StoreContent> createState() => _StoreContentState();
@@ -178,11 +181,7 @@ class _StoreContentState extends ConsumerState<_StoreContent> {
               if (menu case AsyncData(:final value) when !value.isEmpty)
                 PhotoAction(icon: Icons.search_rounded, tooltip: 'Buscar en el menú', onPressed: () => _openSearch(value)),
             ],
-            trailing: FavoriteButton(
-              onPhoto: true,
-              isFavorite: ref.watch(isFavoriteStoreProvider(store.id)),
-              onPressed: () => toggleFavorite(context, ref, FavoriteKind.store, store.id),
-            ),
+            trailing: widget.favorite,
             edge: StoreLogo(logoUrl: summary.logoUrl),
             edgeHeight: StoreLogo.size,
           ),

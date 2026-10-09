@@ -1,6 +1,5 @@
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/checkout/checkout.dart';
-import 'package:apamuy/features/favorites/favorites.dart';
 import 'package:apamuy/features/products/domain/entities/product.dart';
 import 'package:apamuy/features/products/domain/entities/product_selection.dart';
 import 'package:apamuy/features/products/domain/mappers/selection_to_cart_line.dart';
@@ -18,11 +17,14 @@ import 'package:go_router/go_router.dart';
 /// Detalle de producto: la foto manda, las opciones son filas claras y abajo
 /// queda fija la cantidad con "Agregar · total".
 class ProductDetailPage extends ConsumerWidget {
-  const ProductDetailPage({required this.productId, super.key});
+  const ProductDetailPage({required this.productId, this.favorite, super.key});
 
   static const name = 'product-detail';
 
   final String productId;
+
+  /// Acción de favorito sobre la foto, si la app la ofrece.
+  final Widget? favorite;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,18 +36,19 @@ class ProductDetailPage extends ConsumerWidget {
         value: product,
         onRetry: () => ref.invalidate(productDetailProvider(productId)),
         loading: const _ProductDetailSkeleton(),
-        data: (value) => _ProductContent(product: value),
+        data: (value) => _ProductContent(product: value, favorite: favorite),
       ),
     );
   }
 }
 
 class _ProductContent extends ConsumerStatefulWidget {
-  const _ProductContent({required this.product});
+  const _ProductContent({required this.product, this.favorite});
 
   static const imageHeight = 320.0;
 
   final Product product;
+  final Widget? favorite;
 
   @override
   ConsumerState<_ProductContent> createState() => _ProductContentState();
@@ -115,11 +118,7 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
             expandedHeight: _ProductContent.imageHeight,
             fallbackIcon: Icons.fastfood_rounded,
             leadingIcon: Icons.close_rounded,
-            trailing: FavoriteButton(
-              onPhoto: true,
-              isFavorite: ref.watch(isFavoriteProductProvider(product.id)),
-              onPressed: () => toggleFavorite(context, ref, FavoriteKind.product, product.id),
-            ),
+            trailing: widget.favorite,
           ),
           SliverToBoxAdapter(
             child: Padding(

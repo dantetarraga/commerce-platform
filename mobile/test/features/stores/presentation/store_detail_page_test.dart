@@ -1,4 +1,4 @@
-import 'package:apamuy/app/router/app_router.dart';
+import 'package:apamuy/apps/customer/router/app_router.dart';
 import 'package:apamuy/features/favorites/favorites.dart';
 import 'package:apamuy/features/stores/stores.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
