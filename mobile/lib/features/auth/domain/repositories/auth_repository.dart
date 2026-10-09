@@ -31,4 +31,7 @@ abstract interface class AuthRepository {
 
   /// Cierra la sesión localmente aunque el backend no responda.
   Future<void> logout();
+
+  /// Elimina la cuenta en el backend y, si lo logra, borra la sesión del teléfono.
+  Future<Result<void>> deleteAccount();
 }

@@ -1,1 +1,1 @@
-export { landingRoute } from './routes/landing.routes'
+export { accountDeletionRoute, landingRoute } from './routes/landing.routes'

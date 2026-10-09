@@ -1,3 +1,5 @@
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/utils/external_links.dart';
 import 'package:apamuy/features/auth/auth.dart';
 import 'package:apamuy/features/partner_session/domain/partner_mode.dart';
 import 'package:apamuy/features/partner_session/presentation/providers/partner_mode_providers.dart';
@@ -49,6 +51,26 @@ class _AccountSheet extends ConsumerWidget {
     if (!confirmed || !context.mounted) return;
     Navigator.of(context).pop();
     await ref.read(authSessionProvider.notifier).logout();
+  }
+
+  /// La cuenta de un socio la da de baja Apamuy junto con su negocio o sus repartos.
+  Future<void> _deleteAccount(BuildContext context, WidgetRef ref) async {
+    final support = ref.read(appEnvProvider).supportWhatsapp;
+    final contact = await showAppConfirmDialog(
+      context,
+      title: 'Eliminar tu cuenta de socio',
+      message:
+          'Tu cuenta está unida a tu negocio o a tus repartos, así que la damos de baja nosotros: '
+          'cerramos tus pedidos pendientes y borramos tus datos personales. '
+          '${support.isEmpty ? 'Escríbenos a soporte de $brandName.' : 'Escríbenos por WhatsApp y lo hacemos.'}',
+      confirmLabel: support.isEmpty ? 'Entendido' : 'Escribir por WhatsApp',
+    );
+    if (!contact || support.isEmpty) return;
+    final opened = await ExternalLinks.whatsapp(
+      support,
+      text: 'Hola, quiero eliminar mi cuenta de socio de $brandName.',
+    );
+    if (!opened && context.mounted) AppToast.show(context, 'No pudimos abrir WhatsApp.');
   }
 
   @override
@@ -125,6 +147,12 @@ class _AccountSheet extends ConsumerWidget {
             AppButton.secondary(
               label: 'Cerrar sesión',
               onPressed: () => _logout(context, ref),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            TextButton(
+              onPressed: () => _deleteAccount(context, ref),
+              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              child: const Text('Eliminar mi cuenta'),
             ),
           ],
         ),

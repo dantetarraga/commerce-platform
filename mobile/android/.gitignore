@@ -12,3 +12,6 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Firebase: cada entorno pone el suyo (ver mobile/README.md, push).
+/app/google-services.json

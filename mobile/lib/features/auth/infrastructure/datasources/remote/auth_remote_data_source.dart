@@ -21,6 +21,9 @@ abstract interface class AuthRemoteDataSource {
   Future<UserDto> updateMe({required String firstName, required String lastName, String? email});
 
   Future<void> logout(String refreshToken);
+
+  /// `DELETE /users/me`: borra los datos personales y cierra todas las sesiones.
+  Future<void> deleteAccount();
 }
 
 class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
@@ -78,4 +81,7 @@ class ApiAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<void> logout(String refreshToken) =>
       _api.post('/auth/logout', body: {'refreshToken': refreshToken});
+
+  @override
+  Future<void> deleteAccount() => _api.delete('/users/me');
 }

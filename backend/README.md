@@ -31,6 +31,10 @@ La app se conecta con `USE_FAKE_DATA: false`:
 
 En debug, Android permite `http`; iOS lo permite solo hacia la red local.
 
+### Push
+
+`PUSH_PROVIDER=log` (por defecto) escribe los avisos en el log. Para enviarlos de verdad: `PUSH_PROVIDER=fcm` y `FCM_SERVICE_ACCOUNT_BASE64` con la cuenta de servicio de Firebase en base64 (`base64 -w0 cuenta.json`). La app registra el teléfono en `PUT /users/me/devices`; ver `mobile/README.md`.
+
 ### Entrar sin SMS
 
 En desarrollo `SMS_PROVIDER=log`: el código se escribe en el log, y con

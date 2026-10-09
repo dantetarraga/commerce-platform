@@ -47,6 +47,9 @@ export const envSchema = z
       .string()
       .regex(/^MG\w{32}$/)
       .optional(),
+    PUSH_PROVIDER: z.enum(['log', 'fcm']).default('log'),
+    /** JSON de la cuenta de servicio de Firebase, en base64 (una sola línea para Railway). */
+    FCM_SERVICE_ACCOUNT_BASE64: z.string().optional(),
     /** Saltos de proxy delante de la API (Railway: 1). Sin esto, el rate limit ve una sola IP. */
     TRUST_PROXY: z.coerce.number().int().nonnegative().default(0),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -62,6 +65,19 @@ export const envSchema = z
       if (!env.TWILIO_AUTH_TOKEN) fail('TWILIO_AUTH_TOKEN', 'Requerido con SMS_PROVIDER=twilio');
       if (!env.TWILIO_FROM && !env.TWILIO_MESSAGING_SERVICE_SID) {
         fail('TWILIO_MESSAGING_SERVICE_SID', 'Configura TWILIO_MESSAGING_SERVICE_SID o TWILIO_FROM');
+      }
+    }
+    if (env.PUSH_PROVIDER === 'fcm') {
+      try {
+        const account = JSON.parse(
+          Buffer.from(env.FCM_SERVICE_ACCOUNT_BASE64 ?? '', 'base64').toString('utf8'),
+        ) as Record<string, unknown>;
+        if (!account.project_id || !account.client_email || !account.private_key) throw new Error();
+      } catch {
+        fail(
+          'FCM_SERVICE_ACCOUNT_BASE64',
+          'Requerido con PUSH_PROVIDER=fcm: la cuenta de servicio de Firebase en base64',
+        );
       }
     }
     if (env.OTP_SECRET === env.JWT_ACCESS_SECRET) fail('OTP_SECRET', 'Debe ser distinto de JWT_ACCESS_SECRET');

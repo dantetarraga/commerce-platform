@@ -14,6 +14,7 @@
 - **Tests con `mocktail`**, no mockito (`dart-generate-test-mocks` no aplica). Helpers en `test/helpers/`.
 - Textos de UI en español.
 - Paquete Dart `apamuy` (`package:apamuy/...`); raíces `ApamuyApp` y `PartnerApp`. Las claves `chaski.*` solo se conservan para migrar almacenamiento antiguo y en sus pruebas.
+- **Push** detrás de `PushMessaging` (`core/push`): Firebase en el dispositivo, `NoopPushMessaging` en tests, en el modo demo y sin `google-services.json`. El `main` de cada app lo inyecta por `overrides`. El registro del teléfono vive en `auth/presentation/providers/push_registration.dart`; lo que debe correr antes de cerrar sesión se anota en `core/session/logout_hooks.dart` (así la sesión no depende del push).
 - Términos y privacidad en `assets/legal/*.md` (Markdown); los muestra `shared/legal/legal_page.dart` en las dos apps, y un enlace `apamuy:<slug>` abre el otro texto.
 
 ## Dos apps, un proyecto

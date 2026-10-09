@@ -39,7 +39,7 @@ final class AuthSessionProvider
   AuthSession create() => AuthSession();
 }
 
-String _$authSessionHash() => r'e8fe00f40c0ee8352a44a346ce97ec2877c4a1ca';
+String _$authSessionHash() => r'6bc20c929ebd95e16f9b60fb8adbde7ad05abf56';
 
 /// Sesión actual: `AsyncLoading` al restaurarla, `AsyncData(null)` sin sesión y
 /// `AsyncData(user)` autenticado.

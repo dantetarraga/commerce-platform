@@ -583,7 +583,10 @@ model Device {
   id        String   @id @default(cuid())
   userId    String
   pushToken String   @unique
-  platform  String
+  platform  String // android, ios
+  app       String   @default("customer") // customer o partner: Socios recibe la alarma
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, app])
 }

@@ -40,3 +40,6 @@ RestoreSession restoreSession(Ref ref) => RestoreSession(ref.watch(authRepositor
 
 @riverpod
 Logout logout(Ref ref) => Logout(ref.watch(authRepositoryProvider));
+
+@riverpod
+DeleteAccount deleteAccount(Ref ref) => DeleteAccount(ref.watch(authRepositoryProvider));

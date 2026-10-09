@@ -2,7 +2,8 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppException, ErrorCode } from '../../common/exceptions/app.exception';
 import { PrismaService } from '../../database/prisma.service';
 import { Prisma } from '../../generated/prisma/client';
-import type { Role } from '../../generated/prisma/enums';
+import { Role } from '../../generated/prisma/enums';
+import { FINAL_STATUSES } from '../orders/order-list-scope';
 import type { UpdateMeDto } from './dto/update-me.dto';
 
 /** `UserDto` de la app. */
@@ -42,6 +43,52 @@ export class UsersService {
       throw new AppException(ErrorCode.UNAUTHORIZED, HttpStatus.UNAUTHORIZED, 'Inicia sesión para continuar.');
     }
     return toUserResponse(user);
+  }
+
+  /**
+   * Elimina la cuenta: borra los datos personales y la desactiva. Los pedidos se
+   * conservan sin nombre ni celular (contabilidad). Un socio o el equipo se dan de baja
+   * con Apamuy, para no dejar negocios ni repartos sin responsable.
+   */
+  async deleteMe(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: userWithRoles });
+    if (!user?.isActive) return;
+    if (user.roles.some(({ role }) => role !== Role.CUSTOMER)) {
+      throw new AppException(
+        ErrorCode.PARTNER_ACCOUNT,
+        HttpStatus.CONFLICT,
+        'Tu cuenta es de un socio de Apamuy. Escríbenos para darla de baja junto con tu negocio o tus repartos.',
+      );
+    }
+    const active = await this.prisma.order.count({
+      where: { customerId: userId, status: { notIn: FINAL_STATUSES } },
+    });
+    if (active > 0) {
+      throw new AppException(
+        ErrorCode.ACCOUNT_HAS_ACTIVE_ORDER,
+        HttpStatus.CONFLICT,
+        'Tienes un pedido en curso. Podrás eliminar tu cuenta cuando termine.',
+      );
+    }
+    await this.prisma.$transaction([
+      this.prisma.address.deleteMany({ where: { userId } }),
+      this.prisma.device.deleteMany({ where: { userId } }),
+      this.prisma.notification.deleteMany({ where: { userId } }),
+      this.prisma.refreshToken.deleteMany({ where: { userId } }),
+      this.prisma.otpChallenge.deleteMany({ where: { phone: user.phone } }),
+      // El celular queda libre: quien vuelva a registrarse con él empieza de cero.
+      this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          phone: `deleted:${userId}`,
+          email: null,
+          firstName: 'Cuenta',
+          lastName: 'eliminada',
+          avatarUrl: null,
+          isActive: false,
+        },
+      }),
+    ]);
   }
 
   async updateMe(userId: string, dto: UpdateMeDto): Promise<UserResponse> {

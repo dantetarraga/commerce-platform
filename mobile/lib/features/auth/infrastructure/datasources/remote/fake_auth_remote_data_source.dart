@@ -139,6 +139,9 @@ class FakeAuthRemoteDataSource implements AuthRemoteDataSource {
   @override
   Future<void> logout(String refreshToken) => _backend.delay();
 
+  @override
+  Future<void> deleteAccount() => _backend.delay();
+
   Map<String, Object?> _tokens(Map<String, dynamic> user) => {
     'user': user,
     'accessToken': '$_tokenPrefix${user['id']}',

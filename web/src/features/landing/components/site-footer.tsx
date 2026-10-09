@@ -11,12 +11,15 @@ export function SiteFooter() {
           <span className='text-muted-foreground text-sm'>· Hecho en Espinar</span>
         </div>
         <nav aria-label='Pie de página' className='text-muted-foreground flex gap-6 text-sm'>
-          <a href='#negocios' className='hover:text-foreground'>
+          <a href='/#negocios' className='hover:text-foreground'>
             Negocios
           </a>
-          <a href='#repartidores' className='hover:text-foreground'>
+          <a href='/#repartidores' className='hover:text-foreground'>
             Repartidores
           </a>
+          <Link to='/account-deletion' className='hover:text-foreground'>
+            Eliminar cuenta
+          </Link>
           <Link to='/login' className='hover:text-foreground'>
             Ingresar al panel
           </Link>

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../common/decorators/auth.decorators';
@@ -14,6 +14,13 @@ export class UsersController {
   @Get('me')
   me(@CurrentUser() user: AuthUser) {
     return this.users.me(user.id);
+  }
+
+  /** Elimina la cuenta del cliente. 409 si tiene un pedido en curso o es socio. */
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteMe(@CurrentUser() user: AuthUser) {
+    return this.users.deleteMe(user.id);
   }
 
   @Patch('me')

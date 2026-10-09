@@ -86,6 +86,13 @@ class AuthRepositoryImpl implements AuthRepository {
     await guard(() => _remote.logout(tokens.refreshToken));
   }
 
+  @override
+  Future<Result<void>> deleteAccount() async {
+    final result = await guard(_remote.deleteAccount);
+    if (result is Ok<void>) await _tokenStorage.clear();
+    return result;
+  }
+
   Future<Result<AuthUser?>> _clearAndReturnNull() async {
     await _tokenStorage.clear();
     return const Result.ok(null);

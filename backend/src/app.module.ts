@@ -21,6 +21,7 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 import { CouriersModule } from './modules/couriers/couriers.module';
 import { HealthModule } from './modules/health/health.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
+import { PushModule } from './modules/push/push.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { MerchantModule } from './modules/merchant/merchant.module';
 import { OrdersModule } from './modules/orders/orders.module';
@@ -91,6 +92,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     MerchantModule,
     CouriersModule,
     MaintenanceModule,
+    PushModule,
     NotificationsModule,
     AddressesModule,
   ],

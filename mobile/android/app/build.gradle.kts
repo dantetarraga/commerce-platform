@@ -6,6 +6,13 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Push (FCM): un solo google-services.json con las dos apps del proyecto de Firebase
+// (pe.apamuy.app y pe.apamuy.socios), ignorado por git. Sin él, la app compila igual
+// y simplemente no recibe push.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // La key de Google Maps vive en android/local.properties (ignorado por git).
 val localProperties = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
@@ -19,6 +26,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications usa APIs de java.time.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -69,4 +78,8 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

@@ -130,6 +130,26 @@ Cualquier otro celular entra a la app del cliente creando una cuenta nueva. El b
 
 Con un solo teléfono puedes usar el emulador para una app y el celular para la otra (cada uno con su archivo de `env/`).
 
+## Push (Firebase)
+
+Sin configurar Firebase, las dos apps compilan y funcionan igual, solo que sin push.
+
+1. En la consola de Firebase, crea un proyecto con dos apps Android: `pe.apamuy.app` (cliente) y `pe.apamuy.socios` (Socios).
+2. Descarga **un** `google-services.json` (trae las dos apps) y ponlo en `android/app/google-services.json`. Git lo ignora; Gradle activa el plugin solo si existe.
+3. En el backend, `PUSH_PROVIDER=fcm` y `FCM_SERVICE_ACCOUNT_BASE64` con la cuenta de servicio (Configuración del proyecto → Cuentas de servicio → Generar clave), en base64.
+4. El modo demo (`env/fake.json`) nunca usa push.
+
+Qué llega:
+
+| A quién | Cuándo | Cómo |
+|---|---|---|
+| Cliente | Cada cambio de su pedido (el mismo aviso de la app) | Notificación del sistema; al tocarla abre el seguimiento |
+| Negocio (Socios) | Pedido nuevo | **Alarma** que suena en bucle con el sonido `new_order` (canal `order_alarm`), aunque la app esté cerrada. Vence a los 8 minutos, cuando Apamuy cancela el pedido |
+| Negocio (Socios) | El cliente o Apamuy cancelaron | Notificación: "no lo prepares" |
+| Repartidores libres de la ciudad | Pedido listo para recoger | Notificación; al tocarla abre Reparto |
+
+Al cerrar sesión, el teléfono deja de recibir avisos de esa cuenta.
+
 ## Compilar un APK
 
 ```sh

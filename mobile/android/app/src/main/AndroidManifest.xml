@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- La app habla con la API: sin esto, un build de release no tiene red. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Push (Android 13+). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Ubicación para proponer la dirección de entrega. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -35,6 +37,10 @@
             android:value="${mapsApiKey}" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <!-- Canal de los avisos que muestra el sistema (lo crea la app: PushChannels). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="orders" />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

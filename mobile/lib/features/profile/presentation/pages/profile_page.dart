@@ -1,5 +1,6 @@
 import 'package:apamuy/core/config/theme_mode_provider.dart';
 import 'package:apamuy/core/domain/phone_number.dart';
+import 'package:apamuy/core/result/result.dart';
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/addresses/addresses.dart';
 import 'package:apamuy/features/auth/auth.dart';
@@ -34,6 +35,29 @@ class ProfilePage extends ConsumerWidget {
     );
     // El router redirige a la entrada cuando la sesión queda vacía.
     if (confirmed) await ref.read(authSessionProvider.notifier).logout();
+  }
+
+  /// Google Play exige poder eliminar la cuenta desde la app.
+  Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showAppConfirmDialog(
+      context,
+      title: '¿Eliminar tu cuenta?',
+      message:
+          'Borramos tu nombre, celular, correo, direcciones y avisos, y se cierra la sesión en todos tus '
+          'teléfonos. Tus pedidos pasados se guardan sin tus datos, por contabilidad. No se puede deshacer.',
+      confirmLabel: 'Eliminar cuenta',
+      destructive: true,
+    );
+    if (!confirmed) return;
+    final result = await ref.read(authSessionProvider.notifier).deleteAccount();
+    if (!context.mounted) return;
+    // Si se eliminó, el router lleva a la entrada; si no, el backend dice por qué.
+    switch (result) {
+      case Ok():
+        AppToast.show(context, 'Eliminamos tu cuenta. Gracias por pedir con Apamuy.', kind: AppToastKind.success);
+      case Err(:final failure):
+        AppToast.show(context, failure.message, kind: AppToastKind.error);
+    }
   }
 
   Future<void> _pickTheme(BuildContext context, WidgetRef ref, ThemeMode current) async {
@@ -171,6 +195,13 @@ class ProfilePage extends ConsumerWidget {
               icon: Icons.logout_rounded,
               expand: true,
               onPressed: () => _confirmLogout(context, ref),
+            ),
+            Center(
+              child: TextButton(
+                onPressed: () => _confirmDeleteAccount(context, ref),
+                style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+                child: const Text('Eliminar mi cuenta'),
+              ),
             ),
             const SizedBox(height: AppSpacing.xl),
             Center(

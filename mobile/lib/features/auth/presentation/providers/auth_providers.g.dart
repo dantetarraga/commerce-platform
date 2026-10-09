@@ -343,3 +343,44 @@ final class LogoutProvider extends $FunctionalProvider<Logout, Logout, Logout>
 }
 
 String _$logoutHash() => r'a5225faea49ec17d4b0131a4d0778c40edc173c4';
+
+@ProviderFor(deleteAccount)
+final deleteAccountProvider = DeleteAccountProvider._();
+
+final class DeleteAccountProvider
+    extends $FunctionalProvider<DeleteAccount, DeleteAccount, DeleteAccount>
+    with $Provider<DeleteAccount> {
+  DeleteAccountProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deleteAccountProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deleteAccountHash();
+
+  @$internal
+  @override
+  $ProviderElement<DeleteAccount> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DeleteAccount create(Ref ref) {
+    return deleteAccount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DeleteAccount value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DeleteAccount>(value),
+    );
+  }
+}
+
+String _$deleteAccountHash() => r'414ae85a96688cbacf16e645bdca3bc325cbbd00';
