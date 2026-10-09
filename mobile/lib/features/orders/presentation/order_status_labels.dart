@@ -68,3 +68,7 @@ extension OrderStepTitles on Order {
 /// Los cuatro pasos de la portada del pedido activo, por índice de
 /// `Order.activeStep`.
 const activeStepLabels = ['Confirmado', 'Preparando', 'En camino', 'Llegando'];
+
+/// Los pasos de [status]: el primero dice "Recibido" hasta que el negocio lo acepta.
+List<String> activeStepLabelsFor(OrderStatus status) =>
+    status == OrderStatus.received ? ['Recibido', ...activeStepLabels.skip(1)] : activeStepLabels;

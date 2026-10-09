@@ -124,7 +124,7 @@ class ActiveOrderCover extends ConsumerWidget {
             const SizedBox(height: 14),
             StepTrail(
               step: step,
-              labels: activeStepLabels,
+              labels: activeStepLabelsFor(order.status),
               times: [
                 _time(OrderStatus.confirmed) ?? _time(OrderStatus.received),
                 _time(OrderStatus.preparing),

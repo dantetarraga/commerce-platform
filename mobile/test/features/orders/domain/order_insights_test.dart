@@ -69,6 +69,9 @@ void main() {
     expect(order(OrderStatus.onTheWay, eta: now.add(const Duration(minutes: 10))).activeStep(now), 2);
     expect(order(OrderStatus.onTheWay, eta: now.add(const Duration(minutes: 2))).activeStep(now), 3);
     expect(activeStepLabels[order(OrderStatus.delivered).activeStep(now)], 'Llegando');
+    // Hasta que el negocio lo acepta, el primer paso dice "Recibido".
+    expect(activeStepLabelsFor(OrderStatus.received).first, 'Recibido');
+    expect(activeStepLabelsFor(OrderStatus.confirmed).first, 'Confirmado');
   });
 
   test('iniciales del repartidor y etapas del estado', () {
