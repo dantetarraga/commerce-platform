@@ -1,4 +1,5 @@
 import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/core/config/city_area.dart';
 import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/maps/location_service.dart';
 import 'package:equatable/equatable.dart';
@@ -29,7 +30,7 @@ class CurrentDeliveryLocation extends _$CurrentDeliveryLocation {
   Future<void> useGpsIfAllowed() async {
     final reading = await ref.read(locationServiceProvider).current(ask: false);
     if (state.coordinates != cityCenter) return;
-    if (reading case LocationFix(:final coordinates) when isInCoverage(coordinates)) {
+    if (reading case LocationFix(:final coordinates) when ref.read(currentCityAreaProvider).contains(coordinates)) {
       state = DeliveryLocation(label: 'Tu ubicación', coordinates: coordinates);
     }
   }

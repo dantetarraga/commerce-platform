@@ -63,7 +63,7 @@ void main() {
   testWidgets('mover el mapa llena la calle, pero no pisa lo que escribió el usuario', (tester) async {
     final geocoding = _MockGeocodingService();
     when(() => geocoding.streetAt(any())).thenAnswer((_) async => 'Jr. Bolognesi 305');
-    when(() => geocoding.find(any())).thenAnswer((_) async => null);
+    when(() => geocoding.find(any(), within: any(named: 'within'))).thenAnswer((_) async => null);
     await _pumpForm(tester, geocoding: geocoding);
     final street = find.byType(TextFormField).first;
 
@@ -73,7 +73,7 @@ void main() {
 
     await tester.enterText(street, 'Av. Garcilaso 120');
     await tester.pump(const Duration(seconds: 1));
-    verify(() => geocoding.find('Av. Garcilaso 120')).called(1);
+    verify(() => geocoding.find('Av. Garcilaso 120', within: any(named: 'within'))).called(1);
     await tester.drag(find.byType(NeighborhoodPlan), const Offset(40, 0));
     await tester.pumpAndSettle();
     expect(find.descendant(of: street, matching: find.text('Av. Garcilaso 120')), findsOneWidget);

@@ -15,7 +15,8 @@ abstract interface class GeocodingService {
   Future<String?> streetAt(GeoCoordinates point);
 
   /// Dónde queda [street] dentro de la zona de reparto, o `null`.
-  Future<GeoCoordinates?> find(String street);
+  /// El primer resultado que cumple [within] (la zona de reparto).
+  Future<GeoCoordinates?> find(String street, {required bool Function(GeoCoordinates) within});
 }
 
 /// El geocodificador del sistema (en Android, el de Google): sin key ni costo.
@@ -43,12 +44,12 @@ final class PlatformGeocodingService implements GeocodingService {
   }
 
   @override
-  Future<GeoCoordinates?> find(String street) async {
+  Future<GeoCoordinates?> find(String street, {required bool Function(GeoCoordinates) within}) async {
     try {
       final found = await _geocoding.locationFromAddress('$street, $cityName, Espinar, Cusco, Perú');
       for (final location in found) {
         final point = GeoCoordinates.trusted(location.latitude, location.longitude);
-        if (isInCoverage(point)) return point;
+        if (within(point)) return point;
       }
     } on Object {
       // Igual que arriba: se mueve el mapa a mano.
@@ -65,7 +66,7 @@ final class NoGeocodingService implements GeocodingService {
   Future<String?> streetAt(GeoCoordinates point) async => null;
 
   @override
-  Future<GeoCoordinates?> find(String street) async => null;
+  Future<GeoCoordinates?> find(String street, {required bool Function(GeoCoordinates) within}) async => null;
 }
 
 @Riverpod(keepAlive: true)

@@ -45,7 +45,7 @@ final class CurrentDeliveryLocationProvider
 }
 
 String _$currentDeliveryLocationHash() =>
-    r'373433f641b1724c7f5de03e8fc48b036cf7c4b2';
+    r'052637332784a09c7f7ed185d1a9a642ec189cca';
 
 /// La dirección seleccionada en `addresses`; sin ella, el GPS y si no, la plaza.
 

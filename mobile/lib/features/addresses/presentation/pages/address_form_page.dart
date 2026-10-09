@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:apamuy/core/config/city.dart';
+import 'package:apamuy/core/config/city_area.dart';
 import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/maps/delivery_location.dart';
 import 'package:apamuy/core/maps/geocoding_service.dart';
@@ -25,6 +26,9 @@ class AddressFormPage extends ConsumerStatefulWidget {
 }
 
 class _AddressFormPageState extends ConsumerState<AddressFormPage> {
+  /// La zona de reparto que el admin define en Ciudades (la misma que valida el backend).
+  bool _inArea(GeoCoordinates point) => ref.read(currentCityAreaProvider).contains(point);
+
   final _formKey = GlobalKey<FormState>();
   final _street = TextEditingController();
   final _reference = TextEditingController();
@@ -63,14 +67,14 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
     if (!mounted) return;
     setState(() => _locating = false);
     final (String? message, String? action) = switch (reading) {
-      LocationFix(:final coordinates) when isInCoverage(coordinates) => (null, null),
+      LocationFix(:final coordinates) when _inArea(coordinates) => (null, null),
       LocationFix() => ('Tu ubicación está fuera de $cityName. Mueve el mapa hasta tu puerta.', null),
       LocationOff() => ('Activa la ubicación del teléfono para encontrarte.', 'Activar'),
       LocationDenied(forever: true) => ('Da permiso de ubicación a Apamuy en Ajustes.', 'Ajustes'),
       LocationDenied() => quiet ? (null, null) : ('Sin permiso de ubicación. Mueve el mapa hasta tu puerta.', null),
       LocationUnavailable() => quiet ? (null, null) : ('No pudimos encontrarte. Mueve el mapa hasta tu puerta.', null),
     };
-    if (reading case LocationFix(:final coordinates) when isInCoverage(coordinates)) {
+    if (reading case LocationFix(:final coordinates) when _inArea(coordinates)) {
       setState(() => _focus = coordinates);
     }
     if (message != null) {
@@ -105,7 +109,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
     _findDebounce?.cancel();
     if (value == _autoStreet || value.trim().length < StreetLine.minLength) return;
     _findDebounce = Timer(const Duration(milliseconds: 900), () async {
-      final point = await ref.read(geocodingServiceProvider).find(value);
+      final point = await ref.read(geocodingServiceProvider).find(value, within: _inArea);
       if (mounted && point != null && _street.text == value) setState(() => _focus = point);
     });
   }
@@ -121,7 +125,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!isInCoverage(_door)) {
+    if (!_inArea(_door)) {
       AppToast.show(context, 'Ese punto está fuera de la zona de reparto de $cityName.', kind: AppToastKind.error);
       return;
     }
@@ -164,7 +168,7 @@ class _AddressFormPageState extends ConsumerState<AddressFormPage> {
                 focus: _focus,
                 seed: _seed,
                 height: mapHeight,
-                hint: isInCoverage(_door) ? 'Mueve el mapa hasta tu puerta' : 'Fuera de la zona de reparto',
+                hint: _inArea(_door) ? 'Mueve el mapa hasta tu puerta' : 'Fuera de la zona de reparto',
                 onCenter: _onCenter,
               ),
               SafeArea(
