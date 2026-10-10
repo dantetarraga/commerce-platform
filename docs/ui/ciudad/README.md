@@ -1,4 +1,4 @@
-# Chaski · Ciudad en movimiento
+# Apamuy · Ciudad en movimiento
 
 Rediseño implementado en Flutter. [Dirección artística y diagnóstico](../../DIRECCION_VISUAL.md).
 

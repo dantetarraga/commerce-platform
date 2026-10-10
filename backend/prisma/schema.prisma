@@ -1,4 +1,4 @@
-// Schema inicial completo de Chaski (ver docs/ARQUITECTURA.md §4).
+// Schema inicial completo de Apamuy (ver docs/ARQUITECTURA.md §4).
 // La primera migración crea todas las tablas aunque los módulos se implementen
 // por fase. El contrato real es el de la app (mobile/lib/features/*/infrastructure).
 

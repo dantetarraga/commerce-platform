@@ -2,3 +2,6 @@
 # Capturas de pantalla generadas por los tests: se quedan en local, no se versionan.
 docs/ui/**/*.png
 docs/onboarding/*.png
+
+# Variables locales (contraseña del Postgres de docker-compose).
+.env

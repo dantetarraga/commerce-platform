@@ -1,6 +1,6 @@
-# Chaski
+# Apamuy
 
-Monorepo de una app de delivery para Espinar (Cusco): `backend/` (NestJS + Prisma), `mobile/` (Flutter, app del cliente), `docs/`.
+Monorepo de una app de delivery para Espinar (Cusco): `backend/` (NestJS + Prisma), `mobile/` (Flutter, app del cliente y Apamuy Socios), `web/` (React, panel Admin y Portal Socios), `docs/`.
 
 - Diseño y decisiones: `docs/ARQUITECTURA.md`. Qué falta: `docs/PENDIENTES.md`.
 - Textos para el usuario, mensajes de error y docs en **español**. Identificadores y código en inglés.

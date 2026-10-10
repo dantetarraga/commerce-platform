@@ -1,7 +1,7 @@
 /** Entorno de los tests e2e. Nunca apunta a la base de desarrollo. */
 export const TEST_ENV = {
   NODE_ENV: 'test',
-  DATABASE_URL: process.env.TEST_DATABASE_URL ?? 'postgresql://chaski:chaski@localhost:5433/chaski_test',
+  DATABASE_URL: process.env.TEST_DATABASE_URL ?? 'postgresql://apamuy:apamuy@localhost:5433/apamuy_test',
   JWT_ACCESS_SECRET: 'test-secret-test-secret-test-secret-123',
   OTP_SECRET: 'test-otp-secret-test-otp-secret-12345',
   OTP_DEV_CODE: '123456',

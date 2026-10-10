@@ -1155,7 +1155,7 @@ La app Flutter se construyó antes que el backend y su contrato (los `Api*Remote
 - **Endpoints nuevos**: `/discovery/local-products`, `/discovery/popular-searches` (tabla `PopularSearch` con términos curados; el conteo de negocios se calcula) y `GET /cities`. `/promotions` y `/categories` devuelven arrays. `lat`/`lng` son opcionales en todo el catálogo: sin ellos se usa el centro de la ciudad.
 - **Direcciones**: por ahora en el dispositivo; `Address` queda en el schema con `kind`/`label`/`street` para la sincronización futura.
 - **Stack**: NestJS 11, Prisma 7 (generador `prisma-client` en CommonJS, `@prisma/adapter-pg`, URL en `prisma.config.ts`). Búsqueda con `immutable_unaccent()` + índices GIN de trigramas creados en la migración inicial. Postgres de desarrollo en el puerto 5433 (`docker-compose.yml`).
-- **Tests e2e**: corren contra `chaski_test`, que se migra con `migrate deploy`, se vacía y se siembra en cada corrida.
+- **Tests e2e**: corren contra `apamuy_test`, que se migra con `migrate deploy`, se vacía y se siembra en cada corrida.
 
 ## Cambios v0.3 → v0.4
 

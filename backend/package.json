@@ -1,7 +1,7 @@
 {
-  "name": "chaski-backend",
+  "name": "apamuy-backend",
   "version": "0.0.1",
-  "description": "API de Chaski (NestJS + Prisma + PostgreSQL)",
+  "description": "API de Apamuy (NestJS + Prisma + PostgreSQL)",
   "author": "",
   "private": true,
   "license": "UNLICENSED",

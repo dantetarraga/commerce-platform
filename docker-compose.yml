@@ -1,21 +1,20 @@
-# Desarrollo local: Postgres 16 en el puerto 5433 (el 5432 suele estar ocupado
-# por un Postgres instalado en la máquina). La API corre fuera de Docker con
-# `npm run start:dev` desde backend/.
+name: apamuy
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: chaski-postgres
+    container_name: apamuy-postgres
     environment:
-      POSTGRES_USER: chaski
-      POSTGRES_PASSWORD: chaski
-      POSTGRES_DB: chaski
+      POSTGRES_USER: ${POSTGRES_USER:-apamuy}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-apamuy}
+      POSTGRES_DB: ${POSTGRES_DB:-apamuy}
     ports:
-      - "5433:5432"
+      # Solo desde esta máquina, no desde la red local.
+      - '127.0.0.1:5433:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U chaski -d chaski"]
+      test: ['CMD-SHELL', 'pg_isready -U apamuy -d apamuy']
       interval: 5s
       timeout: 3s
       retries: 10

@@ -1,6 +1,6 @@
-# Chaski · backend
+# Apamuy · backend
 
-API REST de Chaski: NestJS 11 (monolito modular) + Prisma 7 + PostgreSQL 16.
+API REST de Apamuy: NestJS 11 (monolito modular) + Prisma 7 + PostgreSQL 16.
 
 El contrato lo define la app: los `Api*RemoteDataSource` y los datasources fake de
 `mobile/lib/features/*/infrastructure` devuelven el mismo JSON que esta API.
@@ -49,7 +49,7 @@ pide nombre y apellido.
 |---|---|
 | `npm run start:dev` | API con recarga |
 | `npm test` | unit tests |
-| `npm run test:e2e` | e2e contra `chaski_test` (se migra, se vacía y se siembra en cada corrida) |
+| `npm run test:e2e` | e2e contra `apamuy_test` (se migra, se vacía y se siembra en cada corrida) |
 | `npm run lint` / `npm run typecheck` | ESLint + Prettier / TypeScript |
 | `npm run db:migrate` | crea y aplica una migración nueva en desarrollo |
 | `npm run db:seed` | siembra (idempotente, upsert por ID) |

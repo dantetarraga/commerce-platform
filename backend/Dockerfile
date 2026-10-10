@@ -1,5 +1,5 @@
-# API de Chaski para producción (Railway u otro host con Docker).
-# Build: docker build -t chaski-api backend/
+# API de Apamuy para producción (Railway u otro host con Docker).
+# Build: docker build -t apamuy-api backend/
 
 FROM node:24-alpine AS build
 WORKDIR /app

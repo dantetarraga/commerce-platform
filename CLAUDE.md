@@ -1,6 +1,6 @@
 # Apamuy
 
-La marca es **Apamuy** ("tráelo" en quechua); la app de negocios y repartidores es **Apamuy Socios**. El código conserva el nombre interno `chaski` (paquete Dart, carpetas, repo): no se renombra.
+La marca es **Apamuy** ("tráelo" en quechua); la app de negocios y repartidores es **Apamuy Socios**. El nombre interno `chaski` solo queda en la carpeta raíz del proyecto.
 
 Monorepo de una app de delivery para Espinar (Cusco): `backend/` (NestJS + Prisma), `mobile/` (Flutter, app del cliente), `web/` (React, panel Admin y Portal Socios: ver `docs/PANEL_WEB.md`), `docs/`.
 

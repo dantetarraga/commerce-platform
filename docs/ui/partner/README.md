@@ -1,4 +1,4 @@
-# Interfaz de Chaski Socios
+# Interfaz de Apamuy Socios
 
 La tienda prioriza los pedidos que necesitan respuesta, conserva el acceso a preparación, reparto y resumen diario, y permite buscar y filtrar productos por disponibilidad. En tablet, los pedidos se distribuyen en dos columnas si el tamaño del texto lo permite.
 

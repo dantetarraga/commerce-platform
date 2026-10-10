@@ -35,7 +35,7 @@ const VALID_FROM = new Date('2026-01-01T00:00:00Z');
 const VALID_UNTIL = new Date('2030-12-31T23:59:59Z');
 
 const DEMO_CUSTOMER = { id: 'usr_demo_customer', phone: '984123456', firstName: 'Alex', lastName: 'Quispe' };
-const ADMIN = { id: 'usr_admin', phone: '900000001', firstName: 'Admin', lastName: 'Chaski' };
+const ADMIN = { id: 'usr_admin', phone: '900000001', firstName: 'Admin', lastName: 'Apamuy' };
 const COURIERS = [
   {
     id: 'usr_courier_luis',

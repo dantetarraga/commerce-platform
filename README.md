@@ -1,6 +1,6 @@
 # Apamuy
 
-> Apamuy es "tráelo" en quechua. El código usa el nombre interno `chaski` (paquete Dart, carpetas y repo).
+> Apamuy es "tráelo" en quechua. El nombre interno `chaski` solo queda en la carpeta raíz del proyecto.
 
 > App de delivery multi-negocio (restaurantes, tiendas, farmacias) pensada para una ciudad pequeña y preparada para escalar a varias ciudades.
 

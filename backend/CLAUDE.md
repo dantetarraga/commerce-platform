@@ -22,7 +22,7 @@ Los endpoints y el JSON salen de `mobile/lib/features/*/infrastructure` (datasou
 docker compose up -d        # desde la raíz: Postgres en localhost:5433
 npm run start:dev
 npm test                    # unit
-npm run test:e2e            # contra chaski_test (migrate deploy + truncate + seed)
+npm run test:e2e            # contra apamuy_test (migrate deploy + truncate + seed)
 npm run lint && npm run typecheck
 npm run db:migrate          # nueva migración en desarrollo
 ```
