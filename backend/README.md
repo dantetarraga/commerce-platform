@@ -137,34 +137,37 @@ del seed (código `123456`):
 
 ## Despliegue en Railway
 
-La imagen sale de `Dockerfile` y Railway la configura con `railway.toml`
-(migraciones en `preDeployCommand`, health check en `/api/v1/health`).
+La infraestructura está en `.railway/railway.ts` (Infrastructure as Code de
+Railway): el servicio `api` (este `Dockerfile`, migraciones en el pre-deploy,
+health check en `/api/v1/health`), la base `postgres` y las variables. Railway
+retiró `railway.toml` para servicios nuevos.
 
-1. **Proyecto:** en Railway, *New Project → Deploy from GitHub repo* (el repo
-   tiene que estar en GitHub). En el servicio de la API: *Settings → Root
-   Directory* = `/backend` y *Config File* = `/backend/railway.toml`.
-2. **Base de datos:** *New → Database → PostgreSQL*. En las variables de la
-   API, `DATABASE_URL` = `${{Postgres.DATABASE_URL}}`.
-3. **Variables de la API:**
+1. **CLI:** `npm i -g @railway/cli` (5.42.1 o más nueva) y `railway login`.
+   En Railway, dale acceso a GitHub al repo `dantetarraga/commerce-platform`.
+2. **Proyecto:** crea un proyecto vacío en Railway y, desde la raíz del repo,
+   `railway link`.
+3. **Aplicar:** en `.railway/`, `npm install`; luego `railway config plan`
+   para ver los cambios y `railway config apply` para crearlos.
+4. **Secretos:** el archivo los declara con `preserve()`, así que se cargan
+   una vez en *Variables* del servicio `api` y se conservan en cada apply:
 
    | Variable | Valor |
    |---|---|
-   | `NODE_ENV` | `production` |
    | `JWT_ACCESS_SECRET`, `OTP_SECRET` | dos valores distintos de 48+ caracteres: `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"` |
-   | `SMS_PROVIDER` | `twilio` |
    | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | de la consola de Twilio |
-   | `TWILIO_MESSAGING_SERVICE_SID` (o `TWILIO_FROM`) | el Messaging Service o el número remitente |
-   | `TRUST_PROXY` | `1` |
-   | `LOG_LEVEL` | `info` |
+   | `TWILIO_MESSAGING_SERVICE_SID` | el Messaging Service (`MG…`) |
+   | `FCM_SERVICE_ACCOUNT_BASE64` | la cuenta de servicio de Firebase en base64 |
 
    Railway pone `PORT` solo. Si falta o está mal una variable, la API no
-   arranca y el log dice cuál.
-4. **Dominio:** *Settings → Networking → Generate Domain*. Revisa
+   arranca y el log dice cuál. Una variable nueva se agrega también en
+   `railway.ts`: lo que no está en el archivo, el apply lo borra.
+5. **Dominio:** *Settings → Networking → Generate Domain* (el dominio de
+   Railway no se declara en `railway.ts`). Revisa
    `https://<dominio>/api/v1/health`.
-5. **Datos iniciales (opcional):** el seed de Espinar se corre desde tu
+6. **Datos iniciales (opcional):** el seed de Espinar se corre desde tu
    máquina contra la URL pública de la base:
    `DATABASE_URL="<URL pública de Postgres>" npm run db:seed`.
-6. **App:** un `env/prod.json` con `USE_FAKE_DATA: false` y
+7. **App:** un `env/prod.json` con `USE_FAKE_DATA: false` y
    `API_BASE_URL: https://<dominio>/api/v1`.
 
 **Twilio:** una cuenta de prueba solo envía a números verificados en la

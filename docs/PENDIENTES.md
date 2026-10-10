@@ -16,7 +16,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 | App (`mobile/`) | Flujo completo del cliente contra la API o en modo demo. Dirección con mapa, GPS y pin; zona de reparto; seguimiento en vivo con la moto en el mapa; push; eliminar la cuenta. Solo contraentrega. **Apamuy Socios** (flavor `partner`): negocio y repartidor en vivo, alarma con la app cerrada, ruta en Google Maps. Versión release probada (firma configurable, reglas de R8) | Mapa en iOS, ubicación del repartidor con la app cerrada |
 | Backend (`backend/`) | Auth OTP, catálogo, pedidos, operación de negocio y repartidor, cancelación (manual y automática), avisos in-app y push (FCM), direcciones, eliminar la cuenta, WebSocket en `/ws`. Admin: socios, catálogo, marketing, ciudades, pedidos en vivo, caja. Portal Socios: catálogo propio, reportes y rendición | Imágenes, cookie httpOnly para la web |
 | Web (`web/`) | Landing con `/privacy`, `/terms` y `/account-deletion`. Admin: métricas, usuarios, pedidos en vivo, socios, catálogo, marketing, ciudades, caja. Portal Socios: inicio del día, mi tienda, menú, reportes, rendición | Subida de fotos, editor de variantes, mapa de repartidores |
-| Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend, web, imagen Docker, APK release de ambas apps), Dockerfile y `railway.toml` | Crear el proyecto en Railway; secretos de Firebase y de la llave en el CI; imagen más liviana (~800 MB); Redis con más de una instancia |
+| Infra | Postgres de desarrollo (`docker-compose.yml`), CI (backend, web, imagen Docker, APK release de ambas apps), Dockerfile e infraestructura de Railway en `.railway/railway.ts` | Crear el proyecto en Railway; secretos de Firebase y de la llave en el CI; imagen más liviana (~800 MB); Redis con más de una instancia |
 
 ## 1. Bloquea el lanzamiento
 
@@ -26,7 +26,7 @@ Estado al 2026-10-09. Complementa [ARQUITECTURA.md](ARQUITECTURA.md), [OPERACION
 | Firma y publicación | ✅ Firma con `android/key.properties`, reglas de R8 y el sonido de la alarma conservado (`res/raw/keep.xml`; sin él la alarma fallaba en release). Falta crear la llave de subida, `env/prod.json` con la URL HTTPS y la ficha en Play Console (ver `mobile/README.md`) |
 | Firebase | ✅ Push hecho y probado en debug y release. Falta `FCM_SERVICE_ACCOUNT_BASE64` en Railway y el secreto `GOOGLE_SERVICES_JSON_BASE64` en el CI |
 | Privacidad y eliminación | ✅ `/privacy`, `/terms` y `/account-deletion` en la web, con el mismo texto que las apps (un test avisa si se separan). Falta declararlas en Google Play |
-| Twilio y Railway | Crear las cuentas. El código ya está listo (`SMS_PROVIDER=twilio`, `railway.toml`) |
+| Twilio y Railway | Crear las cuentas. El código ya está listo (`SMS_PROVIDER=twilio`, `.railway/railway.ts`) |
 | Legal | Términos y privacidad en borrador (Ley 29733), ya al día con push y eliminación de cuenta. Falta la revisión de un abogado y completar los datos entre corchetes |
 
 ## 2. Para operar bien
