@@ -9,6 +9,21 @@ import 'package:apamuy/shared/maps/illustrated_delivery_map.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+/// Más allá de esto, encuadrar negocio y puerta mostraría la región y no las calles.
+const _farKm = 3.0;
+
+/// Con el negocio y la puerta lejos, la cámara va a la calle de lo que importa
+/// ahora: la moto si ya salió, el negocio mientras se prepara y la puerta al final.
+/// `null` si están cerca y conviene encuadrar los dos.
+@visibleForTesting
+MapCoordinate? farFocus(DeliveryMapData data, {required MapCoordinate store, required MapCoordinate destination}) {
+  const kmPerDegree = 111.32;
+  final dLat = (store.latitude - destination.latitude) * kmPerDegree;
+  final dLng = (store.longitude - destination.longitude) * kmPerDegree * math.cos(store.latitude * math.pi / 180);
+  if (math.sqrt(dLat * dLat + dLng * dLng) <= _farKm) return null;
+  return data.courier ?? (data.estimatedProgress >= 0.5 ? destination : store);
+}
+
 /// Seguimiento sobre Google Maps: el negocio, tu puerta y, mientras va en
 /// camino, la moto. Sin coordenadas cae al recorrido ilustrado.
 class GoogleDeliveryMapAdapter implements DeliveryMapAdapter {
@@ -87,8 +102,12 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
       if (size != null) await controller.moveCamera(CameraUpdate.newCameraPosition(_fitted(size)));
       return;
     }
-    final points = [widget.store, widget.destination, ?widget.data.courier];
     _framedCourier = widget.data.courier != null;
+    if (_farFocus() case final focus?) {
+      await _move(controller, CameraUpdate.newLatLngZoom(_latLng(focus), _streetZoom));
+      return;
+    }
+    final points = [widget.store, widget.destination, ?widget.data.courier];
     final south = points.map((p) => p.latitude).reduce((a, b) => a < b ? a : b);
     final north = points.map((p) => p.latitude).reduce((a, b) => a > b ? a : b);
     final west = points.map((p) => p.longitude).reduce((a, b) => a < b ? a : b);
@@ -131,9 +150,14 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
 
   static const _compactPadding = EdgeInsets.fromLTRB(12, 40, 40, 8);
 
+  static const _streetZoom = 15.0;
+
+  MapCoordinate? _farFocus() => farFocus(widget.data, store: widget.store, destination: widget.destination);
+
   /// Cámara que encuadra el negocio, la puerta y la moto en un mapa de [size],
   /// calculada a mano (Web Mercator) con margen para los marcadores.
   CameraPosition _fitted(Size size) {
+    if (_farFocus() case final focus?) return CameraPosition(target: _latLng(focus), zoom: _streetZoom);
     final points = [widget.store, widget.destination, ?widget.data.courier];
     final south = points.map((p) => p.latitude).reduce(math.min);
     final north = points.map((p) => p.latitude).reduce(math.max);
