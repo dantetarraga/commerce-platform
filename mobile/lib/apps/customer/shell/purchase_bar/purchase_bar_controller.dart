@@ -1,5 +1,5 @@
 import 'package:apamuy/features/cart/cart.dart';
-import 'package:apamuy/features/orders/orders.dart';
+import 'package:apamuy/features/orders/orders_customer.dart';
 import 'package:apamuy/shared/design_system/components/app_purchase_bar.dart';
 import 'package:apamuy/shared/design_system/components/app_receipt_slot.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,6 +71,7 @@ PurchaseBarState purchaseBarStateFor(Cart cart, Order? order, DateTime now) {
       message: order.headline,
       eta: order.status == OrderStatus.onTheWay && minutes != null ? '$minutes min' : null,
       delivered: order.status == OrderStatus.delivered,
+      stage: OrderProgressRail.stageOf(order.status),
     );
   }
   if (!cart.isEmpty) return PurchaseBarCart(count: cart.itemCount, total: cart.total, storeName: cart.store?.name);

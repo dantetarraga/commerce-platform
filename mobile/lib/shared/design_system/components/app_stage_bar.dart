@@ -6,10 +6,17 @@ import 'package:flutter/material.dart';
 /// llena y se vacía a medias, como algo que está pasando. En el último tramo el
 /// pedido terminó y queda todo lleno. Con movimiento reducido queda quieto a la mitad.
 class AppStageBar extends StatefulWidget {
-  const AppStageBar({required this.stages, required this.current, super.key});
+  const AppStageBar({required this.stages, required this.current, this.showLabels = true, this.color, this.trackColor, super.key});
 
   final List<String> stages;
   final int current;
+
+  /// Sin nombres, la barra sola y más delgada (p. ej. en la barra de compra).
+  final bool showLabels;
+
+  /// Relleno y fondo de los tramos; por defecto, el primario y el texto atenuado.
+  final Color? color;
+  final Color? trackColor;
 
   @override
   State<AppStageBar> createState() => _AppStageBarState();
@@ -39,14 +46,15 @@ class _AppStageBarState extends State<AppStageBar> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final track = scheme.onSurface.withValues(alpha: 0.12);
+    final fill = widget.color ?? scheme.primary;
+    final track = widget.trackColor ?? scheme.onSurface.withValues(alpha: 0.12);
     final stages = widget.stages;
     final current = widget.current;
     final finished = current == stages.length - 1;
 
     Widget segment(double value) => ClipRRect(
       borderRadius: BorderRadius.circular(3),
-      child: LinearProgressIndicator(value: value, minHeight: 6, color: scheme.primary, backgroundColor: track),
+      child: LinearProgressIndicator(value: value, minHeight: widget.showLabels ? 6 : 4, color: fill, backgroundColor: track),
     );
 
     return Semantics(
@@ -67,24 +75,26 @@ class _AppStageBarState extends State<AppStageBar> with SingleTickerProviderStat
               ],
             ],
           ),
-          const SizedBox(height: AppSpacing.xxs),
-          Row(
-            children: [
-              for (var i = 0; i < stages.length; i++)
-                Expanded(
-                  child: Text(
-                    stages[i],
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: i == current ? scheme.primary : (i < current ? scheme.onSurface : scheme.onSurfaceVariant),
-                      fontWeight: i == current ? FontWeight.w700 : null,
+          if (widget.showLabels) ...[
+            const SizedBox(height: AppSpacing.xxs),
+            Row(
+              children: [
+                for (var i = 0; i < stages.length; i++)
+                  Expanded(
+                    child: Text(
+                      stages[i],
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: i == current ? scheme.primary : (i < current ? scheme.onSurface : scheme.onSurfaceVariant),
+                        fontWeight: i == current ? FontWeight.w700 : null,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ],
       ),
     );

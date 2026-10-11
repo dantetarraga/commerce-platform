@@ -37,16 +37,39 @@ class ScaffoldWithNav extends ConsumerWidget {
       body: shell,
       bottomNavigationBar: AppReceiptSlot(
         receipt: ref.watch(lastAddedProvider),
-        child: AppNavigationDock(
-          index: shell.currentIndex,
-          onSelected: _select,
-          bagCount: count,
-          bagPulse: pulse,
-          onBag: () => openBag(context),
-          liveOrder: liveOrder,
-          avatar: AppAvatar(imageUrl: user.avatarUrl, initials: user.initials, seed: user.id, size: 28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Inicio y Pedidos ya muestran el pedido arriba; en las demás pestañas va fijo aquí.
+            if (liveOrder && shell.currentIndex != 0 && shell.currentIndex != 2) const _OrderStrip(),
+            AppNavigationDock(
+              index: shell.currentIndex,
+              onSelected: _select,
+              bagCount: count,
+              bagPulse: pulse,
+              onBag: () => openBag(context),
+              liveOrder: liveOrder,
+              avatar: AppAvatar(imageUrl: user.avatarUrl, initials: user.initials, seed: user.id, size: 28),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+/// El pedido en curso fijo sobre el menú, con su barra de tramos. Escucha la barra
+/// por su cuenta: un cambio de estado del pedido no reconstruye el shell.
+class _OrderStrip extends ConsumerWidget {
+  const _OrderStrip();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(purchaseBarProvider.select((view) => view.state));
+    if (state is! PurchaseBarOrder) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      child: AppPurchaseBar(state: state, onTap: () => openPurchaseBar(context, ref)),
     );
   }
 }

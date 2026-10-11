@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:apamuy/core/maps/delivery_map_data.dart';
@@ -45,6 +46,9 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
   _MarkerIcons? _icons;
   var _framedCourier = false;
 
+  /// Tamaño de la vista chica, para calcular su cámara.
+  Size? _size;
+
   static LatLng _latLng(MapCoordinate c) => LatLng(c.latitude, c.longitude);
 
   @override
@@ -75,6 +79,14 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
   Future<void> _frame() async {
     final controller = _controller;
     if (controller == null) return;
+    // La vista chica (modo lite) se encuadra con una cámara calculada: el encuadre
+    // por límites no siempre se aplicaba y quedaba mostrando toda la región.
+    if (widget.data.compact) {
+      _framedCourier = widget.data.courier != null;
+      final size = _size;
+      if (size != null) await controller.moveCamera(CameraUpdate.newCameraPosition(_fitted(size)));
+      return;
+    }
     final points = [widget.store, widget.destination, ?widget.data.courier];
     _framedCourier = widget.data.courier != null;
     final south = points.map((p) => p.latitude).reduce((a, b) => a < b ? a : b);
@@ -115,9 +127,30 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
       ),
   };
 
-  /// El modo lite no anima: la cámara salta al encuadre.
-  Future<void> _move(GoogleMapController controller, CameraUpdate update) =>
-      widget.data.compact ? controller.moveCamera(update) : controller.animateCamera(update);
+  Future<void> _move(GoogleMapController controller, CameraUpdate update) => controller.animateCamera(update);
+
+  static const _compactPadding = EdgeInsets.fromLTRB(12, 40, 40, 8);
+
+  /// Cámara que encuadra el negocio, la puerta y la moto en un mapa de [size],
+  /// calculada a mano (Web Mercator) con margen para los marcadores.
+  CameraPosition _fitted(Size size) {
+    final points = [widget.store, widget.destination, ?widget.data.courier];
+    final south = points.map((p) => p.latitude).reduce(math.min);
+    final north = points.map((p) => p.latitude).reduce(math.max);
+    final west = points.map((p) => p.longitude).reduce(math.min);
+    final east = points.map((p) => p.longitude).reduce(math.max);
+    final center = LatLng((south + north) / 2, (west + east) / 2);
+    const margin = 24.0;
+    final width = math.max(size.width - _compactPadding.horizontal - margin * 2, 40);
+    final height = math.max(size.height - _compactPadding.vertical - margin * 2, 40);
+    double mercator(double lat) => math.log(math.tan(math.pi / 4 + lat * math.pi / 360));
+    final lngSpan = east - west;
+    final latSpan = (mercator(north) - mercator(south)).abs();
+    double log2(double x) => math.log(x) / math.ln2;
+    final byWidth = lngSpan < 1e-6 ? 17.0 : log2(width * 360 / (256 * lngSpan));
+    final byHeight = latSpan < 1e-6 ? 17.0 : log2(height * 2 * math.pi / (256 * latSpan));
+    return CameraPosition(target: center, zoom: math.min(byWidth, byHeight).clamp(12.0, 17.0));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,21 +169,26 @@ class _GoogleDeliveryMapState extends State<_GoogleDeliveryMap> {
           tween: _LatLngTween(end: _latLng(courier ?? widget.store)),
           duration: reduceMotionOf(context) ? Duration.zero : const Duration(milliseconds: 1200),
           curve: Curves.easeInOut,
-          builder: (context, position, _) => GoogleMap(
-            initialCameraPosition: CameraPosition(target: _latLng(widget.destination), zoom: 15),
-            style: _style,
-            padding: compact ? const EdgeInsets.fromLTRB(12, 40, 40, 8) : EdgeInsets.fromLTRB(24, top + 64, 24, 24),
-            liteModeEnabled: compact,
-            markers: icons == null ? const {} : _markers(icons, courier == null ? null : position),
-            zoomControlsEnabled: false,
-            myLocationButtonEnabled: false,
-            mapToolbarEnabled: false,
-            compassEnabled: false,
-            rotateGesturesEnabled: false,
-            tiltGesturesEnabled: false,
-            onMapCreated: (controller) {
-              _controller = controller;
-              unawaited(_frame());
+          builder: (context, position, _) => LayoutBuilder(
+            builder: (context, box) {
+              _size = box.biggest;
+              return GoogleMap(
+                initialCameraPosition: compact ? _fitted(box.biggest) : CameraPosition(target: _latLng(widget.destination), zoom: 15),
+                style: _style,
+                padding: compact ? _compactPadding : EdgeInsets.fromLTRB(24, top + 64, 24, 24),
+                liteModeEnabled: compact,
+                markers: icons == null ? const {} : _markers(icons, courier == null ? null : position),
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: false,
+                mapToolbarEnabled: false,
+                compassEnabled: false,
+                rotateGesturesEnabled: false,
+                tiltGesturesEnabled: false,
+                onMapCreated: (controller) {
+                  _controller = controller;
+                  unawaited(_frame());
+                },
+              );
             },
           ),
         ),

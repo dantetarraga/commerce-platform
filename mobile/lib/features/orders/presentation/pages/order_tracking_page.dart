@@ -6,7 +6,7 @@ import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
 import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
 import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
 import 'package:apamuy/features/orders/presentation/widgets/courier_card.dart';
-import 'package:apamuy/features/orders/presentation/widgets/order_stage_track.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_progress_rail.dart';
 import 'package:apamuy/features/orders/presentation/widgets/order_ticket.dart';
 import 'package:apamuy/features/orders/presentation/widgets/rating_sheet.dart';
 import 'package:apamuy/features/orders/presentation/widgets/route_map.dart';
@@ -129,7 +129,7 @@ class _Tracking extends StatelessWidget {
                     _EtaHeader(order: order),
                     if (order.status != OrderStatus.cancelled) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      _Track(order: order),
+                      OrderProgressRail(order: order),
                     ],
                     const SizedBox(height: AppSpacing.md),
                     Row(
@@ -188,37 +188,6 @@ class _TrackingMap extends ConsumerWidget {
     destination: order.destination,
     courier: order.status == OrderStatus.onTheWay ? order.courier?.position?.coordinates : null,
   );
-}
-
-/// El riel de íconos; en camino, la línea hacia la casa avanza con el repartidor.
-class _Track extends ConsumerWidget {
-  const _Track({required this.order});
-
-  final Order order;
-
-  /// Tramo del riel (no se usa con el pedido cancelado).
-  static int _stageOf(OrderStatus status) => switch (status) {
-    OrderStatus.received || OrderStatus.confirmed || OrderStatus.cancelled => 0,
-    OrderStatus.preparing || OrderStatus.ready => 1,
-    OrderStatus.courierAssigned || OrderStatus.onTheWay => 2,
-    OrderStatus.delivered => 3,
-  };
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return OrderStageTrack(
-      current: _stageOf(order.status),
-      // En camino, la línea hacia la casa avanza con el repartidor.
-      travel: order.status == OrderStatus.onTheWay ? order.routeProgress(_liveNow(ref, order)) : null,
-      stages: [
-        // El primero dice "Recibido" hasta que el negocio acepta.
-        (label: order.status == OrderStatus.received ? 'Recibido' : 'Confirmado', icon: Icons.receipt_long_rounded),
-        (label: 'Preparando', icon: Icons.soup_kitchen_rounded),
-        (label: 'En camino', icon: Icons.two_wheeler_rounded),
-        (label: 'Entregado', icon: Icons.home_rounded),
-      ],
-    );
-  }
 }
 
 /// Cuánto falta en grande, a qué hora llega y la etiqueta viva.

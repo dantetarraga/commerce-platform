@@ -1,5 +1,6 @@
 import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/utils/formatters.dart';
+import 'package:apamuy/shared/design_system/components/app_stage_bar.dart';
 import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
 import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:apamuy/shared/design_system/tokens/motion.dart';
@@ -27,7 +28,7 @@ final class PurchaseBarCart extends PurchaseBarState {
 
 /// Hay un pedido en curso (o recién entregado).
 final class PurchaseBarOrder extends PurchaseBarState {
-  const PurchaseBarOrder({required this.message, this.eta, this.delivered = false});
+  const PurchaseBarOrder({required this.message, this.eta, this.delivered = false, this.stage});
 
   /// "Luis va en camino", "Doña Rosa está preparando tu pedido".
   final String message;
@@ -35,6 +36,9 @@ final class PurchaseBarOrder extends PurchaseBarState {
   /// "8 min".
   final String? eta;
   final bool delivered;
+
+  /// Tramo del pedido (0 a 3) para la barra de tramos; `null` la oculta.
+  final int? stage;
 }
 
 /// Bolsa flotante en terracota: aparece cuando hay productos o un pedido activo.
@@ -90,6 +94,7 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
     final (title, subtitle, action) = _texts(state);
     final reduce = reduceMotionOf(context);
     final count = state is PurchaseBarCart ? state.count : null;
+    final stage = state is PurchaseBarOrder && !state.delivered ? state.stage : null;
 
     final pill = Semantics(
       button: true,
@@ -124,7 +129,7 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
                     ),
                   ),
                   child: Row(
-                    key: ValueKey('$title$subtitle$action$count'),
+                    key: ValueKey('$title$subtitle$action$count$stage'),
                     children: [
                       if (count != null) _Count(pulse: _pulse, count: count, bg: fg, fg: bg) else _Knot(pulse: _pulse, ring: fg),
                       const SizedBox(width: AppSpacing.sm),
@@ -149,6 +154,16 @@ class _AppPurchaseBarState extends State<AppPurchaseBar> with SingleTickerProvid
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.bodySmall?.copyWith(color: fg.withValues(alpha: 0.92)),
                               ),
+                            if (stage != null) ...[
+                              const SizedBox(height: 6),
+                              AppStageBar(
+                                stages: const ['Confirmado', 'Preparando', 'En camino', 'Entregado'],
+                                current: stage,
+                                showLabels: false,
+                                color: fg,
+                                trackColor: fg.withValues(alpha: 0.3),
+                              ),
+                            ],
                           ],
                         ),
                       ),

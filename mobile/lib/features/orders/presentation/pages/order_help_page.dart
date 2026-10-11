@@ -3,6 +3,7 @@ import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/orders/domain/order.dart';
 import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
 import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_progress_rail.dart';
 import 'package:apamuy/features/orders/presentation/widgets/store_thumb.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
@@ -16,17 +17,31 @@ class OrderHelpPage extends ConsumerWidget {
 
   final String orderId;
 
-  static const List<(IconData, String)> _reasons = [
-    (Icons.shopping_bag_outlined, 'Falta un producto'),
-    (Icons.close_rounded, 'Llegó dañado o equivocado'),
-    (Icons.credit_card_rounded, 'Me cobraron mal'),
-    (Icons.schedule_rounded, 'Nunca llegó'),
-    (Icons.more_horiz_rounded, 'Otro'),
-  ];
+  /// Los motivos dependen de en qué va el pedido: en curso preocupa la demora o
+  /// la dirección; entregado, lo que llegó.
+  static List<(IconData, String)> _reasonsFor(Order? order) => switch (order?.status) {
+    OrderStatus.delivered => const [
+      (Icons.shopping_bag_outlined, 'Falta un producto'),
+      (Icons.close_rounded, 'Llegó dañado o equivocado'),
+      (Icons.ac_unit_rounded, 'Llegó frío'),
+      (Icons.credit_card_rounded, 'Me cobraron mal'),
+      (Icons.more_horiz_rounded, 'Otro'),
+    ],
+    OrderStatus.cancelled => const [
+      (Icons.credit_card_rounded, 'Me cobraron igual'),
+      (Icons.more_horiz_rounded, 'Otro'),
+    ],
+    null => const [(Icons.more_horiz_rounded, 'Otro')],
+    _ => const [
+      (Icons.schedule_rounded, 'Tarda más de lo que dice'),
+      (Icons.location_on_outlined, 'Quiero cambiar la dirección'),
+      (Icons.edit_note_rounded, 'Quiero cambiar algo del pedido'),
+      (Icons.more_horiz_rounded, 'Otro'),
+    ],
+  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final order = ref.watch(orderWatchProvider(orderId));
 
     return Scaffold(
@@ -57,21 +72,12 @@ class OrderHelpPage extends ConsumerWidget {
           ),
           AppGroupedCard(
             children: [
-              for (final (icon, reason) in _reasons)
+              for (final (icon, reason) in _reasonsFor(order.value))
                 AppGroupedRow(icon: icon, title: reason, onTap: () => _describe(context, reason, order.value)),
             ],
           ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Respondemos en menos de 10 minutos, de 7 am a 11 pm.',
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          AppButton.secondary(
-            label: 'Escribir a soporte',
-            icon: Icons.chat_bubble_outline_rounded,
-            onPressed: () => _describe(context, 'Escribir a soporte', order.value),
-          ),
+          const SizedBox(height: AppSpacing.section),
+          _SupportCard(onWrite: () => _describe(context, 'Escribir a soporte', order.value)),
         ],
       ),
     );
@@ -136,39 +142,108 @@ class _CancelOrderButtonState extends ConsumerState<_CancelOrderButton> {
   );
 }
 
+/// El pedido como talón de boleta: quién, cuándo, cuánto y en qué va.
 class _OrderSummaryCard extends StatelessWidget {
   const _OrderSummaryCard({required this.order});
 
   final Order order;
 
+  static const _stages = ['Confirmado', 'Preparando', 'En camino', 'Entregado'];
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(color: context.apamuy.raised, borderRadius: AppRadius.card),
-      child: Row(
-        children: [
-          StoreThumb(url: order.store.logoUrl, background: theme.colorScheme.surface),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${order.store.name} · ${order.code}',
-                  style: theme.textTheme.titleSmall,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${Formatters.relativeDay(order.placedAt)} · ${Formatters.money(order.total)} · ${order.status.summaryLabel}',
-                  style: theme.textTheme.bodySmall?.copyWith(fontFeatures: AppTypography.tabularFigures),
-                ),
+    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant, fontFeatures: AppTypography.tabularFigures);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const TicketEdge(top: true),
+        TicketSection(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xxs, AppSpacing.md, AppSpacing.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  StoreThumb(url: order.store.logoUrl, background: context.apamuy.raised),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.store.name,
+                          style: theme.textTheme.titleSmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text('${order.code} · ${Formatters.relativeDay(order.placedAt)} · ${order.status.summaryLabel}', style: muted, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  Text(Formatters.money(order.total), style: theme.textTheme.titleSmall?.copyWith(fontFeatures: AppTypography.tabularFigures)),
+                ],
+              ),
+              if (order.isActive) ...[
+                const SizedBox(height: AppSpacing.md),
+                AppStageBar(stages: _stages, current: OrderProgressRail.stageOf(order.status)),
               ],
-            ),
+            ],
           ),
+        ),
+        const TicketEdge(top: false),
+      ],
+    );
+  }
+}
+
+/// Soporte con cara: en línea, cuánto tarda en responder y el botón para escribir.
+class _SupportCard extends StatelessWidget {
+  const _SupportCard({required this.onWrite});
+
+  final VoidCallback onWrite;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final success = context.apamuy.success;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(color: scheme.primaryContainer, borderRadius: AppRadius.card),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(color: scheme.surface, borderRadius: AppRadius.exit(14, cut: 4)),
+                child: Icon(Icons.support_agent_rounded, color: scheme.primary),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Habla con nosotros', style: theme.textTheme.titleSmall),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Icon(Icons.circle, size: 8, color: success),
+                        const SizedBox(width: 6),
+                        Flexible(child: Text('Respondemos en menos de 10 minutos, de 7 am a 11 pm.', style: theme.textTheme.bodySmall)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          AppButton(label: 'Escribir a soporte', icon: Icons.chat_bubble_outline_rounded, onPressed: onWrite),
         ],
       ),
     );

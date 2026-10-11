@@ -5,4 +5,5 @@ export 'orders.dart';
 export 'presentation/pages/order_help_page.dart';
 export 'presentation/pages/order_tracking_page.dart';
 export 'presentation/pages/orders_page.dart';
+export 'presentation/widgets/order_progress_rail.dart';
 export 'presentation/widgets/store_thumb.dart';

@@ -5,6 +5,8 @@ import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
 import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
 import 'package:apamuy/features/orders/presentation/pages/order_tracking_page.dart';
 import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_progress_rail.dart';
+import 'package:apamuy/features/orders/presentation/widgets/rating_sheet.dart';
 import 'package:apamuy/features/orders/presentation/widgets/store_thumb.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:apamuy/shared/widgets/async_value_view.dart';
@@ -103,7 +105,12 @@ class _OrdersList extends StatelessWidget {
             child: Semantics(header: true, child: Text('ANTERIORES', style: AppTypography.eyebrow(context))),
           );
         }
-        if (j <= past.length) return enter(_PastOrderRow(order: past[j - 1], onOpenStore: onOpenStore));
+        if (j <= past.length) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.sm),
+            child: enter(_PastOrderCard(order: past[j - 1], onOpenStore: onOpenStore)),
+          );
+        }
         return Padding(
           padding: const EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.sm, AppSpacing.xs, 0),
           child: AppGroupedRow.link(
@@ -118,10 +125,14 @@ class _OrdersList extends StatelessWidget {
   }
 }
 
+/// El pedido en curso como boleta: quién lo prepara, cuánto falta, la barra de
+/// tramos y qué está pasando. Toda la boleta abre el seguimiento.
 class _ActiveOrderCard extends ConsumerWidget {
   const _ActiveOrderCard({required this.order});
 
   final Order order;
+
+  static const _stages = ['Confirmado', 'Preparando', 'En camino', 'Entregado'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -129,65 +140,78 @@ class _ActiveOrderCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final minutes = live.minutesLeft(ref.watch(clockProvider).value ?? DateTime.now());
-    final stage = live.status.stage;
+    final eta = live.estimatedArrival;
+    final muted = theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant, fontFeatures: AppTypography.tabularFigures);
     void track() => context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': live.id});
 
     return Semantics(
       button: true,
-      label: '${live.store.name}. ${live.headline}${minutes == null ? '' : '. Llega en $minutes minutos'}. Ver mapa',
+      label: '${live.store.name}. ${live.headline}${minutes == null ? '' : '. Llega en $minutes minutos'}. Ver seguimiento',
       excludeSemantics: true,
-      child: Material(
-        color: scheme.primaryContainer,
-        borderRadius: AppRadius.card,
-        child: InkWell(
-          borderRadius: AppRadius.card,
+      child: PressableScale(
+        child: GestureDetector(
           onTap: track,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
+          behavior: HitTestBehavior.opaque,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const TicketEdge(top: true),
+              TicketSection(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    StoreThumb(url: live.store.logoUrl, size: 36, background: scheme.surface),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(live.store.name, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    AppLiveTag(label: minutes == null ? live.status.tag : '$minutes MIN'),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: [
-                    // Una barra por etapa antes de "terminado".
-                    for (var i = 0; i < OrderStatus.stageCount - 1; i++) ...[
-                      if (i > 0) const SizedBox(width: AppSpacing.xxs),
-                      Expanded(
-                        child: AnimatedContainer(
-                          duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: i < stage ? context.apamuy.thread : scheme.surfaceContainerHighest,
-                            borderRadius: const BorderRadius.all(AppRadius.pill),
+                    Row(
+                      children: [
+                        StoreThumb(url: live.store.logoUrl, size: 40, background: context.apamuy.raised),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(live.store.name, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Text(
+                                [live.code, if (eta != null) 'Llega a las ${Formatters.clock(eta)}'].join(' · '),
+                                style: muted,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(live.headline, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        const SizedBox(width: AppSpacing.xs),
+                        if (minutes != null)
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(text: '$minutes', style: AppTypography.price(context, size: 28).copyWith(height: 1)),
+                                TextSpan(text: ' min', style: theme.textTheme.labelLarge?.copyWith(color: scheme.onSurfaceVariant)),
+                              ],
+                            ),
+                          )
+                        else
+                          AppLiveTag(label: live.status.tag),
+                      ],
                     ),
-                    Text('Ver mapa', style: theme.textTheme.labelMedium?.copyWith(color: scheme.primary)),
+                    const SizedBox(height: AppSpacing.md),
+                    AppStageBar(stages: _stages, current: OrderProgressRail.stageOf(live.status)),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(live.headline, style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
                   ],
                 ),
-              ],
-            ),
+              ),
+              TicketSection(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.xs, AppSpacing.xs),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Ver seguimiento', style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary)),
+                    Icon(Icons.chevron_right_rounded, color: scheme.primary),
+                  ],
+                ),
+              ),
+              const TicketEdge(top: false),
+            ],
           ),
         ),
       ),
@@ -195,8 +219,10 @@ class _ActiveOrderCard extends ConsumerWidget {
   }
 }
 
-class _PastOrderRow extends StatelessWidget {
-  const _PastOrderRow({required this.order, this.onOpenStore});
+/// Un pedido anterior: quién, cuándo, cuánto y qué llevaba, con su estado claro
+/// y lo que se puede hacer (calificarlo si falta y volver a pedir).
+class _PastOrderCard extends StatelessWidget {
+  const _PastOrderCard({required this.order, this.onOpenStore});
 
   final Order order;
   final ValueChanged<String>? onOpenStore;
@@ -204,41 +230,109 @@ class _PastOrderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: () => context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': order.id}),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.gutter, vertical: AppSpacing.sm),
-        child: Row(
-          children: [
-            StoreThumb(url: order.store.logoUrl, background: context.apamuy.raised),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
+    final scheme = theme.colorScheme;
+    final apamuy = context.apamuy;
+    final cancelled = order.status == OrderStatus.cancelled;
+    final rating = order.rating;
+    final muted = theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant, fontFeatures: AppTypography.tabularFigures);
+    final items = order.lines.map((l) => '${l.quantity}× ${l.name}').join(', ');
+
+    return Material(
+      color: apamuy.card,
+      borderRadius: AppRadius.card,
+      child: InkWell(
+        borderRadius: AppRadius.card,
+        onTap: () => context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': order.id}),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(order.store.name, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 2),
+                  StoreThumb(url: order.store.logoUrl, size: 44, background: apamuy.raised),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(order.store.name, style: theme.textTheme.titleSmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                        const SizedBox(height: 2),
+                        Text('${Formatters.relativeDay(order.placedAt)} · ${order.code}', style: muted, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
                   Text(
-                    '${Formatters.relativeDay(order.placedAt)} · ${Formatters.money(order.total)} · ${order.status.summaryLabel}',
-                    style: theme.textTheme.bodySmall?.copyWith(fontFeatures: AppTypography.tabularFigures),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    Formatters.money(order.total),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontFeatures: AppTypography.tabularFigures,
+                      color: cancelled ? scheme.onSurfaceVariant : null,
+                      decoration: cancelled ? TextDecoration.lineThrough : null,
+                    ),
                   ),
                 ],
               ),
-            ),
-            if (onOpenStore != null) ...[
-              const SizedBox(width: AppSpacing.xs),
-              AppButton.secondary(
-                label: 'Repetir',
-                semanticLabel: 'Repetir pedido de ${order.store.name}',
-                size: AppButtonSize.sm,
-                expand: false,
-                onPressed: () => onOpenStore!(order.store.id),
+              const SizedBox(height: AppSpacing.sm),
+              Text(items, style: muted, maxLines: 1, overflow: TextOverflow.ellipsis),
+              const SizedBox(height: AppSpacing.xs),
+              Row(
+                children: [
+                  _StatusChip(order: order),
+                  if (rating != null) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    Icon(Icons.star_rounded, size: 16, color: apamuy.rating),
+                    Text(' $rating', style: theme.textTheme.labelMedium),
+                  ],
+                  const Spacer(),
+                  if (order.status == OrderStatus.delivered && rating == null)
+                    TextButton(
+                      onPressed: () => showRatingSheet(context, order),
+                      style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                      child: const Text('Calificar'),
+                    ),
+                  if (onOpenStore != null) ...[
+                    const SizedBox(width: AppSpacing.xxs),
+                    AppButton.secondary(
+                      label: 'Volver a pedir',
+                      semanticLabel: 'Volver a pedir en ${order.store.name}',
+                      size: AppButtonSize.sm,
+                      expand: false,
+                      onPressed: () => onOpenStore!(order.store.id),
+                    ),
+                  ],
+                ],
               ),
             ],
-          ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+/// "Entregado" en verde o "Cancelado" en rojo, con su ícono.
+class _StatusChip extends StatelessWidget {
+  const _StatusChip({required this.order});
+
+  final Order order;
+
+  @override
+  Widget build(BuildContext context) {
+    final apamuy = context.apamuy;
+    final cancelled = order.status == OrderStatus.cancelled;
+    final color = cancelled ? apamuy.danger : apamuy.success;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 3),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: AppRadius.button),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(cancelled ? Icons.cancel_rounded : Icons.check_circle_rounded, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(order.status.summaryLabel, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: color, fontWeight: FontWeight.w700)),
+        ],
       ),
     );
   }

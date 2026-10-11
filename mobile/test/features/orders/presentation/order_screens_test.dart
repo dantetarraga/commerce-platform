@@ -130,7 +130,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     await tester.tap(find.bySemanticsLabel(RegExp('^5 de 5 estrellas')));
     await tester.pump();
-    await tester.tap(find.text('Enviar'));
+    await tester.tap(find.text('Enviar calificación'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pump();
@@ -147,8 +147,10 @@ void main() {
   testWidgets('la ayuda lista los motivos y envía la descripción', (tester) async {
     await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.delivered));
 
-    expect(find.text('Picantería Doña Rosa · #2481'), findsOneWidget);
-    for (final reason in ['Falta un producto', 'Llegó dañado o equivocado', 'Me cobraron mal', 'Nunca llegó', 'Otro']) {
+    expect(find.text('Picantería Doña Rosa'), findsOneWidget);
+    expect(find.textContaining('#2481'), findsOneWidget);
+    // Entregado: los motivos son sobre lo que llegó.
+    for (final reason in ['Falta un producto', 'Llegó dañado o equivocado', 'Llegó frío', 'Me cobraron mal', 'Otro']) {
       expect(find.text(reason), findsOneWidget);
     }
     expect(find.text('Respondemos en menos de 10 minutos, de 7 am a 11 pm.'), findsOneWidget);

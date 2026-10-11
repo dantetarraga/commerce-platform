@@ -5,7 +5,6 @@ import 'package:apamuy/core/time/clock_provider.dart';
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/home/presentation/widgets/active_order_cover/live_dot.dart';
 import 'package:apamuy/features/home/presentation/widgets/active_order_cover/mini_map.dart';
-import 'package:apamuy/features/home/presentation/widgets/active_order_cover/step_trail.dart';
 import 'package:apamuy/features/orders/orders_customer.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:apamuy/shared/maps/delivery_map.dart';
@@ -14,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// Seguimiento a todo el ancho bajo la barra compacta: estado, minutos, mapa
-/// ilustrado, los cuatro pasos con su hora y quién lo lleva.
+/// ilustrado, el riel de los cuatro tramos y quién lo lleva.
 class ActiveOrderCover extends ConsumerWidget {
   const ActiveOrderCover({required this.order, super.key});
 
@@ -31,11 +30,6 @@ class ActiveOrderCover extends ConsumerWidget {
   void _open(BuildContext context) => context.pushNamed(OrderTrackingPage.name, pathParameters: {'orderId': order.id});
 
   void _help(BuildContext context) => context.pushNamed(OrderHelpPage.name, pathParameters: {'orderId': order.id});
-
-  String? _time(OrderStatus status) => switch (order.timeOf(status)) {
-    final at? => Formatters.clock(at),
-    null => null,
-  };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -122,16 +116,7 @@ class ActiveOrderCover extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 14),
-            StepTrail(
-              step: step,
-              labels: activeStepLabelsFor(order.status),
-              times: [
-                _time(OrderStatus.confirmed) ?? _time(OrderStatus.received),
-                _time(OrderStatus.preparing),
-                _time(OrderStatus.onTheWay) ?? _time(OrderStatus.courierAssigned),
-                _time(OrderStatus.delivered),
-              ],
-            ),
+            OrderProgressRail(order: order),
             const SizedBox(height: 14),
             _CourierStrip(courier: order.courier, onHelp: () => _help(context), onMap: () => _open(context)),
           ],

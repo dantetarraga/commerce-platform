@@ -153,7 +153,9 @@ void main() {
 
       await tester.tap(find.bySemanticsLabel(RegExp('^5 de 5 estrellas')));
       await settle(tester, frames: 5);
-      await tester.tap(find.text('Enviar'));
+      await tester.ensureVisible(find.text('Enviar calificación'));
+      await settle(tester, frames: 5);
+      await tester.tap(find.text('Enviar calificación'));
       await settle(tester);
       // Historial fresco del repositorio: el fake responde con demoras, así que
       // se avanza el reloj de prueba hasta que llegue.
