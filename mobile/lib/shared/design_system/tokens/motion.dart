@@ -18,11 +18,8 @@ abstract final class AppMotion {
   /// Onboarding, nudo de confirmación.
   static const story = Duration(milliseconds: 520);
 
-  /// Entrada de una pantalla (transición de página y fundido entre contextos).
+  /// Fundido entre contextos (splash → entrada → app).
   static const page = Duration(milliseconds: 380);
-
-  /// Regreso de una pantalla con la transición de tarjeta que sube.
-  static const pageReverse = Duration(milliseconds: 280);
 
   /// Salida del fundido entre contextos (splash → entrada → app).
   static const fadeThroughReverse = Duration(milliseconds: 260);

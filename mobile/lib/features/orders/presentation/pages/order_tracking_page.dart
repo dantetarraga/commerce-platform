@@ -6,8 +6,8 @@ import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
 import 'package:apamuy/features/orders/presentation/pages/order_help_page.dart';
 import 'package:apamuy/features/orders/presentation/providers/orders_providers.dart';
 import 'package:apamuy/features/orders/presentation/widgets/courier_card.dart';
-import 'package:apamuy/features/orders/presentation/widgets/order_receipt_summary.dart';
-import 'package:apamuy/features/orders/presentation/widgets/order_timeline.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_stage_track.dart';
+import 'package:apamuy/features/orders/presentation/widgets/order_ticket.dart';
 import 'package:apamuy/features/orders/presentation/widgets/rating_sheet.dart';
 import 'package:apamuy/features/orders/presentation/widgets/route_map.dart';
 import 'package:apamuy/features/orders/presentation/widgets/tracking_skeleton.dart';
@@ -127,10 +127,24 @@ class _Tracking extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     _EtaHeader(order: order),
-                    const SizedBox(height: AppSpacing.lg),
-                    OrderTimeline(order: order),
-                    if (order.courier case final courier?) ...[
+                    if (order.status != OrderStatus.cancelled) ...[
                       const SizedBox(height: AppSpacing.lg),
+                      _Track(order: order),
+                    ],
+                    const SizedBox(height: AppSpacing.md),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _Headline(order: order)),
+                        TextButton(
+                          onPressed: () => _showHistory(context, order),
+                          style: TextButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.only(left: AppSpacing.sm)),
+                          child: const Text('Historial ›'),
+                        ),
+                      ],
+                    ),
+                    if (order.courier case final courier?) ...[
+                      const SizedBox(height: AppSpacing.sm),
                       CourierCard(courier: courier),
                     ],
                     if (order.status == OrderStatus.delivered) ...[
@@ -140,14 +154,14 @@ class _Tracking extends StatelessWidget {
                         onPressed: order.rating == null ? () => showRatingSheet(context, order) : null,
                       ),
                     ],
+                    const SizedBox(height: AppSpacing.lg),
+                    OrderTicket(order: order),
                     const SizedBox(height: AppSpacing.sm),
                     AppGroupedRow.link(
                       icon: Icons.help_outline_rounded,
                       title: '¿Algún problema con tu pedido?',
                       onTap: () => _openHelp(context),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    OrderReceiptSummary(order: order),
                   ],
                 ),
               ),
@@ -176,7 +190,38 @@ class _TrackingMap extends ConsumerWidget {
   );
 }
 
-/// "Llega en" + ETA grande + etiqueta viva; el mensaje humano cambia con el estado.
+/// El riel de íconos; en camino, la línea hacia la casa avanza con el repartidor.
+class _Track extends ConsumerWidget {
+  const _Track({required this.order});
+
+  final Order order;
+
+  /// Tramo del riel (no se usa con el pedido cancelado).
+  static int _stageOf(OrderStatus status) => switch (status) {
+    OrderStatus.received || OrderStatus.confirmed || OrderStatus.cancelled => 0,
+    OrderStatus.preparing || OrderStatus.ready => 1,
+    OrderStatus.courierAssigned || OrderStatus.onTheWay => 2,
+    OrderStatus.delivered => 3,
+  };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return OrderStageTrack(
+      current: _stageOf(order.status),
+      // En camino, la línea hacia la casa avanza con el repartidor.
+      travel: order.status == OrderStatus.onTheWay ? order.routeProgress(_liveNow(ref, order)) : null,
+      stages: [
+        // El primero dice "Recibido" hasta que el negocio acepta.
+        (label: order.status == OrderStatus.received ? 'Recibido' : 'Confirmado', icon: Icons.receipt_long_rounded),
+        (label: 'Preparando', icon: Icons.soup_kitchen_rounded),
+        (label: 'En camino', icon: Icons.two_wheeler_rounded),
+        (label: 'Entregado', icon: Icons.home_rounded),
+      ],
+    );
+  }
+}
+
+/// Cuánto falta en grande, a qué hora llega y la etiqueta viva.
 class _EtaHeader extends ConsumerWidget {
   const _EtaHeader({required this.order});
 
@@ -188,19 +233,60 @@ class _EtaHeader extends ConsumerWidget {
     final apamuy = context.apamuy;
     final minutes = order.minutesLeft(_liveNow(ref, order));
     final deliveredAt = order.timeOf(OrderStatus.delivered);
+    final eta = order.estimatedArrival;
     final (String caption, String big) = switch (order.status) {
       OrderStatus.delivered => ('Llegó a las', deliveredAt == null ? '¡Listo!' : Formatters.clock(deliveredAt)),
       OrderStatus.cancelled => ('Tu pedido', 'Cancelado'),
-      _ when minutes != null => ('Llega en', '$minutes min'),
-      _ when order.estimatedArrival != null => ('Llega a las', Formatters.clock(order.estimatedArrival!)),
+      _ when minutes != null => (eta == null ? 'Llega en' : 'Llega a las ${Formatters.clock(eta)}', '$minutes min'),
+      _ when eta != null => ('Llega a las', Formatters.clock(eta)),
       _ => ('Llega en', 'Calculando…'),
     };
 
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(caption, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              Text(big, style: theme.textTheme.displaySmall?.copyWith(fontFeatures: AppTypography.tabularFigures, height: 1.1)),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: AppLiveTag(
+            label: order.status.tag,
+            live: !order.status.isFinal,
+            color: switch (order.status) {
+              OrderStatus.delivered => apamuy.success,
+              OrderStatus.cancelled => apamuy.danger,
+              _ => null,
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Qué está pasando, con nombre propio. Al cambiar de estado el texto anterior se
+/// va de golpe y entra el nuevo, para que no se encimen.
+class _Headline extends StatelessWidget {
+  const _Headline({required this.order});
+
+  final Order order;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Semantics(
       liveRegion: true,
       child: AnimatedSwitcher(
         duration: reduceMotionOf(context) ? Duration.zero : AppMotion.move,
         switchInCurve: AppMotion.arrive,
+        layoutBuilder: (current, _) => current ?? const SizedBox.shrink(),
         transitionBuilder: (child, animation) => FadeTransition(
           opacity: animation,
           child: SlideTransition(
@@ -208,41 +294,71 @@ class _EtaHeader extends ConsumerWidget {
             child: child,
           ),
         ),
-        child: Column(
+        child: SizedBox(
           key: ValueKey(order.status),
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(order.headline, style: theme.textTheme.titleMedium),
+              Text(order.detail, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void _showHistory(BuildContext context, Order order) => showAppBottomSheet<void>(
+  context,
+  title: 'Historial del pedido',
+  subtitle: '${order.code} · ${order.store.name}',
+  builder: (_) => _History(orderId: order.id),
+).ignore();
+
+/// Lo que ya pasó, del más reciente al más antiguo, como renglones de boleta.
+/// Escucha el pedido: si avanza con la hoja abierta, se imprime el renglón nuevo.
+class _History extends ConsumerWidget {
+  const _History({required this.orderId});
+
+  final String orderId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final order = ref.watch(orderWatchProvider(orderId)).value;
+    if (order == null) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final events = [...order.events]..sort((a, b) => b.at.compareTo(a.at));
+    final time = theme.textTheme.bodyMedium?.copyWith(fontFeatures: AppTypography.tabularFigures);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 0, AppSpacing.gutter, AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const TicketEdge(top: true),
+          TicketSection(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.xs),
+            child: Column(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(caption, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                      Text(big, style: theme.textTheme.displaySmall?.copyWith(fontFeatures: AppTypography.tabularFigures, height: 1.1)),
-                    ],
+                for (final (i, e) in events.indexed)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+                    child: LeaderRow(
+                      label: Text(
+                        order.stepTitle(e.status),
+                        style: i == 0 && !order.status.isFinal ? theme.textTheme.bodyMedium?.copyWith(color: scheme.primary, fontWeight: FontWeight.w700) : theme.textTheme.bodyMedium,
+                      ),
+                      value: Text(Formatters.clock(e.at), style: time),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: AppLiveTag(
-                    label: order.status.tag,
-                    live: !order.status.isFinal,
-                    color: switch (order.status) {
-                      OrderStatus.delivered => apamuy.success,
-                      OrderStatus.cancelled => apamuy.danger,
-                      _ => null,
-                    },
-                  ),
-                ),
               ],
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(order.headline, style: theme.textTheme.titleMedium),
-            Text(order.detail, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          ],
-        ),
+          ),
+          const TicketEdge(top: false),
+        ],
       ),
     );
   }

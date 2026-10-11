@@ -55,7 +55,6 @@ class _ProductContent extends ConsumerStatefulWidget {
 }
 
 class _ProductContentState extends ConsumerState<_ProductContent> {
-  final GlobalKey _imageKey = GlobalKey();
   final _groupKeys = <String, GlobalKey>{};
   var _adding = false;
 
@@ -93,10 +92,8 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
       setState(() => _adding = false);
       return;
     }
-    // El traspaso: la foto viaja a la barra de compra y la pantalla se cierra.
-    final from = globalRectOf(_imageKey);
-    if (from != null) await flyToPurchaseBar(context, from: from.deflate(from.width * 0.2), imageUrl: product.imageUrl);
-    if (mounted) context.pop();
+    // Se cierra y la boleta sale de la barra de la pantalla de atrás.
+    context.pop();
   }
 
   @override
@@ -112,7 +109,6 @@ class _ProductContentState extends ConsumerState<_ProductContent> {
       body: CustomScrollView(
         slivers: [
           ImageSliverAppBar(
-            key: _imageKey,
             title: product.name,
             imageUrl: product.imageUrl,
             expandedHeight: _ProductContent.imageHeight,

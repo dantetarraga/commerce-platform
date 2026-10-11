@@ -3,7 +3,8 @@ import 'package:apamuy/features/notifications/presentation/widgets/notice_tile.d
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:flutter/material.dart';
 
-/// El pedido en curso: sus avisos anudados en un hilo, el último latiendo.
+/// El pedido en curso como boleta: arriba el último aviso y la barra de tramos;
+/// tras la perforación, los avisos anteriores con su hora.
 class OrderThreadCard extends StatelessWidget {
   const OrderThreadCard({required this.notices, required this.onTap, super.key});
 
@@ -11,49 +12,111 @@ class OrderThreadCard extends StatelessWidget {
   final List<Notice> notices;
   final VoidCallback onTap;
 
+  static const _stages = ['Confirmado', 'Preparando', 'En camino', 'Entregado'];
+
+  /// Tramo de la barra en el que va el pedido; `null` si se canceló.
+  static int? _stageOf(NoticeKind kind) => switch (kind) {
+    NoticeKind.orderConfirmed => 0,
+    NoticeKind.preparing => 1,
+    NoticeKind.courierAssigned || NoticeKind.courierNearby => 2,
+    NoticeKind.delivered => 3,
+    NoticeKind.orderCancelled || NoticeKind.promotion => null,
+  };
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final latest = notices.last;
+    final earlier = notices.reversed.skip(1).toList();
     final unread = notices.any((n) => !n.read);
+    final stage = _stageOf(latest.kind);
+    final muted = theme.textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant);
 
     return Semantics(
+      button: true,
       hint: 'Abre el seguimiento',
-      child: AppTapSurface(
-        semanticLabel: '${unread ? 'Sin leer. ' : ''}Pedido en curso. ${latest.title}. ${latest.body}',
-        color: scheme.primaryContainer,
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.sm),
+      label: '${unread ? 'Sin leer. ' : ''}Pedido en curso. ${latest.title}. ${latest.body}',
+      excludeSemantics: true,
+      child: PressableScale(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AppQuipu(
-                dense: true,
-                steps: [
-                  for (final n in notices)
-                    QuipuStep(
-                      title: n.title,
-                      subtitle: identical(n, latest) ? n.body : null,
-                      trailing: noticeTime(n.at),
-                      knot: identical(n, latest) ? QuipuKnot.current : QuipuKnot.done,
+              const TicketEdge(top: true),
+              TicketSection(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(color: scheme.primaryContainer, shape: BoxShape.circle),
+                          child: Icon(noticeIcon(latest.kind), size: 20, color: scheme.primary),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(latest.title, style: theme.textTheme.titleMedium),
+                              const SizedBox(height: 2),
+                              Text(latest.body, style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(noticeTime(latest.at), style: muted?.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+                            if (unread) ...[const SizedBox(height: AppSpacing.xs), const NoticeUnreadDot()],
+                          ],
+                        ),
+                      ],
                     ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Row(
-                children: [
-                  if (unread) ...[
-                    const NoticeUnreadDot(),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text('Novedades', style: theme.textTheme.labelMedium?.copyWith(color: scheme.primary)),
+                    if (stage != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      AppStageBar(stages: _stages, current: stage),
+                    ],
                   ],
-                  const Spacer(),
-                  Text('Ver seguimiento', style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary)),
-                  Icon(Icons.chevron_right_rounded, color: scheme.primary),
-                ],
+                ),
               ),
+              if (earlier.isNotEmpty) ...[
+                const TicketPerforation(),
+                TicketSection(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  child: Column(
+                    children: [
+                      for (final n in earlier)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                          child: LeaderRow(
+                            label: Text(n.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodySmall),
+                            value: Text(noticeTime(n.at), style: muted?.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+              TicketSection(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xxs, AppSpacing.xs, AppSpacing.sm),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Ver seguimiento', style: theme.textTheme.labelLarge?.copyWith(color: scheme.primary)),
+                    Icon(Icons.chevron_right_rounded, color: scheme.primary),
+                  ],
+                ),
+              ),
+              const TicketEdge(top: false),
             ],
           ),
         ),

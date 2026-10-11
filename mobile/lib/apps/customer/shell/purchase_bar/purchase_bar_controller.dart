@@ -1,6 +1,7 @@
 import 'package:apamuy/features/cart/cart.dart';
 import 'package:apamuy/features/orders/orders.dart';
 import 'package:apamuy/shared/design_system/components/app_purchase_bar.dart';
+import 'package:apamuy/shared/design_system/components/app_receipt_slot.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -29,6 +30,38 @@ class PurchaseBarPulse extends _$PurchaseBarPulse {
     });
     return 0;
   }
+}
+
+/// La boleta del último producto agregado; la imprime la barra que esté a la vista.
+@Riverpod(keepAlive: true)
+class LastAdded extends _$LastAdded {
+  @override
+  PurchaseReceipt? build() {
+    ref.listen(cartControllerProvider.select((cart) => cart.value), (previous, next) {
+      if (next == null) return;
+      final receipt = receiptFor(previous, next, id: (state?.id ?? 0) + 1, at: DateTime.now());
+      if (receipt != null) state = receipt;
+    });
+    return null;
+  }
+}
+
+/// Qué entró a la bolsa entre [before] y [after]: una línea nueva o más unidades
+/// de una que ya estaba. `null` si nada creció (se quitó o se editó una nota).
+PurchaseReceipt? receiptFor(Cart? before, Cart after, {required int id, required DateTime at}) {
+  final previous = {for (final line in before?.lines ?? const <CartLine>[]) line.id: line.quantity.value};
+  for (final line in after.lines.reversed) {
+    final added = line.quantity.value - (previous[line.id] ?? 0);
+    if (added <= 0) continue;
+    return PurchaseReceipt(
+      id: id,
+      at: at,
+      title: '$added × ${line.name}',
+      detail: line.description.isEmpty ? null : line.description,
+      price: line.unitPrice * added,
+    );
+  }
+  return null;
 }
 
 PurchaseBarState purchaseBarStateFor(Cart cart, Order? order, DateTime now) {

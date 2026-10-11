@@ -1,4 +1,3 @@
-import 'package:apamuy/shared/design_system/theme/page_transitions.dart';
 import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
 import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
@@ -187,11 +186,11 @@ abstract final class AppTheme {
         contentTextStyle: textTheme.bodyMedium?.copyWith(color: scheme.onInverseSurface),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.tile),
       ),
-      // Push a detalle: en Android la pantalla sube como tarjeta con la esquina de
-      // salida; en iOS se mantiene el deslizamiento con gesto de regreso.
+      // Push a detalle: en Android la nueva entra desde la derecha y se funde; en iOS,
+      // el deslizamiento con gesto de regreso.
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: RisingCardPageTransitionsBuilder(),
+          TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),

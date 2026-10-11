@@ -10,6 +10,17 @@ String noticeTime(DateTime at, {DateTime? now}) {
   return sameDay ? Formatters.clock(at) : Formatters.relativeDay(at, now: now);
 }
 
+/// Ícono de cada tipo de aviso.
+IconData noticeIcon(NoticeKind kind) => switch (kind) {
+  NoticeKind.orderConfirmed => Icons.check_rounded,
+  NoticeKind.preparing => Icons.soup_kitchen_rounded,
+  NoticeKind.courierAssigned => Icons.two_wheeler_rounded,
+  NoticeKind.courierNearby => Icons.delivery_dining_rounded,
+  NoticeKind.delivered => Icons.shopping_bag_rounded,
+  NoticeKind.orderCancelled => Icons.cancel_outlined,
+  NoticeKind.promotion => Icons.local_offer_rounded,
+};
+
 /// Un aviso: ícono (terracota para pedidos, hierba para ofertas), título con
 /// la hora y cuerpo. Sin leer, la fila va tintada y con el punto de la marca.
 class NoticeTile extends StatelessWidget {
@@ -17,16 +28,6 @@ class NoticeTile extends StatelessWidget {
 
   final Notice notice;
   final VoidCallback onTap;
-
-  IconData get _icon => switch (notice.kind) {
-    NoticeKind.orderConfirmed => Icons.check_rounded,
-    NoticeKind.preparing => Icons.soup_kitchen_rounded,
-    NoticeKind.courierAssigned => Icons.two_wheeler_rounded,
-    NoticeKind.courierNearby => Icons.delivery_dining_rounded,
-    NoticeKind.delivered => Icons.shopping_bag_rounded,
-    NoticeKind.orderCancelled => Icons.cancel_outlined,
-    NoticeKind.promotion => Icons.local_offer_rounded,
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,7 @@ class NoticeTile extends StatelessWidget {
                         color: order ? scheme.primaryContainer : apamuy.accentSoft,
                         borderRadius: AppRadius.button,
                       ),
-                      child: Icon(_icon, size: 22, color: order ? scheme.primary : apamuy.accent),
+                      child: Icon(noticeIcon(notice.kind), size: 22, color: order ? scheme.primary : apamuy.accent),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(

@@ -72,12 +72,25 @@ void main() {
     );
     await pump(tester, const OrderTrackingPage(orderId: 'o1'), o);
 
-    expect(find.text('Llega en'), findsOneWidget);
+    expect(find.text('Llega a las ${Formatters.clock(eta)}'), findsOneWidget);
     expect(find.text('EN CAMINO'), findsOneWidget);
+    // En camino, la línea hacia la casa avanza con el trayecto.
+    expect(find.bySemanticsLabel(RegExp(r'^Paso 3 de 4: En camino, \d+ % del trayecto$')), findsOneWidget);
+    // Las horas de cada paso están en el historial.
+    expect(find.text('1:12 pm'), findsNothing);
+    await tester.tap(find.text('Historial ›'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Historial del pedido'), findsOneWidget);
     expect(find.text('1:12 pm'), findsOneWidget);
-    expect(find.text('~${Formatters.clock(eta)}'), findsOneWidget);
+    expect(find.descendant(of: find.byType(BottomSheet), matching: find.text('Luis va en camino')), findsOneWidget);
+    await tester.tapAt(const Offset(20, 20));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.scrollUntilVisible(find.text('Luis Quispe'), 100, scrollable: find.byType(Scrollable).last);
     expect(find.text('Luis Quispe'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Pagas con Yape al recibir'), 120, scrollable: find.byType(Scrollable).last);
+    expect(find.textContaining('Pedido #'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('¿Algún problema con tu pedido?'), 120, scrollable: find.byType(Scrollable).last);
     expect(find.text('¿Algún problema con tu pedido?'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
@@ -110,6 +123,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
+    expect(find.bySemanticsLabel('Paso 4 de 4: Entregado'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Calificar pedido'), 100, scrollable: find.byType(Scrollable).last);
     await tester.tap(find.text('Calificar pedido'));
     await tester.pump();

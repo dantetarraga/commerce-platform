@@ -17,7 +17,7 @@ Future<bool> addToCart(BuildContext context, WidgetRef ref, {required CartLine l
   switch (result) {
     case Added():
       HapticFeedback.lightImpact().ignore();
-      AppToast.show(context, '${line.name} va en tu bolsa', kind: AppToastKind.success);
+      // La confirmación es la boleta que sale de la barra de abajo (AppReceiptSlot).
       return true;
     case StoreConflict(:final current, :final incoming):
       final replace = await confirmReplaceCart(context, current: current, incoming: incoming);

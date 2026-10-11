@@ -4,7 +4,6 @@ import 'package:apamuy/shared/design_system/components/app_network_image.dart';
 import 'package:apamuy/shared/design_system/components/app_price.dart';
 import 'package:apamuy/shared/design_system/components/app_skeleton.dart';
 import 'package:apamuy/shared/design_system/components/app_toast.dart';
-import 'package:apamuy/shared/design_system/components/fly_to_purchase_bar.dart';
 import 'package:apamuy/shared/design_system/tokens/app_colors.dart';
 import 'package:apamuy/shared/design_system/tokens/app_spacing.dart';
 import 'package:apamuy/shared/design_system/tokens/app_typography.dart';
@@ -116,16 +115,13 @@ class _Image extends StatefulWidget {
 }
 
 class _ImageState extends State<_Image> {
-  final GlobalKey _imageKey = GlobalKey();
   bool _adding = false;
 
   Future<void> _add() async {
     if (_adding) return;
     setState(() => _adding = true);
-    final from = globalRectOf(_imageKey);
     try {
-      final added = await widget.card.onQuickAdd!();
-      if (added && mounted && from != null) await flyToPurchaseBar(context, from: from, imageUrl: widget.card.data.imageUrl);
+      await widget.card.onQuickAdd!();
     } on Exception {
       if (mounted) AppToast.show(context, 'No pudimos agregar el producto. Inténtalo otra vez.', kind: AppToastKind.error);
     } finally {
@@ -136,7 +132,6 @@ class _ImageState extends State<_Image> {
   @override
   Widget build(BuildContext context) {
     final image = AppNetworkImage(
-      key: _imageKey,
       url: widget.card.data.imageUrl,
       width: widget.width,
       height: widget.height,

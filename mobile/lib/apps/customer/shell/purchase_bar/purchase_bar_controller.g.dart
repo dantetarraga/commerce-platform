@@ -119,3 +119,61 @@ abstract class _$PurchaseBarPulse extends $Notifier<int> {
     return element.handleCreate(ref, build);
   }
 }
+
+/// La boleta del último producto agregado; la imprime la barra que esté a la vista.
+
+@ProviderFor(LastAdded)
+final lastAddedProvider = LastAddedProvider._();
+
+/// La boleta del último producto agregado; la imprime la barra que esté a la vista.
+final class LastAddedProvider
+    extends $NotifierProvider<LastAdded, PurchaseReceipt?> {
+  /// La boleta del último producto agregado; la imprime la barra que esté a la vista.
+  LastAddedProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'lastAddedProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$lastAddedHash();
+
+  @$internal
+  @override
+  LastAdded create() => LastAdded();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PurchaseReceipt? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PurchaseReceipt?>(value),
+    );
+  }
+}
+
+String _$lastAddedHash() => r'f3b751eeedce0e1cd49b12e2eb9f94672e3edca7';
+
+/// La boleta del último producto agregado; la imprime la barra que esté a la vista.
+
+abstract class _$LastAdded extends $Notifier<PurchaseReceipt?> {
+  PurchaseReceipt? build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<PurchaseReceipt?, PurchaseReceipt?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<PurchaseReceipt?, PurchaseReceipt?>,
+              PurchaseReceipt?,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

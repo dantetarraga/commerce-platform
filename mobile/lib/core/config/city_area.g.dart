@@ -47,7 +47,7 @@ final class CurrentCityAreaProvider
   }
 }
 
-String _$currentCityAreaHash() => r'90f20c207fd6f523c581315ac6e033c24d53fb00';
+String _$currentCityAreaHash() => r'e29984e8f9d9ad5847a31f6d05f0c8b9b1ae18b7';
 
 /// La zona vigente: la guardada al abrir y luego la del backend, que se guarda para
 /// la próxima vez. Así un cambio en el panel llega sin publicar otra versión.

@@ -14,12 +14,15 @@ class PurchaseBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final purchaseBar = ref.watch(purchaseBarProvider);
-    return Padding(
-      padding: padding,
-      child: AppPurchaseBar(
-        state: purchaseBar.state,
-        pulse: purchaseBar.pulse,
-        onTap: () => openPurchaseBar(context, ref),
+    return AppReceiptSlot(
+      receipt: ref.watch(lastAddedProvider),
+      child: Padding(
+        padding: padding,
+        child: AppPurchaseBar(
+          state: purchaseBar.state,
+          pulse: purchaseBar.pulse,
+          onTap: () => openPurchaseBar(context, ref),
+        ),
       ),
     );
   }

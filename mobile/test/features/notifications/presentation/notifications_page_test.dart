@@ -14,6 +14,10 @@ void main() {
   }
 
   testWidgets('la página agrupa por día y marca todo como leído', (tester) async {
+    // Alto de teléfono: la boleta del pedido en curso deja AYER a la vista.
+    tester.view.physicalSize = const Size(390, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final c = container();
     await tester.pumpWidget(
       UncontrolledProviderScope(

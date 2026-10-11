@@ -35,14 +35,17 @@ class ScaffoldWithNav extends ConsumerWidget {
     );
     return Scaffold(
       body: shell,
-      bottomNavigationBar: AppNavigationDock(
-        index: shell.currentIndex,
-        onSelected: _select,
-        bagCount: count,
-        bagPulse: pulse,
-        onBag: () => openBag(context),
-        liveOrder: liveOrder,
-        avatar: AppAvatar(imageUrl: user.avatarUrl, initials: user.initials, seed: user.id, size: 28),
+      bottomNavigationBar: AppReceiptSlot(
+        receipt: ref.watch(lastAddedProvider),
+        child: AppNavigationDock(
+          index: shell.currentIndex,
+          onSelected: _select,
+          bagCount: count,
+          bagPulse: pulse,
+          onBag: () => openBag(context),
+          liveOrder: liveOrder,
+          avatar: AppAvatar(imageUrl: user.avatarUrl, initials: user.initials, seed: user.id, size: 28),
+        ),
       ),
     );
   }

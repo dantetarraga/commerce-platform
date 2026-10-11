@@ -32,9 +32,6 @@ class AppNavigationDock extends StatelessWidget {
   /// Avatar del usuario en "Tú" (si no, un ícono).
   final Widget? avatar;
 
-  /// Destino del producto que vuela a la bolsa (ver `flyToPurchaseBar`).
-  static final GlobalKey bagKey = GlobalKey(debugLabel: 'bag-tab');
-
   static const indicatorShape = BorderRadius.only(
     topLeft: Radius.circular(16),
     topRight: Radius.circular(16),
@@ -86,7 +83,6 @@ class AppNavigationDock extends StatelessWidget {
                     marker: liveOrder ? const _Dot() : null,
                   ),
                   _Tab(
-                    key: bagKey,
                     label: 'Bolsa',
                     icon: Icons.shopping_bag_outlined,
                     selectedIcon: Icons.shopping_bag_rounded,
@@ -123,7 +119,6 @@ class _Tab extends StatelessWidget {
     this.semanticsHint,
     this.marker,
     this.custom,
-    super.key,
   });
 
   final String label;
