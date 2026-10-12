@@ -48,3 +48,19 @@ export async function replaceSchedules(
 ) {
   await http.put(`${catalogBase(scope)}/stores/${storeId}/schedules`, { schedules })
 }
+
+/** `GET admin/stores/:id/commission`: `rateBps` null = usa la comisión por defecto. */
+export interface StoreCommission {
+  storeId: string
+  rateBps: number | null
+  defaultRateBps: number
+  effectiveRateBps: number
+}
+
+export async function getStoreCommission(id: string, signal?: AbortSignal) {
+  return (await http.get<StoreCommission>(`/admin/stores/${id}/commission`, { signal })).data
+}
+
+export async function setStoreCommission(id: string, rateBps: number | null) {
+  return (await http.put<StoreCommission>(`/admin/stores/${id}/commission`, { rateBps })).data
+}

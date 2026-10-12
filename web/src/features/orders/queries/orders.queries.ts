@@ -1,6 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { queryKeys } from '@/app/api'
 import {
+  getCouriersMap,
   getOrder,
   getOrdersBoard,
   getOrdersPage,
@@ -8,14 +9,16 @@ import {
 } from '../actions/orders.actions'
 
 /**
- * Tablero en vivo. Los cambios llegan por WebSocket; el sondeo de 30 s mantiene al día
- * los minutos de espera y cubre una conexión caída.
+ * Tablero en vivo. Los cambios llegan por WebSocket; el sondeo de 30 s (también con la
+ * pestaña de fondo) mantiene al día los minutos de espera y cubre una conexión caída.
  */
 export const ordersBoardQuery = (cityId: string) =>
   queryOptions({
     queryKey: queryKeys.orders.board(cityId),
     queryFn: ({ signal }) => getOrdersBoard(cityId, signal),
     refetchInterval: 30_000,
+    // Los atrasos se calculan en el backend: sin esto, en una pestaña de fondo no se ven.
+    refetchIntervalInBackground: true,
     staleTime: 5_000,
   })
 
@@ -31,4 +34,13 @@ export const orderQuery = (id: string) =>
   queryOptions({
     queryKey: queryKeys.orders.detail(id),
     queryFn: ({ signal }) => getOrder(id, signal),
+  })
+
+/** Repartidores conectados. Las ubicaciones llegan por WebSocket; el sondeo trae altas y bajas. */
+export const couriersMapQuery = (cityId: string) =>
+  queryOptions({
+    queryKey: queryKeys.orders.couriers(cityId),
+    queryFn: ({ signal }) => getCouriersMap(cityId, signal),
+    refetchInterval: 30_000,
+    staleTime: 5_000,
   })

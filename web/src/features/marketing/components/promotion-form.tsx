@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { adminStoresQuery, citiesQuery } from '@/app/api/lookups'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
+import { ImageUploadField } from '@/components/shared/image-upload-field'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { SafeImage } from '@/components/shared/safe-image'
 import { Button } from '@/components/ui/button'
@@ -81,11 +82,21 @@ export function PromotionFormDialog({
               {...form.register('subtitle')}
             />
           </div>
-          <TextField
-            label='Imagen (URL https)'
-            hint='Horizontal, al menos 1200 × 520 px.'
-            error={errors.imageUrl?.message}
-            {...form.register('imageUrl')}
+          <Controller
+            control={form.control}
+            name='imageUrl'
+            render={({ field, fieldState }) => (
+              <ImageUploadField
+                label='Imagen'
+                hint='Horizontal, al menos 1200 × 520 px.'
+                shape='wide'
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                target={{ purpose: 'promotion' }}
+                error={fieldState.error?.message}
+                disabled={isSubmitting}
+              />
+            )}
           />
           {/^https:\/\/\S+$/.test(imageUrl) && (
             <SafeImage

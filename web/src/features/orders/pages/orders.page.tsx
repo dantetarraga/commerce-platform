@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/shared/page-header'
 import { QueryBoundary } from '@/components/shared/query-boundary'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/cn'
+import { CouriersMap } from '../components/couriers-map'
 import { LiveBoard } from '../components/live-board'
 import { OrderDetailDialog } from '../components/order-detail-dialog'
 import { OrdersHistory } from '../components/orders-history'
@@ -72,9 +73,12 @@ export function OrdersPage() {
       </div>
       <div className={cn(deferredCity !== cityId && 'opacity-60 transition-opacity')}>
         {tab === 'live' ? (
-          <QueryBoundary fallback={<LiveBoardSkeleton />}>
-            <LiveBoard cityId={deferredCity} onOpen={setOpen} />
-          </QueryBoundary>
+          <div className='space-y-8'>
+            <QueryBoundary fallback={<LiveBoardSkeleton />}>
+              <LiveBoard cityId={deferredCity} onOpen={setOpen} />
+            </QueryBoundary>
+            <CouriersMap cityId={deferredCity} cities={cities.data ?? []} />
+          </div>
         ) : (
           <HistoryPanel onOpen={setOpen} />
         )}

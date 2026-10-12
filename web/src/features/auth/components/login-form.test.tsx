@@ -28,8 +28,9 @@ beforeEach(() => {
   sessionStore.setState({
     status: 'anonymous',
     accessToken: null,
-    refreshToken: null,
     user: null,
+    hasSession: false,
+    legacyRefreshToken: null,
   })
   vi.mocked(authApi.requestOtp).mockResolvedValue({
     phone: '987654321',
@@ -59,7 +60,6 @@ describe('LoginForm', () => {
     vi.mocked(authApi.verifyOtp).mockResolvedValue({
       status: 'AUTHENTICATED',
       accessToken: 'a',
-      refreshToken: 'r',
       user: user(['CUSTOMER', 'ADMIN']),
     })
     const onAuthenticated = vi.fn()
@@ -78,7 +78,6 @@ describe('LoginForm', () => {
     vi.mocked(authApi.verifyOtp).mockResolvedValue({
       status: 'AUTHENTICATED',
       accessToken: 'a',
-      refreshToken: 'r',
       user: user(['CUSTOMER']),
     })
     const onAuthenticated = vi.fn()
@@ -96,7 +95,6 @@ describe('LoginForm', () => {
     vi.mocked(authApi.verifyOtp).mockResolvedValue({
       status: 'AUTHENTICATED',
       accessToken: 'a',
-      refreshToken: 'r',
       user: user(['COURIER']),
     })
     const view = renderWithProviders(<LoginForm onAuthenticated={vi.fn()} />)

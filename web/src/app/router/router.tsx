@@ -5,6 +5,7 @@ import { LoadingState } from '@/components/shared/query-feedback'
 import { RouteError } from '@/components/shared/route-error'
 import { loginRoute } from '@/features/auth'
 import { cashRoute } from '@/features/cash'
+import { settlementsRoute } from '@/features/settlements'
 import {
   catalogRoute,
   partnerMenuRoute,
@@ -63,6 +64,7 @@ const marketing = createRoute({ getParentRoute: () => adminLayoutRoute, ...marke
 const cities = createRoute({ getParentRoute: () => adminLayoutRoute, ...citiesRoute })
 const orders = createRoute({ getParentRoute: () => adminLayoutRoute, ...ordersRoute })
 const cash = createRoute({ getParentRoute: () => adminLayoutRoute, ...cashRoute })
+const settlements = createRoute({ getParentRoute: () => adminLayoutRoute, ...settlementsRoute })
 const users = createRoute({ getParentRoute: () => adminLayoutRoute, ...usersRoute })
 const userDetail = createRoute({ getParentRoute: () => adminLayoutRoute, ...userDetailRoute })
 
@@ -102,6 +104,7 @@ const routeTree = rootRoute.addChildren([
     cities,
     orders,
     cash,
+    settlements,
     users,
     userDetail,
   ]),

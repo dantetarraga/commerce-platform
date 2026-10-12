@@ -20,14 +20,14 @@ function withRefreshLock<T>(task: () => Promise<T>): Promise<T> {
 /** Una sola renovación a la vez: el backend rota el refresh token en cada uso. */
 export function refreshAccessToken(): Promise<string> {
   refreshing ??= withRefreshLock(async () => {
-    // Otra pestaña pudo haberlo rotado mientras esperábamos el lock.
+    // Otra pestaña pudo haber cerrado sesión mientras esperábamos el lock.
     await sessionStore.persist.rehydrate()
-    const refreshToken = session().refreshToken
-    if (!refreshToken) {
+    const { hasSession, legacyRefreshToken } = session()
+    if (!hasSession) {
       throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Tu sesión terminó. Vuelve a ingresar.')
     }
     try {
-      const tokens = await refreshTokens(refreshToken)
+      const tokens = await refreshTokens(legacyRefreshToken ?? undefined)
       session().actions.setTokens(tokens)
       return tokens.accessToken
     } catch (error) {
@@ -40,10 +40,11 @@ export function refreshAccessToken(): Promise<string> {
   return refreshing
 }
 
+/** Borra la cookie en la API y la sesión aquí. */
 function revokeQuietly() {
-  const { refreshToken, actions } = session()
+  const { legacyRefreshToken, actions } = session()
   actions.clear()
-  if (refreshToken) logout(refreshToken).catch(() => undefined)
+  logout(legacyRefreshToken ?? undefined).catch(() => undefined)
 }
 
 /** Recupera la sesión guardada. Sin conexión lanza el error y deja `unknown` para reintentar. */
@@ -51,8 +52,8 @@ export function restoreSession(): Promise<void> {
   if (session().status !== 'unknown') return Promise.resolve()
 
   restoring ??= (async () => {
-    const { refreshToken, accessToken, actions } = session()
-    if (!refreshToken) return actions.clear()
+    const { hasSession, accessToken, actions } = session()
+    if (!hasSession) return actions.clear()
     try {
       if (!accessToken) await refreshAccessToken()
       const user = await fetchMe()
@@ -90,6 +91,6 @@ export function getAccessToken() {
   return session().accessToken
 }
 
-export function hasRefreshToken() {
-  return session().refreshToken !== null
+export function hasSession() {
+  return session().hasSession
 }

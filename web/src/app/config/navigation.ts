@@ -3,6 +3,7 @@ import {
   Banknote,
   ChartColumn,
   ClipboardList,
+  HandCoins,
   LayoutDashboard,
   MapPinned,
   Megaphone,
@@ -37,6 +38,7 @@ export const navigation = {
       { label: 'Marketing', icon: Megaphone, to: '/admin/marketing' },
       { label: 'Ciudades', icon: MapPinned, to: '/admin/cities' },
       { label: 'Caja', icon: Banknote, to: '/admin/cash' },
+      { label: 'Liquidaciones', icon: HandCoins, to: '/admin/settlements' },
     ],
   },
   MERCHANT: {

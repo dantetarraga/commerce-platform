@@ -1,9 +1,13 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { BellRing } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { queryKeys } from '@/app/api'
 import { StatTile } from '@/components/shared/stat-tile'
+import { Button } from '@/components/ui/button'
+import { useAttentionAlert } from '@/hooks/use-attention-alert'
 import { useRealtimeEvent } from '@/hooks/use-realtime-event'
+import { useRealtimeReconnect, useRealtimeStatus } from '@/hooks/use-realtime-status'
 import { formatMoney } from '@/lib/money'
 import { BOARD_COLUMN_LABEL, type AdminOrder, type OrderStatus } from '../model/orders'
 import { ordersBoardQuery } from '../queries/orders.queries'
@@ -13,6 +17,35 @@ interface OrderChanged {
   orderId: string
   status: OrderStatus
   cityId: string
+}
+
+const lateMessage = (count: number) =>
+  count === 1
+    ? '1 pedido lleva 3 minutos o más sin respuesta. Llama al negocio.'
+    : `${count} pedidos llevan 3 minutos o más sin respuesta. Llama al negocio.`
+
+/** Pide permiso para avisar con la pestaña de fondo; solo se puede pedir con un clic. */
+function BrowserAlertsPrompt() {
+  const [permission, setPermission] = useState(() =>
+    'Notification' in window ? Notification.permission : 'denied',
+  )
+  if (permission !== 'default') return null
+  return (
+    <div className='bg-primary-soft flex flex-wrap items-center justify-between gap-3 rounded-lg px-4 py-3 text-sm'>
+      <p>Activa los avisos para enterarte de un pedido atrasado aunque estés en otra pestaña.</p>
+      <Button
+        size='sm'
+        variant='outline'
+        onClick={() => {
+          Notification.requestPermission()
+            .then(setPermission)
+            .catch(() => undefined)
+        }}
+      >
+        Activar avisos
+      </Button>
+    </div>
+  )
 }
 
 /** Pedidos en curso en cuatro columnas, al día por WebSocket. Suspende mientras carga. */
@@ -31,9 +64,24 @@ export function LiveBoard({
     void queryClient.invalidateQueries({ queryKey: queryKeys.orders.all() })
     if (event.status === 'RECEIVED') toast.info('Entró un pedido nuevo', { id: event.orderId })
   })
+  // Lo que cambió con el socket caído no llegó: se vuelve a pedir todo.
+  useRealtimeReconnect(() => {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.orders.all() })
+  })
+  const live = useRealtimeStatus()
+  useAttentionAlert(board.lateCount, lateMessage)
 
   return (
     <div className='space-y-6'>
+      {live === 'reconnecting' && (
+        <p
+          role='status'
+          className='bg-secondary text-muted-foreground rounded-lg px-4 py-2 text-sm'
+        >
+          Sin conexión en vivo. Reintentando; mientras, el tablero se actualiza cada 30 segundos.
+        </p>
+      )}
+      <BrowserAlertsPrompt />
       {board.lateCount > 0 && (
         <div
           role='alert'

@@ -8,8 +8,11 @@ export type SessionStatus = 'unknown' | 'anonymous' | 'authenticated'
 interface SessionData {
   status: SessionStatus
   accessToken: string | null
-  refreshToken: string | null
   user: SessionUser | null
+  /** Hay una cookie de sesión que vale la pena renovar (la cookie no se puede leer). */
+  hasSession: boolean
+  /** Refresh token que guardaba la versión anterior en localStorage; se canjea una vez por la cookie. */
+  legacyRefreshToken: string | null
 }
 
 interface SessionActions {
@@ -25,14 +28,15 @@ export const SESSION_STORAGE_KEY = 'apamuy.panel.session'
 const initialState: SessionData = {
   status: 'unknown',
   accessToken: null,
-  refreshToken: null,
   user: null,
+  hasSession: false,
+  legacyRefreshToken: null,
 }
 
 /**
  * Store vanilla: lo leen también el router y los interceptores, fuera de React.
- * Access token solo en memoria. El refresh token se persiste en localStorage de forma
- * interina, hasta que el backend lo entregue en una cookie httpOnly (docs/PANEL_WEB.md §9).
+ * El access token vive solo en memoria y el refresh token en una cookie httpOnly
+ * que pone la API; aquí solo se recuerda si hay sesión.
  */
 export const sessionStore = createStore<SessionState>()(
   devtools(
@@ -40,16 +44,24 @@ export const sessionStore = createStore<SessionState>()(
       (set) => ({
         ...initialState,
         actions: {
-          setTokens: ({ accessToken, refreshToken }) => set({ accessToken, refreshToken }),
+          setTokens: ({ accessToken }) =>
+            set({ accessToken, hasSession: true, legacyRefreshToken: null }),
           setUser: (user) => set({ user, status: 'authenticated' }),
           clear: () => set({ ...initialState, status: 'anonymous' }),
         },
       }),
       {
         name: SESSION_STORAGE_KEY,
-        version: 1,
+        version: 2,
         storage: createJSONStorage(() => localStorage),
-        partialize: ({ refreshToken }) => ({ refreshToken }),
+        partialize: ({ hasSession, legacyRefreshToken }) => ({ hasSession, legacyRefreshToken }),
+        migrate: (persisted, version) => {
+          if (version < 2) {
+            const { refreshToken } = (persisted ?? {}) as { refreshToken?: string | null }
+            return { hasSession: Boolean(refreshToken), legacyRefreshToken: refreshToken ?? null }
+          }
+          return persisted as Pick<SessionData, 'hasSession' | 'legacyRefreshToken'>
+        },
       },
     ),
     { name: 'session', enabled: import.meta.env.DEV },
@@ -62,17 +74,13 @@ export function useSessionStore<T>(selector: (state: SessionState) => T): T {
 
 export const useSessionStatus = () => useSessionStore((state) => state.status)
 
-/**
- * El backend rota el refresh token en cada uso y, si ve uno ya usado, cierra la sesión
- * en todos lados. Por eso cada pestaña adopta el token que guardó otra, y si otra cerró
- * sesión, esta también.
- */
+/** Si otra pestaña cerró sesión, esta también (la cookie es la misma para todas). */
 export function syncSessionAcrossTabs(): () => void {
   const handleStorage = (event: StorageEvent) => {
     if (event.key !== SESSION_STORAGE_KEY) return
     void Promise.resolve(sessionStore.persist.rehydrate()).then(() => {
-      const { refreshToken, status, actions } = sessionStore.getState()
-      if (!refreshToken && status !== 'anonymous') actions.clear()
+      const { hasSession, status, actions } = sessionStore.getState()
+      if (!hasSession && status !== 'anonymous') actions.clear()
     })
   }
   window.addEventListener('storage', handleStorage)

@@ -67,6 +67,48 @@ export function storeProfilePayload(values: StoreProfileForm, currency: string) 
   }
 }
 
+const childName = z.string().trim().min(1, 'Escribe un nombre.').max(60, 'Máximo 60 caracteres.')
+
+/** "1/4", "Grande": cada una con su precio. */
+const variantSchema = z.object({
+  id: z.string().optional(),
+  name: childName,
+  price: soles.refine(
+    (value) => (parseSoles(value) ?? 0) > 0,
+    'El precio debe ser mayor que cero.',
+  ),
+  isAvailable: z.boolean(),
+})
+
+const optionValueSchema = z.object({
+  id: z.string().optional(),
+  name: childName,
+  /** Lo que suma al precio; vacío: nada. */
+  priceDelta: z.union([z.literal(''), soles]),
+  isAvailable: z.boolean(),
+})
+
+/** "Cremas" (elige hasta 3), "Bebida" (elige 1, obligatorio). */
+const optionSchema = z
+  .object({
+    id: z.string().optional(),
+    name: childName,
+    minSelect: z.number({ error: 'Usa un número.' }).int().min(0).max(20),
+    maxSelect: z.number({ error: 'Usa un número.' }).int().min(1, 'Al menos 1.').max(20),
+    values: z
+      .array(optionValueSchema)
+      .min(1, 'Agrega al menos una opción.')
+      .max(30, 'Hasta 30 opciones.'),
+  })
+  .refine((o) => o.minSelect <= o.maxSelect, {
+    message: 'El mínimo no puede ser mayor que el máximo.',
+    path: ['minSelect'],
+  })
+  .refine((o) => o.maxSelect <= o.values.length, {
+    message: 'Hay menos opciones que el máximo a elegir.',
+    path: ['maxSelect'],
+  })
+
 export const productSchema = z.object({
   name: z
     .string()
@@ -87,17 +129,48 @@ export const productSchema = z.object({
   isAvailable: z.boolean(),
   isFeatured: z.boolean(),
   isLocal: z.boolean(),
+  variants: z.array(variantSchema).max(20, 'Hasta 20 variantes.'),
+  options: z.array(optionSchema).max(20, 'Hasta 20 grupos de opciones.'),
 })
 export type ProductForm = z.infer<typeof productSchema>
 
+/**
+ * Manda variantes y opciones completas: las que traen `id` se editan, las nuevas se
+ * crean y las que faltan se borran. Con variantes, el precio base es el más bajo.
+ */
 export function productPayload(values: ProductForm, currency: string) {
-  // No enviar variants/options: un PATCH con listas vacías borraría las configuraciones existentes.
+  const money = (value: string) => ({ amount: parseSoles(value) ?? 0, currency })
+  const variants = values.variants.map((v, i) => ({
+    ...(v.id && { id: v.id }),
+    name: v.name,
+    price: money(v.price),
+    isAvailable: v.isAvailable,
+    sortOrder: i,
+  }))
+  const lowest = variants.length
+    ? Math.min(...variants.map((v) => v.price.amount))
+    : parseSoles(values.basePrice)!
   return {
     ...values,
     imageUrl: values.imageUrl || null,
     menuSectionId: values.menuSectionId || null,
     stock: values.stock === '' ? null : Number(values.stock),
-    basePrice: { amount: parseSoles(values.basePrice)!, currency },
+    basePrice: { amount: lowest, currency },
+    variants,
+    options: values.options.map((o, i) => ({
+      ...(o.id && { id: o.id }),
+      name: o.name,
+      minSelect: o.minSelect,
+      maxSelect: o.maxSelect,
+      sortOrder: i,
+      values: o.values.map((value, j) => ({
+        ...(value.id && { id: value.id }),
+        name: value.name,
+        priceDelta: money(value.priceDelta || '0'),
+        isAvailable: value.isAvailable,
+        sortOrder: j,
+      })),
+    })),
   }
 }
 

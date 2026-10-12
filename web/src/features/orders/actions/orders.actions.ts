@@ -1,5 +1,5 @@
 import { http } from '@/app/api'
-import type { AdminOrder, OrdersBoard, OrdersPage, OrderStatus } from '../model/orders'
+import type { AdminOrder, CouriersMap, OrdersBoard, OrdersPage, OrderStatus } from '../model/orders'
 
 export interface OrdersHistoryFilters {
   cityId: string
@@ -40,4 +40,13 @@ export async function getOrder(id: string, signal?: AbortSignal) {
 
 export async function cancelOrder(id: string, reason: string) {
   return (await http.post<AdminOrder>(`/admin/orders/${id}/cancel`, { reason })).data
+}
+
+export async function getCouriersMap(cityId: string, signal?: AbortSignal) {
+  return (
+    await http.get<CouriersMap>('/admin/orders/couriers', {
+      params: cityId ? { cityId } : undefined,
+      signal,
+    })
+  ).data
 }

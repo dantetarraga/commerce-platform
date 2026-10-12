@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { citiesQuery } from '@/app/api/lookups'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
+import { ImageUploadField } from '@/components/shared/image-upload-field'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
 import type { StoreDetail } from '../model/catalog'
@@ -143,19 +144,58 @@ export function StoreFormDialog({
               error={errors.minOrderAmount?.message}
               {...form.register('minOrderAmount')}
             />
-            <TextField
-              label='Logo (URL https, opcional)'
-              type='url'
-              error={errors.logoUrl?.message}
-              {...form.register('logoUrl')}
-            />
-            <TextField
-              label='Portada (URL https, opcional)'
-              type='url'
-              error={errors.coverUrl?.message}
-              {...form.register('coverUrl')}
-            />
+            {/* Las fotos van en la carpeta del negocio: al crearlo todavía no tiene id. */}
+            {!store && (
+              <>
+                <TextField
+                  label='Logo (URL https, opcional)'
+                  type='url'
+                  hint='También puedes subirlo después de crear el negocio.'
+                  error={errors.logoUrl?.message}
+                  {...form.register('logoUrl')}
+                />
+                <TextField
+                  label='Portada (URL https, opcional)'
+                  type='url'
+                  error={errors.coverUrl?.message}
+                  {...form.register('coverUrl')}
+                />
+              </>
+            )}
           </div>
+          {store && (
+            <div className='grid gap-4 sm:grid-cols-2'>
+              <Controller
+                control={form.control}
+                name='logoUrl'
+                render={({ field, fieldState }) => (
+                  <ImageUploadField
+                    label='Logo (opcional)'
+                    value={field.value}
+                    onChange={(url) => field.onChange(url)}
+                    target={{ purpose: 'store-logo', storeId: store.id }}
+                    error={fieldState.error?.message}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+              <Controller
+                control={form.control}
+                name='coverUrl'
+                render={({ field, fieldState }) => (
+                  <ImageUploadField
+                    label='Portada (opcional)'
+                    shape='wide'
+                    value={field.value}
+                    onChange={(url) => field.onChange(url)}
+                    target={{ purpose: 'store-cover', storeId: store.id }}
+                    error={fieldState.error?.message}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+            </div>
+          )}
           <TextField
             label='Descripción (opcional)'
             error={errors.description?.message}

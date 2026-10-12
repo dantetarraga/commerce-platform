@@ -1,3 +1,4 @@
+import type { WeekRange } from '@/components/shared/week-nav'
 import type { Money } from '@/lib/money'
 
 export type PaymentMethod = 'CASH' | 'YAPE' | 'PLIN' | 'CARD'
@@ -59,4 +60,31 @@ export interface Settlement {
   /** Pendiente de definir (OPERACION §4): hoy siempre `null`. */
   commission: null
   days: { date: string; delivered: number; sales: Money; collected: Collected }[]
+}
+
+/** `GET merchant/settlements/:storeId?week`: la liquidación de una semana (lunes a domingo). */
+export interface WeeklySettlement {
+  week: WeekRange
+  storeId: string
+  name: string
+  delivered: number
+  sales: Money
+  commission: Money
+  /** Lo que cobraste tú mismo; si cobró el repartidor, 0. */
+  collectedByStore: Money
+  /** > 0: Apamuy te paga; < 0: le pagas a Apamuy. */
+  balance: Money
+  owedTo: 'STORE' | 'APAMUY' | null
+  /** `OPEN`: la semana no terminó · `PENDING`: falta pagarla · `PAID`: ya se liquidó · `EMPTY`: sin entregas. */
+  status: 'OPEN' | 'PENDING' | 'PAID' | 'EMPTY'
+  paid: { at: string; by: { id: string; name: string } | null; balance: Money } | null
+  orders: {
+    id: string
+    code: string
+    deliveredAt: string
+    subtotal: Money
+    rateBps: number
+    commission: Money
+    collectedByStore: Money
+  }[]
 }

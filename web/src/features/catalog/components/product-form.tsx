@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { CheckField, SelectField, TextField } from '@/components/shared/form-controls'
+import { ImageUploadField } from '@/components/shared/image-upload-field'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
-import { formatMoney } from '@/lib/money'
 import { useCatalogScope } from '../hooks/use-catalog-scope'
 import type { Product, StoreDetail } from '../model/catalog'
 import { saveProductMutation } from '../mutations/products.mutations'
+import { ProductOptionsFields } from './product-options-fields'
+import { ProductVariantsFields } from './product-variants-fields'
 import { productPayload, productSchema, type ProductForm } from '../schemas/catalog.schemas'
 
 export function ProductFormDialog({
@@ -34,8 +36,27 @@ export function ProductFormDialog({
       isAvailable: product?.isAvailable ?? true,
       isFeatured: product?.isFeatured ?? false,
       isLocal: product?.isLocal ?? false,
+      variants: (product?.variants ?? []).map((v) => ({
+        id: v.id,
+        name: v.name,
+        price: String(v.price.amount / 100),
+        isAvailable: v.isAvailable,
+      })),
+      options: (product?.options ?? []).map((o) => ({
+        id: o.id,
+        name: o.name,
+        minSelect: o.minSelect,
+        maxSelect: o.maxSelect,
+        values: o.values.map((v) => ({
+          id: v.id,
+          name: v.name,
+          priceDelta: v.priceDelta.amount ? String(v.priceDelta.amount / 100) : '',
+          isAvailable: v.isAvailable,
+        })),
+      })),
     },
   })
+  const hasVariants = useWatch({ control: form.control, name: 'variants' }).length > 0
   const scope = useCatalogScope()
   const mutation = useMutation(saveProductMutation(store.id, product?.id, scope))
   const { errors, isSubmitting } = form.formState
@@ -73,10 +94,8 @@ export function ProductFormDialog({
           <TextField
             label='Precio base (S/)'
             inputMode='decimal'
-            readOnly={Boolean(product?.variants.length)}
-            hint={
-              product?.variants.length ? 'Se cobra el precio de la variante elegida.' : undefined
-            }
+            readOnly={hasVariants}
+            hint={hasVariants ? 'Con variantes se cobra el precio de la elegida.' : undefined}
             error={errors.basePrice?.message}
             {...form.register('basePrice')}
           />
@@ -87,11 +106,20 @@ export function ProductFormDialog({
             error={errors.stock?.message}
             {...form.register('stock')}
           />
-          <TextField
-            label='Foto (URL https, opcional)'
-            type='url'
-            error={errors.imageUrl?.message}
-            {...form.register('imageUrl')}
+          <Controller
+            control={form.control}
+            name='imageUrl'
+            render={({ field, fieldState }) => (
+              <ImageUploadField
+                label='Foto (opcional)'
+                hint='Cuadrada se ve mejor en la app.'
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                target={{ purpose: 'product', storeId: store.id }}
+                error={fieldState.error?.message}
+                disabled={isSubmitting}
+              />
+            )}
           />
           <TextField
             label='Orden en la carta'
@@ -111,25 +139,8 @@ export function ProductFormDialog({
           <CheckField {...form.register('isFeatured')}>Destacado</CheckField>
           <CheckField {...form.register('isLocal')}>Hecho en la ciudad</CheckField>
         </fieldset>
-        {product && (product.variants.length > 0 || product.options.length > 0) && (
-          <div className='bg-secondary space-y-2 rounded-lg p-4 text-sm'>
-            <h3 className='font-semibold'>Variantes y opciones actuales</h3>
-            <p className='text-muted-foreground'>
-              Solo consulta. Se conservan al guardar estos datos.
-            </p>
-            {product.variants.map((variant) => (
-              <p key={variant.id}>
-                {variant.name} · {formatMoney(variant.price)}
-                {!variant.isAvailable && ' · No disponible'}
-              </p>
-            ))}
-            {product.options.map((option) => (
-              <p key={option.id}>
-                {option.name}: {option.values.map((value) => value.name).join(', ')}
-              </p>
-            ))}
-          </div>
-        )}
+        <ProductVariantsFields form={form} disabled={isSubmitting} />
+        <ProductOptionsFields form={form} disabled={isSubmitting} />
         <ErrorNotice error={mutation.error} />
         <div className='flex justify-end gap-3'>
           <Button type='button' variant='outline' disabled={isSubmitting} onClick={onClose}>

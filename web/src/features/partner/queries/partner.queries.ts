@@ -1,6 +1,11 @@
 import { queryOptions } from '@tanstack/react-query'
 import { queryKeys } from '@/app/api'
-import { getDaySummary, getSalesReport, getSettlement } from '../actions/partner.actions'
+import {
+  getDaySummary,
+  getSalesReport,
+  getSettlement,
+  getWeeklySettlement,
+} from '../actions/partner.actions'
 import type { DateRange } from '@/lib/date-range'
 
 export const daySummaryQuery = (date: string) =>
@@ -21,4 +26,10 @@ export const settlementQuery = (range: DateRange, storeId: string) =>
   queryOptions({
     queryKey: queryKeys.partnerSettlement({ ...range, storeId }),
     queryFn: ({ signal }) => getSettlement(range, storeId, signal),
+  })
+
+export const weeklySettlementQuery = (week: string, storeId: string) =>
+  queryOptions({
+    queryKey: queryKeys.partnerWeeklySettlement.detail({ week, storeId }),
+    queryFn: ({ signal }) => getWeeklySettlement(week, storeId, signal),
   })

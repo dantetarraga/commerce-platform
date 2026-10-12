@@ -3,7 +3,7 @@ export {
   restoreSession,
   getCurrentUser,
   getAccessToken,
-  hasRefreshToken,
+  hasSession,
   refreshAccessToken,
 } from './model/session'
 export {

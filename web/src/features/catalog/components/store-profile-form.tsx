@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { TextField } from '@/components/shared/form-controls'
+import { ImageUploadField } from '@/components/shared/image-upload-field'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
 import type { StoreDetail } from '../model/catalog'
@@ -80,15 +81,35 @@ export function StoreProfileFormDialog({
               {...form.register('minOrderAmount')}
             />
           </div>
-          <TextField
-            label='Logo (URL https)'
-            error={errors.logoUrl?.message}
-            {...form.register('logoUrl')}
+          <Controller
+            control={form.control}
+            name='logoUrl'
+            render={({ field, fieldState }) => (
+              <ImageUploadField
+                label='Logo'
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                target={{ purpose: 'store-logo', storeId: store.id }}
+                error={fieldState.error?.message}
+                disabled={isSubmitting}
+              />
+            )}
           />
-          <TextField
-            label='Portada (URL https)'
-            error={errors.coverUrl?.message}
-            {...form.register('coverUrl')}
+          <Controller
+            control={form.control}
+            name='coverUrl'
+            render={({ field, fieldState }) => (
+              <ImageUploadField
+                label='Portada'
+                hint='Horizontal: es lo primero que ve el cliente.'
+                shape='wide'
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                target={{ purpose: 'store-cover', storeId: store.id }}
+                error={fieldState.error?.message}
+                disabled={isSubmitting}
+              />
+            )}
           />
         </fieldset>
         <ErrorNotice error={mutation.error} />

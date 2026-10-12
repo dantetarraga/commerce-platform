@@ -4,6 +4,7 @@ import {
   createStore,
   deleteStore,
   replaceSchedules,
+  setStoreCommission,
   setStorePublished,
   updateStore,
   updateStoreProfile,
@@ -72,4 +73,12 @@ export const saveSchedulesMutation = (storeId: string, scope: CatalogScope) =>
     mutationFn: (schedules: Schedule[]) => replaceSchedules(storeId, schedules, scope),
     onSuccess: (_data, _vars, _result, { client }) =>
       client.invalidateQueries({ queryKey: queryKeys.stores.detail(storeId) }),
+  })
+
+/** `null` devuelve el negocio a la comisión por defecto. Afecta solo a sus pedidos nuevos. */
+export const saveStoreCommissionMutation = (storeId: string) =>
+  mutationOptions({
+    mutationFn: (rateBps: number | null) => setStoreCommission(storeId, rateBps),
+    onSuccess: (_data, _vars, _result, { client }) =>
+      client.invalidateQueries({ queryKey: queryKeys.storeCommission.detail(storeId) }),
   })

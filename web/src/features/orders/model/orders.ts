@@ -117,3 +117,29 @@ export function cancelledByLabel(order: Pick<AdminOrder, 'cancelledBy'>): string
       return 'Apamuy (sin respuesta del negocio)'
   }
 }
+
+export type CourierStatus = 'AVAILABLE' | 'BUSY' | 'OFFLINE'
+
+/** Un repartidor conectado en el mapa de Pedidos en vivo. */
+export interface CourierOnMap {
+  id: string
+  cityId: string
+  name: string
+  phone: string
+  vehicleLabel: string
+  status: CourierStatus
+  /** Última ubicación que mandó la app; `stale` si pasaron más de 5 minutos. */
+  location: { lat: number; lng: number; at: string; stale: boolean } | null
+  order: { id: string; code: string; status: OrderStatus; storeName: string } | null
+}
+
+export interface CouriersMap {
+  generatedAt: string
+  items: CourierOnMap[]
+}
+
+export const COURIER_STATUS_LABEL: Record<CourierStatus, string> = {
+  AVAILABLE: 'Disponible',
+  BUSY: 'Ocupado',
+  OFFLINE: 'Desconectado',
+}

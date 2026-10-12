@@ -2,17 +2,20 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ConfirmActionDialog, type ConfirmAction } from '@/components/shared/confirm-action-dialog'
+import { QueryBoundary } from '@/components/shared/query-boundary'
 import { PageHeader } from '@/components/shared/page-header'
 import { StatusBadge } from '@/components/shared/status-badge'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { deleteStoreMutation, toggleStorePublishedMutation } from '../mutations/stores.mutations'
 import { storeQuery } from '../queries/catalog.queries'
+import { StoreCommissionCard } from './store-commission-card'
 import { StoreFormDialog } from './store-form'
 import { StoreProductsCard } from './store-products-card'
 import { StoreSchedulesCard } from './store-schedules-card'
 import { StoreSectionsCard } from './store-sections-card'
 
-/** Ficha de un negocio para el admin: datos, publicación, horarios y carta. Suspende mientras carga. */
+/** Ficha de un negocio para el admin: datos, publicación, horarios, comisión y carta. Suspende mientras carga. */
 export function StoreDetail({ storeId }: { storeId: string }) {
   const { data: store } = useSuspenseQuery(storeQuery(storeId))
   const navigate = useNavigate()
@@ -58,6 +61,9 @@ export function StoreDetail({ storeId }: { storeId: string }) {
       <div className='grid gap-5 lg:grid-cols-2'>
         <StoreSchedulesCard store={store} />
         <StoreSectionsCard store={store} />
+        <QueryBoundary fallback={<Skeleton className='h-40 w-full' />}>
+          <StoreCommissionCard storeId={store.id} storeName={store.name} />
+        </QueryBoundary>
       </div>
       <StoreProductsCard store={store} />
       <div className='flex flex-wrap items-center justify-between gap-4 border-t pt-5'>

@@ -9,7 +9,20 @@ export const queryKeys = {
   partnerSummary: (date: string) => ['merchant', 'summary', date] as const,
   partnerReport: (filters: object) => ['merchant', 'report', filters] as const,
   partnerSettlement: (filters: object) => ['merchant', 'settlement', filters] as const,
+  partnerWeeklySettlement: {
+    all: () => ['merchant', 'weekly-settlement'] as const,
+    detail: (filters: object) => ['merchant', 'weekly-settlement', filters] as const,
+  },
   cash: (filters: object) => ['admin', 'cash', filters] as const,
+  commission: () => ['admin', 'commission'] as const,
+  storeCommission: {
+    all: () => ['admin', 'store-commission'] as const,
+    detail: (storeId: string) => ['admin', 'store-commission', storeId] as const,
+  },
+  settlements: {
+    all: () => ['admin', 'settlements'] as const,
+    week: (filters: object) => ['admin', 'settlements', 'week', filters] as const,
+  },
   categories: () => ['categories'] as const,
   stores: {
     all: () => ['admin', 'stores'] as const,
@@ -26,6 +39,7 @@ export const queryKeys = {
     board: (cityId: string) => ['admin', 'orders', 'board', cityId || 'all'] as const,
     history: (filters: object) => ['admin', 'orders', 'history', filters] as const,
     detail: (id: string) => ['admin', 'orders', 'detail', id] as const,
+    couriers: (cityId: string) => ['admin', 'orders', 'couriers', cityId || 'all'] as const,
   },
   partners: {
     all: () => ['admin', 'partners'] as const,

@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { lazyRouteComponent } from '@tanstack/react-router'
 import { adminStoresQuery, citiesQuery, ownStoresQuery } from '@/app/api/lookups'
-import { categoriesQuery, storeQuery } from '../queries/catalog.queries'
+import { categoriesQuery, storeCommissionQuery, storeQuery } from '../queries/catalog.queries'
 
 interface LoaderArgs {
   context: { queryClient: QueryClient }
@@ -23,6 +23,7 @@ export const storeDetailRoute = {
   path: 'catalog/$storeId',
   loader: ({ context: { queryClient }, params }: LoaderArgs & { params: { storeId: string } }) => {
     void queryClient.prefetchQuery(storeQuery(params.storeId))
+    void queryClient.prefetchQuery(storeCommissionQuery(params.storeId))
   },
   component: lazyRouteComponent(() => import('../pages/store-detail.page'), 'StoreDetailPage'),
 } as const

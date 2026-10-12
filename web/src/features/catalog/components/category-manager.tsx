@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { EditorDialog } from '@/components/shared/editor-dialog'
 import { TextField } from '@/components/shared/form-controls'
+import { ImageUploadField } from '@/components/shared/image-upload-field'
 import { QueryBoundary } from '@/components/shared/query-boundary'
 import { ErrorNotice } from '@/components/shared/query-feedback'
 import { Button } from '@/components/ui/button'
@@ -44,10 +45,19 @@ function CategoryEditor({ category, onClose }: { category?: Category; onClose: (
             error={errors.name?.message}
             {...form.register('name')}
           />
-          <TextField
-            label='Ícono (URL https, opcional)'
-            error={errors.iconUrl?.message}
-            {...form.register('iconUrl')}
+          <Controller
+            control={form.control}
+            name='iconUrl'
+            render={({ field, fieldState }) => (
+              <ImageUploadField
+                label='Ícono (opcional)'
+                value={field.value}
+                onChange={(url) => field.onChange(url)}
+                target={{ purpose: 'category' }}
+                error={fieldState.error?.message}
+                disabled={isSubmitting}
+              />
+            )}
           />
         </fieldset>
         <ErrorNotice error={mutation.error} />

@@ -15,9 +15,8 @@ export function SettlementView({ range, storeId }: { range: DateRange; storeId: 
       <div role='note' className='bg-secondary/70 flex items-start gap-3 rounded-lg p-4 text-sm'>
         <Info className='text-primary mt-0.5 size-5 shrink-0' aria-hidden />
         <p>
-          La comisión de Apamuy y las liquidaciones semanales todavía no están definidas. Mientras
-          tanto ves lo que vendiste y lo que cobraron los repartidores; el envío y la propina son
-          del repartidor.
+          Lo que vendiste y lo que cobraron los repartidores a tus clientes. Lo cobrado incluye el
+          envío y la propina, que son del repartidor; tu saldo está en la liquidación semanal.
         </p>
       </div>
       <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>

@@ -1,8 +1,8 @@
 import type { SessionUser } from './user'
 
+/** El refresh token viaja en una cookie httpOnly: el panel no lo ve. */
 export interface SessionTokens {
   accessToken: string
-  refreshToken: string
 }
 
 export interface OtpRequested {
