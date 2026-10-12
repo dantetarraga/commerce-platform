@@ -248,7 +248,7 @@ final class CourierActiveDeliveryProvider
 }
 
 String _$courierActiveDeliveryHash() =>
-    r'b9926a79cab3c207860f5ea57d06c3db698f07d9';
+    r'5293fee0179fbd99b2ab68a4fe7cf28757c85ec1';
 
 /// Id del pedido en curso. Solo avisa cuando cambia de pedido, no en cada
 /// consulta.
@@ -300,23 +300,24 @@ final class CourierActiveOrderIdProvider
 String _$courierActiveOrderIdHash() =>
     r'a64e8342d1e270942ab2909de57db3608b59cd9a';
 
-/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
-/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
-/// una vez; sin permiso o sin señal, simplemente no manda nada.
+/// Mientras está conectado y lleva un pedido, manda su ubicación para que el
+/// cliente lo vea llegar, también con la app de fondo o la pantalla apagada
+/// (en Android, con un aviso fijo). Se apaga al entregar, desconectarse o
+/// cerrar sesión. El permiso se pide una vez; si lo niega, el estado lo dice.
 
-@ProviderFor(courierLocationSharing)
+@ProviderFor(CourierLocationSharing)
 final courierLocationSharingProvider = CourierLocationSharingProvider._();
 
-/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
-/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
-/// una vez; sin permiso o sin señal, simplemente no manda nada.
-
+/// Mientras está conectado y lleva un pedido, manda su ubicación para que el
+/// cliente lo vea llegar, también con la app de fondo o la pantalla apagada
+/// (en Android, con un aviso fijo). Se apaga al entregar, desconectarse o
+/// cerrar sesión. El permiso se pide una vez; si lo niega, el estado lo dice.
 final class CourierLocationSharingProvider
-    extends $FunctionalProvider<void, void, void>
-    with $Provider<void> {
-  /// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
-  /// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
-  /// una vez; sin permiso o sin señal, simplemente no manda nada.
+    extends $NotifierProvider<CourierLocationSharing, CourierLocationStatus> {
+  /// Mientras está conectado y lleva un pedido, manda su ubicación para que el
+  /// cliente lo vea llegar, también con la app de fondo o la pantalla apagada
+  /// (en Android, con un aviso fijo). Se apaga al entregar, desconectarse o
+  /// cerrar sesión. El permiso se pide una vez; si lo niega, el estado lo dice.
   CourierLocationSharingProvider._()
     : super(
         from: null,
@@ -333,25 +334,43 @@ final class CourierLocationSharingProvider
 
   @$internal
   @override
-  $ProviderElement<void> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  void create(Ref ref) {
-    return courierLocationSharing(ref);
-  }
+  CourierLocationSharing create() => CourierLocationSharing();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(void value) {
+  Override overrideWithValue(CourierLocationStatus value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<void>(value),
+      providerOverride: $SyncValueProvider<CourierLocationStatus>(value),
     );
   }
 }
 
 String _$courierLocationSharingHash() =>
-    r'bea5dceb27159fe40a4b571cc1196df956dace12';
+    r'68a74aaabf14510c1bcd120a5d572580bafa6107';
+
+/// Mientras está conectado y lleva un pedido, manda su ubicación para que el
+/// cliente lo vea llegar, también con la app de fondo o la pantalla apagada
+/// (en Android, con un aviso fijo). Se apaga al entregar, desconectarse o
+/// cerrar sesión. El permiso se pide una vez; si lo niega, el estado lo dice.
+
+abstract class _$CourierLocationSharing
+    extends $Notifier<CourierLocationStatus> {
+  CourierLocationStatus build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<CourierLocationStatus, CourierLocationStatus>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<CourierLocationStatus, CourierLocationStatus>,
+              CourierLocationStatus,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
 
 @ProviderFor(courierSummary)
 final courierSummaryProvider = CourierSummaryProvider._();

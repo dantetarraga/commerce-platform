@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ubicación del repartidor con la app de fondo o la pantalla apagada mientras lleva
+         un pedido: servicio en primer plano de geolocator, con aviso fijo. Basta el permiso
+         "mientras se usa la app" porque se inicia con la app a la vista. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <application>
+        <!-- Recorte cuadrado de la foto de un producto (image_cropper). Solo Socios. -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+    </application>
+</manifest>

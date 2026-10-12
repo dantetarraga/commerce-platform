@@ -137,6 +137,25 @@ void main() {
     verifyNever(() => storage.clear());
   });
 
+  test('sin red al abrir entra con la última cuenta vista', () async {
+    when(() => storage.read()).thenAnswer((_) async => (accessToken: 'a', refreshToken: 'r'));
+    when(() => remote.me()).thenAnswer((_) async => userDto);
+    expect((await repository.restoreSession()).getOrThrow()?.firstName, 'Alex');
+
+    when(() => remote.me()).thenThrow(const NetworkException());
+    final offline = await repository.restoreSession();
+
+    expect(offline.getOrThrow()?.id, 'u1');
+    verifyNever(() => storage.clear());
+  });
+
+  test('si no se pueden leer los tokens, pide entrar de nuevo', () async {
+    when(() => storage.read()).thenThrow(Exception('BAD_DECRYPT'));
+
+    expect((await repository.restoreSession()).getOrThrow(), isNull);
+    verify(() => storage.clear()).called(1);
+  });
+
   test('logout limpia localmente aunque el backend falle', () async {
     when(() => storage.read()).thenAnswer((_) async => (accessToken: 'a', refreshToken: 'r'));
     when(() => remote.logout('r')).thenThrow(const NetworkException());

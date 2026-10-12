@@ -36,12 +36,33 @@ final class LocationUnavailable extends LocationReading {
   const LocationUnavailable();
 }
 
+/// Aviso fijo de Android con el que se sigue leyendo la ubicación con la app de
+/// fondo o la pantalla apagada (servicio en primer plano).
+final class BackgroundLocationNotice {
+  const BackgroundLocationNotice({required this.title, required this.text, required this.channelName});
+
+  final String title;
+  final String text;
+
+  /// Nombre del canal en los ajustes de notificaciones.
+  final String channelName;
+}
+
 abstract interface class LocationService {
   /// Con [ask] en `false` no muestra el diálogo de permiso: solo lee si ya lo hay.
   Future<LocationReading> current({bool ask = true});
 
   /// Abre los ajustes que corresponden a [reading] (GPS o permisos de la app).
   Future<void> openSettings(LocationReading reading);
+
+  /// Posiciones cada [interval] como mucho, solo si se movió [distanceFilter]
+  /// metros. No pide permiso: hay que tenerlo antes. Con [notice], en Android
+  /// sigue en segundo plano; Android exige empezarlo con la app a la vista.
+  Stream<GeoCoordinates> watch({
+    required Duration interval,
+    required int distanceFilter,
+    BackgroundLocationNotice? notice,
+  });
 }
 
 final class GeolocatorLocationService implements LocationService {
@@ -84,6 +105,35 @@ final class GeolocatorLocationService implements LocationService {
       await Geolocator.openAppSettings();
     }
   }
+
+  @override
+  Stream<GeoCoordinates> watch({
+    required Duration interval,
+    required int distanceFilter,
+    BackgroundLocationNotice? notice,
+  }) {
+    final settings = Platform.isAndroid
+        ? AndroidSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: distanceFilter,
+            intervalDuration: interval,
+            foregroundNotificationConfig: notice == null
+                ? null
+                : ForegroundNotificationConfig(
+                    notificationTitle: notice.title,
+                    notificationText: notice.text,
+                    notificationChannelName: notice.channelName,
+                    notificationIcon: const AndroidResource(name: 'ic_launcher_monochrome'),
+                    // Sin él, con la pantalla apagada las posiciones llegan juntas al despertar.
+                    enableWakeLock: true,
+                    setOngoing: true,
+                  ),
+          )
+        : LocationSettings(distanceFilter: distanceFilter);
+    return Geolocator.getPositionStream(
+      locationSettings: settings,
+    ).map((p) => GeoCoordinates.trusted(p.latitude, p.longitude));
+  }
 }
 
 /// Sin GPS (tests, web, escritorio).
@@ -95,6 +145,13 @@ final class NoLocationService implements LocationService {
 
   @override
   Future<void> openSettings(LocationReading reading) async {}
+
+  @override
+  Stream<GeoCoordinates> watch({
+    required Duration interval,
+    required int distanceFilter,
+    BackgroundLocationNotice? notice,
+  }) => const Stream.empty();
 }
 
 @Riverpod(keepAlive: true)

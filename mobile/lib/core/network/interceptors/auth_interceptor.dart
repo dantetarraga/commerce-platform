@@ -2,22 +2,20 @@ import 'package:apamuy/core/storage/token_storage.dart';
 import 'package:dio/dio.dart';
 
 /// Agrega el Bearer token y, ante un 401, refresca una sola vez y reintenta.
-/// Sin loops: es `QueuedInterceptor`, el refresh usa `_refreshDio`, cada request
-/// se reintenta una vez (`extra['retried']`) y `/auth/*` nunca refresca.
+/// Sin loops: es `QueuedInterceptor`, el refresh y el reintento usan `_refreshDio`
+/// (sin interceptores), cada request se reintenta una vez (`extra['retried']`) y
+/// `/auth/*` nunca refresca.
 class AuthInterceptor extends QueuedInterceptor {
   AuthInterceptor({
-    required Dio dio,
     required Dio refreshDio,
     required TokenStorage tokenStorage,
     required void Function() onSessionExpired,
-  }) : _dio = dio,
-       _refreshDio = refreshDio,
+  }) : _refreshDio = refreshDio,
        _tokenStorage = tokenStorage,
        _onSessionExpired = onSessionExpired;
 
   static const _retriedKey = 'retried';
 
-  final Dio _dio;
   final Dio _refreshDio;
   final TokenStorage _tokenStorage;
   final void Function() _onSessionExpired;
@@ -58,12 +56,19 @@ class AuthInterceptor extends QueuedInterceptor {
       request
         ..headers['Authorization'] = 'Bearer $accessToken'
         ..extra[_retriedKey] = true;
-      handler.resolve(await _dio.fetch<dynamic>(request));
+      // No con `_dio`: su error esperaría en esta misma cola, detrás de este
+      // handler que lo espera a él, y la app entera quedaría colgada.
+      handler.resolve(await _refreshDio.fetch<dynamic>(request));
     } on DioException catch (refreshError) {
       if (refreshError.requestOptions.path.endsWith('/auth/refresh')) {
-        await _tokenStorage.clear();
-        _onSessionExpired();
-        return handler.next(err);
+        // Solo un rechazo del backend cierra la sesión. Sin señal o con un 5xx
+        // se conserva y la pantalla ofrece reintentar.
+        if (_rejected(refreshError)) {
+          await _tokenStorage.clear();
+          _onSessionExpired();
+          return handler.next(err);
+        }
+        return handler.next(refreshError);
       }
       handler.next(refreshError);
     }
@@ -84,4 +89,10 @@ class AuthInterceptor extends QueuedInterceptor {
   }
 
   bool _isAuthPath(String path) => path.startsWith('/auth/');
+
+  /// Token vencido, revocado o cuenta desactivada.
+  static bool _rejected(DioException e) => switch (e.response?.statusCode) {
+    401 || 403 => true,
+    _ => false,
+  };
 }

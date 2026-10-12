@@ -21,7 +21,11 @@ AuthRemoteDataSource authRemoteDataSource(Ref ref) => ref.watch(appEnvProvider).
 
 @Riverpod(keepAlive: true)
 AuthRepository authRepository(Ref ref) =>
-    AuthRepositoryImpl(ref.watch(authRemoteDataSourceProvider), ref.watch(tokenStorageProvider));
+    AuthRepositoryImpl(
+      ref.watch(authRemoteDataSourceProvider),
+      ref.watch(tokenStorageProvider),
+      ref.watch(localJsonStoreProvider),
+    );
 
 @riverpod
 RequestCode requestCode(Ref ref) => RequestCode(ref.watch(authRepositoryProvider));

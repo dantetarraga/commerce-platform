@@ -83,6 +83,7 @@ void main() {
     const partnerOnly = {
       'partner_session',
       'merchant_orders',
+      'merchant_catalog',
       'courier_deliveries',
     };
     const shared = {'auth', 'orders'};

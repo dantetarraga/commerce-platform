@@ -1,3 +1,5 @@
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/config/env.dart';
 import 'package:apamuy/core/errors/failure.dart';
 import 'package:apamuy/core/fake/fake_backend.dart';
 import 'package:apamuy/core/fake/fake_providers.dart';
@@ -14,7 +16,12 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   ProviderContainer container() {
-    final c = ProviderContainer(overrides: [fakeBackendProvider.overrideWithValue(FakeBackend(latency: Duration.zero))]);
+    final c = ProviderContainer(
+      overrides: [
+        appEnvProvider.overrideWithValue(const AppEnv(apiBaseUrl: 'http://test', useFakeData: true)),
+        fakeBackendProvider.overrideWithValue(FakeBackend(latency: Duration.zero)),
+      ],
+    );
     addTearDown(c.dispose);
     return c;
   }

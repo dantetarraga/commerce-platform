@@ -33,6 +33,7 @@ abstract final class MerchantJson {
     ProductFilter.all => 'all',
     ProductFilter.available => 'available',
     ProductFilter.soldOut => 'sold_out',
+    ProductFilter.noPhoto => 'no_photo',
   };
 
   static MerchantCatalog catalog(Map<String, dynamic> json) {
@@ -42,6 +43,7 @@ abstract final class MerchantJson {
         all: counts['all'] as int,
         available: counts['available'] as int,
         soldOut: counts['soldOut'] as int,
+        noPhoto: counts['noPhoto'] as int? ?? 0,
       ),
       sections: [
         for (final s in _rows(json['sections']))

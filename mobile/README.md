@@ -153,11 +153,11 @@ Al cerrar sesión, el teléfono deja de recibir avisos de esa cuenta.
 ## Compilar un APK
 
 ```sh
-flutter build apk --flavor customer --dart-define-from-file=env/dev.json
-flutter build apk --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/dev.json
+flutter build apk --flavor customer --dart-define-from-file=env/prod.json                    # contra la API real
+flutter build apk --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/fake.json  # demo, para mostrar
 ```
 
-Los APK quedan en `build/app/outputs/flutter-apk/`. La versión release solo habla con un backend por **HTTPS**: Android bloquea `http://` fuera de las versiones de prueba, así que con `env/dev.json` instala y abre pero no conecta.
+Los APK quedan en `build/app/outputs/flutter-apk/`. La versión release solo habla con un backend por **HTTPS**, y la app lo exige al arrancar: un release con `env/dev.json` (o sin env) se cierra con el motivo en el log. Sin `--dart-define-from-file` tampoco sale la demo: `USE_FAKE_DATA` es `false` por defecto.
 
 ### Firma para Google Play
 
@@ -176,7 +176,7 @@ Sin `android/key.properties`, la versión release se firma con la llave de prueb
    `env/prod.json` lleva `"USE_FAKE_DATA": false` y la URL HTTPS del backend en Railway.
 4. En Play Console activa **Play App Signing**: Google guarda la llave final y tú subes con la de subida.
 
-El CI arma los APK release. Si el repositorio tiene los secretos `GOOGLE_SERVICES_JSON_BASE64`, `UPLOAD_KEYSTORE_BASE64`, `UPLOAD_KEYSTORE_PASSWORD` y `UPLOAD_KEY_PASSWORD`, salen con push y firmados con la llave de subida.
+El CI arma los APK release **de demo** (`env/fake.json`). Si el repositorio tiene los secretos `GOOGLE_SERVICES_JSON_BASE64`, `UPLOAD_KEYSTORE_BASE64`, `UPLOAD_KEYSTORE_PASSWORD` y `UPLOAD_KEY_PASSWORD`, salen con push y firmados con la llave de subida.
 
 La reducción de código de la versión release borra los recursos que solo se nombran desde Dart; por eso `res/raw/keep.xml` conserva el sonido `new_order`. Un sonido nuevo para avisos también va ahí.
 

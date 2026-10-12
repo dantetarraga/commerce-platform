@@ -5,6 +5,7 @@ import 'package:apamuy/features/courier_deliveries/presentation/widgets/collect_
 import 'package:apamuy/features/courier_deliveries/presentation/widgets/collect_ticket.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/widgets/delivery_route.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/widgets/delivery_skeleton.dart';
+import 'package:apamuy/features/courier_deliveries/presentation/widgets/location_sharing_notice.dart';
 import 'package:apamuy/features/orders/orders.dart';
 import 'package:apamuy/shared/design_system/design_system.dart';
 import 'package:apamuy/shared/partner/partner.dart';
@@ -88,6 +89,7 @@ class _ActiveDeliveryPageState extends ConsumerState<ActiveDeliveryPage> with Pa
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, AppSpacing.md, AppSpacing.gutter, AppSpacing.lg),
                 children: [
+                  const LocationSharingNotice(padding: EdgeInsets.only(bottom: AppSpacing.md)),
                   DeliveryRoute(order: order),
                   const SizedBox(height: AppSpacing.lg),
                   CollectTicket(order: order),

@@ -9,6 +9,11 @@ abstract final class PartnerRoutePaths {
 
   static const merchantHome = '/negocio';
   static const merchantProducts = 'productos/:storeId'; // hija de /negocio
+  // Hijas de productos/:storeId: la carta editable.
+  static const productNew = 'nuevo';
+  static const productEdit = 'editar/:productId';
+  static const menuSections = 'secciones';
+  static const productImport = 'importar';
   static const courierHome = '/reparto';
   static const activeDelivery = 'pedido/:orderId'; // hija de /reparto
 

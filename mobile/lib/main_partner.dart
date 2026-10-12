@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// `flutter run --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/dev.json`.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppEnv.fromEnvironment().ensureReleaseReady();
   final push = AppEnv.fromEnvironment().useFakeData
       ? const NoopPushMessaging()
       : await initPushMessaging(app: PushApp.partner);

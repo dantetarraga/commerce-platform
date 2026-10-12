@@ -1,3 +1,5 @@
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/config/env.dart';
 import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/fake/fake_backend.dart';
 import 'package:apamuy/core/fake/fake_providers.dart';
@@ -79,6 +81,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appEnvProvider.overrideWithValue(const AppEnv(apiBaseUrl: 'http://test', useFakeData: true)),
           fakeBackendProvider.overrideWithValue(FakeBackend(latency: Duration.zero)),
           for (final o in [...orders, ...past]) orderWatchProvider(o.id).overrideWith((ref) => Stream.value(o)),
           ordersHistoryProvider.overrideWith((ref) async => OrderLists(active: [cooking], past: past)),

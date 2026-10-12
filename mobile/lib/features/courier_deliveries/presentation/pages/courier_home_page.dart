@@ -5,6 +5,7 @@ import 'package:apamuy/features/courier_deliveries/domain/courier.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/pages/active_delivery_page.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/providers/courier_providers.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/widgets/courier_day_ticket.dart';
+import 'package:apamuy/features/courier_deliveries/presentation/widgets/location_sharing_notice.dart';
 import 'package:apamuy/features/courier_deliveries/presentation/widgets/route_card.dart';
 import 'package:apamuy/features/orders/orders_staff.dart';
 import 'package:apamuy/features/partner_session/partner_session.dart';
@@ -86,7 +87,13 @@ class _CourierHomePageState extends ConsumerState<CourierHomePage> with PartnerA
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(AppSpacing.gutter, 18, AppSpacing.gutter, 0),
                         child: switch (delivery) {
-                          AsyncValue(value: final active?) => _ActiveDeliveryBanner(order: active),
+                          AsyncValue(value: final active?) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const LocationSharingNotice(padding: EdgeInsets.only(bottom: AppSpacing.sm)),
+                              _ActiveDeliveryBanner(order: active),
+                            ],
+                          ),
                           AsyncValue(hasError: true) || AsyncValue(hasValue: false) => AsyncValueView(
                             value: delivery,
                             compactError: true,

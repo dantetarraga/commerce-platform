@@ -73,10 +73,10 @@ void main() {
     expect(currentPartnerPath(container), startsWith(PartnerRoutePaths.merchantHome));
     expect(find.byType(MerchantProductsPage), findsOneWidget);
 
-    final soldOutBefore = find.text('Agotado').evaluate().length;
+    final soldOutBefore = find.textContaining('Agotado ·').evaluate().length;
     await tester.tap(find.byType(Switch).first);
     await settle(tester);
-    expect(find.text('Agotado'), findsNWidgets(soldOutBefore + 1));
+    expect(find.textContaining('Agotado ·'), findsNWidgets(soldOutBefore + 1));
     await unmountApamuy(tester, container);
   });
 }

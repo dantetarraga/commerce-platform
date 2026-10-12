@@ -21,9 +21,10 @@
 ## Dos apps, un proyecto
 
 - **Cliente**: `lib/main.dart` + `lib/apps/customer/`, flavor Android `customer` (`pe.apamuy.app`).
-- **Apamuy Socios** (negocio y repartidor): `lib/main_partner.dart` + `lib/apps/partner/`, flavor `partner` (`pe.apamuy.socios`). Features propias: `partner_session`, `merchant_orders`, `courier_deliveries`.
+- **Apamuy Socios** (negocio y repartidor): `lib/main_partner.dart` + `lib/apps/partner/`, flavor `partner` (`pe.apamuy.socios`). Features propias: `partner_session`, `merchant_orders`, `merchant_catalog` (carta editable), `courier_deliveries`.
 - `apps/` solo compone: raíz, router y shell de cada app (la barra de compra conectada vive en `apps/customer/shell/`). Features, `core` y `shared` no la importan.
 - Comparten `core/`, `shared/`, `auth` y el dominio de `orders`. **La app del cliente no importa features de socios ni al revés.**
+- **Ubicación del repartidor** (`courierLocationSharingProvider`): solo conectado y con un pedido en curso; sigue de fondo con el servicio en primer plano de geolocator (aviso fijo), sin `ACCESS_BACKGROUND_LOCATION`. Por eso se inicia con la app a la vista. Permisos en `android/app/src/partner/AndroidManifest.xml`.
 - En Android el flavor es obligatorio. iOS solo tiene la app del cliente (se corre sin `--flavor`).
 
 ## Comandos
@@ -36,7 +37,7 @@ flutter run --flavor customer --dart-define-from-file=env/dev-device.json  # tel
 flutter run --dart-define-from-file=env/dev-device.json               # simulador iOS (sin flavor)
 # Apamuy Socios (mismos env; demo: negocio 910000000, repartidor 900000101, código 123456)
 flutter run --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/fake.json
-flutter build apk --flavor partner -t lib/main_partner.dart          # APK para pasar a los socios
+flutter build apk --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/prod.json  # APK para los socios (https)
 dart run build_runner build --delete-conflicting-outputs
 # Marca: los PNG de assets/brand salen de BrandGlyph (la "A" en Bungee)
 flutter test tool/brand/brand_assets_test.dart --update-goldens

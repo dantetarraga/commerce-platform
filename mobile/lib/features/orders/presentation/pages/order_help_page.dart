@@ -1,4 +1,6 @@
+import 'package:apamuy/core/config/app_config_provider.dart';
 import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/utils/external_links.dart';
 import 'package:apamuy/core/utils/formatters.dart';
 import 'package:apamuy/features/orders/domain/order.dart';
 import 'package:apamuy/features/orders/presentation/order_status_labels.dart';
@@ -250,17 +252,18 @@ class _SupportCard extends StatelessWidget {
   }
 }
 
-/// Hoja para contar qué pasó. Por ahora el envío es local (sin backend de soporte).
-class _DescribeSheet extends StatefulWidget {
+/// Hoja para contar qué pasó. Se envía por el WhatsApp de soporte con el pedido ya
+/// escrito: así llega a una persona y la respuesta queda en el chat.
+class _DescribeSheet extends ConsumerStatefulWidget {
   const _DescribeSheet({this.order});
 
   final Order? order;
 
   @override
-  State<_DescribeSheet> createState() => _DescribeSheetState();
+  ConsumerState<_DescribeSheet> createState() => _DescribeSheetState();
 }
 
-class _DescribeSheetState extends State<_DescribeSheet> {
+class _DescribeSheetState extends ConsumerState<_DescribeSheet> {
   final _text = TextEditingController();
   var _sending = false;
 
@@ -270,12 +273,24 @@ class _DescribeSheetState extends State<_DescribeSheet> {
     super.dispose();
   }
 
+  String get _support => ref.read(appEnvProvider).supportWhatsapp;
+
+  String _message() {
+    final order = widget.order;
+    final about = order == null ? '' : ' Es por mi pedido ${order.code} de ${order.store.name}.';
+    return 'Hola, Apamuy.$about ${_text.text.trim()}';
+  }
+
   Future<void> _send() async {
     setState(() => _sending = true);
-    await Future<void>.delayed(AppMotion.move);
+    final opened = await ExternalLinks.whatsapp(_support, text: _message());
     if (!mounted) return;
+    setState(() => _sending = false);
+    if (!opened) {
+      AppToast.show(context, 'No pudimos abrir WhatsApp. ¿Lo tienes instalado?', kind: AppToastKind.error);
+      return;
+    }
     Navigator.of(context).pop();
-    AppToast.show(context, 'Listo. Te escribimos en menos de 10 minutos.', kind: AppToastKind.success);
   }
 
   @override
@@ -307,8 +322,20 @@ class _DescribeSheetState extends State<_DescribeSheet> {
             const SizedBox(height: AppSpacing.sm),
             ListenableBuilder(
               listenable: _text,
-              builder: (context, _) => AppButton(label: 'Enviar', loading: _sending, onPressed: _text.text.trim().isEmpty ? null : _send),
+              builder: (context, _) => AppButton(
+                label: 'Enviar por WhatsApp',
+                icon: Icons.chat_bubble_outline_rounded,
+                loading: _sending,
+                onPressed: _support.isEmpty || _text.text.trim().isEmpty ? null : _send,
+              ),
             ),
+            if (_support.isEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              const AppInlineNotice(
+                message: 'Esta versión todavía no tiene un número de soporte. Mientras, llama al negocio.',
+                kind: AppNoticeKind.warning,
+              ),
+            ],
           ],
         ),
       ),

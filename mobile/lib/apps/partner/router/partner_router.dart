@@ -2,6 +2,7 @@ import 'package:apamuy/apps/partner/router/partner_routes.dart';
 import 'package:apamuy/apps/routing/route_helpers.dart';
 import 'package:apamuy/features/auth/auth.dart';
 import 'package:apamuy/features/courier_deliveries/courier_deliveries.dart';
+import 'package:apamuy/features/merchant_catalog/merchant_catalog.dart';
 import 'package:apamuy/features/merchant_orders/merchant_orders.dart';
 import 'package:apamuy/features/partner_session/partner_session.dart';
 import 'package:apamuy/shared/design_system/brand/brand_logo.dart';
@@ -69,6 +70,31 @@ GoRouter partnerRouter(Ref ref) {
             path: PartnerRoutePaths.merchantProducts,
             name: MerchantProductsPage.name,
             builder: (_, state) => MerchantProductsPage(storeId: state.pathParameters['storeId']!),
+            routes: [
+              materialRoute(
+                path: PartnerRoutePaths.productNew,
+                name: ProductEditorPage.newName,
+                builder: (_, state) => ProductEditorPage(storeId: state.pathParameters['storeId']!),
+              ),
+              materialRoute(
+                path: PartnerRoutePaths.productEdit,
+                name: ProductEditorPage.name,
+                builder: (_, state) => ProductEditorPage(
+                  storeId: state.pathParameters['storeId']!,
+                  productId: state.pathParameters['productId'],
+                ),
+              ),
+              materialRoute(
+                path: PartnerRoutePaths.menuSections,
+                name: MenuSectionsPage.name,
+                builder: (_, state) => MenuSectionsPage(storeId: state.pathParameters['storeId']!),
+              ),
+              materialRoute(
+                path: PartnerRoutePaths.productImport,
+                name: ProductImportPage.name,
+                builder: (_, state) => ProductImportPage(storeId: state.pathParameters['storeId']!),
+              ),
+            ],
           ),
         ],
       ),

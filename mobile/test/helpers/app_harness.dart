@@ -196,8 +196,8 @@ Future<void> unmountApamuy(
 ) async {
   await tester.pumpWidget(const SizedBox());
   container.dispose();
-  // Más que un aviso (AppToast dura 2.6 s), para que no quede su timer vivo.
-  await tester.pump(const Duration(seconds: 3));
+  // Más que un aviso (AppToast dura 2.6 s; con «Deshacer», 4 s), para que no quede su timer vivo.
+  await tester.pump(const Duration(seconds: 5));
 }
 
 /// `pumpAndSettle` no sirve con shimmer y animaciones en bucle: avanza el

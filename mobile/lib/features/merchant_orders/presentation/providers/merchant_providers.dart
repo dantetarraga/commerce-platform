@@ -5,6 +5,7 @@ import 'package:apamuy/core/errors/failure.dart';
 import 'package:apamuy/core/network/network_providers.dart';
 import 'package:apamuy/core/realtime/realtime_client.dart';
 import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/features/merchant_catalog/merchant_catalog.dart';
 import 'package:apamuy/features/merchant_orders/domain/merchant.dart';
 import 'package:apamuy/features/merchant_orders/domain/merchant_board.dart';
 import 'package:apamuy/features/merchant_orders/infrastructure/datasources/merchant_remote_data_source.dart';
@@ -103,13 +104,17 @@ class MerchantOrderActions extends _$MerchantOrderActions {
 
 /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
 /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+/// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
 @riverpod
 Future<MerchantCatalog> merchantCatalog(
   Ref ref,
   String storeId, {
   ProductFilter filter = ProductFilter.all,
   String query = '',
-}) => ref.watch(merchantRepositoryProvider).products(storeId, filter: filter, query: query).then((r) => r.getOrThrow());
+}) {
+  ref.watch(menuRevisionProvider);
+  return ref.watch(merchantRepositoryProvider).products(storeId, filter: filter, query: query).then((r) => r.getOrThrow());
+}
 
 /// Marcar un producto disponible o agotado. Al terminar vuelve a pedir la
 /// carta (en "Disponibles" el producto agotado ya no viene).

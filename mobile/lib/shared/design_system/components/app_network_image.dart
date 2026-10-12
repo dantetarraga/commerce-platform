@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:apamuy/shared/design_system/components/app_skeleton.dart';
 import 'package:apamuy/shared/design_system/tokens/motion.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -37,6 +39,15 @@ class AppNetworkImage extends StatelessWidget {
         : source.startsWith('assets/')
         ? Image.asset(
             source,
+            width: width,
+            height: height,
+            fit: fit,
+            errorBuilder: (_, _, _) => fallback,
+          )
+        // Foto local: en el modo demo de Socios, la que se acaba de elegir.
+        : source.startsWith('/')
+        ? Image.file(
+            File(source),
             width: width,
             height: height,
             fit: fit,

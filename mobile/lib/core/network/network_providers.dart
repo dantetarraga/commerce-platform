@@ -31,7 +31,6 @@ Dio dio(Ref ref) {
   dio.interceptors.addAll([
     RequestIdInterceptor(),
     AuthInterceptor(
-      dio: dio,
       refreshDio: Dio(options),
       tokenStorage: ref.watch(tokenStorageProvider),
       onSessionExpired: ref.read(sessionEventsProvider).notifyExpired,

@@ -19,8 +19,8 @@ class AuthSession extends _$AuthSession {
     ref.onDispose(subscription.cancel);
 
     final result = await ref.read(restoreSessionProvider).call();
-    // Si no se pudo validar (p. ej. sin red), se pide login otra vez: es lo más
-    // seguro y el usuario puede reintentar desde ahí.
+    // Sin red entra con la última cuenta (lo resuelve el repositorio); solo sin
+    // ninguna guardada se pide login otra vez.
     return result.fold((user) => user, (_) => null);
   }
 

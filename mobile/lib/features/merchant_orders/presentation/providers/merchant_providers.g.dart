@@ -403,12 +403,14 @@ abstract class _$MerchantOrderActions extends $Notifier<void> {
 
 /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
 /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+/// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
 
 @ProviderFor(merchantCatalog)
 final merchantCatalogProvider = MerchantCatalogFamily._();
 
 /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
 /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+/// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
 
 final class MerchantCatalogProvider
     extends
@@ -420,6 +422,7 @@ final class MerchantCatalogProvider
     with $FutureModifier<MerchantCatalog>, $FutureProvider<MerchantCatalog> {
   /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
   /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+  /// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
   MerchantCatalogProvider._({
     required MerchantCatalogFamily super.from,
     required (String, {ProductFilter filter, String query}) super.argument,
@@ -470,10 +473,11 @@ final class MerchantCatalogProvider
   }
 }
 
-String _$merchantCatalogHash() => r'd0a0673ab04495cb8eb1fb287e51f835458b7e35';
+String _$merchantCatalogHash() => r'7f3894c6cb83e260f2bae9afdfde37e54e4dd956';
 
 /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
 /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+/// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
 
 final class MerchantCatalogFamily extends $Family
     with
@@ -492,6 +496,7 @@ final class MerchantCatalogFamily extends $Family
 
   /// La carta de un negocio para una pestaña y una búsqueda. El backend filtra,
   /// busca, agrupa y cuenta; cada cambio de pestaña o búsqueda es una consulta.
+  /// Se vuelve a pedir cuando se edita la carta (`merchant_catalog`).
 
   MerchantCatalogProvider call(
     String storeId, {

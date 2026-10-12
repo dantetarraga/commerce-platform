@@ -77,7 +77,11 @@ class RouteCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 22),
                           Text('LLEGA A · ${Formatters.meters(order.distanceMeters)}', style: label.copyWith(color: accent)),
-                          Text(order.order.addressStreet, style: place),
+                          // En la oferta la dirección exacta llega al aceptar.
+                          Text(
+                            order.order.addressStreet.isEmpty ? 'Dirección al aceptar' : order.order.addressStreet,
+                            style: place,
+                          ),
                         ],
                       ),
                     ),

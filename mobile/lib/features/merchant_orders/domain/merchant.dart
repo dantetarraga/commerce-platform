@@ -65,18 +65,19 @@ final class MerchantProduct extends Equatable {
 }
 
 /// Pestañas de la carta en Socios.
-enum ProductFilter { all, available, soldOut }
+enum ProductFilter { all, available, soldOut, noPhoto }
 
 /// Cuántos productos hay en cada pestaña (de toda la carta, no de la búsqueda).
 final class ProductCounts extends Equatable {
-  const ProductCounts({required this.all, required this.available, required this.soldOut});
+  const ProductCounts({required this.all, required this.available, required this.soldOut, this.noPhoto = 0});
 
   final int all;
   final int available;
   final int soldOut;
+  final int noPhoto;
 
   @override
-  List<Object?> get props => [all, available, soldOut];
+  List<Object?> get props => [all, available, soldOut, noPhoto];
 }
 
 final class ProductSection extends Equatable {

@@ -1,3 +1,5 @@
+import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/config/env.dart';
 import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/errors/failure.dart';
 import 'package:apamuy/core/result/result.dart';
@@ -36,7 +38,7 @@ void main() {
     estimatedArrival: eta,
   );
 
-  Future<void> pump(WidgetTester tester, Widget page, Order o, {OrdersRepository? repository}) async {
+  Future<void> pump(WidgetTester tester, Widget page, Order o, {OrdersRepository? repository, String support = ''}) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -46,6 +48,7 @@ void main() {
         overrides: [
           orderWatchProvider(o.id).overrideWith((ref) => Stream.value(o)),
           if (repository != null) ordersRepositoryProvider.overrideWithValue(repository),
+          appEnvProvider.overrideWithValue(AppEnv(apiBaseUrl: 'http://test', useFakeData: true, supportWhatsapp: support)),
         ],
         child: MaterialApp(
           theme: AppTheme.light(),
@@ -144,8 +147,8 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
   });
 
-  testWidgets('la ayuda lista los motivos y envía la descripción', (tester) async {
-    await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.delivered));
+  testWidgets('la ayuda lista los motivos y envía la descripción por WhatsApp', (tester) async {
+    await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.delivered), support: '987654321');
 
     expect(find.text('Picantería Doña Rosa'), findsOneWidget);
     expect(find.textContaining('#2481'), findsOneWidget);
@@ -160,14 +163,30 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     await tester.enterText(find.byType(TextField), 'Faltó la gaseosa');
     await tester.pump();
-    await tester.tap(find.text('Enviar'));
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(milliseconds: 500));
-    // El aviso llega un cuadro después y crece durante la entrada.
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(find.textContaining('Te escribimos en menos de 10 minutos'), findsOneWidget);
+    await tester.tap(find.text('Enviar por WhatsApp'));
+    // En el test no hay WhatsApp: avisa en vez de fingir que se envió.
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.textContaining('No pudimos abrir WhatsApp'), findsOneWidget);
+    expect(find.textContaining('Te escribimos'), findsNothing);
     AppToast.dismiss();
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 5));
+  });
+
+  testWidgets('sin número de soporte no promete una respuesta', (tester) async {
+    await pump(tester, const OrderHelpPage(orderId: 'o1'), order(OrderStatus.delivered));
+    await tester.tap(find.text('Falta un producto'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.enterText(find.byType(TextField), 'Faltó la gaseosa');
+    await tester.pump();
+
+    expect(find.textContaining('todavía no tiene un número de soporte'), findsOneWidget);
+    final send = tester.widget<AppButton>(find.widgetWithText(AppButton, 'Enviar por WhatsApp'));
+    expect(send.onPressed, isNull);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
   });

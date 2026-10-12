@@ -18,7 +18,6 @@ class FakeStaffOrders {
   final Duration newOrderEvery;
 
   final Map<String, Map<String, dynamic>> _orders = {};
-  final Map<String, bool> _productAvailable = {};
   var _acceptingOrders = true;
   var _courierStatus = 'OFFLINE';
   var _nextCode = 3101;
@@ -237,6 +236,11 @@ class FakeStaffOrders {
 
   /// Como `GET /merchant/stores/:id/products`: conteos de toda la carta y
   /// los productos del filtro y la búsqueda, agrupados en el orden del menú.
+  static bool _noPhoto(Map<String, Object?> p) => switch (p['imageUrl']) {
+    final String url => url.isEmpty,
+    _ => true,
+  };
+
   Future<Map<String, dynamic>> products(String storeId, {String status = 'all', String query = ''}) async {
     await _backend.delay();
     final catalog = await _backend.catalog();
@@ -246,14 +250,15 @@ class FakeStaffOrders {
     );
     final menu = (store['menuSections'] as List).cast<Map<String, dynamic>>();
     final all = [
-      for (final p in _backend.listOf(catalog, 'products').where((p) => p['storeId'] == storeId))
+      // La carta editable (FakeMerchantMenu) cambia este mismo catálogo.
+      for (final p in _backend.listOf(catalog, 'products').where((p) => p['storeId'] == storeId && p['deleted'] != true))
         {
           'id': p['id'],
           'name': p['name'],
           'imageUrl': p['imageUrl'],
           'price': _backend.money(p['basePrice'] as int),
           'section': menu.where((s) => (s['productIds'] as List).contains(p['id'])).firstOrNull?['name'] as String?,
-          'isAvailable': _productAvailable[p['id']] ?? (p['isAvailable'] as bool? ?? true),
+          'isAvailable': p['isAvailable'] as bool? ?? true,
         },
     ];
     final needle = normalizeForSearch(query);
@@ -263,13 +268,19 @@ class FakeStaffOrders {
             switch (status) {
               'available' => p['isAvailable']! as bool,
               'sold_out' => !(p['isAvailable']! as bool),
+              'no_photo' => _noPhoto(p),
               _ => true,
             })
           p,
     ];
     final available = all.where((p) => p['isAvailable']! as bool).length;
     return {
-      'counts': {'all': all.length, 'available': available, 'soldOut': all.length - available},
+      'counts': {
+        'all': all.length,
+        'available': available,
+        'soldOut': all.length - available,
+        'noPhoto': all.where(_noPhoto).length,
+      },
       'sections': [
         for (final section in [...menu.map((s) => s['name'] as String), null])
           if (shown.where((p) => p['section'] == section).toList() case final items when items.isNotEmpty)
@@ -280,7 +291,8 @@ class FakeStaffOrders {
 
   Future<Map<String, dynamic>> setProductAvailable(String productId, {required bool available}) async {
     await _backend.delay();
-    _productAvailable[productId] = available;
+    final catalog = await _backend.catalog();
+    _backend.listOf(catalog, 'products').firstWhere((p) => p['id'] == productId)['isAvailable'] = available;
     return {'id': productId, 'isAvailable': available};
   }
 
@@ -389,7 +401,21 @@ class FakeStaffOrders {
     await _backend.delay();
     await _ready();
     if (_courierStatus != 'AVAILABLE') return const [];
-    return _sorted(_orders.values.where((o) => o['status'] == 'READY' && o['_courierId'] == null));
+    return [for (final o in _sorted(_orders.values.where((o) => o['status'] == 'READY' && o['_courierId'] == null))) _offer(o)];
+  }
+
+  /// Como `toCourierOfferResponse`: sin celular, dirección exacta ni apellido hasta aceptar.
+  static Map<String, dynamic> _offer(Map<String, dynamic> order) {
+    double roughly(Object? v) => ((v! as num) * 1000).round() / 1000;
+    final at = order['deliveryLocation'] as Map<String, dynamic>;
+    final near = {'lat': roughly(at['lat']), 'lng': roughly(at['lng'])};
+    final name = ((order['customer'] as Map)['name'] as String).split(' ').first;
+    return {
+      ...order,
+      'customer': {'name': name, 'phone': ''},
+      'address': {'title': '', 'street': '', 'reference': '', 'location': near},
+      'deliveryLocation': near,
+    };
   }
 
   Future<List<Map<String, dynamic>>> courierOrders({String? scope}) async {

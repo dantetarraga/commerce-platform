@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppEnv.fromEnvironment().ensureReleaseReady();
   // En el modo demo no hay backend que envíe push.
   final push = AppEnv.fromEnvironment().useFakeData
       ? const NoopPushMessaging()

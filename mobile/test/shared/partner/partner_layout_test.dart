@@ -165,19 +165,21 @@ void main() {
     await tester.tap(find.byTooltip('Productos'));
     await settle(tester);
     await tester.enterText(find.byType(TextField), 'Pollo entero');
-    await tester.tap(find.textContaining('Disponibles ('));
+    await tester.tap(find.text('disponibles'));
     await settle(tester);
     await tester.ensureVisible(find.byType(Switch).first);
     await settle(tester);
     await tester.tap(find.byType(Switch).first);
     await settle(tester);
     expect(find.text('Sin coincidencias'), findsOneWidget);
-    await tester.ensureVisible(find.textContaining('Agotados ('));
+    // El conteo de agotados también es el filtro.
+    final soldOut = find.byWidgetPredicate((w) => w is Text && (w.data == 'agotado' || w.data == 'agotados'));
+    await tester.ensureVisible(soldOut);
     await settle(tester);
-    await tester.tap(find.textContaining('Agotados ('));
+    await tester.tap(soldOut);
     await settle(tester);
     expect(find.text('Pollo entero a la brasa'), findsOneWidget);
-    expect(find.text('Agotado'), findsOneWidget);
+    expect(find.textContaining('Agotado ·'), findsOneWidget);
     await tester.ensureVisible(find.byType(Switch));
     await settle(tester);
     await tester.tap(find.byType(Switch));

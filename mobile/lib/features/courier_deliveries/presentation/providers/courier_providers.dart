@@ -1,17 +1,21 @@
 import 'dart:async';
 
 import 'package:apamuy/core/config/app_config_provider.dart';
+import 'package:apamuy/core/domain/geo_coordinates.dart';
 import 'package:apamuy/core/domain/money.dart';
 import 'package:apamuy/core/errors/failure.dart';
 import 'package:apamuy/core/maps/location_service.dart';
 import 'package:apamuy/core/network/network_providers.dart';
 import 'package:apamuy/core/realtime/realtime_client.dart';
 import 'package:apamuy/core/result/result.dart';
+import 'package:apamuy/core/session/logout_hooks.dart';
 import 'package:apamuy/features/courier_deliveries/domain/courier.dart';
+import 'package:apamuy/features/courier_deliveries/domain/location_sharing.dart';
 import 'package:apamuy/features/courier_deliveries/infrastructure/courier_repository_impl.dart';
 import 'package:apamuy/features/courier_deliveries/infrastructure/datasources/courier_remote_data_source.dart';
 import 'package:apamuy/features/orders/orders.dart';
 import 'package:apamuy/features/partner_session/partner_session.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'courier_providers.g.dart';
@@ -20,7 +24,7 @@ part 'courier_providers.g.dart';
 /// en curso. Con él, los cambios llegan al instante.
 const courierPollEvery = Duration(seconds: 10);
 
-/// Cada cuánto manda su ubicación mientras lleva un pedido.
+/// Cada cuánto, como mucho, manda su ubicación mientras lleva un pedido.
 const courierLocationEvery = Duration(seconds: 10);
 
 @Riverpod(keepAlive: true)
@@ -66,7 +70,15 @@ Future<List<StaffOrder>> courierAvailableOrders(Ref ref) async {
 Future<StaffOrder?> courierActiveDelivery(Ref ref) async {
   final me = await ref.watch(courierMeProvider.future);
   if (!ref.mounted) return null;
-  if (me.isOnline) refreshLive(ref, events: {RealtimeEvents.courierOrdersChanged}, every: courierPollEvery);
+  // Con un pedido sigue revisando de fondo: si lo cancelan, deja de compartir la ubicación.
+  if (me.isOnline) {
+    refreshLive(
+      ref,
+      events: {RealtimeEvents.courierOrdersChanged},
+      every: courierPollEvery,
+      foregroundOnly: me.availability != CourierAvailability.busy,
+    );
+  }
   return (await ref.watch(courierRepositoryProvider).activeDeliveries()).getOrThrow().firstOrNull;
 }
 
@@ -75,32 +87,150 @@ Future<StaffOrder?> courierActiveDelivery(Ref ref) async {
 @riverpod
 String? courierActiveOrderId(Ref ref) => ref.watch(courierActiveDeliveryProvider).value?.id;
 
-/// Mientras lleva un pedido y la app está a la vista, manda su ubicación cada
-/// [courierLocationEvery] para que el cliente lo vea llegar. El permiso se pide
-/// una vez; sin permiso o sin señal, simplemente no manda nada.
+/// Aviso fijo mientras se comparte la ubicación con la app de fondo.
+const courierLocationNotice = BackgroundLocationNotice(
+  title: 'Llevas un pedido',
+  text: 'Apamuy Socios comparte tu ubicación mientras tienes un pedido',
+  channelName: 'Ubicación durante el reparto',
+);
+
+/// Metros que debe moverse para mandar una posición nueva.
+const courierLocationDistance = 15;
+
+/// Mientras está conectado y lleva un pedido, manda su ubicación para que el
+/// cliente lo vea llegar, también con la app de fondo o la pantalla apagada
+/// (en Android, con un aviso fijo). Se apaga al entregar, desconectarse o
+/// cerrar sesión. El permiso se pide una vez; si lo niega, el estado lo dice.
 @riverpod
-void courierLocationSharing(Ref ref) {
-  final orderId = ref.watch(courierActiveOrderIdProvider);
-  if (orderId == null || !ref.watch(appForegroundProvider)) return;
-  final location = ref.read(locationServiceProvider);
-  final repository = ref.read(courierRepositoryProvider);
-  var ask = true;
-  var sending = false;
-  Future<void> send() async {
-    if (sending) return;
-    sending = true;
+class CourierLocationSharing extends _$CourierLocationSharing {
+  _Tracking? _tracking;
+  var _asked = false;
+
+  @override
+  CourierLocationStatus build() {
+    final online = ref.watch(courierMeProvider.select((me) => me.value?.isOnline ?? false));
+    final orderId = ref.watch(courierActiveOrderIdProvider);
+    late final _Tracking tracking;
+    tracking = _Tracking(ref.read(locationServiceProvider), ref.read(courierRepositoryProvider), (status) {
+      if (!tracking.closed) state = status;
+    });
+    _tracking = tracking;
+    ref.onDispose(tracking.stop);
+
+    LocationSharingStep step({required bool foreground}) => locationSharingStep(
+      online: online,
+      activeOrderId: orderId,
+      foreground: foreground,
+      running: tracking.running,
+    );
+
+    if (step(foreground: true) == LocationSharingStep.stop) {
+      tracking.stop();
+      return CourierLocationStatus.idle;
+    }
+    ref
+      ..onDispose(ref.read(logoutHooksProvider).add(() async => tracking.stop()))
+      // Al volver de los ajustes o del fondo lo intenta de nuevo, sin preguntar.
+      ..listen(appForegroundProvider, (_, foreground) {
+        if (step(foreground: foreground) == LocationSharingStep.start) unawaited(_start(tracking));
+      });
+    if (step(foreground: ref.read(appForegroundProvider)) == LocationSharingStep.start) unawaited(_start(tracking));
+    return CourierLocationStatus.idle;
+  }
+
+  Future<void> _start(_Tracking tracking, {bool? ask}) {
+    final asking = ask ?? !_asked;
+    _asked = true;
+    return tracking.start(ask: asking);
+  }
+
+  /// La acción del aviso: volver a pedir el permiso o abrir los ajustes.
+  Future<void> fix() async {
+    final tracking = _tracking;
+    if (tracking == null || tracking.closed) return;
+    final location = ref.read(locationServiceProvider);
+    switch (state) {
+      case CourierLocationStatus.denied:
+        await _start(tracking, ask: true);
+      case CourierLocationStatus.blocked:
+        await location.openSettings(const LocationDenied(forever: true));
+      case CourierLocationStatus.gpsOff:
+        await location.openSettings(const LocationOff());
+      case CourierLocationStatus.idle || CourierLocationStatus.sharing:
+        break;
+    }
+  }
+}
+
+/// Un seguimiento: desde que corresponde compartir hasta que deja de corresponder.
+class _Tracking {
+  _Tracking(this._location, this._repository, this._onStatus);
+
+  final LocationService _location;
+  final CourierRepository _repository;
+  final void Function(CourierLocationStatus) _onStatus;
+  StreamSubscription<GeoCoordinates>? _subscription;
+  var _starting = false;
+  var _sending = false;
+  bool closed = false;
+
+  bool get running => _subscription != null || _starting;
+
+  Future<void> start({required bool ask}) async {
+    if (closed || running) return;
+    _starting = true;
     try {
-      final reading = await location.current(ask: ask);
-      ask = false;
-      if (reading case LocationFix(:final coordinates) when ref.mounted) await repository.reportLocation(coordinates);
+      final reading = await _location.current(ask: ask);
+      if (closed) return;
+      switch (reading) {
+        case LocationOff():
+          _onStatus(CourierLocationStatus.gpsOff);
+        case LocationDenied(:final forever):
+          _onStatus(forever ? CourierLocationStatus.blocked : CourierLocationStatus.denied);
+        // Sin señal todavía, pero con permiso: el seguimiento la trae.
+        case LocationFix() || LocationUnavailable():
+          if (reading case LocationFix(:final coordinates)) unawaited(_send(coordinates));
+          _subscription = _location
+              .watch(interval: courierLocationEvery, distanceFilter: courierLocationDistance, notice: courierLocationNotice)
+              .listen(_send, onError: (_) => unawaited(_lost()));
+          _onStatus(CourierLocationStatus.sharing);
+      }
     } finally {
-      sending = false;
+      _starting = false;
     }
   }
 
-  unawaited(send());
-  final timer = Timer.periodic(courierLocationEvery, (_) => unawaited(send()));
-  ref.onDispose(timer.cancel);
+  /// Si apagó el GPS o quitó el permiso a mitad del recorrido. Se reintenta al
+  /// volver a la app.
+  Future<void> _lost() async {
+    await _subscription?.cancel();
+    _subscription = null;
+    if (closed) return;
+    final reading = await _location.current(ask: false);
+    if (closed || running) return;
+    _onStatus(switch (reading) {
+      LocationOff() => CourierLocationStatus.gpsOff,
+      LocationDenied(:final forever) => forever ? CourierLocationStatus.blocked : CourierLocationStatus.denied,
+      LocationFix() || LocationUnavailable() => CourierLocationStatus.idle,
+    });
+  }
+
+  /// Si la anterior sigue en camino, esta se descarta: la próxima llega pronto.
+  Future<void> _send(GeoCoordinates at) async {
+    if (_sending || closed) return;
+    _sending = true;
+    try {
+      await _repository.reportLocation(at);
+    } finally {
+      _sending = false;
+    }
+  }
+
+  void stop() {
+    closed = true;
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+  }
 }
 
 @riverpod
