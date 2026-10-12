@@ -33,6 +33,12 @@ export default defineRailway(() => {
       TWILIO_AUTH_TOKEN: preserve(),
       TWILIO_MESSAGING_SERVICE_SID: preserve(),
       FCM_SERVICE_ACCOUNT_BASE64: preserve(),
+      STORAGE_PROVIDER: 'r2',
+      R2_ACCOUNT_ID: preserve(),
+      R2_ACCESS_KEY_ID: preserve(),
+      R2_SECRET_ACCESS_KEY: preserve(),
+      R2_BUCKET: preserve(),
+      R2_PUBLIC_URL: preserve(),
     },
   });
 

@@ -55,7 +55,21 @@ Hoy los pedidos se muestran a los repartidores recién en `READY`. Mostrarlos de
 - **Quién cobra:** el repartidor, el total del pedido.
 - **Registro:** al marcar "Entregado", el repartidor indica el método y el monto recibido. Queda guardado en el pago (`collectedById`, `collectedMethod`, `collectedAmount`, `collectedAt`). Si el monto no coincide con el total, se permite pero queda registrado.
 - **Rendición:** el repartidor y el negocio ven un resumen del día (entregas, total, efectivo frente a Yape o Plin).
-- **Pendiente de definir:** la comisión de Apamuy, el costo de envío para el repartidor y las liquidaciones semanales a los negocios. Durante la prueba no se modelan.
+- **Comisión de Apamuy:** un porcentaje del **subtotal de productos** (sin envío ni propina). Hay una comisión por defecto (10 % al crearla, en `PlatformSettings`) que el admin cambia en Liquidaciones, y cada negocio puede tener la suya (`Store.commissionRateBps`, en su ficha del catálogo). Se guarda en puntos básicos (1000 = 10 %).
+- **La comisión queda en cada pedido:** al crearlo se guarda la que corresponde (`Order.commissionRateBps`). Cambiar la tasa después solo afecta a los pedidos nuevos. Los pedidos anteriores a la comisión quedaron con 10 % en la migración.
+- **Liquidación semanal** (lunes a domingo, hora de Lima, por fecha de entrega), por negocio:
+
+  ```
+  saldo = vendido − comisión − cobrado por el negocio
+  ```
+
+  - *vendido*: suma de los subtotales de los pedidos entregados;
+  - *comisión*: la de cada pedido sobre su subtotal, redondeada al céntimo;
+  - *cobrado por el negocio*: lo que cobró el propio dueño al entregar (`Payment.collectedById` = dueño). Hoy cobra siempre el repartidor y lo rinde a la caja de Apamuy, así que suele ser 0 y el saldo queda a favor del negocio.
+
+  Saldo positivo: Apamuy le paga al negocio; negativo: el negocio le paga a Apamuy. El descuento de un cupón lo asume Apamuy (no baja el vendido).
+- **Pago:** desde el lunes siguiente, el admin marca la semana como pagada. Queda quién y cuándo, con las cifras de ese momento (`StoreSettlement`). Una semana sin pedidos entregados no se liquida. El negocio ve su liquidación en Rendición (Portal Socios), solo lectura.
+- **Pendiente de definir:** el costo de envío para el repartidor y si algún negocio cobrará por su cuenta (Yape propio o reparto propio).
 
 ## 5. Alta de socios
 
@@ -132,6 +146,8 @@ Es el pedido del cliente (`OrderJson`) más:
 | GET | `merchant/stores/:id/products` | | `[{ id, name, imageUrl, price, section, isAvailable }]` |
 | PATCH | `merchant/products/:id` | `{ isAvailable }` | `{ id, isAvailable }` |
 | GET | `merchant/summary` | `date?` | `{ date, deliveredCount, cancelledCount, activeCount, sales }` |
+| GET | `merchant/settlements` | `week?` (cualquier día), `storeId?` | Liquidación semanal de sus negocios (forma de `admin/settlements`) |
+| GET | `merchant/settlements/:storeId` | `week?` | Una semana con sus pedidos y la comisión de cada uno |
 
 - `scope=active`: pedidos no finales (`RECEIVED` … `ON_THE_WAY`). `scope=today`: todos los creados ese día. Sin `scope`, todos.
 - `sales` suma el `subtotal` de los entregados (lo que es del negocio; el envío es del repartidor).
@@ -158,3 +174,6 @@ Es el pedido del cliente (`OrderJson`) más:
 | `COURIER_NOT_AVAILABLE` | 409 | Tomar un pedido sin estar conectado o teniendo otro activo |
 | `COLLECTION_REQUIRED` | 422 | Marcar entregado sin decir cómo pagó el cliente |
 | `PAYMENT_METHOD_UNAVAILABLE` | 422 | Pedir con tarjeta (solo contraentrega: efectivo, Yape o Plin) |
+| `SETTLEMENT_WEEK_OPEN` | 422 | Marcar pagada una semana que no terminó |
+| `SETTLEMENT_EMPTY` | 422 | Marcar pagada una semana sin pedidos entregados |
+| `SETTLEMENT_ALREADY_PAID` | 409 | Marcar pagada una semana ya pagada |

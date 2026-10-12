@@ -11,11 +11,13 @@ Las capturas se generan desde la app real con el backend de demostración. Las i
 - [Pedidos para repartir](repartidor_pedidos.png)
 - [Entrega en curso](repartidor_entrega.png)
 - [Tienda en tablet y modo oscuro](tienda_tablet_oscuro.png)
+- Carta editable: [lista](carta_lista.png), [editar producto](carta_editar.png), [nuevo producto](carta_nuevo.png), [secciones](carta_secciones.png) , [importar desde Excel](carta_importar.png) , [carta vacía](carta_vacia.png), [edición rápida](carta_rapida.png), [elegir varios](carta_elegir.png) y [tablet](carta_tablet.png)
 
 Para regenerarlas, desde `mobile/`:
 
 ```sh
 flutter test --update-goldens --dart-define=CAPTURE_PARTNER_UI=true test/shared/partner/partner_layout_test.dart
+flutter test --update-goldens --dart-define=CAPTURE_PARTNER_UI=true test/features/merchant_catalog/menu_screens_test.dart
 ```
 
 Las pruebas cubren 390 × 844, 320 × 720 con texto al 140 %, tablet de 1024 × 768 en modo oscuro, búsqueda, filtros, disponibilidad, reanudación de la entrega y el formulario de cobro con teclado abierto.

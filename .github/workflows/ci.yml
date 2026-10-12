@@ -88,10 +88,11 @@ jobs:
             } > android/key.properties
           fi
       # Release: así el CI detecta lo que la reducción de código rompe (p. ej. el sonido de la alarma).
-      - name: APK del cliente
-        run: flutter build apk --release --flavor customer -t lib/main.dart
-      - name: APK de Apamuy Socios
-        run: flutter build apk --release --flavor partner -t lib/main_partner.dart
+      # Son APK de demo (env/fake.json): los de la tienda se compilan con env/prod.json.
+      - name: APK del cliente (demo)
+        run: flutter build apk --release --flavor customer -t lib/main.dart --dart-define-from-file=env/fake.json
+      - name: APK de Apamuy Socios (demo)
+        run: flutter build apk --release --flavor partner -t lib/main_partner.dart --dart-define-from-file=env/fake.json
 
   web:
     name: Web (lint, typecheck, test, build)

@@ -31,7 +31,7 @@ Fuentes: [Rappi Portal Partners](https://merchants.rappi.com/es-pe/que-ofrecemos
 |---|---|---|---|
 | App Apamuy | Clientes | `CUSTOMER` | Pedir y seguir el pedido |
 | App Apamuy Socios | Negocios y repartidores | `MERCHANT`, `COURIER` | Operar comandas y entregas (alarma, en vivo) |
-| **Panel web · Admin** | Equipo Apamuy | `ADMIN` | Pedidos en vivo, socios, catálogo, marketing, ciudades, caja |
+| **Panel web · Admin** | Equipo Apamuy | `ADMIN` | Pedidos en vivo, socios, catálogo, marketing, ciudades, caja, liquidaciones |
 | **Panel web · Portal Socios** | Dueños de negocio | `MERCHANT` | Autogestión: menú, fotos, horarios, reportes, rendición |
 
 - **Una sola web**, con el menú y las rutas según el rol (un `ADMIN` ve todo; un `MERCHANT` solo sus tiendas). Un mismo login, un mismo despliegue.
@@ -48,10 +48,11 @@ Fuentes: [Rappi Portal Partners](https://merchants.rappi.com/es-pe/que-ofrecemos
 | Inicio | Métricas del periodo comparadas con el anterior: pedidos, ventas, clientes, horas pico, tiempos, cancelaciones y rankings | ✅ `admin/analytics?from&to&cityId` (calculado en el backend). Web: `/admin` |
 | Usuarios | Todas las cuentas: búsqueda, ficha con actividad y desempeño de socio, bloquear, reactivar socio, cerrar sesiones, acceso de admin, historial | ✅ `admin/users` y `admin/users/:id/*`, tabla `AdminAction`. Web: `/admin/users` |
 | Socios | Buscar por celular, alta de negocio y repartidor, suspensión | ✅ `admin/partners/lookup`, `admin/merchants`, `admin/couriers`, `suspend-partner` |
-| Catálogo | Negocios (borrador → publicado), horarios, secciones, productos con variantes y opciones, categorías | ✅ `admin/stores`, `admin/products`, `admin/categories`. ❌ Subida de fotos |
+| Catálogo | Negocios (borrador → publicado), horarios, secciones, productos con variantes y opciones, categorías | ✅ `admin/stores`, `admin/products`, `admin/categories`, subida de fotos (`uploads/images`) e importación desde Excel o CSV (`stores/:id/products/import`) |
 | Marketing | Cupones y banners del inicio | ✅ `admin/coupons`, `admin/promotions`. Web: `/admin/marketing` |
 | Ciudades | Cobertura (`coverageKm`), tarifas, `routeFactor`. Base para escalar fuera de Espinar | ✅ `admin/cities` (listar, crear inactiva, editar, pausar si no hay pedidos en curso), con ejemplos de tarifa calculados por el backend. Web: `/admin/cities` |
 | Caja | Rendición diaria por repartidor y por negocio (efectivo, Yape, Plin) | ✅ `admin/cash?date&cityId`: por repartidor (cobrado vs. esperado, diferencia) y por negocio. Web: `/admin/cash` |
+| Liquidaciones | Comisión por defecto y por negocio; saldo semanal de cada negocio y marcarlo pagado | ✅ `admin/commission` (GET/PUT), `admin/stores/:id/commission` (GET/PUT, `null` = la por defecto), `admin/settlements?week&cityId`, `admin/settlements/:storeId?week` y `POST admin/settlements/:storeId/pay` (OPERACION §4). Web: `/admin/settlements`; la comisión propia se edita en la ficha del negocio (`/admin/catalog/:storeId`) |
 
 ### Portal Socios (`MERCHANT`)
 
@@ -60,18 +61,18 @@ Fuentes: [Rappi Portal Partners](https://merchants.rappi.com/es-pe/que-ofrecemos
 | Mi tienda | Datos, logo, portada, horarios | ✅ `merchant/catalog/stores/:id` (descripción, teléfono, logo, portada, preparación, pedido mínimo), horarios y pausa. Nombre, dirección y publicación los decide Apamuy. Web: `/partner/store` |
 | Menú | Secciones, productos, precios, fotos, disponibilidad | ✅ `merchant/catalog/*` (secciones y productos) con los servicios del admin y control de dueño. Web: `/partner/menu`. ❌ Fotos (W2) |
 | Reportes | Ventas por día y semana, pedidos entregados y cancelados | ✅ `merchant/reports?from&to` (hasta 92 días, por día y por hora, comparado con el periodo anterior). Web: `/partner/reports` |
-| Rendición | Lo cobrado y lo que corresponde al negocio | 🟡 `merchant/settlement`: vendido y cobrado por día de entrega. `commission: null` hasta definir la comisión (OPERACION §4). Web: `/partner/settlement` |
+| Rendición | Lo cobrado y lo que corresponde al negocio | ✅ `merchant/settlements/:storeId?week`: liquidación semanal (vendido − comisión − cobrado por el negocio, solo lectura) y `merchant/settlement`: vendido y cobrado por día de entrega (su `commission` sigue en `null`). Web: `/partner/settlement` |
 | Después | Promociones propias, reseñas, solicitud de afiliación con documentos | ❌ |
 
 ## 5. Cambios necesarios en el backend
 
 1. **Auth en el navegador.** Hoy el refresh token viaja en el body y la app lo guarda en secure storage. En la web va en **cookie httpOnly + Secure + SameSite**, con un endpoint de refresh que la lea, y el access token solo en memoria. Agregar el dominio del panel a la lista blanca de CORS. Definir si el admin entra con OTP por SMS (costo Twilio) u otro método.
 2. **Pedidos para el admin:** `GET admin/orders` (filtros por ciudad, estado, fecha; cursor), detalle y acciones (cancelar con motivo).
-3. **Imágenes:** storage (S3/R2) con URLs prefirmadas y CDN. Bloquea el catálogo real (ya pendiente en PENDIENTES).
+3. ✅ **Imágenes:** Cloudflare R2 con URLs firmadas para un `PUT` directo desde el navegador; se sirven desde el dominio del bucket (ver `backend/README.md`).
 4. **Catálogo del negocio:** endpoints `merchant/*` para editar su menú y horarios, reutilizando los servicios de `admin/catalog` con ownership por `store.ownerId`.
 5. **Ciudades:** `admin/cities` para editar parámetros de reparto.
 6. **Reportes:** agregados por rango de fechas.
-7. **Liquidaciones:** primero definir la comisión y el pago a negocios (OPERACION §4); después modelarlo.
+7. ✅ **Liquidaciones:** comisión porcentual sobre el subtotal, guardada en cada pedido, y liquidación semanal por negocio (OPERACION §4).
 
 ## 6. Tecnología
 
@@ -117,7 +118,7 @@ El panel hereda [DIRECCION_VISUAL.md](DIRECCION_VISUAL.md): crema `#FBF7F2`, ter
 | W2 | Backend: imágenes + Admin: fotos del catálogo | Catálogo real |
 | W3 | ✅ Backend: `admin/orders` + Admin: pedidos en vivo y alertas. Falta el mapa de repartidores | Vigilar la operación |
 | W4 | ✅ Portal Socios: inicio del día, Mi tienda, menú, horarios, reportes y rendición (sin comisión) | Autogestión de negocios |
-| W5 | ✅ Caja y ciudades. Pendiente: liquidaciones, después de definir la comisión | Escalar |
+| W5 | ✅ Caja, ciudades, comisión y liquidaciones semanales | Escalar |
 
 ## 9. Estructura de `web/`
 
