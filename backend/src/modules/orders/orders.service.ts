@@ -20,6 +20,7 @@ import { orderTotals, priceItem, PricedItem, unavailable } from './order-pricing
 import { summarizeCustomerOrders } from './customer-orders-summary';
 import { FINAL_STATUSES } from './order-list-scope';
 import { orderInclude, toOrderResponse } from './order-presenter';
+import { effectiveRateBps, FALLBACK_RATE_BPS } from '../admin/settlements/commission';
 
 const MAX_SCHEDULE_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -115,6 +116,15 @@ export class OrdersService {
       );
     }
 
+    const settings = await this.prisma.platformSettings.findUnique({
+      where: { id: 1 },
+      select: { commissionRateBps: true },
+    });
+    const commissionRateBps = effectiveRateBps(
+      store.commissionRateBps,
+      settings?.commissionRateBps ?? FALLBACK_RATE_BPS,
+    );
+
     const startsAt = scheduledFor ?? now;
     try {
       const orderId = await this.prisma.$transaction(async (tx) => {
@@ -142,6 +152,7 @@ export class OrdersService {
             taxTotal: tax,
             total,
             currency: city.currency,
+            commissionRateBps,
             distanceMeters: Math.round(delivery.distanceKm * 1000),
             couponId: coupon?.coupon.id,
             couponCode: coupon?.coupon.code,

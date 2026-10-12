@@ -4,12 +4,15 @@ import { Roles } from '../../../common/decorators/auth.decorators';
 import { Role } from '../../../generated/prisma/enums';
 import { AdminProductsService } from './admin-products.service';
 import { AdminStoresService } from './admin-stores.service';
+import { CatalogImportDto } from './import/catalog-import.dto';
+import { CatalogImportService } from './import/catalog-import.service';
 import { ProductDto, UpdateProductDto } from './product.dto';
 import {
   CategoryDto,
   CreateStoreDto,
   ReplaceSchedulesDto,
   SectionDto,
+  SectionOrderDto,
   StoresQueryDto,
   UpdateCategoryDto,
   UpdateSectionDto,
@@ -25,6 +28,7 @@ export class AdminCatalogController {
   constructor(
     private readonly stores: AdminStoresService,
     private readonly products: AdminProductsService,
+    private readonly importer: CatalogImportService,
   ) {}
 
   /** Incluye borradores y pausados. */
@@ -67,6 +71,11 @@ export class AdminCatalogController {
     return this.stores.createSection(storeId, dto);
   }
 
+  @Put('stores/:id/sections/order')
+  reorderSections(@Param('id') storeId: string, @Body() dto: SectionOrderDto) {
+    return this.stores.reorderSections(storeId, dto.sectionIds);
+  }
+
   @Patch('sections/:id')
   updateSection(@Param('id') id: string, @Body() dto: UpdateSectionDto) {
     return this.stores.updateSection(id, dto);
@@ -81,6 +90,13 @@ export class AdminCatalogController {
   @Post('stores/:id/products')
   createProduct(@Param('id') storeId: string, @Body() dto: ProductDto) {
     return this.products.create(storeId, dto);
+  }
+
+  /** Carga masiva desde Excel o CSV: con `dryRun` solo revisa; sin errores, crea y actualiza todo junto. */
+  @Post('stores/:id/products/import')
+  @HttpCode(HttpStatus.OK)
+  importProducts(@Param('id') storeId: string, @Body() dto: CatalogImportDto) {
+    return this.importer.run(storeId, dto);
   }
 
   @Get('products/:id')

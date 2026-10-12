@@ -7,7 +7,7 @@ import { DayQueryDto } from '../../common/dto/day-query.dto';
 import { CourierStatus, OrderStatus, Role } from '../../generated/prisma/enums';
 import { CourierAdvanceOrderDto, CourierOrdersQueryDto } from '../orders/dto/order-status.dto';
 import { listScopeWhere } from '../orders/order-list-scope';
-import { toStaffOrderResponse } from '../orders/order-presenter';
+import { toCourierOfferResponse, toStaffOrderResponse } from '../orders/order-presenter';
 import { OrdersService } from '../orders/orders.service';
 import { OrderStatusService, scopeFor } from '../orders/status/order-status.service';
 import { CouriersService } from './couriers.service';
@@ -66,7 +66,7 @@ export class CouriersController {
       { cityId: courier.cityId, status: OrderStatus.READY, courierId: null },
       query,
     );
-    return { items: orders.map(toStaffOrderResponse), nextCursor };
+    return { items: orders.map(toCourierOfferResponse), nextCursor };
   }
 
   /** Los pedidos que tomó, del más reciente al más antiguo. `scope=active|today`. */

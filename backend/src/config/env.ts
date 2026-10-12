@@ -19,6 +19,8 @@ export const envSchema = z
     JWT_ACCESS_SECRET: z.string().min(32),
     JWT_ACCESS_TTL_SECONDS: port.default(900),
     REFRESH_TOKEN_TTL_DAYS: port.default(30),
+    /** Cookie del refresh token del panel: `none` si panel y API están en sitios distintos (exige HTTPS). */
+    AUTH_COOKIE_SAMESITE: z.enum(['strict', 'lax', 'none']).default('strict'),
     OTP_TTL_SECONDS: port.default(300),
     OTP_RESEND_SECONDS: z.coerce.number().int().nonnegative().default(30),
     OTP_MAX_ATTEMPTS: port.default(5),
@@ -50,6 +52,20 @@ export const envSchema = z
     PUSH_PROVIDER: z.enum(['log', 'fcm']).default('log'),
     /** JSON de la cuenta de servicio de Firebase, en base64 (una sola línea para Railway). */
     FCM_SERVICE_ACCOUNT_BASE64: z.string().optional(),
+    /** Fotos: `none` deja la subida apagada (se pegan URLs); `r2` firma subidas a Cloudflare R2. */
+    STORAGE_PROVIDER: z.enum(['none', 'r2']).default('none'),
+    R2_ACCOUNT_ID: z
+      .string()
+      .regex(/^[a-f0-9]{32}$/)
+      .optional(),
+    R2_ACCESS_KEY_ID: z.string().min(16).optional(),
+    R2_SECRET_ACCESS_KEY: z.string().min(32).optional(),
+    R2_BUCKET: z.string().min(3).optional(),
+    /** Dominio público del bucket (https://img.apamuy.pe o el r2.dev), sin `/` final. */
+    R2_PUBLIC_URL: z
+      .url({ protocol: /^https$/ })
+      .transform((url) => url.replace(/\/+$/, ''))
+      .optional(),
     /** Saltos de proxy delante de la API (Railway: 1). Sin esto, el rate limit ve una sola IP. */
     TRUST_PROXY: z.coerce.number().int().nonnegative().default(0),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -78,6 +94,17 @@ export const envSchema = z
           'FCM_SERVICE_ACCOUNT_BASE64',
           'Requerido con PUSH_PROVIDER=fcm: la cuenta de servicio de Firebase en base64',
         );
+      }
+    }
+    if (env.STORAGE_PROVIDER === 'r2') {
+      for (const key of [
+        'R2_ACCOUNT_ID',
+        'R2_ACCESS_KEY_ID',
+        'R2_SECRET_ACCESS_KEY',
+        'R2_BUCKET',
+        'R2_PUBLIC_URL',
+      ] as const) {
+        if (!env[key]) fail(key, 'Requerido con STORAGE_PROVIDER=r2');
       }
     }
     if (env.OTP_SECRET === env.JWT_ACCESS_SECRET) fail('OTP_SECRET', 'Debe ser distinto de JWT_ACCESS_SECRET');

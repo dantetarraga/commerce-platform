@@ -110,18 +110,20 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  roles         UserRole[]
-  refreshTokens RefreshToken[]
-  addresses     Address[]
-  orders        Order[]
-  ownedStores   Store[]
-  courier       Courier?
-  reviews       Review[]
-  notifications Notification[]
-  devices       Device[]
-  redemptions   CouponRedemption[]
-  adminActions  AdminAction[]      @relation("AdminActionBy")
-  adminHistory  AdminAction[]      @relation("AdminActionTarget")
+  roles           UserRole[]
+  refreshTokens   RefreshToken[]
+  addresses       Address[]
+  orders          Order[]
+  ownedStores     Store[]
+  courier         Courier?
+  reviews         Review[]
+  notifications   Notification[]
+  devices         Device[]
+  redemptions     CouponRedemption[]
+  adminActions    AdminAction[]      @relation("AdminActionBy")
+  adminHistory    AdminAction[]      @relation("AdminActionTarget")
+  settingsEdits   PlatformSettings[]
+  settlementsPaid StoreSettlement[]
 }
 
 model UserRole {
@@ -163,20 +165,20 @@ model RefreshToken {
 
 // Libreta de direcciones sincronizada con la app (local primero; ver PUT /users/me/addresses).
 model Address {
-  id          String    @id @default(cuid())
-  userId      String
-  clientId    String // id que genera la app; único por usuario
-  cityId      String?
-  kind        String // HOME, WORK, OTHER (AddressKind de la app)
-  label       String?
-  street      String
-  reference   String?
-  latitude    Decimal   @db.Decimal(9, 6)
-  longitude   Decimal   @db.Decimal(9, 6)
-  isDefault   Boolean   @default(false)
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  userId    String
+  clientId  String // id que genera la app; único por usuario
+  cityId    String?
+  kind      String // HOME, WORK, OTHER (AddressKind de la app)
+  label     String?
+  street    String
+  reference String?
+  latitude  Decimal   @db.Decimal(9, 6)
+  longitude Decimal   @db.Decimal(9, 6)
+  isDefault Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   city City? @relation(fields: [cityId], references: [id])
@@ -222,12 +224,13 @@ model Store {
   isAcceptingOrders Boolean   @default(true) // pausa manual del merchant
   ratingAvg         Decimal   @default(0) @db.Decimal(2, 1) // desnormalizado
   ratingCount       Int       @default(0)
+  commissionRateBps Int? // override de PlatformSettings.commissionRateBps (100 = 1 %)
   deletedAt         DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  city         City            @relation(fields: [cityId], references: [id])
-  owner        User            @relation(fields: [ownerId], references: [id])
+  city         City              @relation(fields: [cityId], references: [id])
+  owner        User              @relation(fields: [ownerId], references: [id])
   categories   StoreCategory[]
   schedules    StoreSchedule[]
   menuSections MenuSection[]
@@ -236,6 +239,7 @@ model Store {
   reviews      Review[]
   coupons      Coupon[]
   promotions   Promotion[]
+  settlements  StoreSettlement[]
 
   @@unique([cityId, slug])
   @@index([cityId, isActive])
@@ -295,9 +299,9 @@ model Product {
   variants    ProductVariant[]
   options     ProductOption[]
   orderItems  OrderItem[]
+  // búsqueda: índice GIN trigram sobre immutable_unaccent(lower(name)) (SQL manual en la migración)
 
   @@index([storeId, isAvailable])
-  // búsqueda: índice GIN trigram sobre immutable_unaccent(lower(name)) (SQL manual en la migración)
 }
 
 model ProductVariant {
@@ -367,45 +371,47 @@ model PopularSearch {
 // recalcula precios, disponibilidad y totales.
 
 model Order {
-  id             String            @id @default(cuid())
-  code           String            @unique // público y legible: "#2481" (secuencia order_code_seq)
-  idempotencyKey String?
-  customerId     String
-  storeId        String
-  courierId      String?
-  cityId         String
-  status         OrderStatus       @default(RECEIVED)
+  id                String            @id @default(cuid())
+  code              String            @unique // público y legible: "#2481" (secuencia order_code_seq)
+  idempotencyKey    String?
+  customerId        String
+  storeId           String
+  courierId         String?
+  cityId            String
+  status            OrderStatus       @default(RECEIVED)
   // snapshot de la dirección
-  addressTitle   String
-  addressStreet  String
-  addressRef     String?
-  deliveryLat    Decimal           @db.Decimal(9, 6)
-  deliveryLng    Decimal           @db.Decimal(9, 6)
+  addressTitle      String
+  addressStreet     String
+  addressRef        String?
+  deliveryLat       Decimal           @db.Decimal(9, 6)
+  deliveryLng       Decimal           @db.Decimal(9, 6)
   // snapshot del negocio
-  storeName      String
+  storeName         String
   // montos (céntimos), todos calculados por el backend
-  subtotal       Int
-  deliveryFee    Int
-  discountTotal  Int               @default(0)
-  tip            Int               @default(0)
-  taxTotal       Int               @default(0) // IGV incluido, informativo
-  total          Int
-  currency       String
-  distanceMeters Int
-  couponId       String?
-  couponCode     String?
-  paymentMethod  PaymentMethodType
-  cashChangeFor  Int? // "¿con cuánto pagas?" (solo CASH)
-  notes          String?
-  scheduledFor   DateTime? // pedido programado
-  cancelReason   String?
-  cancelledBy    Role?
-  estimatedAt    DateTime?
-  acceptedAt     DateTime? // el negocio lo aceptó (CONFIRMED): inicio de la preparación
-  readyAt        DateTime? // listo para recoger (READY)
-  deliveredAt    DateTime?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
+  subtotal          Int
+  deliveryFee       Int
+  discountTotal     Int               @default(0)
+  tip               Int               @default(0)
+  taxTotal          Int               @default(0) // IGV incluido, informativo
+  total             Int
+  currency          String
+  // comisión de Apamuy sobre `subtotal` al crear el pedido; null = pedido anterior a la comisión
+  commissionRateBps Int?
+  distanceMeters    Int
+  couponId          String?
+  couponCode        String?
+  paymentMethod     PaymentMethodType
+  cashChangeFor     Int? // "¿con cuánto pagas?" (solo CASH)
+  notes             String?
+  scheduledFor      DateTime? // pedido programado
+  cancelReason      String?
+  cancelledBy       Role?
+  estimatedAt       DateTime?
+  acceptedAt        DateTime? // el negocio lo aceptó (CONFIRMED): inicio de la preparación
+  readyAt           DateTime? // listo para recoger (READY)
+  deliveredAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 
   customer      User                 @relation(fields: [customerId], references: [id], onDelete: Restrict)
   store         Store                @relation(fields: [storeId], references: [id])
@@ -425,6 +431,7 @@ model Order {
   @@index([courierId, status])
   @@index([cityId, status]) // tablero en vivo del admin
   @@index([cityId, createdAt]) // historial del admin
+  @@index([deliveredAt]) // caja y liquidaciones
 }
 
 model OrderItem {
@@ -605,4 +612,36 @@ model AdminAction {
   user      User     @relation("AdminActionTarget", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+// ───────────────────────── Comisión y liquidaciones ─────────────────────────
+
+// Una sola fila (id = 1): parámetros globales que edita el admin.
+model PlatformSettings {
+  id                Int      @id @default(1)
+  commissionRateBps Int // comisión por defecto sobre el subtotal de productos (1000 = 10 %)
+  updatedById       String?
+  updatedAt         DateTime @updatedAt
+  updatedBy         User?    @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+// Una semana (lunes a domingo, hora local) liquidada a un negocio. Las cifras
+// quedan como se pagaron, aunque después cambie algo.
+model StoreSettlement {
+  id               String   @id @default(cuid())
+  storeId          String
+  weekStart        DateTime @db.Date // lunes
+  deliveredCount   Int
+  sales            Int
+  commission       Int
+  collectedByStore Int
+  balance          Int // > 0: Apamuy le paga al negocio; < 0: el negocio le paga a Apamuy
+  currency         String
+  paidById         String?
+  paidAt           DateTime @default(now())
+  store            Store    @relation(fields: [storeId], references: [id])
+  paidBy           User?    @relation(fields: [paidById], references: [id], onDelete: SetNull)
+
+  @@unique([storeId, weekStart])
+  @@index([weekStart])
 }

@@ -22,6 +22,8 @@ import { UpdateStoreStatusDto } from './dto/update-store-status.dto';
 import { BOARD_LIMIT, groupBoard } from './merchant-board';
 import { actorOf, ownerOf } from './merchant-actor';
 import { MerchantService } from './merchant.service';
+import { AdminSettlementsService } from '../admin/settlements/admin-settlements.service';
+import { MerchantSettlementsQueryDto, SettlementWeekQueryDto } from '../admin/settlements/settlements.dto';
 
 /**
  * Operación del negocio (app Apamuy Socios): ver sus pedidos, aceptarlos con
@@ -38,6 +40,7 @@ export class MerchantController {
     private readonly orders: OrdersService,
     private readonly status: OrderStatusService,
     private readonly merchant: MerchantService,
+    private readonly settlements: AdminSettlementsService,
   ) {}
 
   @Get('stores')
@@ -127,5 +130,20 @@ export class MerchantController {
   @Get('settlement')
   settlement(@CurrentUser() user: AuthUser, @Query() query: MerchantReportQueryDto) {
     return this.merchant.settlement(query.from, query.to, ownerOf(user), query.storeId);
+  }
+
+  /** Liquidación semanal de sus negocios (lunes a domingo): vendido, comisión y saldo. Solo lectura. */
+  @Get('settlements')
+  weeklySettlements(@CurrentUser() user: AuthUser, @Query() query: MerchantSettlementsQueryDto) {
+    return this.settlements.week(query.week, { ownerId: ownerOf(user), storeId: query.storeId });
+  }
+
+  @Get('settlements/:storeId')
+  weeklySettlement(
+    @CurrentUser() user: AuthUser,
+    @Param('storeId') storeId: string,
+    @Query() query: SettlementWeekQueryDto,
+  ) {
+    return this.settlements.detail(storeId, query.week, ownerOf(user));
   }
 }

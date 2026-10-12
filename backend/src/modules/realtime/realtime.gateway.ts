@@ -127,11 +127,19 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection {
 
   @OnEvent(COURIER_MOVED)
   onCourierMoved(event: CourierMovedEvent) {
-    this.server.to(rooms.order(event.orderId)).emit('courier.location', {
-      orderId: event.orderId,
+    const at = event.at.toISOString();
+    if (event.orderId) {
+      this.server
+        .to(rooms.order(event.orderId))
+        .emit('courier.location', { orderId: event.orderId, lat: event.lat, lng: event.lng, at });
+    }
+    // El mapa de Pedidos en vivo filtra por ciudad en el cliente.
+    this.server.to(rooms.admin).emit('admin.courier.moved', {
+      courierId: event.courierId,
+      cityId: event.cityId,
       lat: event.lat,
       lng: event.lng,
-      at: event.at.toISOString(),
+      at,
     });
   }
 }

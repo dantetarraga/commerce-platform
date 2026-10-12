@@ -21,6 +21,8 @@ interface AccessPayload {
 const ACCESS_AUDIENCE = 'access';
 const REGISTRATION_AUDIENCE = 'registration';
 const REGISTRATION_TTL_SECONDS = 15 * 60;
+/** Cuánto se tolera repetir una rotación cuya respuesta no llegó. */
+export const ROTATION_GRACE_MS = 30_000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export const sha256 = (value: string) => createHash('sha256').update(value).digest('hex');
@@ -60,6 +62,8 @@ export class TokensService {
     if (!stored) throw invalidRefresh();
 
     if (stored.revokedAt) {
+      const retried = await this.retryLostRotation(stored, userAgent);
+      if (retried) return retried;
       await this.revokeFamily(stored.familyId);
       throw invalidRefresh();
     }
@@ -80,6 +84,37 @@ export class TokensService {
     }
 
     const next = await this.createRefreshToken(stored.userId, stored.familyId, userAgent);
+    await this.prisma.refreshToken.update({ where: { id: stored.id }, data: { replacedById: next.id } });
+    const user = { id: stored.userId, roles: stored.user.roles.map((r) => r.role) };
+    return { accessToken: await this.signAccess(user), refreshToken: next.refreshToken };
+  }
+
+  /**
+   * Con mala señal la respuesta de una rotación se puede perder y la app reintenta con
+   * el token anterior. Si fue hace menos de [ROTATION_GRACE_MS] y su reemplazo nunca se
+   * usó, se descarta ese reemplazo y se entrega otro, sin cerrar la sesión. Fuera de
+   * eso sigue siendo reuso.
+   */
+  private async retryLostRotation(
+    stored: {
+      id: string;
+      userId: string;
+      familyId: string;
+      revokedAt: Date | null;
+      replacedById: string | null;
+      user: { roles: { role: Role }[] };
+    },
+    userAgent?: string,
+  ): Promise<SessionTokens | null> {
+    if (!stored.replacedById || !stored.revokedAt) return null;
+    if (Date.now() - stored.revokedAt.getTime() > ROTATION_GRACE_MS) return null;
+    const { count } = await this.prisma.refreshToken.updateMany({
+      where: { id: stored.replacedById, revokedAt: null, replacedById: null },
+      data: { revokedAt: new Date() },
+    });
+    if (count === 0) return null;
+    const next = await this.createRefreshToken(stored.userId, stored.familyId, userAgent);
+    // El descartado queda sin reemplazo: si alguien lo usa, es reuso y cae la sesión.
     await this.prisma.refreshToken.update({ where: { id: stored.id }, data: { replacedById: next.id } });
     const user = { id: stored.userId, roles: stored.user.roles.map((r) => r.role) };
     return { accessToken: await this.signAccess(user), refreshToken: next.refreshToken };

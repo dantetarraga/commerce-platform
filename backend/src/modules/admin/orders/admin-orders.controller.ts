@@ -21,6 +21,12 @@ export class AdminOrdersController {
     return this.orders.board(query.cityId);
   }
 
+  /** Repartidores conectados con su última ubicación y el pedido que llevan, para el mapa. */
+  @Get('couriers')
+  couriers(@Query() query: AdminBoardQueryDto) {
+    return this.orders.couriers(query.cityId);
+  }
+
   /** Pedidos de un día (hoy por defecto), con cursor. */
   @Get()
   list(@Query() query: AdminOrdersQueryDto) {

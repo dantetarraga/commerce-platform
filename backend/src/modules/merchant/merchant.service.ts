@@ -65,15 +65,19 @@ export class MerchantService {
     if (!store) throw AppException.notFound('No encontramos ese negocio.');
 
     const where = { storeId, deletedAt: null };
-    const [available, soldOut, matching] = await Promise.all([
+    const noPhotoWhere = { OR: [{ imageUrl: null }, { imageUrl: '' }] };
+    const [available, soldOut, noPhoto, matching] = await Promise.all([
       this.prisma.product.count({ where: { ...where, isAvailable: true } }),
       this.prisma.product.count({ where: { ...where, isAvailable: false } }),
+      this.prisma.product.count({ where: { ...where, ...noPhotoWhere } }),
       query.q ? matchingProductIds(this.prisma, storeId, query.q) : null,
     ]);
     const products = await this.prisma.product.findMany({
       where: {
         ...where,
-        ...(query.status !== 'all' && { isAvailable: query.status === 'available' }),
+        ...(query.status === 'available' && { isAvailable: true }),
+        ...(query.status === 'sold_out' && { isAvailable: false }),
+        ...(query.status === 'no_photo' && noPhotoWhere),
         ...(matching && { id: { in: [...matching] } }),
       },
       orderBy: [{ menuSection: { sortOrder: 'asc' } }, { sortOrder: 'asc' }, { name: 'asc' }],
@@ -101,7 +105,7 @@ export class MerchantService {
     }
     if (others.length > 0) sections.push({ name: 'Otros', items: others });
 
-    return { counts: { all: available + soldOut, available, soldOut }, sections };
+    return { counts: { all: available + soldOut, available, soldOut, noPhoto }, sections };
   }
 
   /** Marca un producto disponible o agotado. Uno de otro negocio responde 404. */

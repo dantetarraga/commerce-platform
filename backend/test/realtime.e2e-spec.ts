@@ -12,6 +12,7 @@ import { createTestApp } from './test-app';
 const CHASKI_OWNER = '910000000'; // dueño de st_chaski_dorado
 const LUIS = '900000101'; // courier
 const YENI = '900000102'; // courier
+const ADMIN = '900000001';
 
 const STORE = 'st_chaski_dorado';
 const ALL_DAY = Array.from({ length: 7 }, (_, dayOfWeek) => ({ dayOfWeek, opensAt: 0, closesAt: 1440 }));
@@ -147,11 +148,25 @@ describe('Tiempo real (e2e)', () => {
       .expect(200);
     await onTheWay;
 
+    const admin = await sessionFor(app, ADMIN);
+    const operator = await connect(admin);
     const moved = next(buyer, 'courier.location');
+    const onMap = next(operator, 'admin.courier.moved');
     await http().post(`${API}/courier/me/location`).set(luis.auth).send({ lat: -14.79, lng: -71.41 }).expect(204);
     expect(await moved).toMatchObject({ orderId: order.id, lat: -14.79, lng: -71.41 });
+    expect(await onMap).toMatchObject({ lat: -14.79, lng: -71.41, cityId: expect.any(String) });
     // Un segundo envío inmediato se ignora (se guarda uno cada 2 s).
     await http().post(`${API}/courier/me/location`).set(luis.auth).send({ lat: 0, lng: 0 }).expect(204);
+
+    // El mapa de Pedidos en vivo muestra al repartidor con el pedido que lleva.
+    const map = await http().get(`${API}/admin/orders/couriers`).set(admin.auth).expect(200);
+    const onDuty = map.body.items.find((c: { phone: string }) => c.phone === LUIS);
+    expect(onDuty).toMatchObject({
+      status: expect.any(String),
+      location: { lat: -14.79, lng: -71.41, stale: false },
+      order: { id: order.id, status: 'ON_THE_WAY', storeName: expect.any(String) },
+    });
+    await http().get(`${API}/admin/orders/couriers`).set(merchant.auth).expect(403);
 
     const tracking = await http().get(`${API}/orders/${order.id}`).set(customer.auth).expect(200);
     expect(tracking.body.courier.location).toMatchObject({ lat: -14.79, lng: -71.41 });

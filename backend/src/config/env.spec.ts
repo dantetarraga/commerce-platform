@@ -29,6 +29,20 @@ describe('validateEnv', () => {
     expect(() => validateEnv({ ...base, SMS_PROVIDER: 'twilio' })).toThrow(/TWILIO_ACCOUNT_SID/);
   });
 
+  it('R2 sin credenciales no arranca', () => {
+    expect(() => validateEnv({ ...base, STORAGE_PROVIDER: 'r2' })).toThrow(/R2_BUCKET/);
+    const env = validateEnv({
+      ...base,
+      STORAGE_PROVIDER: 'r2',
+      R2_ACCOUNT_ID: 'a'.repeat(32),
+      R2_ACCESS_KEY_ID: 'k'.repeat(32),
+      R2_SECRET_ACCESS_KEY: 's'.repeat(64),
+      R2_BUCKET: 'apamuy-images',
+      R2_PUBLIC_URL: 'https://img.apamuy.pe/',
+    });
+    expect(env.R2_PUBLIC_URL).toBe('https://img.apamuy.pe');
+  });
+
   it('el secreto del OTP no puede ser el del JWT', () => {
     expect(() => validateEnv({ ...base, OTP_SECRET: base.JWT_ACCESS_SECRET })).toThrow(/OTP_SECRET/);
   });

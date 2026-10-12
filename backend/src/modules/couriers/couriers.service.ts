@@ -98,9 +98,14 @@ export class CouriersService {
       where: { courierId: courier.id, status: OrderStatus.ON_THE_WAY },
       select: { id: true },
     });
-    if (order) {
-      this.events.emit(COURIER_MOVED, { orderId: order.id, lat, lng, at: now } satisfies CourierMovedEvent);
-    }
+    this.events.emit(COURIER_MOVED, {
+      courierId: courier.id,
+      cityId: courier.cityId,
+      orderId: order?.id ?? null,
+      lat,
+      lng,
+      at: now,
+    } satisfies CourierMovedEvent);
   }
 
   /** Entregas de ese día (hora local) y lo cobrado, por método. */

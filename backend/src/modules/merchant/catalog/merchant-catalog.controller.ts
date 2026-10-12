@@ -3,8 +3,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '../../../common/decorators/auth.decorators';
 import type { AuthUser } from '../../../common/decorators/auth.decorators';
 import { Role } from '../../../generated/prisma/enums';
+import { CatalogImportDto } from '../../admin/catalog/import/catalog-import.dto';
 import { ProductDto, UpdateProductDto } from '../../admin/catalog/product.dto';
-import { ReplaceSchedulesDto, SectionDto, UpdateSectionDto } from '../../admin/catalog/store.dto';
+import { ReplaceSchedulesDto, SectionDto, SectionOrderDto, UpdateSectionDto } from '../../admin/catalog/store.dto';
 import { ownerOf } from '../merchant-actor';
 import { MerchantStoreProfileDto } from './merchant-catalog.dto';
 import { MerchantCatalogService } from './merchant-catalog.service';
@@ -39,6 +40,12 @@ export class MerchantCatalogController {
     return this.catalog.createSection(id, dto, ownerOf(user));
   }
 
+  /** Todas las secciones, en el orden nuevo. */
+  @Put('stores/:id/sections/order')
+  reorderSections(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dto: SectionOrderDto) {
+    return this.catalog.reorderSections(id, dto.sectionIds, ownerOf(user));
+  }
+
   @Patch('sections/:id')
   updateSection(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dto: UpdateSectionDto) {
     return this.catalog.updateSection(id, dto, ownerOf(user));
@@ -53,6 +60,13 @@ export class MerchantCatalogController {
   @Post('stores/:id/products')
   createProduct(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dto: ProductDto) {
     return this.catalog.createProduct(id, dto, ownerOf(user));
+  }
+
+  /** Carga masiva desde Excel o CSV; con `dryRun` solo revisa. */
+  @Post('stores/:id/products/import')
+  @HttpCode(HttpStatus.OK)
+  importProducts(@CurrentUser() user: AuthUser, @Param('id') id: string, @Body() dto: CatalogImportDto) {
+    return this.catalog.importProducts(id, dto, ownerOf(user));
   }
 
   @Get('products/:id')

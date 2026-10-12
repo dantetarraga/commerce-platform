@@ -118,11 +118,28 @@ describe('Auth (e2e)', () => {
     const rotated = await http().post(`${API}/auth/refresh`).send({ refreshToken: first }).expect(200);
     expect(rotated.body).toEqual({ accessToken: expect.any(String), refreshToken: expect.any(String) });
     expect(rotated.body.refreshToken).not.toBe(first);
+    // El nuevo se usa: desde ahí, el viejo ya no se tolera.
+    const current = await http()
+      .post(`${API}/auth/refresh`)
+      .send({ refreshToken: rotated.body.refreshToken })
+      .expect(200);
 
     const reuse = await http().post(`${API}/auth/refresh`).send({ refreshToken: first }).expect(401);
     expect(reuse.body.code).toBe('INVALID_REFRESH_TOKEN');
-    // Toda la familia quedó revocada, incluido el token nuevo.
-    await http().post(`${API}/auth/refresh`).send({ refreshToken: rotated.body.refreshToken }).expect(401);
+    // Toda la familia quedó revocada, incluido el token vigente.
+    await http().post(`${API}/auth/refresh`).send({ refreshToken: current.body.refreshToken }).expect(401);
+  });
+
+  it('si se perdió la respuesta de una rotación, repetirla al toque no cierra la sesión', async () => {
+    const first = (await signUp()).refreshToken;
+    const lost = await http().post(`${API}/auth/refresh`).send({ refreshToken: first }).expect(200);
+
+    // La app nunca vio `lost` y reintenta con el anterior.
+    const retried = await http().post(`${API}/auth/refresh`).send({ refreshToken: first }).expect(200);
+    expect(retried.body.refreshToken).not.toBe(lost.body.refreshToken);
+    // El reentregado sirve; el que se perdió ya no (y usarlo cuenta como robo).
+    await http().post(`${API}/auth/refresh`).send({ refreshToken: retried.body.refreshToken }).expect(200);
+    await http().post(`${API}/auth/refresh`).send({ refreshToken: lost.body.refreshToken }).expect(401);
   });
 
   it('logout es idempotente y revoca el refresh token', async () => {
@@ -130,6 +147,38 @@ describe('Auth (e2e)', () => {
     await http().post(`${API}/auth/logout`).send({ refreshToken }).expect(204);
     await http().post(`${API}/auth/logout`).send({ refreshToken }).expect(204);
     await http().post(`${API}/auth/refresh`).send({ refreshToken }).expect(401);
+  });
+
+  it('el panel web recibe el refresh token en una cookie httpOnly, no en el cuerpo', async () => {
+    const web = { 'X-Apamuy-Client': 'web' };
+    const phone = String(nextPhone++);
+    const { body } = await verify(phone);
+    const registered = await http()
+      .post(`${API}/auth/register`)
+      .set(web)
+      .send({ registrationToken: body.registrationToken, firstName: 'Web', lastName: 'Panel' })
+      .expect(201);
+    expect(registered.body.refreshToken).toBeUndefined();
+    const cookieOf = (res: { headers: Record<string, unknown> }) => {
+      const header = ([] as string[]).concat((res.headers['set-cookie'] as string[] | undefined) ?? []);
+      return header.find((c) => c.startsWith('apamuy_rt='));
+    };
+    const first = cookieOf(registered)!;
+    expect(first).toMatch(/HttpOnly/);
+    expect(first).toMatch(/Path=\/api\/v1\/auth/);
+
+    const pair = first.split(';')[0];
+    const rotated = await http().post(`${API}/auth/refresh`).set(web).set('Cookie', pair).send({}).expect(200);
+    expect(rotated.body).toEqual({ accessToken: expect.any(String) });
+    const second = cookieOf(rotated)!.split(';')[0];
+    expect(second).not.toBe(pair);
+
+    // Sin la cabecera del panel la cookie no cuenta (un sitio ajeno no puede usarla).
+    await http().post(`${API}/auth/refresh`).set('Cookie', second).send({}).expect(401);
+
+    const out = await http().post(`${API}/auth/logout`).set(web).set('Cookie', second).send({}).expect(204);
+    expect(cookieOf(out)).toMatch(/Expires=Thu, 01 Jan 1970/);
+    await http().post(`${API}/auth/refresh`).set(web).set('Cookie', second).send({}).expect(401);
   });
 
   it('PATCH /users/me no deja cambiar roles ni teléfono', async () => {

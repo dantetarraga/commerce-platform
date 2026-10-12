@@ -130,3 +130,22 @@ export function toStaffOrderResponse(order: OrderWithDetails) {
         : null,
   };
 }
+
+/** ~110 m: alcanza para estimar la distancia sin señalar la casa. */
+const roughly = (value: number) => Math.round(value * 1000) / 1000;
+
+/**
+ * Lo que ve un repartidor antes de aceptar: el negocio, la distancia y la ganancia,
+ * pero no el celular, la dirección exacta ni el apellido del cliente (Ley 29733).
+ * Al aceptar recibe el pedido completo.
+ */
+export function toCourierOfferResponse(order: OrderWithDetails) {
+  const staff = toStaffOrderResponse(order);
+  const near = { lat: roughly(staff.deliveryLocation.lat), lng: roughly(staff.deliveryLocation.lng) };
+  return {
+    ...staff,
+    customer: { name: order.customer.firstName, phone: '' },
+    address: { title: '', street: '', reference: '', location: near },
+    deliveryLocation: near,
+  };
+}

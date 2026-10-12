@@ -3,6 +3,8 @@ import { AppException } from '../../../common/exceptions/app.exception';
 import { PrismaService } from '../../../database/prisma.service';
 import { AdminProductsService } from '../../admin/catalog/admin-products.service';
 import { AdminStoresService } from '../../admin/catalog/admin-stores.service';
+import { CatalogImportDto } from '../../admin/catalog/import/catalog-import.dto';
+import { CatalogImportService } from '../../admin/catalog/import/catalog-import.service';
 import { ProductDto, UpdateProductDto } from '../../admin/catalog/product.dto';
 import { OpeningHoursDto, SectionDto, UpdateSectionDto } from '../../admin/catalog/store.dto';
 import { MerchantStoreProfileDto } from './merchant-catalog.dto';
@@ -18,6 +20,7 @@ export class MerchantCatalogService {
     private readonly prisma: PrismaService,
     private readonly stores: AdminStoresService,
     private readonly products: AdminProductsService,
+    private readonly importer: CatalogImportService,
   ) {}
 
   async store(storeId: string, ownerId?: string) {
@@ -40,6 +43,11 @@ export class MerchantCatalogService {
     return this.stores.createSection(storeId, dto);
   }
 
+  async reorderSections(storeId: string, sectionIds: string[], ownerId?: string) {
+    await this.ownStore(storeId, ownerId);
+    return this.stores.reorderSections(storeId, sectionIds);
+  }
+
   async updateSection(sectionId: string, dto: UpdateSectionDto, ownerId?: string) {
     await this.ownSection(sectionId, ownerId);
     return this.stores.updateSection(sectionId, dto);
@@ -53,6 +61,11 @@ export class MerchantCatalogService {
   async createProduct(storeId: string, dto: ProductDto, ownerId?: string) {
     await this.ownStore(storeId, ownerId);
     return this.products.create(storeId, dto);
+  }
+
+  async importProducts(storeId: string, dto: CatalogImportDto, ownerId?: string) {
+    await this.ownStore(storeId, ownerId);
+    return this.importer.run(storeId, dto);
   }
 
   async product(productId: string, ownerId?: string) {

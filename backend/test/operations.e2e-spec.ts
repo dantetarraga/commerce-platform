@@ -116,8 +116,14 @@ describe('Operación del pedido (e2e)', () => {
     // Listo: aparece para los repartidores; lo toma uno solo.
     const available = await http().get(`${API}/courier/orders/available`).set(luis.auth).expect(200);
     expect(available.body.items.map((o: { id: string }) => o.id)).toContain(order.id);
+    // Antes de aceptar no ve el celular ni la dirección exacta del cliente.
+    const offer = available.body.items.find((o: { id: string }) => o.id === order.id);
+    expect(offer.customer.phone).toBe('');
+    expect(offer.address).toMatchObject({ street: '', reference: '' });
+    expect(offer.customer.name).not.toContain(' ');
 
     const accepted = await http().post(`${API}/courier/orders/${order.id}/accept`).set(luis.auth).expect(200);
+    expect(accepted.body.customer.phone).toMatch(/^9\d{8}$/);
     expect(accepted.body).toMatchObject({
       status: 'COURIER_ASSIGNED',
       courier: { name: 'Luis Quispe', vehicle: 'Moto roja', since: 2023 },

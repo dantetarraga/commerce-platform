@@ -182,6 +182,15 @@ export class SectionDto {
 
 export class UpdateSectionDto extends PartialType(SectionDto) {}
 
+/** Todas las secciones del negocio, en el orden en que el cliente las ve. */
+export class SectionOrderDto {
+  @IsArray()
+  @ArrayMaxSize(200)
+  @ArrayUnique()
+  @IsString({ each: true })
+  sectionIds!: string[];
+}
+
 export class CategoryDto {
   @Transform(trim)
   @IsString()

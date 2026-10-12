@@ -30,6 +30,7 @@ import { PromotionsModule } from './modules/promotions/promotions.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { SearchModule } from './modules/search/search.module';
 import { StoresModule } from './modules/stores/stores.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 import { UsersModule } from './modules/users/users.module';
 
 const REQUEST_ID = /^[\w-]{8,64}$/;
@@ -80,6 +81,7 @@ const REQUEST_ID = /^[\w-]{8,64}$/;
     RealtimeModule,
     AuthModule,
     UsersModule,
+    UploadsModule,
     AdminModule,
     CitiesModule,
     CategoriesModule,

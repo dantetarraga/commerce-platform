@@ -193,7 +193,7 @@ describe('Apamuy Socios: negocio (e2e)', () => {
 
   it('productos: lista con precio y sección, marcar agotado; los de otro negocio dan 404', async () => {
     type Catalog = {
-      counts: { all: number; available: number; soldOut: number };
+      counts: { all: number; available: number; soldOut: number; noPhoto: number };
       sections: { name: string; items: { id: string; name: string; isAvailable: boolean }[] }[];
     };
     const catalog = async (query: object = {}) =>
@@ -232,8 +232,16 @@ describe('Apamuy Socios: negocio (e2e)', () => {
       all: all.counts.all,
       available: all.counts.available - 1,
       soldOut: all.counts.soldOut + 1,
+      noPhoto: all.counts.noPhoto,
     });
     expect(ids(await catalog({ status: 'available' }))).not.toContain('pr_pollo_medio');
+    const { imageUrl } = await prisma.product.findUniqueOrThrow({ where: { id: 'pr_pollo_medio' } });
+    await prisma.product.update({ where: { id: 'pr_pollo_medio' }, data: { imageUrl: null } });
+    const noPhoto = await catalog({ status: 'no_photo' });
+    expect(ids(noPhoto)).toContain('pr_pollo_medio');
+    expect(ids(noPhoto)).toHaveLength(noPhoto.counts.noPhoto);
+    expect(noPhoto.counts.noPhoto).toBe(all.counts.noPhoto + 1);
+    await prisma.product.update({ where: { id: 'pr_pollo_medio' }, data: { imageUrl } });
     // Sin tildes ni mayúsculas.
     expect(ids(await catalog({ q: 'POLLO A LA BRASA' }))).toContain('pr_pollo_medio');
     expect(ids(await catalog({ q: 'ninguno-asi' }))).toEqual([]);

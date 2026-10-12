@@ -88,6 +88,8 @@ const POPULAR_SEARCHES = [
 
 export async function seed(prisma: PrismaClient): Promise<void> {
   await prisma.city.upsert({ where: { id: CITY.id }, create: CITY, update: CITY });
+  // Solo la crea: la comisión que fijó el admin no se pisa al volver a sembrar.
+  await prisma.platformSettings.upsert({ where: { id: 1 }, create: { commissionRateBps: 1000 }, update: {} });
 
   for (const [sortOrder, c] of catalog.categories.entries()) {
     const data = { name: c.name, slug: c.slug, iconUrl: c.iconUrl, sortOrder };
@@ -254,7 +256,27 @@ async function seedProduct(prisma: PrismaClient, productId: string, menuSectionI
   }
 }
 
+/**
+ * El seed trae admin, repartidores y dueños con celulares de prueba y cupones
+ * hasta 2030: en una base real, cualquiera con esos números entraría con esos
+ * roles. Solo corre contra una base local, salvo SEED_ALLOW_REMOTE=true (staging).
+ */
+export function seedAllowed(databaseUrl: string | undefined, allowRemote = process.env.SEED_ALLOW_REMOTE) {
+  if (allowRemote === 'true') return true;
+  try {
+    return ['localhost', '127.0.0.1', '::1', 'postgres'].includes(new URL(databaseUrl ?? '').hostname);
+  } catch {
+    return false;
+  }
+}
+
 if (require.main === module) {
+  if (!seedAllowed(process.env.DATABASE_URL)) {
+    console.error(
+      'El seed es de demo y la base no es local. Para producción usa `npm run db:bootstrap` (crea solo el admin).',
+    );
+    process.exit(1);
+  }
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
   seed(prisma)
     .then(() => console.log('Seed listo.'))

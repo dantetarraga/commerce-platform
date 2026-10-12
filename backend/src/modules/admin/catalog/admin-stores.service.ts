@@ -139,6 +139,24 @@ export class AdminStoresService {
     return { id, name, sortOrder };
   }
 
+  /** Pide todas las secciones del negocio: así nunca quedan dos con el mismo orden. */
+  async reorderSections(storeId: string, sectionIds: string[]) {
+    await this.findStore(storeId);
+    const current = await this.prisma.menuSection.findMany({ where: { storeId }, select: { id: true } });
+    const known = new Set(current.map((s) => s.id));
+    if (sectionIds.length !== known.size || sectionIds.some((id) => !known.has(id))) {
+      throw invalid({ sectionIds: 'Manda todas las secciones del negocio, una vez cada una.' });
+    }
+    await this.prisma.$transaction(
+      sectionIds.map((id, sortOrder) => this.prisma.menuSection.update({ where: { id }, data: { sortOrder } })),
+    );
+    return this.prisma.menuSection.findMany({
+      where: { storeId },
+      orderBy: { sortOrder: 'asc' },
+      select: { id: true, name: true, sortOrder: true },
+    });
+  }
+
   /** Sus productos quedan sin sección (siguen en la carta). */
   async removeSection(id: string) {
     await this.findSection(id);

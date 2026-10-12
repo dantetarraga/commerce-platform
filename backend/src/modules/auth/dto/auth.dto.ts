@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsString, Length, Matches } from 'class-validator';
+import { IsOptional, IsString, Length, Matches } from 'class-validator';
 
 const stripSeparators = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.replace(/[\s-]/g, '') : value;
@@ -36,8 +36,10 @@ export class RegisterDto {
   lastName!: string;
 }
 
+/** Sin `refreshToken`, el panel web lo manda en la cookie. */
 export class RefreshTokenDto {
+  @IsOptional()
   @IsString()
   @Length(1, 200)
-  refreshToken!: string;
+  refreshToken?: string;
 }

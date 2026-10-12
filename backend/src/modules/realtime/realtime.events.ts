@@ -14,8 +14,11 @@ export interface OrderChangedEvent {
   status: OrderStatus;
 }
 
+/** [orderId] solo si va en camino con un pedido (lo ve ese cliente); el admin ve todos. */
 export interface CourierMovedEvent {
-  orderId: string;
+  courierId: string;
+  cityId: string;
+  orderId: string | null;
   lat: number;
   lng: number;
   at: Date;

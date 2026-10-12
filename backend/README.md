@@ -35,6 +35,26 @@ En debug, Android permite `http`; iOS lo permite solo hacia la red local.
 
 `PUSH_PROVIDER=log` (por defecto) escribe los avisos en el log. Para enviarlos de verdad: `PUSH_PROVIDER=fcm` y `FCM_SERVICE_ACCOUNT_BASE64` con la cuenta de servicio de Firebase en base64 (`base64 -w0 cuenta.json`). La app registra el teléfono en `PUT /users/me/devices`; ver `mobile/README.md`.
 
+### Fotos en Cloudflare R2
+
+`STORAGE_PROVIDER=none` (por defecto) apaga la subida: el panel deja pegar una URL. Con `r2`, el panel y el Portal Socios piden a `POST /uploads/images` una URL firmada (5 minutos, con tipo y tamaño fijos) y suben la foto directo al bucket. La API no recibe el archivo. Después se guarda la `publicUrl` en el producto, negocio o banner.
+
+1. En Cloudflare, **R2 → Create bucket** (`apamuy-images`).
+2. **Settings → Public access → Custom domain**: un subdominio propio (`img.apamuy.pe`). Mientras no haya dominio sirve el `r2.dev` de desarrollo, que tiene límite de tráfico.
+3. **Settings → CORS policy**, para que el navegador pueda hacer el `PUT`:
+
+   ```json
+   [{ "AllowedOrigins": ["https://panel.apamuy.pe", "http://localhost:5173"],
+      "AllowedMethods": ["PUT"],
+      "AllowedHeaders": ["content-type", "cache-control"],
+      "MaxAgeSeconds": 3600 }]
+   ```
+
+4. **R2 → Manage API tokens → Create API token**: permiso *Object Read & Write* solo sobre ese bucket.
+5. Variables: `R2_ACCOUNT_ID` (en la portada de R2), `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` y `R2_PUBLIC_URL` (`https://img.apamuy.pe`).
+
+Cada foto tiene una key nueva (`stores/<id>/products/<uuid>.webp`) y se sirve con `Cache-Control: immutable`. Cambiar la foto no borra la anterior; la limpieza está en `docs/PENDIENTES.md`.
+
 ### Entrar sin SMS
 
 En desarrollo `SMS_PROVIDER=log`: el código se escribe en el log, y con
@@ -112,6 +132,8 @@ Prefijo `/api/v1`. Errores siempre como
 | PATCH | `/merchant/stores/:id` `{ isAcceptingOrders }` | Bearer (MERCHANT, ADMIN) |
 | GET | `/courier/orders/available`, `/courier/orders` | Bearer (COURIER) |
 | POST | `/courier/orders/:id/accept`, `/courier/orders/:id/status` `{ status: ON_THE_WAY\|DELIVERED }` | Bearer (COURIER) |
+| POST | `/uploads/images` `{ purpose, storeId?, contentType, size }` → `{ uploadUrl, headers, publicUrl }` (503 `STORAGE_NOT_CONFIGURED` sin R2) | Bearer (MERCHANT, ADMIN) |
+| POST | `/merchant/catalog/stores/:id/products/import` y `/admin/stores/:id/products/import` `{ rows, dryRun? }` → resumen por fila | Bearer (MERCHANT, ADMIN) |
 | GET | `/notifications?cursor=&limit=` → `{ items, nextCursor, unreadCount }`; POST `/notifications/read-all` | Bearer |
 | GET | `/health` | pública |
 
@@ -157,6 +179,7 @@ retiró `railway.toml` para servicios nuevos.
    | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | de la consola de Twilio |
    | `TWILIO_MESSAGING_SERVICE_SID` | el Messaging Service (`MG…`) |
    | `FCM_SERVICE_ACCOUNT_BASE64` | la cuenta de servicio de Firebase en base64 |
+   | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL` | del bucket de fotos (ver "Fotos en Cloudflare R2") |
 
    Railway pone `PORT` solo. Si falta o está mal una variable, la API no
    arranca y el log dice cuál. Una variable nueva se agrega también en
@@ -164,9 +187,13 @@ retiró `railway.toml` para servicios nuevos.
 5. **Dominio:** *Settings → Networking → Generate Domain* (el dominio de
    Railway no se declara en `railway.ts`). Revisa
    `https://<dominio>/api/v1/health`.
-6. **Datos iniciales (opcional):** el seed de Espinar se corre desde tu
-   máquina contra la URL pública de la base:
-   `DATABASE_URL="<URL pública de Postgres>" npm run db:seed`.
+6. **Primer admin:** desde tu máquina, contra la URL pública de la base:
+   `ADMIN_PHONE=9XXXXXXXX ADMIN_FIRST_NAME=Nombre ADMIN_LAST_NAME=Apellido DATABASE_URL="<URL pública de Postgres>" npm run db:bootstrap`.
+   Con ese celular entras al panel y das de alta la ciudad, los negocios y
+   los repartidores. **No corras `db:seed` en producción**: trae usuarios con
+   celulares de prueba (900000001 es admin) y cupones de demo; por eso se
+   niega con una base que no sea local (`SEED_ALLOW_REMOTE=true` solo para
+   un staging desechable).
 7. **App:** un `env/prod.json` con `USE_FAKE_DATA: false` y
    `API_BASE_URL: https://<dominio>/api/v1`.
 
